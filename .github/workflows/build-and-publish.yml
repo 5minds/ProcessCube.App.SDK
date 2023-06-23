@@ -8,16 +8,6 @@ on:
 
 env:
   CI_TOOLS_VERSION: '^4.0.0'
-name: Node CI
-
-on:
-  push:
-    branches:
-      - '*'
-      - '*/*'
-
-env:
-  CI_TOOLS_VERSION: '4.0.3'
   # NOTE: Um den Releasezyklus von Alpha nach Beta zu ändern, einfach die nachfolgend deklarierten Env Variablen switchen.
   CI_TOOLS_ALPHA_BRANCH: next
   CI_TOOLS_ALPHA_NPM_TAG: next
