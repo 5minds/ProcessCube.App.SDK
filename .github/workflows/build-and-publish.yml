@@ -1,0 +1,71 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - '*'
+      - '*/*'
+
+env:
+  CI_TOOLS_VERSION: '^4.0.0'
+name: Node CI
+
+on:
+  push:
+    branches:
+      - '*'
+      - '*/*'
+
+env:
+  CI_TOOLS_VERSION: '4.0.3'
+  # NOTE: Um den Releasezyklus von Alpha nach Beta zu ändern, einfach die nachfolgend deklarierten Env Variablen switchen.
+  CI_TOOLS_ALPHA_BRANCH: next
+  CI_TOOLS_ALPHA_NPM_TAG: next
+  CI_TOOLS_STABLE_BRANCH: main
+  # CI_TOOLS_BETA_BRANCH: next
+  # CI_TOOLS_BETA_NPM_TAG: next
+
+jobs:
+  build_and_publish:
+    name: 'Build and publish sources'
+    runs-on: ubuntu-latest
+    if: "!(contains(github.actor, 'process-engine-ci') || contains(github.actor, 'admin'))"
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_CI_USER_TOKEN }}
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install CI Tools
+        run: sudo npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
+
+      - name: 'Install Dependencies'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm ci
+
+      - name: 'Prepare Version'
+        run: ci_tools prepare-version --allow-dirty-workdir
+
+      - name: 'Build Sources'
+        run: npm run build
+
+      - name: 'Commit & Tag Version'
+        env:
+          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
+          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
+        run: |
+          ci_tools commit-and-tag-version --only-on-primary-branches
+          ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+
+      - name: 'Publish Version'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: ci_tools publish-npm-package --create-tag-from-branch-name
