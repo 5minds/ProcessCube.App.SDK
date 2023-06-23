@@ -34,7 +34,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install CI Tools
-        run: sudo npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
 
       - name: 'Install Dependencies'
         env:
@@ -43,9 +45,6 @@ jobs:
 
       - name: 'Prepare Version'
         run: ci_tools prepare-version --allow-dirty-workdir
-
-      - name: 'Build Sources'
-        run: npm run build
 
       - name: 'Commit & Tag Version'
         env:
