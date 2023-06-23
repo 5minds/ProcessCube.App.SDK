@@ -1,0 +1,10 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import type { RedirectType } from 'next/dist/client/components/redirect';
+
+export async function hardNavigate(url: string, type?: RedirectType) {
+  revalidatePath(url);
+  redirect(url, type);
+}
