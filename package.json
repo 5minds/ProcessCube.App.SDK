@@ -3,30 +3,30 @@
   "version": "0.0.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
-  "main": "out/server/index.js",
-  "module": "out/server/index.js",
-  "browser": "out/client/index.js",
-  "types": "out/server/index.d.ts",
+  "main": "server/index.js",
+  "module": "server/index.js",
+  "browser": "client/index.js",
+  "types": "server/index.d.ts",
   "exports": {
     ".": {
-      "types": "./out/server/index.d.ts",
-      "default":"./out/server/index.js"
+      "types": "./server/index.d.ts",
+      "default":"./server/index.js"
     },
     "./server": {
-      "types": "./out/server/index.d.ts",
-      "default":"./out/server/index.js"
+      "types": "./server/index.d.ts",
+      "default":"./server/index.js"
     },
     "./client": {
       "types": {
-        "default": "./out/client/index.d.ts"
+        "default": "./client/index.d.ts"
       },
-      "default": "./out/client/index.js"
+      "default": "./client/index.js"
     }
   },
   "scripts": {
     "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc && tsc -p tsconfig.client.json",
     "watch": "tsc --watch"
   },
   "repository": {
@@ -34,7 +34,8 @@
     "url": "git+ssh://git@github.com/5minds/ProcessCube.App.SDK.git"
   },
   "files": [
-    "out"
+    "client",
+    "server"
   ],
   "keywords": [
     "SDK",
