@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_CI_USER_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Use Node.js 18
         uses: actions/setup-node@v3
@@ -49,8 +49,8 @@ jobs:
 
       - name: 'Commit & Tag Version'
         env:
-          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
-          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
+          GH_USER: ${{ secrets.GH_USER }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           ci_tools commit-and-tag-version --only-on-primary-branches
           ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
