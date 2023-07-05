@@ -6,11 +6,9 @@ const url = getEngineUrl();
 const client = new EngineClient(url);
 
 export async function startProcess(processModelId: string): Promise<DataModels.ProcessInstances.ProcessStartResponse> {
-  'use server';
   return await client.processModels.startProcessInstance({ processModelId: processModelId });
 }
 
 export async function finishTask(flowNodeInstanceId: string, result: any) {
-  'use server';
   await client.userTasks.finishUserTask(flowNodeInstanceId, result);
 }
