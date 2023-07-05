@@ -17,14 +17,7 @@
       "default": "./server/index.js"
     },
     "./client": {
-      "types": {
-        "default": "./client/index.d.ts"
-      },
-      "default": "./client/index.js"
-    },
-    "./test": {
-      "import": "./client/index.js",
-      "require": "./client/index.js",
+      "types": "./client/index.d.ts",
       "default": "./client/index.js"
     }
   },
@@ -75,6 +68,7 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "^4.3.1"
+    "@5minds/processcube_engine_client": "^4.3.1",
+    "server-only": "^0.0.1"
   }
 }
