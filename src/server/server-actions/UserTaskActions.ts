@@ -1,6 +1,8 @@
 import 'server-only';
 import { DataModels, EngineClient } from '@5minds/processcube_engine_client';
 import { getEngineUrl } from '../lib/internal/EngineUrlConfig';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 const url = getEngineUrl();
 const client = new EngineClient(url);
@@ -11,4 +13,18 @@ export async function startProcess(processModelId: string): Promise<DataModels.P
 
 export async function finishTask(flowNodeInstanceId: string, result: any) {
   await client.userTasks.finishUserTask(flowNodeInstanceId, result);
+}
+
+type Urlaubsantrag = {
+  antragsteller: string;
+  start: string;
+  ende: string;
+};
+
+export async function erstellen(flowNodeInstanceId: string, antrag: Urlaubsantrag) {
+  'use server';
+
+  await finishTask(flowNodeInstanceId, antrag);
+  revalidatePath('/Urlaubsantrag_stellen/');
+  redirect('/');
 }
