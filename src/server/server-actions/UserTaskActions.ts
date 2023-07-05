@@ -1,4 +1,4 @@
-'use server';
+// 'use server';
 
 import { DataModels, EngineClient } from '@5minds/processcube_engine_client';
 import { getEngineUrl } from '../lib/internal/EngineUrlConfig';
