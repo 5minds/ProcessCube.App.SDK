@@ -3,6 +3,11 @@ node_modules
 out
 client
 server
+common
+
+!src/client
+!src/server
+!src/common
 
 # Files
 .tsbuildinfo

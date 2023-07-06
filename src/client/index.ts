@@ -1,1 +1,3 @@
-export * from './components';
+import 'client-only';
+
+export * from './components/DynamicLink';
