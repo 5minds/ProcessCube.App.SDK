@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
-  "main": "server/index.js",
-  "module": "server/index.js",
+  "main": "common/index.js",
+  "module": "common/index.js",
   "browser": "client/index.js",
-  "types": "server/index.d.ts",
+  "types": "common/index.d.ts",
   "exports": {
     ".": {
-      "types": "./server/index.d.ts",
-      "default": "./server/index.js"
+      "types": "./common/index.d.ts",
+      "default": "./common/index.js"
     },
     "./server": {
       "types": "./server/index.d.ts",
@@ -22,12 +22,12 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf client server",
+    "clean": "rm -rf server common client",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_ENV=development esbuild src/server/index.ts src/client/index.ts --outdir=.  --packages=external --bundle --format=esm  --analyze=verbose && tsc --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "build:prod": "npm run clean && NODE_ENV=production esbuild src/server/index.ts src/client/index.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console && tsc --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild,tsc:server,tsc:client \"esbuild src/server/index.ts src/client/index.ts --watch --outdir=. --format=esm --bundle --packages=external\" \"tsc --watch --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --emitDeclarationOnly\""
+    "build": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose && tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly &&  tsc -p tsconfig.client.json --emitDeclarationOnly",
+    "build:prod": "npm run clean && NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console && tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly &&  tsc -p tsconfig.client.json --emitDeclarationOnly",
+    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external\" \"tsc --watch --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --emitDeclarationOnly\""
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,8 @@
   },
   "files": [
     "client",
-    "server"
+    "server",
+    "common"
   ],
   "keywords": [
     "SDK",
