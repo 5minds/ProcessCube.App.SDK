@@ -2,7 +2,10 @@
 
 Das SDK beinhaltet Komponenten und Funktionen für Frontend und Backend (Client/Server) zur einfachen und schnellen Entiwcklung einer ProcessCube App auf Basis von [Next.js](https://nextjs.org/).
 
-## Installation
+## Installation zur Verwendung
+
+### Vorraussetzungen
+-  NodeJS `>= v16`
 
 ```shell
 npm i @5minds/processcube_app_sdk
@@ -39,3 +42,39 @@ Es können nur Komponenten und Funktionen imprortiert werden, die im Browser fun
 import { DynamicLink } from "@5minds/processcube_app_sdk/client";
 ```
 
+
+## Wie kann ich das Projekt aufsetzen?
+
+### Setup/Installation
+
+Das SDK wird über den Node Paketmanager `npm` gebaut.
+
+Für das Installieren und Bauen können folgende Befehle benutzt werden:
+
+```shell
+npm ci
+npm run build
+```
+
+Für ein Productionbuild:
+
+```shell
+npm run build:prod
+```
+
+Um mit dem Paket lokal zu arbeiten kann es mit npm in ein anderes Projekt verlinkt werden:
+
+```shell
+npm link
+npm run watch
+```
+
+Im Zielprojekt anschließend:
+
+```shell
+npm link @5minds/processcube_app_sdk
+```
+
+## Wen kann ich auf das Projekt ansprechen?
+
+1. [Alexander Kasten](mailto:alexander.kasten@5minds.de)
