@@ -110,6 +110,7 @@
         "name": "next"
       }
     ],
+    "types": ["./src/packages.d.ts"]
   },
   "include": ["./src/server"],
 }
