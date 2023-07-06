@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { setEngineUrl } from './lib/internal/EngineUrlConfig';
 
 export default {

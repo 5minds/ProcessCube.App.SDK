@@ -1,4 +1,3 @@
-import 'server-only';
 import { EngineClient, DataModels } from '@5minds/processcube_engine_client';
 import { getEngineUrl } from './internal/EngineUrlConfig';
 
