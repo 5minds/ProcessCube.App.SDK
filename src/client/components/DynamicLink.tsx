@@ -1,5 +1,3 @@
-import 'client-only';
-
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -10,6 +8,7 @@ type DynamicLinkProps = {
 
 // Workaround für https://github.com/vercel/next.js/issues/42991#issuecomment-1592921378
 export function DynamicLink({ href, children }: DynamicLinkProps) {
+  import('client-only');
   const router = useRouter();
 
   return (
