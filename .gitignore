@@ -4,5 +4,7 @@ out
 client
 server
 
+!src/client
+!src/server
 # Files
 .tsbuildinfo
