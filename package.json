@@ -60,7 +60,6 @@
     "@types/react": "^18.2.13",
     "concurrently": "^8.2.0",
     "esbuild": "0.18.11",
-    "parcel": "^2.9.3",
     "prettier": "^2.8.8",
     "typescript": "^5.1.3"
   },
