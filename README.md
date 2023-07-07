@@ -38,7 +38,7 @@ import { startProcess } from "@5minds/processcube_app_sdk/server";
 
 ### Client
 
-Es können nur Komponenten und Funktionen imprortiert werden, die im Browser funktionieren. Zum Beispiel React Komponenten, die einen Clientseitigen Router und dessen React Hooks nutzen oder Funktionen die auf `window` oder generell globale Browser APIs zugreifen möchten.
+Es können nur Komponenten und Funktionen importiert werden, die im Browser funktionieren. Zum Beispiel React Komponenten, die einen Clientseitigen Router und dessen React Hooks nutzen oder Funktionen die auf `window` oder generell globale Browser APIs zugreifen möchten.
 
 ```javascript
 import { DynamicLink } from "@5minds/processcube_app_sdk/client";
