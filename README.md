@@ -5,7 +5,8 @@ Das SDK beinhaltet Komponenten und Funktionen für Frontend und Backend (Client/
 ## Installation zur Verwendung
 
 ### Vorraussetzungen
--  NodeJS `>= v16`
+
+- NodeJS `>= v16`
 
 ```shell
 npm i @5minds/processcube_app_sdk
@@ -20,6 +21,7 @@ Das NPM Paket hat *drei* Exports.
 Hier werden Komponten und Funktionen exportiert, die im Client und Server genutzt werden können.
 
 Zum Beispiel die React Kompontene RemoteUserTask:
+
 ```javascript
 import { RemoteUserTask } from "@5minds/processcube_app_sdk";
 ```
@@ -41,7 +43,6 @@ Es können nur Komponenten und Funktionen imprortiert werden, die im Browser fun
 ```javascript
 import { DynamicLink } from "@5minds/processcube_app_sdk/client";
 ```
-
 
 ## Wie kann ich das Projekt aufsetzen?
 
