@@ -3,30 +3,38 @@
   "version": "0.0.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
-  "main": "common/index.js",
-  "module": "common/index.js",
-  "browser": "client/index.js",
+  "main": "common/index.cjs",
+  "module": "common/index.mjs",
+  "browser": "client/index.mjs",
   "types": "common/index.d.ts",
   "exports": {
     ".": {
       "types": "./common/index.d.ts",
-      "default": "./common/index.js"
+      "require": "./common/index.cjs",
+      "default": "./common/index.mjs"
     },
     "./server": {
       "types": "./server/index.d.ts",
-      "default": "./server/index.js"
+      "require": "./server/index.cjs",
+      "default": "./server/index.mjs"
     },
     "./client": {
       "types": "./client/index.d.ts",
-      "default": "./client/index.js"
+      "require": "./client/index.cjs",
+      "default": "./client/index.mjs"
     }
   },
   "scripts": {
     "clean": "rm -rf server common client",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose && tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly &&  tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "build:prod": "npm run clean && NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console && tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly &&  tsc -p tsconfig.client.json --emitDeclarationOnly",
+    "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
+    "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
+    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
+    "build:types": "concurrently -n=server,common,client \"tsc -p tsconfig.json --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --emitDeclarationOnly\"",
+    "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\"",
+    "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
+    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify --drop:console",
     "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external\" \"tsc --watch --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --emitDeclarationOnly\""
   },
   "repository": {
