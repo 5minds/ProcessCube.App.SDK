@@ -1,17 +1,17 @@
-import { EngineClient, DataModels } from '@5minds/processcube_engine_client';
-import { getEngineUrl } from './internal/EngineUrlConfig';
-
-const url = getEngineUrl();
-const client = new EngineClient(url);
+import { DataModels } from '@5minds/processcube_engine_client';
+import { Client } from './internal/EngineClient';
 
 async function getUserTaskByFlowNodeInstanceId(flowNodeInstanceId?: string) {
-  const result = await client.userTasks.query({ flowNodeInstanceId: flowNodeInstanceId });
+  const result = await Client.userTasks.query({ flowNodeInstanceId: flowNodeInstanceId });
 
   return result.userTasks[0];
 }
 
 async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
-  const result = await client.userTasks.query({ processInstanceId: processInstanceId, flowNodeId: flowNodeId });
+  const result = await Client.userTasks.query({
+    processInstanceId: processInstanceId,
+    flowNodeId: flowNodeId,
+  });
 
   if (result.totalCount == 0) {
     return null;
@@ -25,7 +25,7 @@ export async function waitForUserTaskByProcessInstanceId(
   flowNodeId: string
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve) => {
-    const promise = client.userTasks.onUserTaskWaiting(async (event) => {
+    const promise = Client.userTasks.onUserTaskWaiting(async (event) => {
       if (event.processInstanceId === processInstanceId && event.flowNodeId === flowNodeId) {
         const userTask = await getUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
         resolve(userTask);
@@ -43,9 +43,9 @@ export async function waitForUserTaskByProcessInstanceId(
 }
 
 export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, result: any, flowNodeId: string) {
-  await client.userTasks.finishUserTask(flowNodeInstanceId, result);
+  await Client.userTasks.finishUserTask(flowNodeInstanceId, result);
 
-  const userTasks = await client.userTasks.query({
+  const userTasks = await Client.userTasks.query({
     flowNodeId: flowNodeId,
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
   });

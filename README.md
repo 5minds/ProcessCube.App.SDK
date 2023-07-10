@@ -36,6 +36,8 @@ Beispiel:
 import { startProcess } from "@5minds/processcube_app_sdk/server";
 ```
 
+Um die Engine URL anzupassen, die von den exportierten Funktionen genutzt wird, muss `PROCESSCUBE_ENGINE_URL` als Umgebungsvariable gesetzt werden. Andernfalls wird localhost mit dem Standardport der Engine genutzt `10560`.
+
 ### Client
 
 Es können nur Komponenten und Funktionen importiert werden, die im Browser funktionieren. Zum Beispiel React Komponenten, die einen Clientseitigen Router und dessen React Hooks nutzen oder Funktionen die auf `window` oder generell globale Browser APIs zugreifen möchten.
