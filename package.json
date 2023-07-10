@@ -78,6 +78,6 @@
   "dependencies": {
     "@5minds/processcube_engine_client": "^4.3.1",
     "client-only": "^0.0.1",
-    "server-only": "^0.0.1"
+    "only-server": "^0.0.1"
   }
 }
