@@ -36,7 +36,7 @@ Beispiel:
 import { startProcess } from "@5minds/processcube_app_sdk/server";
 ```
 
-Um die Engine URL anzupassen, die von den exportierten Funktionen genutzt wird, muss `PROCESSCUBE_ENGINE_URL` als Umgebungsvariable gesetzt werden. Andernfalls wird localhost mit dem Standardport der Engine genutzt `12560`.
+Um die Engine URL anzupassen, die von den exportierten Funktionen genutzt wird, muss `PROCESSCUBE_ENGINE_URL` als Umgebungsvariable gesetzt werden. Andernfalls wird localhost mit dem Standardport der Engine genutzt `10560`.
 
 ### Client
 
