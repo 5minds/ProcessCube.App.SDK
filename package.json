@@ -73,11 +73,13 @@
   },
   "peerDependencies": {
     "next": ">=13.4",
+    "next-auth": "^4.22.1",
     "react": ">=18.0.0"
   },
   "dependencies": {
     "@5minds/processcube_engine_client": "^4.3.1",
     "client-only": "^0.0.1",
+    "jwt-decode": "^3.1.2",
     "only-server": "^0.0.1"
   }
 }
