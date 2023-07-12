@@ -1,12 +1,6 @@
 import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
-async function getUserTaskByFlowNodeInstanceId(flowNodeInstanceId?: string) {
-  const result = await Client.userTasks.query({ flowNodeInstanceId: flowNodeInstanceId });
-
-  return result.userTasks[0];
-}
-
 async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
   const result = await Client.userTasks.query({
     processInstanceId: processInstanceId,
@@ -20,15 +14,20 @@ async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNod
   return result.userTasks[0];
 }
 
-export async function waitForUserTaskByProcessInstanceId(
-  processInstanceId: string,
-  flowNodeId: string
-): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
-  return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve) => {
+export async function waitForUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
+  return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const promise = Client.userTasks.onUserTaskWaiting(async (event) => {
-      if (event.processInstanceId === processInstanceId && event.flowNodeId === flowNodeId) {
-        const userTask = await getUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
-        resolve(userTask);
+      if (
+        event.processInstanceId === processInstanceId &&
+        event.flowNodeId === flowNodeId &&
+        event.flowNodeInstanceId != null
+      ) {
+        const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
+        if (userTask != null) {
+          return resolve(userTask);
+        }
+
+        return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
       }
     });
 
@@ -52,6 +51,68 @@ export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, resul
 
   if (userTasks.totalCount > 0) {
     return userTasks.userTasks[0];
+  }
+
+  return null;
+}
+
+export async function getUserTasks(...args: Parameters<typeof Client.userTasks.query>) {
+  return Client.userTasks.query(...args);
+}
+
+/**
+ *
+ * @param options Additional options for the query e.g. `identity` or `sortSettings`
+ * @returns DataModels.FlowNodeInstances.UserTaskList
+ */
+export async function getWaitingUserTasks(options?: Parameters<typeof Client.userTasks.query>[1]) {
+  return Client.userTasks.query(
+    {
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    options
+  );
+}
+
+/**
+ *
+ * @param flowNodeId The UserTasks ID (BPMN)
+ * @param options Additional options for the query e.g. `identity` or `sortSettings`
+ * @returns DataModels.FlowNodeInstances.UserTaskList
+ */
+export async function getWaitingUserTasksByFlowNodeId(
+  flowNodeId: string | string[],
+  options?: Parameters<typeof Client.userTasks.query>[1]
+) {
+  return Client.userTasks.query(
+    {
+      flowNodeId: flowNodeId,
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    options
+  );
+}
+
+/**
+ *
+ * @param flowNodeInstanceId The UserTask Instance ID
+ * @param options Additional options for the query e.g. `identity`
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance | null
+ */
+export async function getWaitingUserTaskByFlowNodeInstanceId(
+  flowNodeInstanceId: string,
+  options?: Parameters<typeof Client.userTasks.query>[1]
+) {
+  const result = await Client.userTasks.query(
+    {
+      flowNodeInstanceId: flowNodeInstanceId,
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    options
+  );
+
+  if (result.userTasks.length) {
+    return result.userTasks[0];
   }
 
   return null;
