@@ -1,4 +1,4 @@
-import { DataModels } from '@5minds/processcube_engine_client';
+import { DataModels, Identity } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
 async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
@@ -133,4 +133,32 @@ export async function getWaitingUserTaskByCorrelationId(correlationId: string) {
   }
 
   return result.userTasks[0];
+}
+
+/**
+ * @param identity The identity of the user
+ * @param options Additional options for the query e.g. `sortSettings`
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
+ */
+export async function getReservedUserTasksByIdentity(
+  identity: Identity,
+  options?: Parameters<typeof Client.userTasks.query>[1]
+) {
+  const result = await Client.userTasks.query(
+    {
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    {
+      ...options,
+      identity: identity,
+    }
+  );
+
+  const reservedUserTasks = result.userTasks.filter((userTask) => userTask.actualOwnerId === identity.userId);
+
+  if (reservedUserTasks.length) {
+    return reservedUserTasks;
+  }
+
+  return null;
 }
