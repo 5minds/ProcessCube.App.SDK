@@ -1,4 +1,4 @@
-import { DataModels, Identity } from '@5minds/processcube_engine_client';
+import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
 async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
@@ -141,16 +141,20 @@ export async function getWaitingUserTaskByCorrelationId(correlationId: string) {
  * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
  */
 export async function getReservedUserTasksByIdentity(
-  identity: Identity,
-  options?: Parameters<typeof Client.userTasks.query>[1]
+  identity: DataModels.Iam.Identity,
+  options?: {
+    offset?: number;
+    limit?: number;
+    sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
+  }
 ) {
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
     {
-      ...options,
       identity: identity,
+      ...options,
     }
   );
 

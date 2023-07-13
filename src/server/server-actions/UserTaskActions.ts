@@ -1,4 +1,4 @@
-import type { EngineClient, Identity } from '@5minds/processcube_engine_client';
+import type { DataModels, EngineClient } from '@5minds/processcube_engine_client';
 import { Client } from '../lib/internal/EngineClient';
 
 export async function startProcess(
@@ -13,6 +13,6 @@ export async function finishUserTask(
   await Client.userTasks.finishUserTask(...args);
 }
 
-export function getIdentity(): Identity {
+export function getIdentity(): DataModels.Iam.Identity {
   return Client.userTasks.identity;
 }
