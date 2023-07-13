@@ -14,23 +14,28 @@ async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNod
   return result.userTasks[0];
 }
 
-export async function waitForUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
+/**
+ * Waits for a UserTask to be created and returns it.
+ * @param processInstanceId The ProcessInstance ID
+ * @param flowNodeId The optional UserTasks ID (BPMN)
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance
+ * @throws Error if the UserTask does not exist
+ */
+export async function waitForUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId?: string) {
+  if (flowNodeId !== undefined) {
+    return waitForUserTaskByProcessInstanceIdAndFlowNodeId(processInstanceId, flowNodeId);
+  }
+
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
-    const promise = Client.userTasks.onUserTaskWaiting(async (event) => {
-      if (
-        event.processInstanceId === processInstanceId &&
-        event.flowNodeId === flowNodeId &&
-        event.flowNodeInstanceId != null
-      ) {
-        const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
-        if (userTask != null) {
-          return resolve(userTask);
-        }
+    const promise = createOnUserTaskWaitingPromise(processInstanceId, undefined, resolve, reject);
 
-        return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
-      }
-    });
+    await promise;
+  });
+}
 
+async function waitForUserTaskByProcessInstanceIdAndFlowNodeId(processInstanceId: string, flowNodeId: string) {
+  return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
+    const promise = createOnUserTaskWaitingPromise(processInstanceId, flowNodeId, resolve, reject);
     const userTask = await getUserTaskByProcessInstanceId(processInstanceId, flowNodeId);
 
     if (userTask) {
@@ -38,6 +43,28 @@ export async function waitForUserTaskByProcessInstanceId(processInstanceId: stri
     }
 
     await promise;
+  });
+}
+
+function createOnUserTaskWaitingPromise(
+  processInstanceId: string,
+  flowNodeId: string | undefined,
+  resolve: Function,
+  reject: Function
+) {
+  return Client.userTasks.onUserTaskWaiting(async (event) => {
+    if (
+      event.processInstanceId === processInstanceId &&
+      (flowNodeId === undefined || event.flowNodeId === flowNodeId) &&
+      event.flowNodeInstanceId != null
+    ) {
+      const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
+      if (userTask != null) {
+        return resolve(userTask);
+      }
+
+      return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
+    }
   });
 }
 
