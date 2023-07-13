@@ -114,6 +114,7 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
   if (result.userTasks.length) {
     return result.userTasks[0];
   }
+
   return null;
 }
 
