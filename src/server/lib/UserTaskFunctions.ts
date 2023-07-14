@@ -1,4 +1,4 @@
-import { DataModels, Identity } from '@5minds/processcube_engine_client';
+import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
 async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
