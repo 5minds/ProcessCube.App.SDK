@@ -13,6 +13,7 @@ export async function finishUserTask(
   await Client.userTasks.finishUserTask(...args);
 }
 
+// for test purposes - should be removed before merge
 export function getIdentity(): DataModels.Iam.Identity {
   return Client.userTasks.identity;
 }
