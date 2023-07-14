@@ -1,70 +1,52 @@
-import { DataModels } from '@5minds/processcube_engine_client';
+import { DataModels, Messages } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
-
-async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
-  const result = await Client.userTasks.query({
-    processInstanceId: processInstanceId,
-    flowNodeId: flowNodeId,
-  });
-
-  if (result.totalCount == 0) {
-    return null;
-  }
-
-  return result.userTasks[0];
-}
 
 /**
  * Waits for a UserTask to be created and returns it.
- * @param processInstanceId The ProcessInstance ID
- * @param flowNodeId The optional UserTasks ID (BPMN)
- * @returns DataModels.FlowNodeInstances.UserTaskInstance
- * @throws Error if the UserTask does not exist
+ *
+ * @param processInstanceId The ProcessInstance ID for which the UserTask should be created.
+ * @param flowNodeId        The FlowNode ID for which the UserTask should be created.
+ * @returns                 The created UserTask.
  */
-export async function waitForUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId?: string) {
-  if (flowNodeId !== undefined) {
-    return waitForUserTaskByProcessInstanceIdAndFlowNodeId(processInstanceId, flowNodeId);
+export async function waitForUserTask(processInstanceId?: string, flowNodeId?: string) {
+  if (processInstanceId && flowNodeId) {
+    return await waitForUserTaskByProcessInstanceIdAndFlowNodeId(processInstanceId, flowNodeId);
+  }
+
+  if (processInstanceId) {
+    return await waitForUserTaskByProcessInstanceId(processInstanceId);
+  }
+
+  if (flowNodeId) {
+    throw new Error('Not implemented yet.');
   }
 
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
-    const promise = createOnUserTaskWaitingPromise(processInstanceId, undefined, resolve, reject);
+    await Client.userTasks.onUserTaskWaiting(
+      async (event) => await onUserTaskWaitingEventHandler(event, resolve, reject)
+    );
+  });
+}
 
-    await promise;
+async function waitForUserTaskByProcessInstanceId(processInstanceId: string) {
+  return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
+    await Client.userTasks.onUserTaskWaiting(async (event) =>
+      onUserTaskWaitingByProcessInstanceIdEventHandler(event, processInstanceId, resolve, reject)
+    );
   });
 }
 
 async function waitForUserTaskByProcessInstanceIdAndFlowNodeId(processInstanceId: string, flowNodeId: string) {
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
-    const promise = createOnUserTaskWaitingPromise(processInstanceId, flowNodeId, resolve, reject);
-    const userTask = await getUserTaskByProcessInstanceId(processInstanceId, flowNodeId);
-
-    if (userTask) {
-      resolve(userTask);
-    }
-
-    await promise;
-  });
-}
-
-function createOnUserTaskWaitingPromise(
-  processInstanceId: string,
-  flowNodeId: string | undefined,
-  resolve: Function,
-  reject: Function
-) {
-  return Client.userTasks.onUserTaskWaiting(async (event) => {
-    if (
-      event.processInstanceId === processInstanceId &&
-      (flowNodeId === undefined || event.flowNodeId === flowNodeId) &&
-      event.flowNodeInstanceId != null
-    ) {
-      const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
-      if (userTask != null) {
-        return resolve(userTask);
-      }
-
-      return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
-    }
+    await Client.userTasks.onUserTaskWaiting(async (event) =>
+      onUserTaskWaitingByProcessInstanceIdAndFlowNodeIdEventHandler(
+        event,
+        processInstanceId,
+        flowNodeId,
+        resolve,
+        reject
+      )
+    );
   });
 }
 
@@ -93,12 +75,18 @@ export async function getUserTasks(...args: Parameters<typeof Client.userTasks.q
  * @returns DataModels.FlowNodeInstances.UserTaskList
  */
 export async function getWaitingUserTasks(options?: Parameters<typeof Client.userTasks.query>[1]) {
-  return Client.userTasks.query(
+  const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
     options
   );
+
+  if (result.totalCount === 0) {
+    return null;
+  }
+
+  return result.userTasks;
 }
 
 /**
@@ -225,4 +213,71 @@ export async function getAssignedUserTasksByIdentity(
   }
 
   return null;
+}
+
+async function onUserTaskWaitingEventHandler(
+  event: Messages.EventMessage,
+  resolve: (
+    value: DataModels.FlowNodeInstances.UserTaskInstance | PromiseLike<DataModels.FlowNodeInstances.UserTaskInstance>
+  ) => void,
+  reject: (reason?: any) => void
+) {
+  if (event.flowNodeInstanceId === undefined) {
+    return;
+  }
+
+  const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
+
+  if (userTask === null) {
+    return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
+  }
+
+  return resolve(userTask);
+}
+
+async function onUserTaskWaitingByProcessInstanceIdEventHandler(
+  event: Messages.EventMessage,
+  processInstanceId: string,
+  resolve: (
+    value: DataModels.FlowNodeInstances.UserTaskInstance | PromiseLike<DataModels.FlowNodeInstances.UserTaskInstance>
+  ) => void,
+  reject: (reason?: any) => void
+) {
+  if (event.flowNodeInstanceId === undefined || event.processInstanceId !== processInstanceId) {
+    return;
+  }
+
+  const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
+
+  if (userTask === null) {
+    return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
+  }
+
+  return resolve(userTask);
+}
+
+async function onUserTaskWaitingByProcessInstanceIdAndFlowNodeIdEventHandler(
+  event: Messages.EventMessage,
+  processInstanceId: string,
+  flowNodeId: string,
+  resolve: (
+    value: DataModels.FlowNodeInstances.UserTaskInstance | PromiseLike<DataModels.FlowNodeInstances.UserTaskInstance>
+  ) => void,
+  reject: (reason?: any) => void
+) {
+  if (
+    event.flowNodeId !== flowNodeId ||
+    event.processInstanceId !== processInstanceId ||
+    event.flowNodeInstanceId === undefined
+  ) {
+    return;
+  }
+
+  const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
+
+  if (userTask === null) {
+    return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
+  }
+
+  return resolve(userTask);
 }
