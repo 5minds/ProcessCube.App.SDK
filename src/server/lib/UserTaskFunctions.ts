@@ -117,3 +117,20 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
 
   return null;
 }
+
+/**
+ * @param correlationId The Correlation ID
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance | null
+ */
+export async function getWaitingUserTaskByCorrelationId(correlationId: string) {
+  const result = await Client.userTasks.query({
+    correlationId: correlationId,
+    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+  });
+
+  if (result.totalCount == 0) {
+    return null;
+  }
+
+  return result.userTasks[0];
+}
