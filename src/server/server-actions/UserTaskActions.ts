@@ -7,7 +7,7 @@ export async function startProcess(
   return await Client.processModels.startProcessInstance(...args);
 }
 
-export async function finishTask(
+export async function finishUserTask(
   ...args: Parameters<typeof EngineClient.prototype.userTasks.finishUserTask>
 ): ReturnType<typeof EngineClient.prototype.userTasks.finishUserTask> {
   await Client.userTasks.finishUserTask(...args);
