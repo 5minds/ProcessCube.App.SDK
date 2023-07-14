@@ -134,3 +134,35 @@ export async function getWaitingUserTaskByCorrelationId(correlationId: string) {
 
   return result.userTasks[0];
 }
+
+/**
+ * @param identity The identity of the user
+ * @param options Additional options for the query e.g. `sortSettings`
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
+ */
+export async function getReservedUserTasksByIdentity(
+  identity: DataModels.Iam.Identity,
+  options?: {
+    offset?: number;
+    limit?: number;
+    sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
+  }
+) {
+  const result = await Client.userTasks.query(
+    {
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    {
+      identity: identity,
+      ...options,
+    }
+  );
+
+  const reservedUserTasks = result.userTasks.filter((userTask) => userTask.actualOwnerId === identity.userId);
+
+  if (reservedUserTasks.length) {
+    return reservedUserTasks;
+  }
+
+  return null;
+}
