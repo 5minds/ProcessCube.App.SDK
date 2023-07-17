@@ -166,3 +166,36 @@ export async function getReservedUserTasksByIdentity(
 
   return null;
 }
+
+/**
+ *
+ * @param identity The identity of the user
+ * @param options Additional options for the query e.g. `sortSettings`
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
+ */
+export async function getAssignedUserTasksByIdentity(
+  identity: DataModels.Iam.Identity,
+  options?: {
+    offset?: number;
+    limit?: number;
+    sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
+  }
+) {
+  const result = await Client.userTasks.query(
+    {
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    {
+      identity: identity,
+      ...options,
+    }
+  );
+
+  const assignedUserTasks = result.userTasks.filter((userTask) => userTask.assignedUserIds?.includes(identity.userId));
+
+  if (assignedUserTasks.length) {
+    return assignedUserTasks;
+  }
+
+  return null;
+}
