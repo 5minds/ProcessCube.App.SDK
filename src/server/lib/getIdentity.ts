@@ -1,6 +1,7 @@
 import { cookies, headers } from 'next/headers';
 import { getToken } from 'next-auth/jwt';
-import { DataModels } from '@5minds/processcube_engine_client';
+
+import type { DataModels } from '@5minds/processcube_engine_client';
 
 export async function getIdentity(): Promise<DataModels.Iam.Identity> {
   const token = await getToken({
