@@ -25,6 +25,7 @@ export async function waitForUserTask(
       if (
         event.flowNodeInstanceId === undefined ||
         (processInstanceId !== undefined && event.processInstanceId !== processInstanceId) ||
+        (flowNodeId !== undefined && event.flowNodeId !== flowNodeId) ||
         (processInstanceId !== undefined &&
           flowNodeId !== undefined &&
           event.processDefinitionId !== processInstanceId &&
