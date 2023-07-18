@@ -117,3 +117,85 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
 
   return null;
 }
+
+/**
+ * @param correlationId The Correlation ID
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance | null
+ */
+export async function getWaitingUserTaskByCorrelationId(correlationId: string) {
+  const result = await Client.userTasks.query({
+    correlationId: correlationId,
+    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+  });
+
+  if (result.totalCount == 0) {
+    return null;
+  }
+
+  return result.userTasks[0];
+}
+
+/**
+ * @param identity The identity of the user
+ * @param options Additional options for the query e.g. `sortSettings`
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
+ */
+export async function getReservedUserTasksByIdentity(
+  identity: DataModels.Iam.Identity,
+  options?: {
+    offset?: number;
+    limit?: number;
+    sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
+  }
+) {
+  const result = await Client.userTasks.query(
+    {
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    {
+      identity: identity,
+      ...options,
+    }
+  );
+
+  const reservedUserTasks = result.userTasks.filter((userTask) => userTask.actualOwnerId === identity.userId);
+
+  if (reservedUserTasks.length) {
+    return reservedUserTasks;
+  }
+
+  return null;
+}
+
+/**
+ *
+ * @param identity The identity of the user
+ * @param options Additional options for the query e.g. `sortSettings`
+ * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
+ */
+export async function getAssignedUserTasksByIdentity(
+  identity: DataModels.Iam.Identity,
+  options?: {
+    offset?: number;
+    limit?: number;
+    sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
+  }
+) {
+  const result = await Client.userTasks.query(
+    {
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    {
+      identity: identity,
+      ...options,
+    }
+  );
+
+  const assignedUserTasks = result.userTasks.filter((userTask) => userTask.assignedUserIds?.includes(identity.userId));
+
+  if (assignedUserTasks.length) {
+    return assignedUserTasks;
+  }
+
+  return null;
+}
