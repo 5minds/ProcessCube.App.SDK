@@ -47,7 +47,6 @@ export async function createExternalTaskWorker(
 
 function startRefreshingIdentity(): void {
   interval = setInterval(async (): Promise<void> => {
-    //logger.info('Refreshing identity');
     const newIdentity = await AuthTokenProvider.getIdentity();
 
     externalTaskWorker.identity = newIdentity;
