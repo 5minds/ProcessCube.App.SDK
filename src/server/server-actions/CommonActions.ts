@@ -15,30 +15,42 @@ export async function navigateToNextTaskInProcess(processInstanceId: string): Pr
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
   });
 
+  if (userTasks.totalCount === 0) {
+    redirect("/");
+  }
+
   const userTask: DataModels.FlowNodeInstances.UserTaskInstance = userTasks.userTasks[0];
-  console.log(userTask);
 
   const processModelId: string = userTask.processModelId;
   const flowNodeId: string = userTask.flowNodeId;
 
   const uri: string = `/${processModelId}/${processInstanceId}/${flowNodeId}`;
 
-  if (userTask) {
-    redirect(uri);
-  }
+  redirect(uri);
 }
 
-export async function navigateToNextTaskInCorrelation(flowNodeInstanceId: string, result: any, flowNodeId: string) {
-  await Client.userTasks.finishUserTask(flowNodeInstanceId, result);
-
+export async function navigateToNextTaskInCorrelation(processInstanceId: string, correlationId: string) {
   const userTasks = await Client.userTasks.query({
-    flowNodeId: flowNodeId,
+    correlationId: correlationId,
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
   });
 
-  console.log(userTasks);
+  console.log(userTasks.totalCount);
 
-  redirect("/");
+  if (userTasks.totalCount === 0) {
+    redirect("/");
+  }
+
+  const userTask: DataModels.FlowNodeInstances.UserTaskInstance =
+    userTasks.userTasks.find(task => task.processInstanceId === processInstanceId)
+    || userTasks.userTasks[0]; userTasks.userTasks[0];
+
+  const processModelId: string = userTask.processModelId;
+  const flowNodeId: string = userTask.flowNodeId;
+
+  const uri: string = `/${processModelId}/${processInstanceId}/${flowNodeId}`;
+
+  redirect(uri);
 }
 
 export async function navigateToNextTaskOfSameType(flowNodeInstanceId: string, result: any, flowNodeId: string) {
@@ -55,5 +67,6 @@ export async function navigateToNextTaskOfSameType(flowNodeInstanceId: string, r
 }
 
 export async function navigateToUrl(url: string) {
-  redirect(url);
+  console.log("window", window)
+  // redirect(url);
 }
