@@ -13,20 +13,22 @@ export async function waitForUserTask(
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
-      const processInstanceAndFlowNodeGivenCondition =
-        processInstanceId &&
-        flowNodeId &&
-        event.processInstanceId !== processInstanceId &&
-        event.flowNodeId !== flowNodeId;
-      const onlyProcessInstanceGivenCondition =
-        processInstanceId && !flowNodeId && event.processInstanceId !== processInstanceId;
-      const onlyFlowNodeGivenCondition = !processInstanceId && flowNodeId && event.flowNodeId !== flowNodeId;
+      // const processInstanceAndFlowNodeGivenCondition =
+      //   processInstanceId &&
+      //   flowNodeId &&
+      //   event.processInstanceId !== processInstanceId &&
+      //   event.flowNodeId !== flowNodeId;
+      // const onlyProcessInstanceGivenCondition =
+      //   processInstanceId && !flowNodeId && event.processInstanceId !== processInstanceId;
+      // const onlyFlowNodeGivenCondition = !processInstanceId && flowNodeId && event.flowNodeId !== flowNodeId;
 
       if (
         event.flowNodeInstanceId === undefined ||
-        processInstanceAndFlowNodeGivenCondition ||
-        onlyProcessInstanceGivenCondition ||
-        onlyFlowNodeGivenCondition
+        (processInstanceId !== undefined && event.processInstanceId !== processInstanceId) ||
+        (processInstanceId !== undefined &&
+          flowNodeId !== undefined &&
+          event.processDefinitionId !== processInstanceId &&
+          event.flowNodeId !== flowNodeId)
       ) {
         return;
       }
