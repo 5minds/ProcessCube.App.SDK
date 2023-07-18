@@ -16,16 +16,7 @@ export async function waitForUserTask({
 } = {}): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
-      // const processInstanceAndFlowNodeGivenCondition =
-      //   processInstanceId &&
-      //   flowNodeId &&
-      //   event.processInstanceId !== processInstanceId &&
-      //   event.flowNodeId !== flowNodeId;
-      // const onlyProcessInstanceGivenCondition =
-      //   processInstanceId && !flowNodeId && event.processInstanceId !== processInstanceId;
-      // const onlyFlowNodeGivenCondition = !processInstanceId && flowNodeId && event.flowNodeId !== flowNodeId;
-
-      if (
+      const eventMatchesCriteria = !(
         event.flowNodeInstanceId === undefined ||
         (processInstanceId !== undefined && event.processInstanceId !== processInstanceId) ||
         (flowNodeId !== undefined && event.flowNodeId !== flowNodeId) ||
@@ -33,11 +24,13 @@ export async function waitForUserTask({
           flowNodeId !== undefined &&
           event.processDefinitionId !== processInstanceId &&
           event.flowNodeId !== flowNodeId)
-      ) {
+      );
+
+      if (!eventMatchesCriteria) {
         return;
       }
 
-      const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
+      const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId as string);
       Client.notification.removeSubscription(sub);
 
       if (userTask === null) {
