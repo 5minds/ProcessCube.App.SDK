@@ -7,10 +7,13 @@ import { Client } from './internal/EngineClient';
  * @param flowNodeId  The FlowNode ID (BPMN)
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The created UserTask.
  */
-export async function waitForUserTask(
-  processInstanceId?: string,
-  flowNodeId?: string
-): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
+export async function waitForUserTask({
+  processInstanceId,
+  flowNodeId,
+}: {
+  processInstanceId?: string;
+  flowNodeId?: string;
+} = {}): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
       // const processInstanceAndFlowNodeGivenCondition =
