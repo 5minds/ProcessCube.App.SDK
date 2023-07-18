@@ -11,55 +11,23 @@ export async function waitForUserTask(
   processInstanceId?: string,
   flowNodeId?: string
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
-  if (processInstanceId && flowNodeId) {
-    return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
-      const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
-        if (
-          event.flowNodeId !== flowNodeId ||
-          event.processInstanceId !== processInstanceId ||
-          event.flowNodeInstanceId === undefined
-        ) {
-          return;
-        }
-
-        const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
-        Client.notification.removeSubscription(sub);
-
-        if (userTask === null) {
-          return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
-        }
-
-        return resolve(userTask);
-      });
-    });
-  }
-
-  if (processInstanceId) {
-    return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
-      const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
-        if (event.flowNodeInstanceId === undefined || event.processInstanceId !== processInstanceId) {
-          return;
-        }
-
-        const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
-        Client.notification.removeSubscription(sub);
-
-        if (userTask === null) {
-          return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
-        }
-
-        return resolve(userTask);
-      });
-    });
-  }
-
-  if (flowNodeId) {
-    throw new Error('Not implemented yet.');
-  }
-
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
-      if (event.flowNodeInstanceId === undefined) {
+      const processInstanceAndFlowNodeGivenCondition =
+        processInstanceId &&
+        flowNodeId &&
+        event.processInstanceId !== processInstanceId &&
+        event.flowNodeId !== flowNodeId;
+      const onlyProcessInstanceGivenCondition =
+        processInstanceId && !flowNodeId && event.processInstanceId !== processInstanceId;
+      const onlyFlowNodeGivenCondition = !processInstanceId && flowNodeId && event.flowNodeId !== flowNodeId;
+
+      if (
+        event.flowNodeInstanceId === undefined ||
+        processInstanceAndFlowNodeGivenCondition ||
+        onlyProcessInstanceGivenCondition ||
+        onlyFlowNodeGivenCondition
+      ) {
         return;
       }
 
