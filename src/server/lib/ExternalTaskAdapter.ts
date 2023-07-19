@@ -3,7 +3,9 @@ import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
 import { Engine_URL } from './internal/EngineClient';
 import path from 'path';
+import esbuild from 'esbuild';
 import { getDirectories } from './utils';
+import fs from 'fs';
 
 const DEFAULT_EXTERNAL_TASK_WORKER_CONFIG: IExternalTaskWorkerConfig = {
   lockDuration: 20000,
@@ -30,7 +32,10 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
     logger.info(`Found worker file in directory '${directory}'`);
 
     const fullWorkerFilePath = path.join(directory, workerFile);
-    const module = await import(fullWorkerFilePath);
+    await importAndTranspile(fullWorkerFilePath);
+    const pathToModule = path.join(directory, 'dist', 'worker.js');
+
+    const module = await import(pathToModule);
 
     const identity = await getIdentity();
     const lockDuration = (await module.lockDuration) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.lockDuration;
@@ -77,4 +82,39 @@ async function getIdentity(): Promise<Identity> {
     token: 'ZHVtbXlfdG9rZW4=',
     userId: 'dummy_token',
   };
+}
+
+async function importAndTranspile(fullWorkerFilePath: string) {
+  const tsCode = await fs.promises.readFile(fullWorkerFilePath, 'utf-8');
+  logger.info(`Read code from file '${fullWorkerFilePath}'`);
+  logger.info(`Code: ${tsCode}`);
+
+  // const result = await esbuild.transform(tsCode, {
+  //   loader: 'ts',
+  //   format: 'esm',
+  //   target: 'es2017',
+  // });
+
+  const result = esbuild.buildSync({
+    entryPoints: [fullWorkerFilePath],
+    outfile: path.join(path.dirname(fullWorkerFilePath), 'dist', 'worker.js'),
+    bundle: true,
+    platform: 'node',
+    target: 'node14',
+    format: 'cjs',
+  });
+
+  logger.info(`Result: ${JSON.stringify(result)}`);
+
+  if (result.errors.length > 0) {
+    logger.error(`Could not transpile worker file '${fullWorkerFilePath}'`, {
+      errors: result.errors,
+    });
+  }
+
+  if (result.warnings.length > 0) {
+    logger.warn(`Transpiled worker file '${fullWorkerFilePath}' with warnings`, {
+      warnings: result.warnings,
+    });
+  }
 }
