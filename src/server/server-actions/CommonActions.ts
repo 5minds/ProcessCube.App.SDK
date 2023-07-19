@@ -1,8 +1,9 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { RedirectType } from 'next/dist/client/components/redirect';
-import { Client } from '../lib/internal/EngineClient';
+
 import { BpmnType, DataModels } from '@5minds/processcube_engine_client';
+import { Client } from '../lib/internal/EngineClient';
 
 export async function hardNavigate(url: string, type?: RedirectType) {
   revalidatePath(url);
@@ -51,7 +52,7 @@ export async function navigateToNextTaskInCorrelation(correlationId: string) {
 }
 
 export async function navigateToNextTaskOfSameType(flowNodeType: BpmnType) {
-  const flowNodeInstances = await Client.flowNodeInstances.query({
+  const flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstanceList = await Client.flowNodeInstances.query({
     flowNodeType: flowNodeType,
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
   });
