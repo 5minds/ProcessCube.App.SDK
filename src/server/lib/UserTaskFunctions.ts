@@ -3,7 +3,7 @@ import { Client } from './internal/EngineClient';
 
 /**
  * Waits for a UserTask to be created and returns it.
- * @param processInstanceId The ProcessInstance ID (BPMN)
+ * @param processInstanceId The ProcessInstance ID
  * @param flowNodeId  The FlowNode ID (BPMN)
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The created UserTask.
  */
@@ -16,17 +16,22 @@ export async function waitForUserTask({
 } = {}): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
-      const eventMatchesCriteria = !(
-        event.flowNodeInstanceId === undefined ||
-        (processInstanceId !== undefined && event.processInstanceId !== processInstanceId) ||
-        (flowNodeId !== undefined && event.flowNodeId !== flowNodeId) ||
-        (processInstanceId !== undefined &&
-          flowNodeId !== undefined &&
-          event.processDefinitionId !== processInstanceId &&
-          event.flowNodeId !== flowNodeId)
-      );
+      const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
+      const processInstanceIdGivenButNotMatching =
+        processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
+      const flowNodeIdGivenButNotMatching = flowNodeId !== undefined && event.flowNodeId !== flowNodeId;
+      const processInstanceIdAndFlowNodeIdGivenButNotMatching =
+        processInstanceId !== undefined &&
+        flowNodeId !== undefined &&
+        event.processInstanceId !== processInstanceId &&
+        event.flowNodeId !== flowNodeId;
 
-      if (!eventMatchesCriteria) {
+      if (
+        flowNodeInstanceIdIsUndefined ||
+        processInstanceIdGivenButNotMatching ||
+        flowNodeIdGivenButNotMatching ||
+        processInstanceIdAndFlowNodeIdGivenButNotMatching
+      ) {
         return;
       }
 
