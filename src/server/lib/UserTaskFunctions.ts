@@ -3,8 +3,7 @@ import { Client } from './internal/EngineClient';
 
 /**
  * Waits for a UserTask to be created and returns it.
- * @param processInstanceId The ProcessInstance ID
- * @param flowNodeId  The FlowNode ID (BPMN)
+ * @param {{processInstanceId?: string, flowNodeId?: string}} options - Options for the query.
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The created UserTask.
  */
 export async function waitForUserTask({
