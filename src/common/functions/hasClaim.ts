@@ -44,6 +44,7 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
     token.accessToken = account.access_token;
     token.idToken = account.id_token;
   }
+  
   return token;
 }
 
