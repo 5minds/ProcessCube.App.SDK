@@ -43,12 +43,15 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
     const longpollingTimeout =
       (await module.longpollingTimeout) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.longpollingTimeout;
 
-    logger.info(`Using lock duration of ${lockDuration}ms`);
-    logger.info(`Using max tasks of ${maxTasks}`);
-    logger.info(`Using longpolling timeout of ${longpollingTimeout}ms`);
+    // logger.info(`Using lock duration of ${lockDuration}ms`);
+    // logger.info(`Using max tasks of ${maxTasks}`);
+    // logger.info(`Using longpolling timeout of ${longpollingTimeout}ms`);
 
     const topic = path.basename(directory);
     const handler = module.default;
+
+    logger.info(`Using handler ${handler} ${JSON.stringify(handler)} with type ${typeof handler}`);
+
     const config: IExternalTaskWorkerConfig = {
       lockDuration: lockDuration,
       maxTasks: maxTasks,
@@ -85,17 +88,11 @@ async function getIdentity(): Promise<Identity> {
 }
 
 async function importAndTranspile(fullWorkerFilePath: string) {
-  const tsCode = await fs.promises.readFile(fullWorkerFilePath, 'utf-8');
-  logger.info(`Read code from file '${fullWorkerFilePath}'`);
-  logger.info(`Code: ${tsCode}`);
+  // const tsCode = await fs.promises.readFile(fullWorkerFilePath, 'utf-8');
+  // logger.info(`Read code from file '${fullWorkerFilePath}'`);
+  // logger.info(`Code: ${tsCode}`);
 
-  // const result = await esbuild.transform(tsCode, {
-  //   loader: 'ts',
-  //   format: 'esm',
-  //   target: 'es2017',
-  // });
-
-  const result = esbuild.buildSync({
+  const result = await esbuild.build({
     entryPoints: [fullWorkerFilePath],
     outfile: path.join(path.dirname(fullWorkerFilePath), 'dist', 'worker.js'),
     bundle: true,
@@ -103,8 +100,6 @@ async function importAndTranspile(fullWorkerFilePath: string) {
     target: 'node14',
     format: 'cjs',
   });
-
-  logger.info(`Result: ${JSON.stringify(result)}`);
 
   if (result.errors.length > 0) {
     logger.error(`Could not transpile worker file '${fullWorkerFilePath}'`, {
