@@ -3,16 +3,19 @@ import { Client } from './internal/EngineClient';
 
 /**
  * Waits for a UserTask to be created and returns it.
- * @param {{processInstanceId?: string, flowNodeId?: string}} options - Options for the query.
+ *
+ * @param filterBy Additional filter options
+ * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
+ * @param filterBy.flowNodeId The UserTask FlowNode ID (BPMN)
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The created UserTask.
  */
-export async function waitForUserTask({
-  processInstanceId,
-  flowNodeId,
-}: {
-  processInstanceId?: string;
-  flowNodeId?: string;
-} = {}): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
+export async function waitForUserTask(
+  filterBy: {
+    processInstanceId?: string;
+    flowNodeId?: string;
+  } = {}
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
+  const { processInstanceId, flowNodeId } = filterBy;
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
       const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
