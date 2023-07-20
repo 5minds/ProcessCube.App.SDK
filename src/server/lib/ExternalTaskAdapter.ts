@@ -4,7 +4,7 @@ import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcu
 import { Engine_URL } from './internal/EngineClient';
 import path from 'path';
 import esbuild from 'esbuild';
-import { getDirectories } from './utils';
+import { promises as fs, PathLike } from 'fs';
 
 const DEFAULT_EXTERNAL_TASK_WORKER_CONFIG: IExternalTaskWorkerConfig = {
   lockDuration: 20000,
@@ -27,7 +27,7 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
     }
 
     const fullWorkerFilePath = path.join(directory, workerFile);
-    await importAndTranspile(fullWorkerFilePath);
+    await transpileTypescriptFile(fullWorkerFilePath);
     const pathToModule = path.join(directory, 'dist', 'worker.js');
 
     // TODO: find a better way to import the module?
@@ -53,6 +53,7 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
     };
     const externalTaskWorker = new ExternalTaskWorker<any, any>(Engine_URL, topic, handler, config);
 
+    // TODO remove log
     logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
 
     externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
@@ -80,10 +81,16 @@ async function getIdentity(): Promise<Identity> {
   };
 }
 
-async function importAndTranspile(fullWorkerFilePath: string) {
+/**
+ * Transpile a typescript file to javascript.
+ * @param {string} entryPoint The path to the typescript file
+ * @param {string} outdir The directory to put the transpiled file in
+ * @returns {Promise<void>} A promise that resolves when the file is transpiled
+ * */
+async function transpileTypescriptFile(entryPoint: string, outdir?: string): Promise<void> {
   const result = await esbuild.build({
-    entryPoints: [fullWorkerFilePath],
-    outfile: path.join(path.dirname(fullWorkerFilePath), 'dist', 'worker.js'),
+    entryPoints: [entryPoint],
+    outdir: outdir ?? path.join(path.dirname(entryPoint), 'dist'),
     bundle: true,
     platform: 'node',
     target: 'node14',
@@ -91,14 +98,33 @@ async function importAndTranspile(fullWorkerFilePath: string) {
   });
 
   if (result.errors.length > 0) {
-    logger.error(`Could not transpile worker file '${fullWorkerFilePath}'`, {
+    logger.error(`Could not transpile file at '${entryPoint}'`, {
       errors: result.errors,
     });
   }
 
   if (result.warnings.length > 0) {
-    logger.warn(`Transpiled worker file '${fullWorkerFilePath}' with warnings`, {
+    logger.warn(`Transpiled file at '${entryPoint}' with warnings`, {
       warnings: result.warnings,
     });
   }
+}
+
+/**
+ * Recursively get all directories in a directory.
+ * It gives the full path to the directory.
+ * @param {PathLike} source The directory to search in
+ * @returns A list of all directories in the directory
+ **/
+async function getDirectories(source: PathLike): Promise<string[]> {
+  const dirents = await fs.readdir(source, { withFileTypes: true });
+  const directories = await Promise.all(
+    dirents.map(async (dirent) => {
+      const fullPath = path.join(source.toString(), dirent.name);
+
+      return dirent.isDirectory() ? [fullPath, ...(await getDirectories(fullPath))] : [];
+    })
+  );
+
+  return Array.prototype.concat(...directories);
 }
