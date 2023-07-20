@@ -10,7 +10,8 @@ import jwtDecode from 'jwt-decode';
  */
 export async function hasClaim(claim: string): Promise<boolean> {
   let user: Session['user'] | undefined;
-  if (typeof window === 'undefined') {
+  const isCalledInServerComponent = typeof window === 'undefined'
+  if (isCalledInServerComponent ) {
     user = (
       await getServerSession({
         callbacks: {
