@@ -17,7 +17,7 @@ export async function navigateToNextTaskInProcess(processInstanceId: string): Pr
   });
 
   if (flowNodeInstances.totalCount === 0) {
-    redirect("/");
+    throw new Error(`No suspended FlowNodeInstance found for ProcessInstance with ID ${processInstanceId}`);
   }
 
   const flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance = flowNodeInstances.flowNodeInstances[0];
@@ -37,7 +37,7 @@ export async function navigateToNextTaskInCorrelation(correlationId: string) {
   });
 
   if (flowNodeInstances.totalCount === 0) {
-    redirect("/");
+    throw new Error(`No suspended FlowNodeInstance found for Correlation with ID ${correlationId}`);
   }
 
   const flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance = flowNodeInstances.flowNodeInstances[0];
@@ -58,7 +58,7 @@ export async function navigateToNextTaskOfSameType(flowNodeType: BpmnType) {
   });
 
   if (flowNodeInstances.totalCount === 0) {
-    redirect("/");
+    throw new Error(`No suspended FlowNodeInstance found for FlowNodeType ${flowNodeType}`);
   }
 
   const flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance = flowNodeInstances.flowNodeInstances[0];
