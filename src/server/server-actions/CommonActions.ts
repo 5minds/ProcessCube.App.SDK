@@ -2,75 +2,63 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { RedirectType } from 'next/dist/client/components/redirect';
 
+import { DataModels } from '@5minds/processcube_engine_client';
+import {
+  getWaitingUserTaskByCorrelationId,
+  getWaitingUserTaskByProcessInstanceId,
+  getWaitingUserTasksByFlowNodeId,
+} from '../lib';
 
 export async function hardNavigate(url: string, type?: RedirectType) {
   revalidatePath(url);
   redirect(url, type);
 }
 
-export async function navigateToNextTaskInProcess(processInstanceId: string): Promise<void> {
-  const flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstanceList = await Client.flowNodeInstances.query({
-    processInstanceId: processInstanceId,
-    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
 export async function navigateToNextUserTaskInProcess(processInstanceId: string): Promise<void> {
+  const userTask: DataModels.FlowNodeInstances.UserTaskInstance | null = await getWaitingUserTaskByProcessInstanceId(processInstanceId);
 
-  if (flowNodeInstances.totalCount === 0) {
+  if (userTask === null) {
     throw new Error(`No suspended FlowNodeInstance found for ProcessInstance with ID ${processInstanceId}`);
   }
 
-  const flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance = flowNodeInstances.flowNodeInstances[0];
-
-  const processModelId: string = flowNodeInstance.processModelId;
-  const flowNodeId: string = flowNodeInstance.flowNodeId;
-
-  const uri: string = `/${processModelId}/${processInstanceId}/${flowNodeId}`;
-
-  redirect(uri);
+  await navigateToUserTaskInstance(userTask);
 }
 
-export async function navigateToNextTaskInCorrelation(correlationId: string) {
-  const flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstanceList = await Client.flowNodeInstances.query({
-    correlationId: correlationId,
-    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-  });
+export async function navigateToNextUserTaskInCorrelation(correlationId: string): Promise<void> {
+  const userTask: DataModels.FlowNodeInstances.UserTaskInstance | null = await getWaitingUserTaskByCorrelationId(
+    correlationId
+  );
 
-  if (flowNodeInstances.totalCount === 0) {
-    throw new Error(`No suspended FlowNodeInstance found for Correlation with ID ${correlationId}`);
+  if (userTask === null) {
+    throw new Error(`No suspended UserTaskInstance found for Correlation with ID ${correlationId}`);
   }
 
-  const flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance = flowNodeInstances.flowNodeInstances[0];
-
-  const processModelId: string = flowNodeInstance.processModelId;
-  const processInstanceId: string = flowNodeInstance.processInstanceId;
-  const flowNodeId: string = flowNodeInstance.flowNodeId;
-
-  const uri: string = `/${processModelId}/${processInstanceId}/${flowNodeId}`;
-
-  redirect(uri);
+  await navigateToUserTaskInstance(userTask);
 }
 
-export async function navigateToNextTaskOfSameType(flowNodeType: BpmnType) {
-  const flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstanceList = await Client.flowNodeInstances.query({
-    flowNodeType: flowNodeType,
-    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-  });
+export async function navigateToNextUserTaskOfSameType(flowNodeId: string): Promise<void> {
+  const userTaskList: DataModels.FlowNodeInstances.UserTaskList = await getWaitingUserTasksByFlowNodeId(flowNodeId);
 
-  if (flowNodeInstances.totalCount === 0) {
-    throw new Error(`No suspended FlowNodeInstance found for FlowNodeType ${flowNodeType}`);
+  if (userTaskList.userTasks.length === 0) {
+    throw new Error(`No suspended FlowNodeInstance found for FlowNodeId ${flowNodeId}`);
   }
 
-  const flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance = flowNodeInstances.flowNodeInstances[0];
+  const userTask: DataModels.FlowNodeInstances.UserTaskInstance = userTaskList.userTasks[0];
 
-  const processModelId: string = flowNodeInstance.processModelId;
-  const processInstanceId: string = flowNodeInstance.processInstanceId;
-  const flowNodeId: string = flowNodeInstance.flowNodeId;
-
-  const uri: string = `/${processModelId}/${processInstanceId}/${flowNodeId}`;
-
-  redirect(uri);
+  await navigateToUserTaskInstance(userTask);
 }
 
 export async function navigateToUrl(url: string) {
   revalidatePath(url);
   redirect(url);
+}
+
+async function navigateToUserTaskInstance(userTaskInstance: DataModels.FlowNodeInstances.UserTaskInstance) {
+  const processModelId: string = userTaskInstance.processModelId;
+  const processInstanceId: string = userTaskInstance.processInstanceId;
+  const flowNodeId: string = userTaskInstance.flowNodeId;
+
+  const uri: string = `/${processModelId}/${processInstanceId}/${flowNodeId}`;
+
+  redirect(uri);
 }
