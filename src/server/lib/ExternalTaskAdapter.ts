@@ -35,7 +35,10 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
     await importAndTranspile(fullWorkerFilePath);
     const pathToModule = path.join(directory, 'dist', 'worker.js');
 
-    const module = await import(pathToModule);
+    let module = await import(pathToModule);
+    if (module.default.default) {
+      module = module.default;
+    }
 
     const identity = await getIdentity();
     const lockDuration = (await module.lockDuration) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.lockDuration;

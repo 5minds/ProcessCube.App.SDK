@@ -140,6 +140,9 @@ async function ne(e) {
     c.info(`Found worker file in directory '${r}'`);
     let i = l.default.join(r, u);
     await ae(i);
+    const { inspect } = require('node:util');
+    console.log(inspect(require.resolve(l.default.join(r, 'dist', 'worker.js'))), 'require.resolve');
+    console.log(inspect(await import(l.default.join(r, 'dist', 'worker.js'))), 'import');
     let f = await import(l.default.join(r, 'dist', 'worker.js')),
       _ = await oe(),
       M = (await f.lockDuration) ?? T.lockDuration,
