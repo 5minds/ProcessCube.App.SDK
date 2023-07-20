@@ -118,6 +118,25 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
   return null;
 }
 
+export async function getWaitingUserTaskByProcessInstanceId(
+  processInstanceId: string,
+  options?: Parameters<typeof Client.userTasks.query>[1]
+) {
+  const result = await Client.userTasks.query(
+    {
+      processInstanceId: processInstanceId,
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    options
+  );
+
+  if (result.userTasks.length > 0) {
+    return result.userTasks[0];
+  }
+
+  return null;
+}
+
 /**
  * @param correlationId The Correlation ID
  * @returns DataModels.FlowNodeInstances.UserTaskInstance | null

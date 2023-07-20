@@ -2,8 +2,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { RedirectType } from 'next/dist/client/components/redirect';
 
-import { BpmnType, DataModels } from '@5minds/processcube_engine_client';
-import { Client } from '../lib/internal/EngineClient';
 
 export async function hardNavigate(url: string, type?: RedirectType) {
   revalidatePath(url);
@@ -14,7 +12,7 @@ export async function navigateToNextTaskInProcess(processInstanceId: string): Pr
   const flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstanceList = await Client.flowNodeInstances.query({
     processInstanceId: processInstanceId,
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-  });
+export async function navigateToNextUserTaskInProcess(processInstanceId: string): Promise<void> {
 
   if (flowNodeInstances.totalCount === 0) {
     throw new Error(`No suspended FlowNodeInstance found for ProcessInstance with ID ${processInstanceId}`);
