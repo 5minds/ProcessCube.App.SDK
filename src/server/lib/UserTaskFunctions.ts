@@ -1,43 +1,51 @@
 import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
-async function getUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
-  const result = await Client.userTasks.query({
-    processInstanceId: processInstanceId,
-    flowNodeId: flowNodeId,
-  });
-
-  if (result.totalCount == 0) {
-    return null;
-  }
-
-  return result.userTasks[0];
-}
-
-export async function waitForUserTaskByProcessInstanceId(processInstanceId: string, flowNodeId: string) {
+/**
+ * Waits for a UserTask to be created and returns it.
+ *
+ * @param filterBy Additional filter options
+ * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
+ * @param filterBy.flowNodeId The UserTask FlowNode ID (BPMN)
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The created UserTask.
+ */
+export async function waitForUserTask(
+  filterBy: {
+    processInstanceId?: string;
+    flowNodeId?: string;
+  } = {}
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
+  const { processInstanceId, flowNodeId } = filterBy;
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
-    const promise = Client.userTasks.onUserTaskWaiting(async (event) => {
-      if (
-        event.processInstanceId === processInstanceId &&
-        event.flowNodeId === flowNodeId &&
-        event.flowNodeInstanceId != null
-      ) {
-        const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId);
-        if (userTask != null) {
-          return resolve(userTask);
-        }
+    const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
+      const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
+      const processInstanceIdGivenButNotMatching =
+        processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
+      const flowNodeIdGivenButNotMatching = flowNodeId !== undefined && event.flowNodeId !== flowNodeId;
+      const processInstanceIdAndFlowNodeIdGivenButNotMatching =
+        processInstanceId !== undefined &&
+        flowNodeId !== undefined &&
+        event.processInstanceId !== processInstanceId &&
+        event.flowNodeId !== flowNodeId;
 
+      if (
+        flowNodeInstanceIdIsUndefined ||
+        processInstanceIdGivenButNotMatching ||
+        flowNodeIdGivenButNotMatching ||
+        processInstanceIdAndFlowNodeIdGivenButNotMatching
+      ) {
+        return;
+      }
+
+      const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId as string);
+      Client.notification.removeSubscription(sub);
+
+      if (userTask === null) {
         return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
       }
+
+      return resolve(userTask);
     });
-
-    const userTask = await getUserTaskByProcessInstanceId(processInstanceId, flowNodeId);
-
-    if (userTask) {
-      resolve(userTask);
-    }
-
-    await promise;
   });
 }
 
@@ -66,12 +74,18 @@ export async function getUserTasks(...args: Parameters<typeof Client.userTasks.q
  * @returns DataModels.FlowNodeInstances.UserTaskList
  */
 export async function getWaitingUserTasks(options?: Parameters<typeof Client.userTasks.query>[1]) {
-  return Client.userTasks.query(
+  const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
     options
   );
+
+  if (result.totalCount === 0) {
+    return null;
+  }
+
+  return result.userTasks;
 }
 
 /**
