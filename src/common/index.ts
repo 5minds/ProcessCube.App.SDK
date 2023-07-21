@@ -1,6 +1,15 @@
 export * from './components/RemoteUserTask';
 export * from './functions/hasClaim';
 
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      NEXTAUTH_CLIENT_ID?: string;
+      PROCESSCUBE_AUTHORITY_URL?: string;
+    }
+  }
+}
+
 import NextAuth, { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
@@ -12,6 +21,7 @@ declare module 'next-auth' {
       /** The user's identity claims. */
       claims?: Record<string, unknown>;
     } & DefaultSession['user'];
+    error?: 'RefreshAccessTokenError';
   }
 }
 
@@ -24,5 +34,9 @@ declare module 'next-auth/jwt' {
     accessToken?: string;
     /** OpenID ID Token */
     idToken?: string;
+    /** OpenID Refresh Token */
+    refreshToken?: string;
+    expiresAt: number;
+    error?: 'RefreshAccessTokenError';
   }
 }
