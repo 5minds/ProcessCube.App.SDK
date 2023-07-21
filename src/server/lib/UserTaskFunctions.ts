@@ -80,7 +80,7 @@ export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, resul
 export async function getUserTasks(...args: Parameters<typeof Client.userTasks.query>) {
   const result = await Client.userTasks.query(...args);
 
-  if (result.totalCount === 0) {
+  if (result.userTasks.length === 0) {
     return null;
   }
 
