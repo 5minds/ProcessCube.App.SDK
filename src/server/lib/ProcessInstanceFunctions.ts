@@ -11,7 +11,6 @@ export async function getActiveProcessInstances(options?: Parameters<typeof Clie
     {
       state: DataModels.ProcessInstances.ProcessInstanceState.running,
     },
-
     options
   );
 

@@ -141,7 +141,7 @@ export async function getWaitingUserTasksByFlowNodeId(
 export async function getWaitingUserTasksByProcessInstanceId(
   processInstanceId: string,
   options?: Parameters<typeof Client.userTasks.query>[1]
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       processInstanceId: processInstanceId,
@@ -168,7 +168,7 @@ export async function getWaitingUserTasksByFlowNodeIdAndProcessInstanceId(
   flowNodeId: string | string[],
   processInstanceId: string,
   options?: Parameters<typeof Client.userTasks.query>[1]
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       flowNodeId: flowNodeId,
@@ -194,7 +194,7 @@ export async function getWaitingUserTasksByFlowNodeIdAndProcessInstanceId(
 export async function getWaitingUserTaskByFlowNodeInstanceId(
   flowNodeInstanceId: string,
   options?: Parameters<typeof Client.userTasks.query>[1]
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance | null> {
   const result = await Client.userTasks.query(
     {
       flowNodeInstanceId: flowNodeInstanceId,
@@ -221,7 +221,7 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
 export async function getWaitingUserTasksByCorrelationId(
   correlationId: string,
   options?: Parameters<typeof Client.userTasks.query>[1]
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       correlationId: correlationId,
@@ -249,7 +249,7 @@ export async function getReservedUserTasksByIdentity(
     limit?: number;
     sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
   }
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
@@ -282,7 +282,7 @@ export async function getAssignedUserTasksByIdentity(
     limit?: number;
     sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
   }
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
