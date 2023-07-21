@@ -5,6 +5,7 @@ import { Engine_URL } from './internal/EngineClient';
 import path from 'path';
 import esbuild from 'esbuild';
 import { promises as fs, PathLike } from 'fs';
+import { Issuer } from 'openid-client';
 
 const DEFAULT_EXTERNAL_TASK_WORKER_CONFIG: IExternalTaskWorkerConfig = {
   lockDuration: 20000,
@@ -75,9 +76,40 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
 // TODO refresh identity in regular intervals
 // TODO replace with real identity provider
 async function getIdentity(): Promise<Identity> {
+  const issuer = await Issuer.discover('http://authority:11560/');
+  let client;
+
+  try {
+    client = new issuer.Client({
+      client_id: 'test_etw',
+      client_secret: 'abc',
+    });
+  } catch (error) {
+    logger.error('Could not create client', { error });
+    throw error;
+  }
+
+  logger.info('Created client', { client });
+
+  let tokenSet;
+  try {
+    tokenSet = await client!.grant({
+      grant_type: 'client_credentials',
+      // scope: 'test_resource',
+    });
+  } catch (error) {
+    logger.error('Could not get token set', { error });
+    throw error;
+  }
+
+  logger.info('Got token set', {
+    accessToken: tokenSet!.access_token,
+    sub: tokenSet!.claims().sub,
+  });
+
   return {
-    token: 'ZHVtbXlfdG9rZW4=',
-    userId: 'dummy_token',
+    token: tokenSet!.access_token as string,
+    userId: tokenSet!.claims().sub,
   };
 }
 

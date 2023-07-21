@@ -1,0 +1,14 @@
+{
+  "level": 30,
+  "time": "2023-07-21T08:19:36.267Z",
+  "levelName": "info",
+  "namespace": "external_task_worker_playground",
+  "message": "Client: ",
+  "grant_types": ["authorization_code"],
+  "id_token_signed_response_alg": "RS256",
+  "authorization_signed_response_alg": "RS256",
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "client_secret_basic",
+  "client_id": "test_etw",
+  "client_secret": "abc"
+}
