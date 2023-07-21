@@ -18,17 +18,6 @@ export async function waitForUserTask(
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   const { processInstanceId, flowNodeId } = filterBy;
 
-  const userTasks = await getUserTasks({
-    processInstanceId: processInstanceId,
-    flowNodeId: flowNodeId,
-    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-  });
-  const userTask = userTasks?.[0];
-
-  if (userTask) {
-    return userTask;
-  }
-
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
       const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
@@ -59,6 +48,17 @@ export async function waitForUserTask(
 
       return resolve(userTask);
     });
+
+    const userTasks = await getUserTasks({
+      processInstanceId: processInstanceId,
+      flowNodeId: flowNodeId,
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    });
+    const userTask = userTasks?.[0];
+
+    if (userTask) {
+      resolve(userTask);
+    }
   });
 }
 
@@ -70,7 +70,7 @@ export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, resul
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
   });
 
-  if (userTasks.totalCount === 0) {
+  if (userTasks.userTasks.length === 0) {
     return null;
   }
 
@@ -102,7 +102,7 @@ export async function getWaitingUserTasks(
     options
   );
 
-  if (result.totalCount === 0) {
+  if (result.userTasks.length === 0) {
     return null;
   }
 
