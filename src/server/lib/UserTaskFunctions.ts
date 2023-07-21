@@ -136,59 +136,6 @@ export async function getWaitingUserTasksByFlowNodeId(
 
 /**
  *
- * @param processInstanceId The ID of the ProcessInstance the UserTask belongs to
- * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
- * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
- */
-export async function getWaitingUserTasksByProcessInstanceId(
-  processInstanceId: string,
-  options?: Parameters<typeof Client.userTasks.query>[1]
-): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
-  const result = await Client.userTasks.query(
-    {
-      processInstanceId: processInstanceId,
-      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-    },
-    options
-  );
-
-  if (result.userTasks.length === 0) {
-    return null;
-  }
-
-  return result.userTasks;
-}
-
-/**
- *
- * @param flowNodeId The UserTasks ID (BPMN)
- * @param processInstanceId The ID of the ProcessInstance the UserTask belongs to
- * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
- * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
- */
-export async function getWaitingUserTasksByFlowNodeIdAndProcessInstanceId(
-  flowNodeId: string | string[],
-  processInstanceId: string,
-  options?: Parameters<typeof Client.userTasks.query>[1]
-): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
-  const result = await Client.userTasks.query(
-    {
-      flowNodeId: flowNodeId,
-      processInstanceId: processInstanceId,
-      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-    },
-    options
-  );
-
-  if (result.userTasks.length === 0) {
-    return null;
-  }
-
-  return result.userTasks;
-}
-
-/**
- *
  * @param flowNodeInstanceId The UserTask Instance ID
  * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance | null>}
