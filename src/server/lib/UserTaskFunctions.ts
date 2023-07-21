@@ -2,6 +2,8 @@ import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
 /**
+ * If there is no UserTask waiting, this function will wait for the next UserTask to be created.
+ * If there is already a UserTask waiting, this function will return it.
  *
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
