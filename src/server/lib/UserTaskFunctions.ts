@@ -89,7 +89,7 @@ export async function getUserTasks(...args: Parameters<typeof Client.userTasks.q
 
 /**
  *
- * @param options Additional options for the query e.g. `identity` or `sortSettings`
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getWaitingUserTasks(
@@ -112,7 +112,7 @@ export async function getWaitingUserTasks(
 /**
  *
  * @param flowNodeId The UserTasks ID (BPMN)
- * @param options Additional options for the query e.g. `identity` or `sortSettings`
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getWaitingUserTasksByFlowNodeId(
@@ -137,7 +137,7 @@ export async function getWaitingUserTasksByFlowNodeId(
 /**
  *
  * @param processInstanceId The ID of the ProcessInstance the UserTask belongs to
- * @param options Additional options for the query e.g. `identity` or `sortSettings`
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getWaitingUserTasksByProcessInstanceId(
@@ -163,7 +163,7 @@ export async function getWaitingUserTasksByProcessInstanceId(
  *
  * @param flowNodeId The UserTasks ID (BPMN)
  * @param processInstanceId The ID of the ProcessInstance the UserTask belongs to
- * @param options Additional options for the query e.g. `identity` or `sortSettings`
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getWaitingUserTasksByFlowNodeIdAndProcessInstanceId(
@@ -190,7 +190,7 @@ export async function getWaitingUserTasksByFlowNodeIdAndProcessInstanceId(
 /**
  *
  * @param flowNodeInstanceId The UserTask Instance ID
- * @param options Additional options for the query e.g. `identity`
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance | null>}
  */
 export async function getWaitingUserTaskByFlowNodeInstanceId(
@@ -217,7 +217,7 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
 
 /**
  * @param correlationId The Correlation ID
- * @param options Additional options for the query e.g. `identity`
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getWaitingUserTasksByCorrelationId(
@@ -241,7 +241,7 @@ export async function getWaitingUserTasksByCorrelationId(
 
 /**
  * @param identity The identity of the user
- * @param options Additional options for the query e.g. `sortSettings`
+ * @param options Additional options for the query e.g. {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getReservedUserTasksByIdentity(
@@ -274,7 +274,7 @@ export async function getReservedUserTasksByIdentity(
 /**
  *
  * @param identity The identity of the user
- * @param options Additional options for the query e.g. `sortSettings`
+ * @param options Additional options for the query e.g. {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getAssignedUserTasksByIdentity(
