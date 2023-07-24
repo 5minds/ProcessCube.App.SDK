@@ -78,8 +78,11 @@
   },
   "dependencies": {
     "@5minds/processcube_engine_client": "^4.3.1",
+    "@chakra-ui/pro-theme": "^0.0.66",
+    "@chakra-ui/react": "^2.6.1",
     "client-only": "^0.0.1",
     "jwt-decode": "^3.1.2",
-    "only-server": "^0.0.1"
+    "only-server": "^0.0.1",
+    "react-icons": "^4.10.1"
   }
 }
