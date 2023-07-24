@@ -29,17 +29,16 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     }
 
     const fullWorkerFilePath = path.join(directory, workerFile);
-    await transpileTypescriptFile(fullWorkerFilePath);
-
-    const pathToModule = path.join(directory, 'dist', 'worker.js');
+    const outFilePath = path.join(path.dirname(fullWorkerFilePath), 'dist', 'worker.js');
+    await transpileTypescriptFile(fullWorkerFilePath, outFilePath);
 
     // TODO: find a better way to import the module?
-    let module = await import(pathToModule);
+    let module = await import(outFilePath);
     if (module.default.default) {
       module = module.default;
     }
 
-    const identity = await getIdentity();
+    const identity = await getIdentityForExternalTaskWorkers();
     const lockDuration = (await module.lockDuration) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.lockDuration;
     const maxTasks = (await module.maxTasks) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.maxTasks;
     const longpollingTimeout =
@@ -73,12 +72,13 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
 
     externalTaskWorker.start();
     allExternalTaskWorker.push(externalTaskWorker);
+    await fs.rm(outFilePath, { recursive: true });
   }
 
   return allExternalTaskWorker;
 }
 
-async function getIdentity(): Promise<Identity> {
+async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
   const issuer = await Issuer.discover('http://authority:11560/');
   const client = new issuer.Client({
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
@@ -105,11 +105,11 @@ async function getIdentity(): Promise<Identity> {
  * @returns {Promise<NodeJS.Timeout>} A promise that resolves with the interval that is refreshing the identity
  * */
 async function startRefreshingIdentity(externalTaskWorker: ExternalTaskWorker<any, any>): Promise<NodeJS.Timeout> {
-  const expires_in = await getExpiresIn();
+  const expires_in = await getExpiresInForExternalTaskWorkers();
   const delay = expires_in * 0.85 * 1000;
   const interval = setInterval(async (): Promise<void> => {
     logger.info('Refreshing identity');
-    const newIdentity = await getIdentity();
+    const newIdentity = await getIdentityForExternalTaskWorkers();
     externalTaskWorker.identity = newIdentity;
   }, delay);
 
@@ -119,13 +119,13 @@ async function startRefreshingIdentity(externalTaskWorker: ExternalTaskWorker<an
 /**
  * Transpile a typescript file to javascript.
  * @param {string} entryPoint The path to the typescript file
- * @param {string} outdir The directory to put the transpiled file in
+ * @param {string} outFile The path to the transpiled javascript file
  * @returns {Promise<void>} A promise that resolves when the file is transpiled
  * */
-async function transpileTypescriptFile(entryPoint: string, outdir?: string): Promise<void> {
+async function transpileTypescriptFile(entryPoint: string, outFile: string): Promise<void> {
   const result = await esbuild.build({
     entryPoints: [entryPoint],
-    outdir: outdir ?? path.join(path.dirname(entryPoint), 'dist'),
+    outfile: outFile,
     bundle: true,
     platform: 'node',
     target: 'node14',
@@ -168,7 +168,7 @@ async function getDirectories(source: PathLike): Promise<string[]> {
  * Get the time in seconds until the current access token expires.
  * @returns {Promise<number>} A promise that resolves with the time in seconds until the current access token expires
  * */
-async function getExpiresIn(): Promise<number> {
+async function getExpiresInForExternalTaskWorkers(): Promise<number> {
   const issuer = await Issuer.discover('http://authority:11560/');
   const client = new issuer.Client({
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
