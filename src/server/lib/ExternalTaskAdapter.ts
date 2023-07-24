@@ -72,7 +72,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
 
     externalTaskWorker.start();
     allExternalTaskWorker.push(externalTaskWorker);
-    await fs.rm(outFilePath, { recursive: true });
+    await fs.rm(path.dirname(outFilePath), { recursive: true });
   }
 
   return allExternalTaskWorker;
