@@ -16,9 +16,9 @@ const DEFAULT_EXTERNAL_TASK_WORKER_CONFIG: IExternalTaskWorkerConfig = {
 
 const logger = new Logger('external_task_worker_playground');
 
-export async function subscribeToExternalTasks(external_tasks_dir: string): Promise<ExternalTaskWorker<any, any>[]> {
+export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<ExternalTaskWorker<any, any>[]> {
   const allExternalTaskWorker = [];
-  const directories = await getDirectories(external_tasks_dir);
+  const directories = await getDirectories(externalTasksDirPath);
 
   for (const directory of directories) {
     const files = await readdir(directory);
@@ -30,6 +30,7 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
 
     const fullWorkerFilePath = path.join(directory, workerFile);
     await transpileTypescriptFile(fullWorkerFilePath);
+
     const pathToModule = path.join(directory, 'dist', 'worker.js');
 
     // TODO: find a better way to import the module?
@@ -109,7 +110,6 @@ async function startRefreshingIdentity(externalTaskWorker: ExternalTaskWorker<an
   const interval = setInterval(async (): Promise<void> => {
     logger.info('Refreshing identity');
     const newIdentity = await getIdentity();
-
     externalTaskWorker.identity = newIdentity;
   }, delay);
 
