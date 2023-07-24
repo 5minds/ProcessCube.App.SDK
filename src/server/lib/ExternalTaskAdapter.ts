@@ -77,99 +77,25 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
   return allExternalTaskWorker;
 }
 
-// TODO refresh identity in regular intervals
-// TODO replace with real identity provider
 async function getIdentity(): Promise<Identity> {
-  try {
-    logger.info('Discovering issuer...');
-    const issuer = await Issuer.discover('http://authority:11560/');
-    logger.info('Issuer discovered:', { issuer: issuer.issuer });
+  const issuer = await Issuer.discover('http://authority:11560/');
+  const client = new issuer.Client({
+    client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
+    client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
+  });
 
-    let client;
-    try {
-      logger.info('Creating client...');
-      client = new issuer.Client({
-        client_id: 'test_etw',
-        client_secret: 'abc',
-      });
-      logger.info('Client created:', { client });
-    } catch (error) {
-      logger.error('Could not create client:', { error });
-      throw error;
-    }
+  const tokenSet = await client.grant({
+    grant_type: 'client_credentials',
+    scope: 'engine_etw',
+  });
 
-    let tokenSet;
-    try {
-      logger.info('Requesting token set...');
-      tokenSet = await client!.grant({
-        grant_type: 'client_credentials',
-        scope: 'engine_etw',
-      });
-      logger.info('Token set received:', { tokenSet });
-    } catch (error) {
-      logger.error('Could not get token set:', { error });
-      throw error;
-    }
+  const accessToken = tokenSet.access_token as string;
+  const decodedToken = jwtDecode<Record<string, unknown>>(accessToken);
 
-    logger.info(`${tokenSet!.expires_in} seconds until token expires`);
-    const accessToken = tokenSet!.access_token as string;
-    const decodedToken = jwtDecode<Record<string, unknown>>(accessToken);
-    logger.info('Decoded token from accessToken:', { decodedToken });
-
-    return {
-      token: tokenSet!.access_token as string,
-      userId: decodedToken.sub as string,
-    };
-  } catch (error) {
-    // Add a catch block at the highest level to log unexpected errors
-    logger.error('Unexpected error occurred:', { error });
-    throw error;
-  }
-}
-
-/**
- * Get the time in seconds until the current access token expires.
- * @returns {Promise<number>} A promise that resolves with the time in seconds until the current access token expires
- * */
-async function getExpiresIn(): Promise<number> {
-  try {
-    logger.info('Discovering issuer...');
-    const issuer = await Issuer.discover('http://authority:11560/');
-    logger.info('Issuer discovered:', { issuer: issuer.issuer });
-
-    let client;
-    try {
-      logger.info('Creating client...');
-      client = new issuer.Client({
-        client_id: 'test_etw',
-        client_secret: 'abc',
-      });
-      logger.info('Client created:', { client });
-    } catch (error) {
-      logger.error('Could not create client:', { error });
-      throw error;
-    }
-
-    let tokenSet;
-    try {
-      logger.info('Requesting token set...');
-      tokenSet = await client!.grant({
-        grant_type: 'client_credentials',
-        scope: 'engine_etw',
-      });
-      logger.info('Token set received:', { tokenSet });
-    } catch (error) {
-      logger.error('Could not get token set:', { error });
-      throw error;
-    }
-
-    logger.info(`${tokenSet!.expires_in} seconds until token expires`);
-    return tokenSet!.expires_in as number;
-  } catch (error) {
-    // Add a catch block at the highest level to log unexpected errors
-    logger.error('Unexpected error occurred:', { error });
-    throw error;
-  }
+  return {
+    token: tokenSet.access_token as string,
+    userId: decodedToken.sub as string,
+  };
 }
 
 /**
@@ -180,7 +106,6 @@ async function getExpiresIn(): Promise<number> {
 async function startRefreshingIdentity(externalTaskWorker: ExternalTaskWorker<any, any>): Promise<NodeJS.Timeout> {
   const expires_in = await getExpiresIn();
   const delay = expires_in * 0.85 * 1000;
-  logger.info(`Refreshing identity in ${delay}ms`);
   const interval = setInterval(async (): Promise<void> => {
     logger.info('Refreshing identity');
     const newIdentity = await getIdentity();
@@ -237,4 +162,23 @@ async function getDirectories(source: PathLike): Promise<string[]> {
   );
 
   return Array.prototype.concat(...directories);
+}
+
+/**
+ * Get the time in seconds until the current access token expires.
+ * @returns {Promise<number>} A promise that resolves with the time in seconds until the current access token expires
+ * */
+async function getExpiresIn(): Promise<number> {
+  const issuer = await Issuer.discover('http://authority:11560/');
+  const client = new issuer.Client({
+    client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
+    client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
+  });
+
+  const tokenSet = await client.grant({
+    grant_type: 'client_credentials',
+    scope: 'engine_etw',
+  });
+
+  return tokenSet.expires_in as number;
 }

@@ -7,6 +7,8 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       PROCESSCUBE_ENGINE_URL?: string;
+      EXTERNAL_TASK_WORKER_CLIENT_ID?: string;
+      EXTERNAL_TASK_WORKER_CLIENT_SECRET?: string;
     }
   }
 }
