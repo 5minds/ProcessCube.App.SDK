@@ -34,6 +34,7 @@ export async function subscribeToExternalTasks(external_tasks_dir: string): Prom
 
     // TODO: find a better way to import the module?
     let module = await import(pathToModule);
+    logger.info(`module.default.default: ${module.default.default}`);
     if (module.default.default) {
       module = module.default;
     }
@@ -204,7 +205,7 @@ async function transpileTypescriptFile(entryPoint: string, outdir?: string): Pro
     bundle: true,
     platform: 'node',
     target: 'node14',
-    format: 'cjs',
+    format: 'esm',
   });
 
   if (result.errors.length > 0) {
