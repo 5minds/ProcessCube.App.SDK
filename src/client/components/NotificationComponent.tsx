@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiBell } from 'react-icons/fi';
+import { FiBell, FiBellOff } from 'react-icons/fi';
 import { IconButton } from '@chakra-ui/react';
 
 export const NotificationComponent = () => {
@@ -26,10 +26,9 @@ export const NotificationComponent = () => {
 
   return (
     <IconButton
-      icon={<FiBell fontSize="1.25rem" />}
+      icon={showNotifications ? <FiBell fontSize="1.25rem" /> : <FiBellOff fontSize="1.25rem" />}
       aria-label="Settings"
       onClick={() => setShowNotifications(!showNotifications)}
-      style={{ color: showNotifications ? 'red' : 'white' }}
     />
   );
 };
