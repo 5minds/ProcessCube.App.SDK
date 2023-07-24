@@ -4,7 +4,7 @@ import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcu
 import { Engine_URL } from './internal/EngineClient';
 import path from 'path';
 import esbuild from 'esbuild';
-import { promises as fs, PathLike } from 'fs';
+import fs, { promises as fsp, PathLike } from 'fs';
 import { Issuer } from 'openid-client';
 import jwtDecode from 'jwt-decode';
 
@@ -19,6 +19,10 @@ const logger = new Logger('external_task_worker_playground');
 export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<ExternalTaskWorker<any, any>[]> {
   const allExternalTaskWorker = [];
   const directories = await getDirectories(externalTasksDirPath);
+  const outDir = path.join(externalTasksDirPath, 'dist');
+  if (!fs.existsSync(outDir)) {
+    await fsp.mkdir(outDir);
+  }
 
   for (const directory of directories) {
     const files = await readdir(directory);
@@ -29,7 +33,8 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     }
 
     const fullWorkerFilePath = path.join(directory, workerFile);
-    const outFilePath = path.join(path.dirname(fullWorkerFilePath), 'dist', 'worker.js');
+    const topic = path.basename(directory);
+    const outFilePath = path.join(outDir, `${topic}_worker.js`);
     await transpileTypescriptFile(fullWorkerFilePath, outFilePath);
 
     // TODO: find a better way to import the module?
@@ -44,7 +49,6 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     const longpollingTimeout =
       (await module.longpollingTimeout) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.longpollingTimeout;
 
-    const topic = path.basename(directory);
     const handler = module.default;
 
     const config: IExternalTaskWorkerConfig = {
@@ -72,14 +76,14 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
 
     externalTaskWorker.start();
     allExternalTaskWorker.push(externalTaskWorker);
-    await fs.rm(path.dirname(outFilePath), { recursive: true });
   }
+  await fsp.rm(outDir, { recursive: true });
 
   return allExternalTaskWorker;
 }
 
 async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
-  const issuer = await Issuer.discover('http://authority:11560/');
+  const issuer = await Issuer.discover(process.env.AUTHORITY_URL as string);
   const client = new issuer.Client({
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
@@ -152,7 +156,7 @@ async function transpileTypescriptFile(entryPoint: string, outFile: string): Pro
  * @returns A list of all directories in the directory
  **/
 async function getDirectories(source: PathLike): Promise<string[]> {
-  const dirents = await fs.readdir(source, { withFileTypes: true });
+  const dirents = await fsp.readdir(source, { withFileTypes: true });
   const directories = await Promise.all(
     dirents.map(async (dirent) => {
       const fullPath = path.join(source.toString(), dirent.name);
@@ -169,7 +173,7 @@ async function getDirectories(source: PathLike): Promise<string[]> {
  * @returns {Promise<number>} A promise that resolves with the time in seconds until the current access token expires
  * */
 async function getExpiresInForExternalTaskWorkers(): Promise<number> {
-  const issuer = await Issuer.discover('http://authority:11560/');
+  const issuer = await Issuer.discover(process.env.AUTHORITY_URL as string);
   const client = new issuer.Client({
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
