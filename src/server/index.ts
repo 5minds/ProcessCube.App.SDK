@@ -9,7 +9,7 @@ declare global {
       PROCESSCUBE_ENGINE_URL?: string;
       EXTERNAL_TASK_WORKER_CLIENT_ID?: string;
       EXTERNAL_TASK_WORKER_CLIENT_SECRET?: string;
-      AUTHORITY_URL?: string;
+      PROCESSCUBE_AUTHORITY_URL?: string;
     }
   }
 }

@@ -93,7 +93,7 @@ async function getWorkerFile(directory: string): Promise<string | null> {
 }
 
 async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
-  const issuer = await Issuer.discover(process.env.AUTHORITY_URL as string);
+  const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
   const client = new issuer.Client({
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
@@ -182,7 +182,7 @@ async function getDirectories(source: PathLike): Promise<string[]> {
  * @returns {Promise<number>} A promise that resolves with the time in seconds until the current access token expires
  * */
 async function getExpiresInForExternalTaskWorkers(): Promise<number> {
-  const issuer = await Issuer.discover(process.env.AUTHORITY_URL as string);
+  const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
   const client = new issuer.Client({
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
