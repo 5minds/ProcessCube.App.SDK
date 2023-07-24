@@ -1,4 +1,3 @@
-import { readdir } from 'fs/promises';
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
 import { Engine_URL } from './internal/EngineClient';
@@ -79,7 +78,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
 }
 
 async function getWorkerFile(directory: string): Promise<string | null> {
-  const files = await readdir(directory);
+  const files = await fsp.readdir(directory);
   const workerFiles = files.filter((file) => file.startsWith('worker') && file.endsWith('.ts'));
 
   if (workerFiles.length === 0) {
