@@ -14,7 +14,7 @@ const DEFAULT_EXTERNAL_TASK_WORKER_CONFIG: IExternalTaskWorkerConfig = {
   longpollingTimeout: 1000,
 };
 
-const logger = new Logger('external_task_worker_playground');
+const logger = new Logger('ExternalTaskAdapter');
 
 export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<ExternalTaskWorker<any, any>[]> {
   const allExternalTaskWorker = [];
@@ -26,6 +26,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
 
   for (const directory of directories) {
     const workerFile = await getWorkerFile(directory);
+
     if (!workerFile) {
       continue;
     }
@@ -35,7 +36,6 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     const outFilePath = path.join(outDir, `${topic}_worker.js`);
     await transpileTypescriptFile(fullWorkerFilePath, outFilePath);
 
-    // TODO: find a better way to import the module?
     let module = await import(outFilePath);
     if (module.default.default) {
       module = module.default;
@@ -46,9 +46,6 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     const maxTasks = (await module.maxTasks) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.maxTasks;
     const longpollingTimeout =
       (await module.longpollingTimeout) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.longpollingTimeout;
-
-    const handler = module.default;
-
     const config: IExternalTaskWorkerConfig = {
       lockDuration: lockDuration,
       maxTasks: maxTasks,
@@ -56,10 +53,10 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
       identity: identity,
     };
 
+    const handler = module.default;
     const externalTaskWorker = new ExternalTaskWorker<any, any>(Engine_URL, topic, handler, config);
     const interval = await startRefreshingIdentity(externalTaskWorker);
 
-    // TODO remove log
     logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
 
     externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
@@ -70,6 +67,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
         workerId: externalTaskWorker.workerId,
       });
       clearInterval(interval);
+      throw error;
     });
 
     externalTaskWorker.start();
@@ -80,7 +78,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
   return allExternalTaskWorker;
 }
 
-async function getWorkerFile(directory: string) {
+async function getWorkerFile(directory: string): Promise<string | null> {
   const files = await readdir(directory);
   const workerFiles = files.filter((file) => file.startsWith('worker') && file.endsWith('.ts'));
 
@@ -125,7 +123,6 @@ async function startRefreshingIdentity(externalTaskWorker: ExternalTaskWorker<an
   const expires_in = await getExpiresInForExternalTaskWorkers();
   const delay = expires_in * 0.85 * 1000;
   const interval = setInterval(async (): Promise<void> => {
-    logger.info('Refreshing identity');
     const newIdentity = await getIdentityForExternalTaskWorkers();
     externalTaskWorker.identity = newIdentity;
   }, delay);
