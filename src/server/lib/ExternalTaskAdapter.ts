@@ -25,9 +25,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
   }
 
   for (const directory of directories) {
-    const files = await readdir(directory);
-    const workerFile = files.find((file) => file.startsWith('worker') && file.endsWith('.ts'));
-
+    const workerFile = await getWorkerFile(directory);
     if (!workerFile) {
       continue;
     }
@@ -80,6 +78,21 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
   await fsp.rm(outDir, { recursive: true });
 
   return allExternalTaskWorker;
+}
+
+async function getWorkerFile(directory: string) {
+  const files = await readdir(directory);
+  const workerFiles = files.filter((file) => file.startsWith('worker') && file.endsWith('.ts'));
+
+  if (workerFiles.length === 0) {
+    return null;
+  }
+
+  if (workerFiles.length > 1) {
+    throw new Error(`Found more than one worker file in directory '${directory}'`);
+  }
+
+  return workerFiles[0];
 }
 
 async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
