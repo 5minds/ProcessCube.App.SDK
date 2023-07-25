@@ -22,7 +22,7 @@ const logger = new Logger('ExternalTaskAdapter');
 const withAuthority = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
 export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<ExternalTaskWorker<any, any>[]> {
-  const allExternalTaskWorker = [];
+  const allExternalTaskWorker: Array<ExternalTaskWorker<any, any>>= [];
   const directories = await getDirectories(externalTasksDirPath);
   const outDir = path.join(externalTasksDirPath, 'dist');
   if (!fs.existsSync(outDir)) {
