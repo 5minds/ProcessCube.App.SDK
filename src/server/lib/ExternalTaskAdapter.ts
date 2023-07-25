@@ -13,7 +13,13 @@ const DEFAULT_EXTERNAL_TASK_WORKER_CONFIG: IExternalTaskWorkerConfig = {
   longpollingTimeout: 1000,
 };
 
+const DUMMY_IDENTITY: Identity = {
+  token: 'ZHVtbXlfdG9rZW4=',
+  userId: 'dummy_token',
+};
+
 const logger = new Logger('ExternalTaskAdapter');
+const withAuthority = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
 export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<ExternalTaskWorker<any, any>[]> {
   const allExternalTaskWorker = [];
@@ -93,6 +99,10 @@ async function getWorkerFile(directory: string): Promise<string | null> {
 }
 
 async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
+  if (!withAuthority) {
+    return DUMMY_IDENTITY;
+  }
+
   const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
   const client = new issuer.Client({
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
@@ -116,9 +126,15 @@ async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
 /**
  * Start refreshing the identity in regular intervals.
  * @param {ExternalTaskWorker<any, any>} externalTaskWorker The external task worker to refresh the identity for
- * @returns {Promise<NodeJS.Timeout>} A promise that resolves with the interval that is refreshing the identity
+ * @returns {Promise<NodeJS.Timeout | undefined>} A promise that resolves with the interval that refreshes the identity or undefined if no authority is configured
  * */
-async function startRefreshingIdentity(externalTaskWorker: ExternalTaskWorker<any, any>): Promise<NodeJS.Timeout> {
+async function startRefreshingIdentity(
+  externalTaskWorker: ExternalTaskWorker<any, any>
+): Promise<NodeJS.Timeout | undefined> {
+  if (!withAuthority) {
+    return;
+  }
+
   const expires_in = await getExpiresInForExternalTaskWorkers();
   const delay = expires_in * 0.85 * 1000;
   const interval = setInterval(async (): Promise<void> => {
