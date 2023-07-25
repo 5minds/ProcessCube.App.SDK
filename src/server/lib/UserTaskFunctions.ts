@@ -2,7 +2,8 @@ import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
 /**
- * Waits for a UserTask to be created and returns it.
+ * If there is no UserTask waiting, this function will wait for the next UserTask to be created.
+ * If there is already a UserTask waiting, this function will return it.
  *
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
@@ -16,6 +17,7 @@ export async function waitForUserTask(
   } = {}
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   const { processInstanceId, flowNodeId } = filterBy;
+
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(async (event) => {
       const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
@@ -46,6 +48,18 @@ export async function waitForUserTask(
 
       return resolve(userTask);
     });
+
+    const userTasks = await getUserTasks({
+      processInstanceId: processInstanceId,
+      flowNodeId: flowNodeId,
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    });
+    const userTask = userTasks?.[0];
+
+    if (userTask) {
+      Client.notification.removeSubscription(sub);
+      resolve(userTask);
+    }
   });
 }
 
@@ -57,23 +71,31 @@ export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, resul
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
   });
 
-  if (userTasks.totalCount > 0) {
-    return userTasks.userTasks[0];
+  if (userTasks.userTasks.length === 0) {
+    return null;
   }
 
-  return null;
+  return userTasks.userTasks[0];
 }
 
 export async function getUserTasks(...args: Parameters<typeof Client.userTasks.query>) {
-  return Client.userTasks.query(...args);
+  const result = await Client.userTasks.query(...args);
+
+  if (result.userTasks.length === 0) {
+    return null;
+  }
+
+  return result.userTasks;
 }
 
 /**
  *
- * @param options Additional options for the query e.g. `identity` or `sortSettings`
- * @returns DataModels.FlowNodeInstances.UserTaskList
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
-export async function getWaitingUserTasks(options?: Parameters<typeof Client.userTasks.query>[1]) {
+export async function getWaitingUserTasks(
+  options?: Parameters<typeof Client.userTasks.query>[1]
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
@@ -81,7 +103,7 @@ export async function getWaitingUserTasks(options?: Parameters<typeof Client.use
     options
   );
 
-  if (result.totalCount === 0) {
+  if (result.userTasks.length === 0) {
     return null;
   }
 
@@ -91,58 +113,50 @@ export async function getWaitingUserTasks(options?: Parameters<typeof Client.use
 /**
  *
  * @param flowNodeId The UserTasks ID (BPMN)
- * @param options Additional options for the query e.g. `identity` or `sortSettings`
- * @returns DataModels.FlowNodeInstances.UserTaskList
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getWaitingUserTasksByFlowNodeId(
   flowNodeId: string | string[],
   options?: Parameters<typeof Client.userTasks.query>[1]
-) {
-  return Client.userTasks.query(
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
+  const result = await Client.userTasks.query(
     {
       flowNodeId: flowNodeId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
     options
   );
+
+  if (result.userTasks.length === 0) {
+    return null;
+  }
+
+  return result.userTasks;
 }
 
 /**
  *
  * @param flowNodeInstanceId The UserTask Instance ID
- * @param options Additional options for the query e.g. `identity`
- * @returns DataModels.FlowNodeInstances.UserTaskInstance | null
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity}
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance | null>}
  */
 export async function getWaitingUserTaskByFlowNodeInstanceId(
   flowNodeInstanceId: string,
   options?: Parameters<typeof Client.userTasks.query>[1]
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance | null> {
   const result = await Client.userTasks.query(
     {
       flowNodeInstanceId: flowNodeInstanceId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
-    options
+    {
+      ...options,
+      limit: 1,
+    }
   );
 
-  if (result.userTasks.length) {
-    return result.userTasks[0];
-  }
-
-  return null;
-}
-
-/**
- * @param correlationId The Correlation ID
- * @returns DataModels.FlowNodeInstances.UserTaskInstance | null
- */
-export async function getWaitingUserTaskByCorrelationId(correlationId: string) {
-  const result = await Client.userTasks.query({
-    correlationId: correlationId,
-    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-  });
-
-  if (result.totalCount == 0) {
+  if (result.userTasks.length === 0) {
     return null;
   }
 
@@ -150,9 +164,33 @@ export async function getWaitingUserTaskByCorrelationId(correlationId: string) {
 }
 
 /**
+ * @param correlationId The Correlation ID
+ * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity}
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
+ */
+export async function getWaitingUserTasksByCorrelationId(
+  correlationId: string,
+  options?: Parameters<typeof Client.userTasks.query>[1]
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
+  const result = await Client.userTasks.query(
+    {
+      correlationId: correlationId,
+      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    },
+    options
+  );
+
+  if (result.userTasks.length === 0) {
+    return null;
+  }
+
+  return result.userTasks;
+}
+
+/**
  * @param identity The identity of the user
- * @param options Additional options for the query e.g. `sortSettings`
- * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
+ * @param options Additional options for the query e.g. {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getReservedUserTasksByIdentity(
   identity: DataModels.Iam.Identity,
@@ -161,7 +199,7 @@ export async function getReservedUserTasksByIdentity(
     limit?: number;
     sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
   }
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
@@ -174,18 +212,18 @@ export async function getReservedUserTasksByIdentity(
 
   const reservedUserTasks = result.userTasks.filter((userTask) => userTask.actualOwnerId === identity.userId);
 
-  if (reservedUserTasks.length) {
-    return reservedUserTasks;
+  if (reservedUserTasks.length === 0) {
+    return null;
   }
 
-  return null;
+  return reservedUserTasks;
 }
 
 /**
  *
  * @param identity The identity of the user
- * @param options Additional options for the query e.g. `sortSettings`
- * @returns DataModels.FlowNodeInstances.UserTaskInstance[] | null
+ * @param options Additional options for the query e.g. {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
  */
 export async function getAssignedUserTasksByIdentity(
   identity: DataModels.Iam.Identity,
@@ -194,7 +232,7 @@ export async function getAssignedUserTasksByIdentity(
     limit?: number;
     sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
   }
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
@@ -207,9 +245,9 @@ export async function getAssignedUserTasksByIdentity(
 
   const assignedUserTasks = result.userTasks.filter((userTask) => userTask.assignedUserIds?.includes(identity.userId));
 
-  if (assignedUserTasks.length) {
-    return assignedUserTasks;
+  if (assignedUserTasks.length === 0) {
+    return null;
   }
 
-  return null;
+  return assignedUserTasks;
 }
