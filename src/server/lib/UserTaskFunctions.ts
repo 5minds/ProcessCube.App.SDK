@@ -57,6 +57,7 @@ export async function waitForUserTask(
     const userTask = userTasks?.[0];
 
     if (userTask) {
+      Client.notification.removeSubscription(sub);
       resolve(userTask);
     }
   });
