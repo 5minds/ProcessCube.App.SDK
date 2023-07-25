@@ -1,13 +1,22 @@
-// // import { waitForUserTask } from '../lib';
+import { getIdentity, waitForUserTask } from '../lib';
 
-// // import { NotificationIcon } from '../../client/';
-export const NotificationComponent = () => {
+import { Client } from '../lib/internal/EngineClient';
 
+export const NotificationComponent = async () => {
+
+  // console.log('NotificationComponent');
   // const userTask = await waitForUserTask();
   // console.log(userTask);
 
+  const key = 'portal:flowNodeInstance:seen';
+  const identity = await getIdentity();
+  const metadata = await Client.userMetadata.query(key, identity);
+  console.log(metadata)
+
   return (
-    <></>
-    // <NotificationIcon></NotificationIcon>
+    <div>
+      <div>NotificationComponent</div>
+      {/* <NotificationIcon></NotificationIcon> */}
+    </div>
   );
 };
