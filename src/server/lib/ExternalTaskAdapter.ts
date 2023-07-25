@@ -18,6 +18,8 @@ const DUMMY_IDENTITY: Identity = {
   userId: 'dummy_token',
 };
 
+const DELAY_FACTOR = 0.85;
+
 const logger = new Logger('ExternalTaskAdapter');
 const withAuthority = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
@@ -136,7 +138,7 @@ async function startRefreshingIdentity(
   }
 
   const expires_in = await getExpiresInForExternalTaskWorkers();
-  const delay = expires_in * 0.85 * 1000;
+  const delay = expires_in * DELAY_FACTOR * 1000;
   const interval = setInterval(async (): Promise<void> => {
     const newIdentity = await getIdentityForExternalTaskWorkers();
     externalTaskWorker.identity = newIdentity;
