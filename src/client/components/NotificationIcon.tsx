@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiBell, FiBellOff } from 'react-icons/fi';
 import { IconButton } from '@chakra-ui/react';
 
-export const NotificationComponent = () => {
+export const NotificationIcon = () => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
