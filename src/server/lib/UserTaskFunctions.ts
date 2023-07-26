@@ -114,7 +114,7 @@ export async function getWaitingUserTasks(
  *
  * @param processInstanceId The Process Instance ID
  * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
- * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null>}
+ * @returns {Promise<Array<DataModels.FlowNodeInstances.UserTaskInstance> | null>}
  */
 export async function getWaitingUserTasksByProcessInstanceId(
   processInstanceId: string | string[],
