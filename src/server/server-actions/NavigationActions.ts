@@ -5,9 +5,9 @@ import { redirect } from 'next/navigation';
 /**
  * Navigates to an URL. This uses next's {@link redirect} function. As this is an server action, the {@link RedirectType} is 'push' only.
  * @param url The URL to navigate to.
- * @returns Promise<never>
+ * @returns never
  */
-export async function navigateToUrl(url: string): Promise<never> {
+export function navigateToUrl(url: string): never {
   revalidatePath(url);
   redirect(url);
 }
