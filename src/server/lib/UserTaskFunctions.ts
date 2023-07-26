@@ -117,9 +117,9 @@ export async function getWaitingUserTasks(
  * @returns {Promise<Array<DataModels.FlowNodeInstances.UserTaskInstance> | null>}
  */
 export async function getWaitingUserTasksByProcessInstanceId(
-  processInstanceId: string | string[],
+  processInstanceId: string | Array<string>,
   options?: Parameters<typeof Client.userTasks.query>[1]
-): Promise<DataModels.FlowNodeInstances.UserTaskInstance[] | null> {
+): Promise<Array<DataModels.FlowNodeInstances.UserTaskInstance> | null> {
   const result = await Client.userTasks.query(
     {
       processInstanceId: processInstanceId,
