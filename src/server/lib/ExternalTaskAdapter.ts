@@ -17,10 +17,7 @@ const DELAY_FACTOR = 0.85;
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
-export async function subscribeToExternalTasks(
-  externalTasksDirPath: string
-): Promise<Array<ExternalTaskWorker<any, any>>> {
-  const allExternalTaskWorker: Array<ExternalTaskWorker<any, any>> = [];
+export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<void> {
   const directories = await getDirectories(externalTasksDirPath);
   const outDir = join(externalTasksDirPath, 'dist');
   if (!existsSync(outDir)) {
@@ -70,11 +67,9 @@ export async function subscribeToExternalTasks(
     });
 
     externalTaskWorker.start();
-    allExternalTaskWorker.push(externalTaskWorker);
   }
-  await fsp.rm(outDir, { recursive: true });
 
-  return allExternalTaskWorker;
+  await fsp.rm(outDir, { recursive: true });
 }
 
 async function getWorkerFile(directory: string): Promise<string | null> {
