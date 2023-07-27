@@ -4,7 +4,7 @@ import { EngineURL } from './internal/EngineClient';
 import { join, basename } from 'node:path';
 import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
-import { Issuer } from 'openid-client';
+import { Issuer, TokenSet } from 'openid-client';
 import jwtDecode from 'jwt-decode';
 
 const DUMMY_IDENTITY: Identity = {
@@ -41,9 +41,10 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
       module = module.default;
     }
 
+    const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
     // TODO add all configs
     const config: IExternalTaskWorkerConfig = {
-      identity: await getIdentityForExternalTaskWorkers(),
+      identity: await getIdentityForExternalTaskWorkers(tokenSet),
       lockDuration: module.lockDuration,
       longpollingTimeout: module.longpollingTimeout,
       maxTasks: module.maxTasks,
@@ -51,7 +52,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
 
     const handler = module.default;
     const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-    const interval = await startRefreshingIdentity(externalTaskWorker);
+    await startRefreshingIdentity(tokenSet, externalTaskWorker);
 
     logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
 
@@ -60,10 +61,7 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
         err: error,
         type: errorType,
         externalTask: externalTask,
-        workerId: externalTaskWorker.workerId,
       });
-      clearInterval(interval);
-      throw error;
     });
 
     externalTaskWorker.start();
@@ -87,9 +85,9 @@ async function getWorkerFile(directory: string): Promise<string | null> {
   return workerFiles[0];
 }
 
-async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
+async function getFreshTokenSet(): Promise<TokenSet> {
   if (!authorityIsConfigured) {
-    return DUMMY_IDENTITY;
+    throw new Error('No authority is configured');
   }
 
   const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
@@ -97,11 +95,18 @@ async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
     client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
   });
-
   const tokenSet = await client.grant({
     grant_type: 'client_credentials',
     scope: 'engine_etw',
   });
+
+  return tokenSet;
+}
+
+async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Promise<Identity> {
+  if (!authorityIsConfigured || tokenSet === null) {
+    return DUMMY_IDENTITY;
+  }
 
   const accessToken = tokenSet.access_token as string;
   const decodedToken = jwtDecode<Record<string, unknown>>(accessToken);
@@ -114,24 +119,43 @@ async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
 
 /**
  * Start refreshing the identity in regular intervals.
+ * @param {TokenSet | null} tokenSet The token set to refresh the identity for
  * @param {ExternalTaskWorker<any, any>} externalTaskWorker The external task worker to refresh the identity for
- * @returns {Promise<NodeJS.Timeout | undefined>} A promise that resolves with the interval that refreshes the identity or undefined if no authority is configured
+ * @param {number} retries The number of retries to refresh the identity
+ * @returns {Promise<void>} A promise that resolves when the identity is refreshed
  * */
 async function startRefreshingIdentity(
-  externalTaskWorker: ExternalTaskWorker<any, any>
-): Promise<NodeJS.Timeout | undefined> {
-  if (!authorityIsConfigured) {
-    return;
+  tokenSet: TokenSet | null,
+  externalTaskWorker: ExternalTaskWorker<any, any>,
+  retries: number = 5
+): Promise<void> {
+  try {
+    if (!authorityIsConfigured || tokenSet === null) {
+      return;
+    }
+
+    const expiresIn = await getExpiresInForExternalTaskWorkers(tokenSet);
+    const delay = expiresIn * DELAY_FACTOR * 1000;
+
+    setTimeout(async () => {
+      console.log('refreshing identity');
+      const newTokenSet = await getFreshTokenSet();
+      const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
+      externalTaskWorker.identity = newIdentity;
+      await startRefreshingIdentity(newTokenSet, externalTaskWorker);
+    }, delay);
+  } catch (error) {
+    if (retries === 0) {
+      throw error;
+    }
+
+    logger.error(`Could not refresh identity for external task worker ${externalTaskWorker.workerId}`, {
+      err: error,
+      workerId: externalTaskWorker.workerId,
+    });
+
+    await startRefreshingIdentity(tokenSet, externalTaskWorker, retries - 1);
   }
-
-  const expiresIn = await getExpiresInForExternalTaskWorkers();
-  const delay = expiresIn * DELAY_FACTOR * 1000;
-  const interval = setInterval(async (): Promise<void> => {
-    const newIdentity = await getIdentityForExternalTaskWorkers();
-    externalTaskWorker.identity = newIdentity;
-  }, delay);
-
-  return interval;
 }
 
 /**
@@ -186,17 +210,10 @@ async function getDirectories(source: PathLike): Promise<string[]> {
  * Get the time in seconds until the current access token expires.
  * @returns {Promise<number>} A promise that resolves with the time in seconds until the current access token expires
  * */
-async function getExpiresInForExternalTaskWorkers(): Promise<number> {
-  const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
-  const client = new issuer.Client({
-    client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
-    client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
-  });
+async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<number> {
+  if (!tokenSet.expires_in) {
+    throw new Error('Could not get expires_in property from token set');
+  }
 
-  const tokenSet = await client.grant({
-    grant_type: 'client_credentials',
-    scope: 'engine_etw',
-  });
-
-  return tokenSet.expires_in as number;
+  return tokenSet.expires_in;
 }
