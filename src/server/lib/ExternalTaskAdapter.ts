@@ -42,14 +42,13 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     }
 
     const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
-    // TODO add all configs
     const config: IExternalTaskWorkerConfig = {
       identity: await getIdentityForExternalTaskWorkers(tokenSet),
       lockDuration: module.lockDuration,
       longpollingTimeout: module.longpollingTimeout,
       maxTasks: module.maxTasks,
+      payloadFilter: module.payloadFilter,
     };
-
     const handler = module.default;
     const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
     await startRefreshingIdentity(tokenSet, externalTaskWorker);
@@ -129,6 +128,8 @@ async function startRefreshingIdentity(
   externalTaskWorker: ExternalTaskWorker<any, any>,
   retries: number = 5
 ): Promise<void> {
+  console.log('startRefreshingIdentity');
+  console.log('retries', retries);
   try {
     if (!authorityIsConfigured || tokenSet === null) {
       return;
