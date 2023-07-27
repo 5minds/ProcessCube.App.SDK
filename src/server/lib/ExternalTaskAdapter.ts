@@ -139,8 +139,8 @@ async function startRefreshingIdentity(
     return;
   }
 
-  const expires_in = await getExpiresInForExternalTaskWorkers();
-  const delay = expires_in * DELAY_FACTOR * 1000;
+  const expiresIn = await getExpiresInForExternalTaskWorkers();
+  const delay = expiresIn * DELAY_FACTOR * 1000;
   const interval = setInterval(async (): Promise<void> => {
     const newIdentity = await getIdentityForExternalTaskWorkers();
     externalTaskWorker.identity = newIdentity;
