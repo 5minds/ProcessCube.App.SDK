@@ -3,7 +3,7 @@ import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcu
 import { EngineURL } from './internal/EngineClient';
 import {join, basename} from 'node:path';
 import esbuild from 'esbuild';
-import fs, { promises as fsp, PathLike } from 'fs';
+import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer } from 'openid-client';
 import jwtDecode from 'jwt-decode';
 
