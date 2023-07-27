@@ -156,7 +156,7 @@ async function startRefreshingIdentity(
  * @returns {Promise<void>} A promise that resolves when the file is transpiled
  * */
 async function transpileTypescriptFile(entryPoint: string, outFile: string): Promise<void> {
-  const result = await esbuild.build({
+  const result = await esBuild({
     entryPoints: [entryPoint],
     outfile: outFile,
     bundle: true,
