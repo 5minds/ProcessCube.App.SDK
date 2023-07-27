@@ -1,17 +1,11 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
 import { EngineURL } from './internal/EngineClient';
-import {join, basename} from 'node:path';
+import { join, basename } from 'node:path';
 import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer } from 'openid-client';
 import jwtDecode from 'jwt-decode';
-
-const DEFAULT_EXTERNAL_TASK_WORKER_CONFIG: IExternalTaskWorkerConfig = {
-  lockDuration: 20000,
-  maxTasks: 5,
-  longpollingTimeout: 1000,
-};
 
 const DUMMY_IDENTITY: Identity = {
   token: 'ZHVtbXlfdG9rZW4=',
@@ -28,7 +22,7 @@ export async function subscribeToExternalTasks(
 ): Promise<Array<ExternalTaskWorker<any, any>>> {
   const allExternalTaskWorker: Array<ExternalTaskWorker<any, any>> = [];
   const directories = await getDirectories(externalTasksDirPath);
-  const outDir = path.join(externalTasksDirPath, 'dist');
+  const outDir = join(externalTasksDirPath, 'dist');
   if (!existsSync(outDir)) {
     await fsp.mkdir(outDir);
   }
@@ -40,9 +34,9 @@ export async function subscribeToExternalTasks(
       continue;
     }
 
-    const fullWorkerFilePath = path.join(directory, workerFile);
-    const topic = path.basename(directory);
-    const outFilePath = path.join(outDir, `${topic}_worker.js`);
+    const fullWorkerFilePath = join(directory, workerFile);
+    const topic = basename(directory);
+    const outFilePath = join(outDir, `${topic}_worker.js`);
     await transpileTypescriptFile(fullWorkerFilePath, outFilePath);
 
     let module = await import(outFilePath);
@@ -50,20 +44,16 @@ export async function subscribeToExternalTasks(
       module = module.default;
     }
 
-    const identity = await getIdentityForExternalTaskWorkers();
-    const lockDuration = (await module.lockDuration) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.lockDuration;
-    const maxTasks = (await module.maxTasks) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.maxTasks;
-    const longpollingTimeout =
-      (await module.longpollingTimeout) ?? DEFAULT_EXTERNAL_TASK_WORKER_CONFIG.longpollingTimeout;
+    // TODO add all configs
     const config: IExternalTaskWorkerConfig = {
-      lockDuration: lockDuration,
-      maxTasks: maxTasks,
-      longpollingTimeout: longpollingTimeout,
-      identity: identity,
+      identity: await getIdentityForExternalTaskWorkers(),
+      lockDuration: module.lockDuration,
+      longpollingTimeout: module.longpollingTimeout,
+      maxTasks: module.maxTasks,
     };
 
     const handler = module.default;
-    const externalTaskWorker = new ExternalTaskWorker<any, any>(Engine_URL, topic, handler, config);
+    const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
     const interval = await startRefreshingIdentity(externalTaskWorker);
 
     logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
@@ -103,7 +93,7 @@ async function getWorkerFile(directory: string): Promise<string | null> {
 }
 
 async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
-  if (!withAuthority) {
+  if (!authorityIsConfigured) {
     return DUMMY_IDENTITY;
   }
 
@@ -135,7 +125,7 @@ async function getIdentityForExternalTaskWorkers(): Promise<Identity> {
 async function startRefreshingIdentity(
   externalTaskWorker: ExternalTaskWorker<any, any>
 ): Promise<NodeJS.Timeout | undefined> {
-  if (!withAuthority) {
+  if (!authorityIsConfigured) {
     return;
   }
 
@@ -188,7 +178,7 @@ async function getDirectories(source: PathLike): Promise<string[]> {
   const dirents = await fsp.readdir(source, { withFileTypes: true });
   const directories = await Promise.all(
     dirents.map(async (dirent) => {
-      const fullPath = path.join(source.toString(), dirent.name);
+      const fullPath = join(source.toString(), dirent.name);
 
       return dirent.isDirectory() ? [fullPath, ...(await getDirectories(fullPath))] : [];
     })
