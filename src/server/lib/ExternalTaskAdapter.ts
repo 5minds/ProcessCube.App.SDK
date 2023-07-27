@@ -2,7 +2,7 @@ import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
 import { EngineURL } from './internal/EngineClient';
 import {join, basename} from 'node:path';
-import esbuild from 'esbuild';
+import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer } from 'openid-client';
 import jwtDecode from 'jwt-decode';
