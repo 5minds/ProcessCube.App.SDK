@@ -161,7 +161,7 @@ async function transpileTypescriptFile(entryPoint: string, outFile: string): Pro
     outfile: outFile,
     bundle: true,
     platform: 'node',
-    target: 'node14',
+    target: 'node18',
     format: 'cjs',
   });
 
