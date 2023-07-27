@@ -20,7 +20,7 @@ const DUMMY_IDENTITY: Identity = {
 
 const DELAY_FACTOR = 0.85;
 
-const logger = new Logger('ExternalTaskAdapter');
+const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const withAuthority = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
 export async function subscribeToExternalTasks(
