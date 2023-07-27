@@ -29,7 +29,7 @@ export async function subscribeToExternalTasks(
   const allExternalTaskWorker: Array<ExternalTaskWorker<any, any>> = [];
   const directories = await getDirectories(externalTasksDirPath);
   const outDir = path.join(externalTasksDirPath, 'dist');
-  if (!fs.existsSync(outDir)) {
+  if (!existsSync(outDir)) {
     await fsp.mkdir(outDir);
   }
 
