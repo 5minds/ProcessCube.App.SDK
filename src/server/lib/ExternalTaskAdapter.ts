@@ -1,6 +1,6 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
-import { Engine_URL } from './internal/EngineClient';
+import { EngineURL } from './internal/EngineClient';
 import path from 'path';
 import esbuild from 'esbuild';
 import fs, { promises as fsp, PathLike } from 'fs';
