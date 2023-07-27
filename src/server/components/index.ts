@@ -1,1 +1,1 @@
-export * from './NotificationComponent';
+export * from './getTasks';

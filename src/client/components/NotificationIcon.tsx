@@ -3,30 +3,44 @@ import { FiBell, FiBellOff } from 'react-icons/fi';
 import { BsDot } from 'react-icons/bs';
 import { IconButton, Icon, Box, Badge, Flex, Text } from '@chakra-ui/react';
 
+import useSWR from 'swr';
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
+
 export const NotificationIcon = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(sendNotification, 3000);
+  const { data, error } = useSWR('http://worldtimeapi.org/api/timezone/America/New_York', fetcher, {
+    refreshInterval: 5000,
+    onSuccess: (data) => {
+      if (data && data.datetime) {
+        const unixTime = new Date(data.datetime).getTime() / 1000;
+        const lastTwoDigits = Math.floor(unixTime % 100);
+        setNotificationCount(lastTwoDigits);
+      }
+    },
+  });
 
-    return () => clearInterval(interval);
-  }, [showNotifications]);
+  if (error) return <div>Error fetching data</div>;
+  if (!data) return <div>Loading...</div>;
 
-  const sendNotification = () => {
-    setNotificationCount((prev) => prev + 1);
+  const currentTime = new Date(data.datetime).toLocaleString();
 
-    if (showNotifications) {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          new window.Notification('Hello!', {
-            body: 'This is a notification sent via the Notification API.',
-          });
-          console.log('Notification sent!');
-        }
-      });
-    }
-  };
+  // const sendNotification = () => {
+  //   setNotificationCount((prev) => prev + 1);
+
+  //   if (showNotifications) {
+  //     Notification.requestPermission().then((permission) => {
+  //       if (permission === 'granted') {
+  //         new window.Notification('Hello!', {
+  //           body: 'This is a notification sent via the Notification API.',
+  //         });
+  //         console.log('Notification sent!');
+  //       }
+  //     });
+  //   }
+  // };
 
 
   return (
@@ -36,7 +50,7 @@ export const NotificationIcon = () => {
         aria-label="Settings"
         onClick={() => setShowNotifications((prev) => !prev)}
       />
-      {(showNotifications && notificationCount > 0) && (
+      {showNotifications && notificationCount > 0 && (
         <Box
           bg="red"
           w="16px"
