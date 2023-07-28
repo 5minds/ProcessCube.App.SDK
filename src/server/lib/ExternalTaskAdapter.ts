@@ -3,7 +3,7 @@ import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcu
 import { EngineURL } from './internal/EngineClient';
 import { join, basename } from 'node:path';
 import { build as esBuild } from 'esbuild';
-import { promises as fsp, PathLike, existsSync } from 'node:fs';
+import { promises as fsp, PathLike } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import jwtDecode from 'jwt-decode';
 
@@ -19,11 +19,6 @@ const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefine
 
 export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<void> {
   const directories = await getDirectories(externalTasksDirPath);
-  console.log(`Found ${directories.length} external task(s) in directory '${externalTasksDirPath}'`);
-  const outDir = join(externalTasksDirPath, 'dist');
-  if (!existsSync(outDir)) {
-    await fsp.mkdir(outDir);
-  }
 
   for (const directory of directories) {
     const workerFile = await getWorkerFile(directory);
@@ -33,16 +28,9 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     }
 
     const fullWorkerFilePath = join(directory, workerFile);
-    const topic = basename(directory);
-    const outFilePath = join(outDir, `${topic}_worker.js`);
-
-    let module = await transpileTypescriptFile(fullWorkerFilePath, outFilePath);
-    if (module.default.default) {
-      logger.warn(`Found default export in default export of module '${fullWorkerFilePath}'`);
-      module = module.default;
-    }
-
+    const module = await transpileTypescriptFile(fullWorkerFilePath);
     const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+
     const config: IExternalTaskWorkerConfig = {
       identity: await getIdentityForExternalTaskWorkers(tokenSet),
       lockDuration: module.lockDuration,
@@ -51,6 +39,8 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
       payloadFilter: module.payloadFilter,
     };
     const handler = module.default;
+    const topic = basename(directory);
+
     const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
     await startRefreshingIdentity(tokenSet, externalTaskWorker);
 
@@ -66,8 +56,6 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
 
     externalTaskWorker.start();
   }
-
-  await fsp.rm(outDir, { recursive: true });
 }
 
 async function getWorkerFile(directory: string): Promise<string | null> {
@@ -161,10 +149,9 @@ async function startRefreshingIdentity(
 /**
  * Transpile a typescript file to javascript.
  * @param {string} entryPoint The path to the typescript file
- * @param {string} outFile The path to the transpiled javascript file
  * @returns {Promise<any>} A promise that resolves with the module exports of the transpiled file
  * */
-async function transpileTypescriptFile(entryPoint: string, outFile: string): Promise<any> {
+async function transpileTypescriptFile(entryPoint: string): Promise<any> {
   const result = await esBuild({
     entryPoints: [entryPoint],
     write: false,
@@ -174,15 +161,14 @@ async function transpileTypescriptFile(entryPoint: string, outFile: string): Pro
     format: 'cjs',
   });
 
-  console.log(result.outputFiles[0].text);
   const moduleString = result.outputFiles[0].text;
   const moduleExports = requireFromString(moduleString, entryPoint);
-  // console.log(moduleExports);
 
   if (result.errors.length > 0) {
     logger.error(`Could not transpile file at '${entryPoint}'`, {
       errors: result.errors,
     });
+    throw new Error(`Could not transpile file at '${entryPoint}'`);
   }
 
   if (result.warnings.length > 0) {
@@ -225,9 +211,24 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
   return tokenSet.expires_in;
 }
 
+/**
+ * Require a module from a string.
+ * @param {string} src The source code of the module
+ * @param {string} filename The filename of the module
+ * @returns The module exports of the module
+ * */
 function requireFromString(src: string, filename: string) {
-  var Module = module.constructor as any;
-  var m = new Module();
-  m._compile(src, filename);
-  return m.exports;
+  try {
+    var Module = module.constructor as any;
+    var m = new Module();
+    m._compile(src, filename);
+
+    return m.exports;
+  } catch (error) {
+    logger.error(`Could not require module from string`, {
+      err: error,
+    });
+
+    throw error;
+  }
 }
