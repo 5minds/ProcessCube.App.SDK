@@ -19,6 +19,7 @@ const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefine
 
 export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<void> {
   const directories = await getDirectories(externalTasksDirPath);
+  console.log(`Found ${directories.length} external task(s) in directory '${externalTasksDirPath}'`);
   const outDir = join(externalTasksDirPath, 'dist');
   if (!existsSync(outDir)) {
     await fsp.mkdir(outDir);
@@ -34,10 +35,10 @@ export async function subscribeToExternalTasks(externalTasksDirPath: string): Pr
     const fullWorkerFilePath = join(directory, workerFile);
     const topic = basename(directory);
     const outFilePath = join(outDir, `${topic}_worker.js`);
-    await transpileTypescriptFile(fullWorkerFilePath, outFilePath);
 
-    let module = await import(outFilePath);
+    let module = await transpileTypescriptFile(fullWorkerFilePath, outFilePath);
     if (module.default.default) {
+      logger.warn(`Found default export in default export of module '${fullWorkerFilePath}'`);
       module = module.default;
     }
 
@@ -161,17 +162,22 @@ async function startRefreshingIdentity(
  * Transpile a typescript file to javascript.
  * @param {string} entryPoint The path to the typescript file
  * @param {string} outFile The path to the transpiled javascript file
- * @returns {Promise<void>} A promise that resolves when the file is transpiled
+ * @returns {Promise<any>} A promise that resolves with the module exports of the transpiled file
  * */
-async function transpileTypescriptFile(entryPoint: string, outFile: string): Promise<void> {
+async function transpileTypescriptFile(entryPoint: string, outFile: string): Promise<any> {
   const result = await esBuild({
     entryPoints: [entryPoint],
-    outfile: outFile,
+    write: false,
     bundle: true,
     platform: 'node',
     target: 'node18',
     format: 'cjs',
   });
+
+  console.log(result.outputFiles[0].text);
+  const moduleString = result.outputFiles[0].text;
+  const moduleExports = requireFromString(moduleString, entryPoint);
+  // console.log(moduleExports);
 
   if (result.errors.length > 0) {
     logger.error(`Could not transpile file at '${entryPoint}'`, {
@@ -184,6 +190,8 @@ async function transpileTypescriptFile(entryPoint: string, outFile: string): Pro
       warnings: result.warnings,
     });
   }
+
+  return moduleExports;
 }
 
 /**
@@ -215,4 +223,11 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
   }
 
   return tokenSet.expires_in;
+}
+
+function requireFromString(src: string, filename: string) {
+  var Module = module.constructor as any;
+  var m = new Module();
+  m._compile(src, filename);
+  return m.exports;
 }
