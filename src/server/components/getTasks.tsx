@@ -5,13 +5,16 @@ import { getIdentity, getWaitingUserTasks, waitForUserTask } from '../lib';
 export const getTasks = async () => {
   console.log('getTasks called');
 
-  const identity = await getIdentity();
-  const options = {
-    identity,
-  };
+  // const identity = await getIdentity();
+  // const options = {
+  //   identity,
+  // };
+
+  const options = {};
 
   // Fetch all initial tasks
   const initialTasks = (await getWaitingUserTasks(options)) || [];
+  console.log('Initial tasks', initialTasks);
 
   // Function to get updated tasks with a Promise
   const getUpdatedTasks = (): any => {
