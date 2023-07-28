@@ -128,8 +128,6 @@ async function startRefreshingIdentity(
   externalTaskWorker: ExternalTaskWorker<any, any>,
   retries: number = 5
 ): Promise<void> {
-  console.log('startRefreshingIdentity');
-  console.log('retries', retries);
   try {
     if (!authorityIsConfigured || tokenSet === null) {
       return;
@@ -139,7 +137,6 @@ async function startRefreshingIdentity(
     const delay = expiresIn * DELAY_FACTOR * 1000;
 
     setTimeout(async () => {
-      console.log('refreshing identity');
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
       externalTaskWorker.identity = newIdentity;
@@ -155,7 +152,8 @@ async function startRefreshingIdentity(
       workerId: externalTaskWorker.workerId,
     });
 
-    await startRefreshingIdentity(tokenSet, externalTaskWorker, retries - 1);
+    const delay = 2 * 1000;
+    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorker, retries - 1), delay);
   }
 }
 
