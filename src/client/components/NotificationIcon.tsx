@@ -35,27 +35,43 @@ const fetcher = (url: any) => fetch(url).then((res) => res.json());
 const List = chakra(Reorder.Group);
 const ListItem = chakra(Reorder.Item);
 
-export const NotificationIcon = ({
-  onTaskClick,
-}: {
-  onTaskClick: (taskId: string) => void;
-}) => {
+export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string) => void }) => {
   const [notificationCount, setNotificationCount] = useState(0);
-  const [taskList, setTaskList] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
-  const [order, setOrder] = useState(() => taskList.map((task) => task.flowNodeInstanceId));
+  const [tasks, setTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
+  const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
+  const [seenTasks, setSeenTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
 
-  const { data, error } = useSWR('/api/usertasks', fetcher, {
+  const { data: fetchedTasks, error: userTaskError } = useSWR('/api/usertasks', fetcher, {
     refreshInterval: 3000,
     onSuccess: (taskList) => {
-      // console.log('taskList', taskList);
-      setNotificationCount(taskList.length);
-      setTaskList(taskList);
-      setOrder(taskList.map((task) => task.flowNodeInstanceId));
+      setTasks(taskList);
+      updateNewTasks();
     },
   });
 
-  if (error) return <div>Error fetching data</div>;
+  // const { data: fetchedSeenTasks, error: newTasksError } = useSWR(
+  //   '/api/usermetadata',
+  //   () =>
+  //     fetch('/api/usermetadata', {
+  //       body: JSON.stringify({ flowNodeInstanceIds: tasks.map((task) => task.processInstanceId) }),
+  //     }).then((res) => res.json()),
+  //   {
+  //     refreshInterval: 3000,
+  //     onSuccess: (taskList) => {
+  //       setSeenTasks(taskList);
+  //       updateNewTasks();
+  //     },
+  //   }
+  // );
+
+  if (userTaskError) return <div>Error fetching data</div>;
   // if (!data) return <div>Loading...</div>;
+
+  function updateNewTasks() {
+    const newTasks = tasks.filter((task) => !seenTasks.includes(task));
+    setNewTasks(newTasks);
+    setNotificationCount(newTasks.length);
+  }
 
   return (
     <ChakraProvider>
@@ -93,44 +109,46 @@ export const NotificationIcon = ({
             <PopoverBody>
               <Center maxW="sm" mx="auto" py={{ base: '4', md: '8' }}>
                 <Stack spacing="5" flex="1">
-                  <List values={order} onReorder={setOrder} listStyleType="none">
+                  <List values={newTasks} onReorder={setNewTasks} listStyleType="none">
                     <Stack spacing="3" width="full">
-                      {order
-                        .map((item) => taskList.find((task) => task.flowNodeInstanceId === item))
-                        .map((task) =>
-                          task ? (
-                            <ListItem
-                              key={task.flowNodeInstanceId}
-                              value={task.flowNodeInstanceId}
-                              backgroundColor="white"
-                              p="4"
-                              boxShadow="sm"
-                              position="relative"
-                              borderRadius="lg"
-                              cursor="grab"
-                              whileTap={{ cursor: 'grabbing', scale: 1.1 }}
-                            >
-                              <Stack shouldWrapChildren spacing="4">
-                                <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
-                                  {task.flowNodeId}
-                                </Text>
-                                <HStack justify="space-between">
-                                  {/* <Badge colorScheme={task.type === 'Feature' ? 'green' : 'red'} size="sm">
+                      {newTasks.map((task) =>
+                        task ? (
+                          <ListItem
+                            key={task.flowNodeInstanceId}
+                            value={task.flowNodeInstanceId}
+                            backgroundColor="white"
+                            p="4"
+                            boxShadow="sm"
+                            position="relative"
+                            borderRadius="lg"
+                            cursor="grab"
+                            whileTap={{ cursor: 'grabbing', scale: 1.1 }}
+                          >
+                            <Stack shouldWrapChildren spacing="4">
+                              <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
+                                {task.flowNodeId}
+                              </Text>
+                              <HStack justify="space-between">
+                                {/* <Badge colorScheme={task.type === 'Feature' ? 'green' : 'red'} size="sm">
                                     {task.type}
                                   </Badge> */}
-                                  <HStack spacing="3">
-                                    <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
-                                      {task.flowNodeInstanceId}
-                                    </Text>
-                                    <Button size="xs" colorScheme="blue" onClick={() => onTaskClick(task.flowNodeInstanceId)}>
-                                      X
-                                    </Button>
-                                  </HStack>
+                                <HStack spacing="3">
+                                  <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
+                                    {task.flowNodeInstanceId}
+                                  </Text>
+                                  <Button
+                                    size="xs"
+                                    colorScheme="blue"
+                                    onClick={() => onTaskClick(task.flowNodeInstanceId)}
+                                  >
+                                    X
+                                  </Button>
                                 </HStack>
-                              </Stack>
-                            </ListItem>
-                          ) : null
-                        )}
+                              </HStack>
+                            </Stack>
+                          </ListItem>
+                        ) : null
+                      )}
                     </Stack>
                   </List>
                 </Stack>
