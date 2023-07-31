@@ -19,29 +19,40 @@ import {
   CardHeader,
   Heading,
   CardBody,
+  HStack,
+  Text,
+  Stack,
+  Center,
+  Badge,
+  chakra,
 } from '@chakra-ui/react';
+import { Reorder } from 'framer-motion';
 
 import useSWR from 'swr';
 import { DataModels } from '@5minds/processcube_engine_client';
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
+const List = chakra(Reorder.Group);
+const ListItem = chakra(Reorder.Item);
 
-export const NotificationIcon = () => {
+export const NotificationIcon = ({
+  onTaskClick,
+}: {
+  onTaskClick: (taskId: string) => void;
+}) => {
   const [notificationCount, setNotificationCount] = useState(0);
-  const [taskList, setTaskList] = useState([]);
+  const [taskList, setTaskList] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
+  const [order, setOrder] = useState(() => taskList.map((task) => task.flowNodeInstanceId));
 
   const { data, error } = useSWR('/api/usertasks', fetcher, {
     refreshInterval: 3000,
     onSuccess: (taskList) => {
-      console.log('taskList', taskList);
+      // console.log('taskList', taskList);
       setNotificationCount(taskList.length);
       setTaskList(taskList);
+      setOrder(taskList.map((task) => task.flowNodeInstanceId));
     },
   });
-
-  const handleClick = (task: DataModels.FlowNodeInstances.UserTaskInstance) => {
-    console.log('handleClick', task);
-  };
 
   if (error) return <div>Error fetching data</div>;
   // if (!data) return <div>Loading...</div>;
@@ -73,34 +84,57 @@ export const NotificationIcon = () => {
               )}
             </Flex>
           </PopoverTrigger>
-          <PopoverContent color="white" bg="blue.800" borderColor="blue.800">
+          <PopoverContent color="black" bg="gray.100" borderColor="blue.800">
             <PopoverHeader pt={4} fontWeight="bold" border="0">
               Neue Aufgaben
             </PopoverHeader>
             <PopoverArrow bg="blue.800" />
             <PopoverCloseButton />
             <PopoverBody>
-              <Box>
-                {taskList.map((task: DataModels.FlowNodeInstances.UserTaskInstance) => (
-                  <Box as="section" py={{ base: '4', md: '8' }} minW={{ base: '100%', md: '60%' }}>
-                    <Card
-                      variant="elevated"
-                      direction={{ base: 'column', md: 'row' }}
-                      justify={{ base: 'space-between' }}
-                      overflow="hidden"
-                    >
-                      <CardHeader>
-                        <Heading size="sm">{task.processModelId}</Heading>
-                      </CardHeader>
-                      <CardBody textAlign="right">
-                        <Button variant="primary" onClick={() => handleClick(task)}>
-                          {task.flowNodeName}
-                        </Button>
-                      </CardBody>
-                    </Card>
-                  </Box>
-                ))}
-              </Box>
+              <Center maxW="sm" mx="auto" py={{ base: '4', md: '8' }}>
+                <Stack spacing="5" flex="1">
+                  <List values={order} onReorder={setOrder} listStyleType="none">
+                    <Stack spacing="3" width="full">
+                      {order
+                        .map((item) => taskList.find((task) => task.flowNodeInstanceId === item))
+                        .map((task) =>
+                          task ? (
+                            <ListItem
+                              key={task.flowNodeInstanceId}
+                              value={task.flowNodeInstanceId}
+                              backgroundColor="white"
+                              p="4"
+                              boxShadow="sm"
+                              position="relative"
+                              borderRadius="lg"
+                              cursor="grab"
+                              whileTap={{ cursor: 'grabbing', scale: 1.1 }}
+                            >
+                              <Stack shouldWrapChildren spacing="4">
+                                <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
+                                  {task.flowNodeId}
+                                </Text>
+                                <HStack justify="space-between">
+                                  {/* <Badge colorScheme={task.type === 'Feature' ? 'green' : 'red'} size="sm">
+                                    {task.type}
+                                  </Badge> */}
+                                  <HStack spacing="3">
+                                    <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
+                                      {task.flowNodeInstanceId}
+                                    </Text>
+                                    <Button size="xs" colorScheme="blue" onClick={() => onTaskClick(task.flowNodeInstanceId)}>
+                                      X
+                                    </Button>
+                                  </HStack>
+                                </HStack>
+                              </Stack>
+                            </ListItem>
+                          ) : null
+                        )}
+                    </Stack>
+                  </List>
+                </Stack>
+              </Center>
             </PopoverBody>
             <PopoverFooter border="0" display="flex" alignItems="center" justifyContent="space-between" pb={4}>
               <ButtonGroup size="sm" ml="auto">
