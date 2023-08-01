@@ -127,7 +127,10 @@ export const NotificationIcon = ({
                                     </Text>
                                     {task.startedAt && (
                                       <Text textStyle="xs" color="gray.500" textAlign="right">
-                                        {new Date(task.startedAt).toLocaleString()}
+                                        {new Date(task.startedAt).toLocaleString(undefined, {
+                                          dateStyle: 'short',
+                                          timeStyle: 'short',
+                                        })}
                                       </Text>
                                     )}
                                   </Flex>
