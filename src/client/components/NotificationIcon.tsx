@@ -12,24 +12,26 @@ import {
   PopoverCloseButton,
   PopoverBody,
   PopoverTrigger,
-  ButtonGroup,
-  PopoverFooter,
   ChakraProvider,
-  HStack,
+  ListItem,
   Text,
-  Stack,
   Center,
-  chakra,
+  List,
+  Stack,
 } from '@chakra-ui/react';
-import { Reorder } from 'framer-motion';
 
 import useSWR from 'swr';
 import { DataModels } from '@5minds/processcube_engine_client';
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
-const List = chakra(Reorder.Group);
-const ListItem = chakra(Reorder.Item);
-export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string) => void }) => {
+
+export const NotificationIcon = ({
+  onTaskClick,
+  loadingComponent = null,
+}: {
+  onTaskClick: (taskId: string) => void;
+  loadingComponent: any;
+}) => {
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
 
   const { data, error } = useSWR('/api/usertasks', fetcher, {
@@ -40,12 +42,12 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
   });
 
   if (error) return <div>Error fetching data</div>;
-  if (!data) return <div>Loading...</div>;
+  if (!data && loadingComponent) return loadingComponent;
 
   return (
     <ChakraProvider>
       <Box>
-        <Popover placement="bottom" closeOnBlur={false}>
+        <Popover placement="right-end" closeOnBlur={false}>
           <PopoverTrigger>
             <Flex position="relative" align="center">
               <IconButton icon={<FiBell fontSize="1.25rem" />} aria-label="Settings" bg="gray.300" />
@@ -89,7 +91,7 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
                 <PopoverBody>
                   <Center maxW="sm" mx="auto" py={{ base: '4', md: '8' }}>
                     <Stack spacing="5" flex="1">
-                      <List values={newTasks} onReorder={setNewTasks} listStyleType="none">
+                      <List listStyleType="none">
                         <Stack spacing="3" width="full">
                           {newTasks.map((task) =>
                             task ? (
@@ -101,8 +103,6 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
                                 boxShadow="sm"
                                 position="relative"
                                 borderRadius="lg"
-                                cursor="grab"
-                                whileTap={{ cursor: 'grabbing', scale: 1.1 }}
                               >
                                 <Stack shouldWrapChildren spacing="4">
                                   <Flex justify="space-between" alignItems="center">
@@ -118,7 +118,7 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
                                     </Button>
                                   </Flex>
                                   <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
-                                    {task.flowNodeId}
+                                    {task.flowNodeName}
                                   </Text>
                                 </Stack>
                               </ListItem>
