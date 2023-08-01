@@ -28,9 +28,11 @@ const fetcher = (url: any) => fetch(url).then((res) => res.json());
 export const NotificationIcon = ({
   onTaskClick,
   loadingComponent = null,
+  errorComponent = null,
 }: {
   onTaskClick: (taskId: string) => void;
-  loadingComponent: any;
+  loadingComponent?: React.ReactNode;
+  errorComponent?: React.ReactNode;
 }) => {
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
 
@@ -41,7 +43,7 @@ export const NotificationIcon = ({
     },
   });
 
-  if (error) return <div>Error fetching data</div>;
+  if (error && errorComponent) return errorComponent;
   if (!data && loadingComponent) return loadingComponent;
 
   return (
