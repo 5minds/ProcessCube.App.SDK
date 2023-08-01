@@ -70,54 +70,68 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
             </Flex>
           </PopoverTrigger>
           <PopoverContent color="black" bg="gray.100" borderColor="blue.800">
-            <PopoverHeader pt={4} fontWeight="bold" border="0">
-              Neue Aufgaben
-            </PopoverHeader>
-            <PopoverArrow bg="blue.800" />
-            <PopoverCloseButton />
-            <PopoverBody>
-              <Center maxW="sm" mx="auto" py={{ base: '4', md: '8' }}>
-                <Stack spacing="5" flex="1">
-                  <List values={newTasks} onReorder={setNewTasks} listStyleType="none">
-                    <Stack spacing="3" width="full">
-                      {newTasks.map((task) =>
-                        task ? (
-                          <ListItem
-                            key={task.flowNodeInstanceId}
-                            value={task.flowNodeInstanceId}
-                            backgroundColor="white"
-                            p="4"
-                            boxShadow="sm"
-                            position="relative"
-                            borderRadius="lg"
-                            cursor="grab"
-                            whileTap={{ cursor: 'grabbing', scale: 1.1 }}
-                          >
-                            <Stack shouldWrapChildren spacing="4">
-                              <Flex justify="space-between" alignItems="center">
-                                <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
-                                  {task.processModelId}
-                                </Text>
-                                <Button
-                                  size="xs"
-                                  colorScheme="blue"
-                                  onClick={() => onTaskClick(task.flowNodeInstanceId)}
-                                >
-                                  X
-                                </Button>
-                              </Flex>
-                              <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
-                                {task.flowNodeId}
-                              </Text>
-                            </Stack>
-                          </ListItem>
-                        ) : null
-                      )}
+            {newTasks.length === 0 && (
+              <>
+                <PopoverHeader pt={4} fontWeight="bold" border="0">
+                  Keine neuen Aufgaben
+                </PopoverHeader>
+                <PopoverArrow bg="blue.800" />
+                <PopoverCloseButton />
+              </>
+            )}
+            {newTasks.length > 0 && (
+              <>
+                <PopoverHeader pt={4} fontWeight="bold" border="0">
+                  Neue Aufgaben
+                </PopoverHeader>
+                <PopoverArrow bg="blue.800" />
+                <PopoverCloseButton />
+                <PopoverBody>
+                  <Center maxW="sm" mx="auto" py={{ base: '4', md: '8' }}>
+                    <Stack spacing="5" flex="1">
+                      <List values={newTasks} onReorder={setNewTasks} listStyleType="none">
+                        <Stack spacing="3" width="full">
+                          {newTasks.map((task) =>
+                            task ? (
+                              <ListItem
+                                key={task.flowNodeInstanceId}
+                                value={task.flowNodeInstanceId}
+                                backgroundColor="white"
+                                p="4"
+                                boxShadow="sm"
+                                position="relative"
+                                borderRadius="lg"
+                                cursor="grab"
+                                whileTap={{ cursor: 'grabbing', scale: 1.1 }}
+                              >
+                                <Stack shouldWrapChildren spacing="4">
+                                  <Flex justify="space-between" alignItems="center">
+                                    <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
+                                      {task.processModelId}
+                                    </Text>
+                                    <Button
+                                      size="xs"
+                                      colorScheme="blue"
+                                      onClick={() => onTaskClick(task.flowNodeInstanceId)}
+                                    >
+                                      X
+                                    </Button>
+                                  </Flex>
+                                  <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
+                                    {task.flowNodeId}
+                                  </Text>
+                                </Stack>
+                              </ListItem>
+                            ) : null
+                          )}
+                        </Stack>
+                      </List>
                     </Stack>
-                  </List>
-                </Stack>
-              </Center>
-            </PopoverBody>
+                  </Center>
+                </PopoverBody>
+              </>
+            )}
+
             {/* <PopoverFooter border="0" display="flex" alignItems="center" justifyContent="space-between" pb={4}>
               <ButtonGroup size="sm" ml="auto">
                 <Button colorScheme="green">Alle Aufgaben als gelesen markieren</Button>
