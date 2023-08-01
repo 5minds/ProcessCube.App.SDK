@@ -15,15 +15,10 @@ import {
   ButtonGroup,
   PopoverFooter,
   ChakraProvider,
-  Card,
-  CardHeader,
-  Heading,
-  CardBody,
   HStack,
   Text,
   Stack,
   Center,
-  Badge,
   chakra,
 } from '@chakra-ui/react';
 import { Reorder } from 'framer-motion';
@@ -34,44 +29,18 @@ import { DataModels } from '@5minds/processcube_engine_client';
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 const List = chakra(Reorder.Group);
 const ListItem = chakra(Reorder.Item);
-
 export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string) => void }) => {
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [tasks, setTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
-  const [seenTasks, setSeenTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
 
-  const { data: fetchedTasks, error: userTaskError } = useSWR('/api/usertasks', fetcher, {
+  const { data, error } = useSWR('/api/usertasks', fetcher, {
     refreshInterval: 3000,
     onSuccess: (taskList) => {
-      setTasks(taskList);
-      updateNewTasks();
+      setNewTasks(taskList);
     },
   });
 
-  // const { data: fetchedSeenTasks, error: newTasksError } = useSWR(
-  //   '/api/usermetadata',
-  //   () =>
-  //     fetch('/api/usermetadata', {
-  //       body: JSON.stringify({ flowNodeInstanceIds: tasks.map((task) => task.processInstanceId) }),
-  //     }).then((res) => res.json()),
-  //   {
-  //     refreshInterval: 3000,
-  //     onSuccess: (taskList) => {
-  //       setSeenTasks(taskList);
-  //       updateNewTasks();
-  //     },
-  //   }
-  // );
-
-  if (userTaskError) return <div>Error fetching data</div>;
-  // if (!data) return <div>Loading...</div>;
-
-  function updateNewTasks() {
-    const newTasks = tasks.filter((task) => !seenTasks.includes(task));
-    setNewTasks(newTasks);
-    setNotificationCount(newTasks.length);
-  }
+  if (error) return <div>Error fetching data</div>;
+  if (!data) return <div>Loading...</div>;
 
   return (
     <ChakraProvider>
@@ -80,7 +49,7 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
           <PopoverTrigger>
             <Flex position="relative" align="center">
               <IconButton icon={<FiBell fontSize="1.25rem" />} aria-label="Settings" bg="gray.300" />
-              {notificationCount > 0 && (
+              {newTasks.length > 0 && (
                 <Box
                   bg="red"
                   w="20px"
@@ -95,7 +64,7 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
                   fontSize="0.8rem"
                   color="white"
                 >
-                  {notificationCount}
+                  {newTasks.length}
                 </Box>
               )}
             </Flex>
@@ -126,15 +95,12 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
                           >
                             <Stack shouldWrapChildren spacing="4">
                               <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
-                                {task.flowNodeId}
+                                {task.processModelId}
                               </Text>
                               <HStack justify="space-between">
-                                {/* <Badge colorScheme={task.type === 'Feature' ? 'green' : 'red'} size="sm">
-                                    {task.type}
-                                  </Badge> */}
                                 <HStack spacing="3">
                                   <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
-                                    {task.flowNodeInstanceId}
+                                    {task.flowNodeId}
                                   </Text>
                                   <Button
                                     size="xs"
@@ -154,11 +120,11 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
                 </Stack>
               </Center>
             </PopoverBody>
-            <PopoverFooter border="0" display="flex" alignItems="center" justifyContent="space-between" pb={4}>
+            {/* <PopoverFooter border="0" display="flex" alignItems="center" justifyContent="space-between" pb={4}>
               <ButtonGroup size="sm" ml="auto">
                 <Button colorScheme="green">Alle Aufgaben als gelesen markieren</Button>
               </ButtonGroup>
-            </PopoverFooter>
+            </PopoverFooter> */}
           </PopoverContent>
         </Popover>
       </Box>
