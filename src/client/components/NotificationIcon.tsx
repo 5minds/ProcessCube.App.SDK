@@ -27,16 +27,18 @@ const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
 export const NotificationIcon = ({
   onTaskClick,
+  newTasksApiUrl,
   loadingComponent = null,
   errorComponent = null,
 }: {
   onTaskClick: (taskId: string) => void;
+  newTasksApiUrl: string;
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
 }) => {
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
 
-  const { data, error } = useSWR('/api/usertasks', fetcher, {
+  const { data, error } = useSWR(newTasksApiUrl, fetcher, {
     refreshInterval: 3000,
     onSuccess: (taskList) => {
       setNewTasks(taskList);
