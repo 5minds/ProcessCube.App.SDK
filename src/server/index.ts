@@ -2,7 +2,6 @@ import 'only-server';
 
 export * from './lib';
 export * from './server-actions';
-export * from './components';
 
 declare global {
   namespace NodeJS {
