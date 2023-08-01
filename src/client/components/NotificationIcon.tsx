@@ -94,23 +94,21 @@ export const NotificationIcon = ({ onTaskClick }: { onTaskClick: (taskId: string
                             whileTap={{ cursor: 'grabbing', scale: 1.1 }}
                           >
                             <Stack shouldWrapChildren spacing="4">
-                              <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
-                                {task.processModelId}
+                              <Flex justify="space-between" alignItems="center">
+                                <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
+                                  {task.processModelId}
+                                </Text>
+                                <Button
+                                  size="xs"
+                                  colorScheme="blue"
+                                  onClick={() => onTaskClick(task.flowNodeInstanceId)}
+                                >
+                                  X
+                                </Button>
+                              </Flex>
+                              <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
+                                {task.flowNodeId}
                               </Text>
-                              <HStack justify="space-between">
-                                <HStack spacing="3">
-                                  <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
-                                    {task.flowNodeId}
-                                  </Text>
-                                  <Button
-                                    size="xs"
-                                    colorScheme="blue"
-                                    onClick={() => onTaskClick(task.flowNodeInstanceId)}
-                                  >
-                                    X
-                                  </Button>
-                                </HStack>
-                              </HStack>
                             </Stack>
                           </ListItem>
                         ) : null
