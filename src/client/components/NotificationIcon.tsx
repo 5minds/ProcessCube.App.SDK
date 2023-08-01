@@ -121,9 +121,16 @@ export const NotificationIcon = ({
                                       X
                                     </Button>
                                   </Flex>
-                                  <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
-                                    {task.flowNodeName}
-                                  </Text>
+                                  <Flex justify="space-between" alignItems="center">
+                                    <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
+                                      {task.flowNodeName}
+                                    </Text>
+                                    {task.startedAt && (
+                                      <Text textStyle="xs" color="gray.500" textAlign="right">
+                                        {new Date(task.startedAt).toLocaleString()}
+                                      </Text>
+                                    )}
+                                  </Flex>
                                 </Stack>
                               </ListItem>
                             ) : null
