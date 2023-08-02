@@ -18,6 +18,7 @@ import {
   Center,
   List,
   Stack,
+  Spinner,
 } from '@chakra-ui/react';
 
 import useSWR from 'swr';
@@ -118,7 +119,12 @@ export const NotificationIcon = ({
                                     <Button
                                       size="xs"
                                       colorScheme="blue"
-                                      onClick={() => onTaskClick(task.flowNodeInstanceId)}
+                                      onClick={() => {
+                                        onTaskClick(task.flowNodeInstanceId);
+                                        setNewTasks(
+                                          newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId)
+                                        );
+                                      }}
                                     >
                                       X
                                     </Button>
