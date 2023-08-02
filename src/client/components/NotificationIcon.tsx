@@ -41,9 +41,7 @@ export const NotificationIcon = ({
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
 
   const { data, error } = useSWR(newTasksApiUrl, fetcher, {
-    refreshInterval: 3000,
     refreshInterval,
-    onSuccess: (taskList) => {
     onSuccess: (taskList: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
       setNewTasks(taskList);
     },
