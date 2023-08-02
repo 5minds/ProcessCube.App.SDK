@@ -44,6 +44,7 @@ export const NotificationIcon = ({
     refreshInterval: 3000,
     refreshInterval,
     onSuccess: (taskList) => {
+    onSuccess: (taskList: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
       setNewTasks(taskList);
     },
   });
