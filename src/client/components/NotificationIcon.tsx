@@ -28,11 +28,13 @@ const fetcher = (url: any) => fetch(url).then((res) => res.json());
 export const NotificationIcon = ({
   onTaskClick,
   newTasksApiUrl,
+  refreshInterval = 5000,
   loadingComponent = null,
   errorComponent = null,
 }: {
   onTaskClick: (taskId: string) => void;
   newTasksApiUrl: string;
+  refreshInterval?: number;
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
 }) => {
@@ -40,6 +42,7 @@ export const NotificationIcon = ({
 
   const { data, error } = useSWR(newTasksApiUrl, fetcher, {
     refreshInterval: 3000,
+    refreshInterval,
     onSuccess: (taskList) => {
       setNewTasks(taskList);
     },
