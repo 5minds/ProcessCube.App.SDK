@@ -40,11 +40,38 @@ export const NotificationIcon = ({
   errorComponent?: React.ReactNode;
 }) => {
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
+  const [previousTasks, setPreviousTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
+  Notification.requestPermission().then((result) => {
+    console.log(result);
+  });
+
+  const shownTaskIds = new Set(JSON.parse(localStorage.getItem('shownTaskIds') as any) || []);
 
   const { data, error } = useSWR(newTasksApiUrl, fetcher, {
     refreshInterval,
+    refreshWhenHidden: true,
     onSuccess: (taskList: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
       setNewTasks(taskList);
+      taskList.forEach((task) => {
+        console.log('shownTaskIds', shownTaskIds);
+        if (!shownTaskIds.has(task.flowNodeInstanceId)) {
+          console.log('NEW NOTIFICATION');
+          shownTaskIds.add(task.flowNodeInstanceId);
+
+          const notificationInstance = new Notification(task.processModelId, {
+            icon: 'https://picsum.photos/16/16',
+            body: task.flowNodeName,
+            tag: task.flowNodeInstanceId,
+          });
+
+          notificationInstance.onclose = () => {
+            shownTaskIds.delete(task.flowNodeInstanceId);
+            onTaskClick(task.flowNodeInstanceId);
+          };
+        }
+      });
+
+      localStorage.setItem('shownTaskIds', JSON.stringify([...shownTaskIds]));
     },
   });
 
@@ -121,6 +148,7 @@ export const NotificationIcon = ({
                                       colorScheme="blue"
                                       onClick={() => {
                                         onTaskClick(task.flowNodeInstanceId);
+                                        shownTaskIds.delete(task.flowNodeInstanceId);
                                         setNewTasks(
                                           newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId)
                                         );
