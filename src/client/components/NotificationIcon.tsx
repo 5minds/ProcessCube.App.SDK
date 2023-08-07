@@ -59,7 +59,6 @@ export const NotificationIcon = ({
           shownTaskIds.add(task.flowNodeInstanceId);
 
           const notificationInstance = new Notification(task.processModelId, {
-            icon: 'https://picsum.photos/16/16',
             body: task.flowNodeName,
             tag: task.flowNodeInstanceId,
           });
