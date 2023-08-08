@@ -18,7 +18,6 @@ import {
   Center,
   List,
   Stack,
-  Spinner,
 } from '@chakra-ui/react';
 
 import useSWR from 'swr';
@@ -40,7 +39,6 @@ export const NotificationIcon = ({
   errorComponent?: React.ReactNode;
 }) => {
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
-  const [previousTasks, setPreviousTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
   Notification.requestPermission().then((result) => {
     console.log(result);
   });
