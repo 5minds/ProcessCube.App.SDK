@@ -25,7 +25,7 @@ import { DataModels } from '@5minds/processcube_engine_client';
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
-export const NotificationIcon = ({
+export const NotificationIcon: any = ({
   onTaskClick,
   newTasksApiUrl,
   refreshInterval = 5000,
