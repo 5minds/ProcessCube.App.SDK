@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiBell } from 'react-icons/fi';
+import { FiBell, FiX } from 'react-icons/fi';
 import {
   IconButton,
   Box,
@@ -146,9 +146,10 @@ export const NotificationComponent = ({
                                     <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
                                       {task.processModelId}
                                     </Text>
-                                    <Button
+                                    <IconButton
                                       size="xs"
-                                      colorScheme="blue"
+                                      icon={<FiX />}
+                                      aria-label="close"
                                       onClick={() => {
                                         onTaskClick(task.flowNodeInstanceId);
                                         shownTaskIds.delete(task.flowNodeInstanceId);
@@ -156,9 +157,7 @@ export const NotificationComponent = ({
                                           newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId)
                                         );
                                       }}
-                                    >
-                                      X
-                                    </Button>
+                                    />
                                   </Flex>
                                   <Flex justify="space-between" alignItems="center">
                                     <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
