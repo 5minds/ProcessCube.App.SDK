@@ -3,7 +3,7 @@ import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcu
 import { EngineURL } from './internal/EngineClient';
 import { join, basename } from 'node:path';
 import { build as esBuild } from 'esbuild';
-import { promises as fsp, PathLike } from 'node:fs';
+import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import jwtDecode from 'jwt-decode';
 
@@ -17,7 +17,27 @@ const DELAY_FACTOR = 0.85;
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
-export async function subscribeToExternalTasks(externalTasksDirPath: string): Promise<void> {
+/**
+ * Subscribe to external tasks.
+ * @param {string} customExternalTasksDirPath Optional path to the external tasks directory. Uses the Next.js app directory by default.
+ * @returns {Promise<void>} A promise that resolves when the external tasks are subscribed
+ * */
+export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
+  let externalTasksDirPath: string | undefined;
+
+  const potentialPaths = [customExternalTasksDirPath, join(__dirname, 'app'), join(__dirname, 'src', 'app')];
+
+  for (const path of potentialPaths) {
+    if (path && existsSync(path)) {
+      externalTasksDirPath = path;
+      break;
+    }
+  }
+
+  if (!externalTasksDirPath) {
+    throw new Error('Could not find external tasks directory');
+  }
+
   const directories = await getDirectories(externalTasksDirPath);
 
   for (const directory of directories) {
