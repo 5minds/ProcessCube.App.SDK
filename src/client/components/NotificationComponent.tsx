@@ -150,7 +150,7 @@ export const NotificationComponent = ({
                                       size="xs"
                                       icon={<FiX />}
                                       aria-label="close"
-                                      color={'gray.500'}
+                                      color={'gray.900'}
                                       onClick={() => {
                                         onTaskClick(task.flowNodeInstanceId);
                                         shownTaskIds.delete(task.flowNodeInstanceId);
