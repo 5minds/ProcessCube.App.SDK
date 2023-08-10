@@ -29,6 +29,7 @@ export const NotificationComponent: any = ({
   onTaskClick,
   newTasksApiUrl,
   refreshInterval = 5000,
+  theme = {},
   fontSize = '1.5rem',
   loadingComponent = null,
   errorComponent = null,
@@ -36,6 +37,7 @@ export const NotificationComponent: any = ({
   onTaskClick: (taskId: string) => void;
   newTasksApiUrl: string;
   refreshInterval?: number;
+  theme?: Record<string, any>;
   fontSize?: string;
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
@@ -76,7 +78,7 @@ export const NotificationComponent: any = ({
   if (!data && loadingComponent) return loadingComponent;
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <Box>
         <Popover placement="right-end" closeOnBlur={false}>
           <PopoverTrigger>
