@@ -31,6 +31,8 @@ export const NotificationComponent: any = ({
   refreshInterval = 5000,
   theme = {},
   fontSize = '1.5rem',
+  badgeTop = '-10px',
+  badgeRight = '-10px',
   loadingComponent = null,
   errorComponent = null,
 }: {
@@ -39,6 +41,8 @@ export const NotificationComponent: any = ({
   refreshInterval?: number;
   theme?: Record<string, any>;
   fontSize?: string;
+  badgeTop?: string;
+  badgeRight?: string;
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
 }) => {
@@ -91,8 +95,8 @@ export const NotificationComponent: any = ({
                   h="20px"
                   borderRadius="50%"
                   position="absolute"
-                  top="-10px"
-                  right="-10px"
+                  top={badgeTop}
+                  right={badgeRight}
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
