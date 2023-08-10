@@ -24,8 +24,7 @@ const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefine
  * */
 export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
   let externalTasksDirPath: string | undefined;
-
-  const potentialPaths = [customExternalTasksDirPath, join(__dirname, 'app'), join(__dirname, 'src', 'app')];
+  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
 
   for (const path of potentialPaths) {
     if (path && existsSync(path)) {
