@@ -2,4 +2,4 @@
 import 'client-only';
 
 export * from './components/DynamicLink';
-export * from './components/NotificationIcon';
+export * from './components/NotificationComponent';

@@ -25,16 +25,18 @@ import { DataModels } from '@5minds/processcube_engine_client';
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
-export const NotificationIcon: any = ({
+export const NotificationComponent: any = ({
   onTaskClick,
   newTasksApiUrl,
   refreshInterval = 5000,
+  fontSize = '1.5rem',
   loadingComponent = null,
   errorComponent = null,
 }: {
   onTaskClick: (taskId: string) => void;
   newTasksApiUrl: string;
   refreshInterval?: number;
+  fontSize?: string;
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
 }) => {
@@ -51,9 +53,7 @@ export const NotificationIcon: any = ({
     onSuccess: (taskList: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
       setNewTasks(taskList);
       taskList.forEach((task) => {
-        console.log('shownTaskIds', shownTaskIds);
         if (!shownTaskIds.has(task.flowNodeInstanceId)) {
-          console.log('NEW NOTIFICATION');
           shownTaskIds.add(task.flowNodeInstanceId);
 
           const notificationInstance = new Notification(task.processModelId, {
@@ -81,7 +81,7 @@ export const NotificationIcon: any = ({
         <Popover placement="right-end" closeOnBlur={false}>
           <PopoverTrigger>
             <Flex position="relative" align="center">
-              <IconButton icon={<FiBell fontSize="1.25rem" />} aria-label="Settings" bg="gray.300" />
+              <IconButton icon={<FiBell fontSize={fontSize} />} aria-label="Settings" />
               {newTasks.length > 0 && (
                 <Box
                   bg="red"
