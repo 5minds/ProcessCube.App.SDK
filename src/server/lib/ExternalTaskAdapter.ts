@@ -52,10 +52,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 
     const config: IExternalTaskWorkerConfig = {
       identity: await getIdentityForExternalTaskWorkers(tokenSet),
-      lockDuration: module.lockDuration,
-      longpollingTimeout: module.longpollingTimeout,
-      maxTasks: module.maxTasks,
-      payloadFilter: module.payloadFilter,
+      ...module?.config,
     };
     const handler = module.default;
     const topic = basename(directory);
