@@ -11,8 +11,8 @@ const DUMMY_IDENTITY: Identity = {
   token: 'ZHVtbXlfdG9rZW4=',
   userId: 'dummy_token',
 };
-
 const DELAY_FACTOR = 0.85;
+const EXTERNAL_TASK_FILE_NAME = 'external_task';
 
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
@@ -40,7 +40,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
   const directories = await getDirectories(externalTasksDirPath);
 
   for (const directory of directories) {
-    const workerFile = await getWorkerFile(directory);
+    const workerFile = await getExternalTaskFile(directory);
 
     if (!workerFile) {
       continue;
@@ -77,19 +77,19 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
   }
 }
 
-async function getWorkerFile(directory: string): Promise<string | null> {
+async function getExternalTaskFile(directory: string): Promise<string | null> {
   const files = await fsp.readdir(directory);
-  const workerFiles = files.filter((file) => file.startsWith('worker') && file.endsWith('.ts'));
+  const externalTaskFiles = files.filter((file) => file.startsWith(EXTERNAL_TASK_FILE_NAME) && file.endsWith('.ts'));
 
-  if (workerFiles.length === 0) {
+  if (externalTaskFiles.length === 0) {
     return null;
   }
 
-  if (workerFiles.length > 1) {
-    throw new Error(`Found more than one worker file in directory '${directory}'`);
+  if (externalTaskFiles.length > 1) {
+    throw new Error(`Found more than one external task file in directory '${directory}'`);
   }
 
-  return workerFiles[0];
+  return externalTaskFiles[0];
 }
 
 async function getFreshTokenSet(): Promise<TokenSet> {
