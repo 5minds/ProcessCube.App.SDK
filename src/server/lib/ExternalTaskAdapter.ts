@@ -1,7 +1,7 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
 import { EngineURL } from './internal/EngineClient';
-import { join, basename } from 'node:path';
+import { join, relative, basename } from 'node:path';
 import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
@@ -55,7 +55,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       ...module?.config,
     };
     const handler = module.default;
-    const topic = basename(directory);
+    const topic = relative(externalTasksDirPath, directory).replace(/^\.\/+/, '');
 
     const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
     await startRefreshingIdentity(tokenSet, externalTaskWorker);
