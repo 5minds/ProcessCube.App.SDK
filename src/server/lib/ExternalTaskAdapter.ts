@@ -135,6 +135,9 @@ async function startRefreshingIdentity(
 ): Promise<void> {
   try {
     if (!authorityIsConfigured || tokenSet === null) {
+      logger.info(
+        `No authority is configured. Using dummy identity for external task worker ${externalTaskWorker.workerId}`
+      );
       return;
     }
 
@@ -220,11 +223,17 @@ async function getDirectories(source: PathLike): Promise<string[]> {
  * @returns {Promise<number>} A promise that resolves with the time in seconds until the current access token expires
  * */
 async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<number> {
-  if (!tokenSet.expires_in) {
-    throw new Error('Could not get expires_in property from token set');
+  let expiresIn = tokenSet.expires_in;
+
+  if (!expiresIn && tokenSet.expires_at) {
+    expiresIn = tokenSet.expires_at - Math.floor(Date.now() / 1000);
   }
 
-  return tokenSet.expires_in;
+  if (expiresIn === undefined) {
+    throw new Error('Could not get expires_in for external task workers');
+  }
+
+  return expiresIn;
 }
 
 /**
@@ -247,4 +256,12 @@ function requireFromString(src: string, filename: string) {
 
     throw error;
   }
+}
+
+function calculateEquivalentTimeInSecondsExpiresAt(expiresAt: number): number {
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const remainingTime = expiresAt - currentTimestamp;
+  const equivalentTime = currentTimestamp + remainingTime - expiresAt;
+
+  return equivalentTime;
 }
