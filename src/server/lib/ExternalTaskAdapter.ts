@@ -223,7 +223,7 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
   let expiresIn = tokenSet.expires_in;
 
   if (!expiresIn && tokenSet.expires_at) {
-    expiresIn = tokenSet.expires_at - Math.floor(Date.now() / 1000);
+    expiresIn = Math.floor(tokenSet.expires_at - Date.now() / 1000);
   }
 
   if (expiresIn === undefined) {
