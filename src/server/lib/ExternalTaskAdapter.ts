@@ -96,8 +96,8 @@ async function getFreshTokenSet(): Promise<TokenSet> {
 
   const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
   const client = new issuer.Client({
-    client_id: process.env.EXTERNAL_TASK_WORKER_CLIENT_ID as string,
-    client_secret: process.env.EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
+    client_id: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID as string,
+    client_secret: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
   });
   const tokenSet = await client.grant({
     grant_type: 'client_credentials',
