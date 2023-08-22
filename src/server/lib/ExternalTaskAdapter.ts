@@ -227,7 +227,7 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
   }
 
   if (expiresIn === undefined) {
-    throw new Error('Could not get expires_in for external task workers');
+    throw new Error('Could not determine the time until the access token for external task workers expires');
   }
 
   return expiresIn;
