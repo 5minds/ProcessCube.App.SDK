@@ -135,9 +135,6 @@ async function startRefreshingIdentity(
 ): Promise<void> {
   try {
     if (!authorityIsConfigured || tokenSet === null) {
-      logger.info(
-        `No authority is configured. Using dummy identity for external task worker ${externalTaskWorker.workerId}`
-      );
       return;
     }
 
@@ -256,12 +253,4 @@ function requireFromString(src: string, filename: string) {
 
     throw error;
   }
-}
-
-function calculateEquivalentTimeInSecondsExpiresAt(expiresAt: number): number {
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  const remainingTime = expiresAt - currentTimestamp;
-  const equivalentTime = currentTimestamp + remainingTime - expiresAt;
-
-  return equivalentTime;
 }
