@@ -1,7 +1,7 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
 import { EngineURL } from './internal/EngineClient';
-import { join, relative, basename } from 'node:path';
+import { join, relative } from 'node:path';
 import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
@@ -16,6 +16,8 @@ const EXTERNAL_TASK_FILE_NAME = 'external_task.ts';
 
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
+
+export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
 
 /**
  * Subscribe to external tasks.
