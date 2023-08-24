@@ -17,7 +17,7 @@ const EXTERNAL_TASK_FILE_NAME = 'external_task.ts';
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
-export type ExternalTaskWorkerConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
+export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
 
 /**
  * Subscribe to external tasks.
