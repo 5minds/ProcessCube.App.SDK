@@ -12,7 +12,7 @@ const DUMMY_IDENTITY: Identity = {
   userId: 'dummy_token',
 };
 const DELAY_FACTOR = 0.85;
-const EXTERNAL_TASK_FILE_NAME = 'external_task';
+const EXTERNAL_TASK_FILE_NAME = 'external_task.ts';
 
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
@@ -76,7 +76,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
   const files = await fsp.readdir(directory);
-  const externalTaskFiles = files.filter((file) => file.startsWith(EXTERNAL_TASK_FILE_NAME) && file.endsWith('.ts'));
+  const externalTaskFiles = files.filter((file) => file === EXTERNAL_TASK_FILE_NAME);
 
   if (externalTaskFiles.length === 0) {
     return null;
