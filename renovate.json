@@ -2,5 +2,15 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
-  ]
+  ],
+    "schedule": [
+    "before 7am on Monday"
+  ],
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "reviewers": [
+    "christian.werner@5minds.de",
+    "alexander.kasten@5minds.de"
+  ],
+  "updateLockFiles": true
 }
