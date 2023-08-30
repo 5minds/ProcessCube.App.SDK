@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/dist/shared/lib/constants';
 
 import { subscribeToExternalTasks } from '../lib';
 
@@ -16,7 +17,11 @@ export function withApplicationSDK(_nextConfig = {} as NextConfigWithApplication
   const { applicationSDK: applicationSDKConfig, ...nextConfig } = _nextConfig;
 
   return async (phase, context) => {
-    if (applicationSDKConfig?.subscribeToExternalTasks) {
+    const shouldSubscribeToExternalTasks =
+      applicationSDKConfig?.subscribeToExternalTasks &&
+      (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER);
+
+    if (shouldSubscribeToExternalTasks) {
       await subscribeToExternalTasks();
     }
 
