@@ -5,12 +5,12 @@ import { Client } from './internal/EngineClient';
  * @param query The query options of {@link Client.processInstances.query}
  * @param query.query The query of {@link Client.processInstances.query}
  * @param query.options The options of {@link Client.processInstances.query}
- * @returns {DataModels.ProcessInstances.ProcessInstance[] | null}
+ * @returns {@link DataModels.ProcessInstances.ProcessInstanceList}
  */
 export async function getActiveProcessInstances(query?: {
   query?: Omit<DataModels.ProcessInstances.ProcessInstanceQuery, 'state'>;
   options?: Parameters<typeof Client.processInstances.query>[1];
-}): Promise<DataModels.ProcessInstances.ProcessInstance[] | null> {
+}): Promise<DataModels.ProcessInstances.ProcessInstanceList> {
   const result = await Client.processInstances.query(
     {
       ...query?.query,
@@ -19,9 +19,5 @@ export async function getActiveProcessInstances(query?: {
     query?.options
   );
 
-  if (result.processInstances.length === 0) {
-    return null;
-  }
-
-  return result.processInstances;
+  return result;
 }
