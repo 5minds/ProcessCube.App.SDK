@@ -1,6 +1,7 @@
 import 'only-server';
 
 export * from './lib';
+export * from './plugin';
 export * from './server-actions';
 
 declare global {
