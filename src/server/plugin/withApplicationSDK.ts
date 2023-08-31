@@ -5,7 +5,7 @@ import { subscribeToExternalTasks } from '../lib';
 
 export interface NextConfigWithApplicationSDKConfig extends NextConfig {
   applicationSDK?: {
-    subscribeToExternalTasks?: boolean;
+    useExternalTasks?: boolean;
   };
 }
 
@@ -17,9 +17,8 @@ export function withApplicationSDK(_nextConfig = {} as NextConfigWithApplication
   const { applicationSDK: applicationSDKConfig, ...nextConfig } = _nextConfig;
 
   return async (phase, context) => {
-    const shouldSubscribeToExternalTasks =
-      applicationSDKConfig?.subscribeToExternalTasks &&
-      (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER);
+    const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
+    const shouldSubscribeToExternalTasks = applicationSDKConfig?.useExternalTasks && isStartingServer;
 
     if (shouldSubscribeToExternalTasks) {
       await subscribeToExternalTasks();
