@@ -2,7 +2,6 @@ import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
 
 /**
- * @param query The query options of {@link Client.processInstances.query}
  * @param query.query The query of {@link Client.processInstances.query}
  * @param query.options The options of {@link Client.processInstances.query}
  * @returns {@link DataModels.ProcessInstances.ProcessInstanceList}
