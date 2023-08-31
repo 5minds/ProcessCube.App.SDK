@@ -54,7 +54,7 @@ export async function waitForUserTask(
       flowNodeId: flowNodeId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     });
-    const userTask = userTasks?.[0];
+    const userTask = userTasks.userTasks[0];
 
     if (userTask) {
       Client.notification.removeSubscription(sub);
@@ -80,8 +80,6 @@ export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, resul
 
 export async function getUserTasks(...args: Parameters<typeof Client.userTasks.query>) {
   const result = await Client.userTasks.query(...args);
-
-  console.log('getUserTasks', result);
 
   return result;
 }
@@ -147,7 +145,8 @@ export async function getWaitingUserTasksByFlowNodeId(
     options
   );
 
-  return result
+  return result;
+}
 
 /**
  *
