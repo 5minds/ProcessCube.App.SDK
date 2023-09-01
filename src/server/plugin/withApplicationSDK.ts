@@ -1,9 +1,9 @@
 import type { NextConfig } from 'next';
 import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/dist/shared/lib/constants';
 
-import { subscribeToExternalTasks } from '../lib';
+import { subscribeToExternalTasks } from '../lib/ExternalTaskAdapter';
 
-export interface NextConfigWithApplicationSDKConfig extends NextConfig {
+export interface NextConfigWithApplicationSdkConfig extends NextConfig {
   applicationSDK?: {
     useExternalTasks?: boolean;
   };
@@ -13,8 +13,8 @@ interface NextConfigFn {
   (phase: string, context?: any): Promise<NextConfig> | NextConfig;
 }
 
-export function withApplicationSDK(_nextConfig = {} as NextConfigWithApplicationSDKConfig): NextConfigFn {
-  const { applicationSDK: applicationSDKConfig, ...nextConfig } = _nextConfig;
+export function withApplicationSdk(config = {} as NextConfig): NextConfigFn {
+  const { applicationSDK: applicationSDKConfig, ...nextConfig } = config;
 
   return async (phase, context) => {
     const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
