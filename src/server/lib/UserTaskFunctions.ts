@@ -106,12 +106,12 @@ export async function getWaitingUserTasks(
  *
  * @param processInstanceId The Process Instance ID
  * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
- * @returns {Promise<Array<DataModels.FlowNodeInstances.UserTaskInstance> | null>}
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskList>}
  */
 export async function getWaitingUserTasksByProcessInstanceId(
   processInstanceId: string | Array<string>,
   options?: Parameters<typeof Client.userTasks.query>[1]
-): Promise<Array<DataModels.FlowNodeInstances.UserTaskInstance> | null> {
+): Promise<DataModels.FlowNodeInstances.UserTaskList> {
   const result = await Client.userTasks.query(
     {
       processInstanceId: processInstanceId,
@@ -120,11 +120,7 @@ export async function getWaitingUserTasksByProcessInstanceId(
     options
   );
 
-  if (result.userTasks.length === 0) {
-    return null;
-  }
-
-  return result.userTasks;
+  return result;
 }
 
 /**
