@@ -4,7 +4,7 @@ import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/dist/sha
 import { subscribeToExternalTasks } from '../lib/ExternalTaskAdapter';
 
 export interface NextConfigWithApplicationSdkConfig extends NextConfig {
-  applicationSDK?: {
+  applicationSdk?: {
     customExternalTasksDirPath?: string;
     useExternalTasks?: boolean;
   };
@@ -15,14 +15,14 @@ interface NextConfigFn {
 }
 
 export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = {}): NextConfigFn {
-  const { applicationSDK: applicationSDKConfig, ...nextConfig } = config;
+  const { applicationSdk: applicationSdkConfig, ...nextConfig } = config;
 
   return async (phase, context) => {
     const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
-    const shouldSubscribeToExternalTasks = applicationSDKConfig?.useExternalTasks && isStartingServer;
+    const shouldSubscribeToExternalTasks = applicationSdkConfig?.useExternalTasks && isStartingServer;
 
     if (shouldSubscribeToExternalTasks) {
-      await subscribeToExternalTasks(applicationSDKConfig?.customExternalTasksDirPath);
+      await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
     }
 
     return nextConfig;
