@@ -62,8 +62,6 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
     await startRefreshingIdentity(tokenSet, externalTaskWorker);
 
-    logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
-
     externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
       logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
         err: error,
@@ -73,6 +71,8 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     });
 
     externalTaskWorker.start();
+
+    logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
   }
 }
 
