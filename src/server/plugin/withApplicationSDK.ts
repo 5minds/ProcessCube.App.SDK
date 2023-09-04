@@ -5,6 +5,7 @@ import { subscribeToExternalTasks } from '../lib/ExternalTaskAdapter';
 
 export interface NextConfigWithApplicationSdkConfig extends NextConfig {
   applicationSDK?: {
+    customExternalTasksDirPath?: string;
     useExternalTasks?: boolean;
   };
 }
@@ -13,7 +14,7 @@ interface NextConfigFn {
   (phase: string, context?: any): Promise<NextConfig> | NextConfig;
 }
 
-export function withApplicationSdk(config = {} as NextConfig): NextConfigFn {
+export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = {}): NextConfigFn {
   const { applicationSDK: applicationSDKConfig, ...nextConfig } = config;
 
   return async (phase, context) => {
@@ -21,7 +22,7 @@ export function withApplicationSdk(config = {} as NextConfig): NextConfigFn {
     const shouldSubscribeToExternalTasks = applicationSDKConfig?.useExternalTasks && isStartingServer;
 
     if (shouldSubscribeToExternalTasks) {
-      await subscribeToExternalTasks();
+      await subscribeToExternalTasks(applicationSDKConfig?.customExternalTasksDirPath);
     }
 
     return nextConfig;
