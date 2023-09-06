@@ -17,7 +17,7 @@ type ComboboxProps = {
 }
 
 
-export default function ComboboxComponent({ people }: ComboboxProps) {
+export function ComboboxComponent({ people }: ComboboxProps) {
   const [query, setQuery] = useState('')
   const [selectedPerson, setSelectedPerson] = useState(null)
   const filteredPeople =
