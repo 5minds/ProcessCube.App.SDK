@@ -78,10 +78,13 @@
   "dependencies": {
     "@5minds/processcube_engine_client": "^4.3.1",
     "@5minds/processcube_engine_sdk": "^3.3.1",
+    "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^2.0.18",
     "client-only": "^0.0.1",
     "esbuild": "^0.18.14",
     "jwt-decode": "^3.1.2",
     "only-server": "^0.0.1",
-    "openid-client": "^5.4.3"
+    "openid-client": "^5.4.3",
+    "tailwindcss": "^3.3.3"
   }
 }
