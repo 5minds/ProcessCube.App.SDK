@@ -29,7 +29,7 @@
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:css": "npx tailwindcss -i ./src/client/app.css -o ./client/app.css --minify && esbuild ./client/app.css --bundle --outfile=./client/app.css",
-    "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
+    "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:css\" \"npm run build:commonjs\" \"npm run build:types\"",
     "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
     "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
     "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
