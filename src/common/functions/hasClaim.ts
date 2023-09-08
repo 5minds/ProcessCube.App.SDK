@@ -43,18 +43,13 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
   const { token, account } = args;
 
   if (account) {
-    console.log('acc', account);
     token.accessToken = account.access_token;
     token.idToken = account.id_token;
     token.refreshToken = account.refresh_token;
     token.expiresAt = account.expires_at ?? Math.floor(Date.now() / 1000 + (account.expires_in as number));
-    console.log('account.expires_at', account.expires_at);
-    console.log('account.expires_in', account.expires_in);
-    console.log('account.refresh_token', account.refresh_token);
   }
 
   if (Date.now() >= token.expiresAt * 1000) {
-    console.log('token is expired');
     try {
       const response = await fetch(`${process.env.PROCESSCUBE_AUTHORITY_URL}/token`, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -68,17 +63,12 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
       });
 
       const tokens: TokenSet = await response.json();
-      console.log('new tokens from fetch', tokens);
       if (!response.ok) throw tokens;
 
       token.accessToken = tokens.access_token;
       token.idToken = tokens.id_token;
       token.expiresAt = Math.floor(Date.now() / 1000 + (tokens.expires_in as number));
       token.refreshToken = tokens.refresh_token ?? token.refreshToken;
-
-      console.log('new access_token', tokens.access_token);
-      console.log('new refresh_token', tokens.refresh_token);
-      console.log('new expires_at', token.expiresAt);
     } catch (error) {
       console.error('Error refreshing access token', error);
 
@@ -86,7 +76,6 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
     }
   }
 
-  console.log('token to return ', token);
   return token;
 }
 

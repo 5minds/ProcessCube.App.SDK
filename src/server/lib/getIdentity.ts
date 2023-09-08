@@ -1,38 +1,61 @@
 import { cookies, headers } from 'next/headers';
+import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
 import { getToken } from 'next-auth/jwt';
 
 import type { DataModels } from '@5minds/processcube_engine_client';
-import { getServerSession } from 'next-auth/next';
-import { getSession } from 'next-auth/react';
+
+const IS_SECURE_COOKIE = process.env.NEXTAUTH_URL?.startsWith('https://');
+const SESSION_TOKEN_COOKIE_NAME = `${IS_SECURE_COOKIE ? '__Secure-' : ''}next-auth.session-token`;
+
 /**
  *
  * @returns The users {@link DataModels.Iam.Identity} which can be used to access the 5Minds Engine.
  */
-export async function getIdentity(): Promise<DataModels.Iam.Identity> {
-  // schauen ob man selbst nen request machen kann gegen die nextauth routen
-  // oder den access token hier dekodieren und erneueern?
-  // middleware von nextauth dafür nutzen? => checken ob server actions die middleware triggern
-  const session = await getServerSession();
-  const secondsession = await getSession({ triggerEvent: true });
-
-  console.log('get server session called', session, secondsession);
-  const thirdsession = await getSession({ event: 'timer' });
-  const fourth = await getSession({ event: 'storage' });
-  const fifth = await getSession({ event: 'hidden' });
-  console.log('headers', headers());
-  console.log('cookieus', cookies());
-  const sixth = await getSession({
-    req: {
-      headers: headers() as any,
-    },
+export async function getIdentity(authConfig?: any): Promise<DataModels.Iam.Identity> {
+  let token = await getToken({
+    req: { cookies: cookies(), headers: headers() } as any,
   });
 
-  console.log('thirdsession, fourth, fifth, sixth', thirdsession, fourth, fifth, sixth);
-  const token = await getToken({
-    req: { cookies: cookies(), headers: headers() },
-  } as any);
+  // token is expired
+  if (token?.expiresAt && Date.now() >= token.expiresAt * 1000) {
+    /**
+     * This call triggers the jwt callback function to refresh the access token and
+     * responds with a `Set-Cookie` Header that holds the new encrypted cookie, which contains the new access token.
+     *
+     * The jwt callback function (`authConfigJwtCallback`) is configured by the AuthOptions at the NextAuth Route Handler.
+     */
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/session`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        cookie: cookies().toString(),
+      },
+    });
 
-  console.log('token from getT9oken', token);
+    const responseCookies = new ResponseCookies(response.headers);
+    const newSessionTokenCookie = responseCookies.get(SESSION_TOKEN_COOKIE_NAME);
+
+    if (newSessionTokenCookie) {
+      let errorOnSetCookies = false;
+      // update the server cookie with the new session and refreshed access token
+      try {
+        cookies().set(SESSION_TOKEN_COOKIE_NAME, newSessionTokenCookie.value, {
+          ...newSessionTokenCookie,
+        });
+      } catch {
+        // Cookies can only be modified in a Server Action or Route Handler, not in a React Server Component
+        // so this would lead to an error
+        errorOnSetCookies = true;
+      }
+
+      token = await getToken({
+        req: { cookies: errorOnSetCookies ? responseCookies : cookies(), headers: headers() },
+      } as any);
+
+      if (token?.error) throw token.error;
+    }
+  }
+
   if (!token?.accessToken || !token?.sub) {
     throw new Error('AccessToken or Sub could not be determined!');
   }
