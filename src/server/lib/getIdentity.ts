@@ -11,7 +11,7 @@ const SESSION_TOKEN_COOKIE_NAME = `${IS_SECURE_COOKIE ? '__Secure-' : ''}next-au
  *
  * @returns The users {@link DataModels.Iam.Identity} which can be used to access the 5Minds Engine.
  */
-export async function getIdentity(authConfig?: any): Promise<DataModels.Iam.Identity> {
+export async function getIdentity(): Promise<DataModels.Iam.Identity> {
   let token = await getToken({
     req: { cookies: cookies(), headers: headers() } as any,
   });
@@ -44,7 +44,7 @@ export async function getIdentity(authConfig?: any): Promise<DataModels.Iam.Iden
         });
       } catch {
         // Cookies can only be modified in a Server Action or Route Handler, not in a React Server Component
-        // so this would lead to an error
+        // so in this case we use the responseCookie to get the refreshed token
         errorOnSetCookies = true;
       }
 
