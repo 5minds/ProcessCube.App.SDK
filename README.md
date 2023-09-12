@@ -1,12 +1,12 @@
 # ProcessCube.App.SDK
 
-Das SDK beinhaltet Komponenten und Funktionen für Frontend und Backend (Client/Server) zur einfachen und schnellen Entiwcklung einer ProcessCube App auf Basis von [Next.js](https://nextjs.org/).
+Das SDK beinhaltet Komponenten und Funktionen für Frontend und Backend (Client/Server) zur einfachen und schnellen Entwicklung einer ProcessCube App auf Basis von [Next.js](https://nextjs.org/).
 
 ## Installation zur Verwendung
 
-### Vorraussetzungen
+### Voraussetzungen
 
-- NodeJS `>= v16`
+- NodeJS `>= v18`
 
 ```shell
 npm i @5minds/processcube_app_sdk
@@ -18,9 +18,9 @@ Das NPM Paket hat *drei* Exports.
 
 ### Default/Common
 
-Hier werden Komponten und Funktionen exportiert, die im Client und Server genutzt werden können.
+Hier werden Komponenten und Funktionen exportiert, die im Client und Server genutzt werden können.
 
-Zum Beispiel die React Kompontene RemoteUserTask:
+Zum Beispiel die React Komponente RemoteUserTask:
 
 ```javascript
 import { RemoteUserTask } from "@5minds/processcube_app_sdk";
@@ -28,7 +28,7 @@ import { RemoteUserTask } from "@5minds/processcube_app_sdk";
 
 ### Server
 
-Hier steht alles ausschließlich für eine Serverseitige Umgebung zur Verfügung. Dazu zählen Funktionen die mit der Engine arbeiten, oder React Komponenten, die Serverseitig gerendert werden können.
+Hier steht alles ausschließlich für eine serverseitige Umgebung zur Verfügung. Dazu zählen Funktionen, die mit der Engine arbeiten, oder React Komponenten, die Serverseitig gerendert werden können.
 
 Beispiel:
 
@@ -40,7 +40,7 @@ Um die Engine URL anzupassen, die von den exportierten Funktionen genutzt wird, 
 
 ### Client
 
-Es können nur Komponenten und Funktionen importiert werden, die im Browser funktionieren. Zum Beispiel React Komponenten, die einen Clientseitigen Router und dessen React Hooks nutzen oder Funktionen die auf `window` oder generell globale Browser APIs zugreifen möchten.
+Es können nur Komponenten und Funktionen importiert werden, die im Browser funktionieren. Zum Beispiel React Komponenten, die einen clientseitigen Router und dessen React Hooks nutzen oder Funktionen, die auf `window` oder generell globale Browser APIs zugreifen möchten.
 
 ```javascript
 import { DynamicLink } from "@5minds/processcube_app_sdk/client";
@@ -65,7 +65,7 @@ Für ein Productionbuild:
 npm run build:prod
 ```
 
-Um mit dem Paket lokal zu arbeiten kann es mit npm in ein anderes Projekt verlinkt werden:
+Um mit dem Paket lokal zu arbeiten, kann es mit npm in ein anderes Projekt verlinkt werden:
 
 ```shell
 npm link
@@ -81,3 +81,6 @@ npm link @5minds/processcube_app_sdk
 ## Wen kann ich auf das Projekt ansprechen?
 
 1. [Alexander Kasten](mailto:alexander.kasten@5minds.de)
+2. [Matthias Danne](mailto:matthias.danne@5minds.de)
+3. [Jeremy Hill](mailto:jeremy.hill@5minds.de)
+4. [Marius Jahn](mailto:marius.jahn@5minds.de)
