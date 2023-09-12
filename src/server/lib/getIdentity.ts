@@ -16,8 +16,8 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
     req: { cookies: cookies(), headers: headers() } as any,
   });
 
-  // token is expired
-  if (token?.expiresAt && Date.now() >= token.expiresAt * 1000) {
+  const tokenIsExpired = token?.expiresAt && Date.now() >= token.expiresAt * 1000;
+  if (tokenIsExpired) {
     /**
      * This call triggers the jwt callback function to refresh the access token and
      * responds with a `Set-Cookie` Header that holds the new encrypted cookie, which contains the new access token.
