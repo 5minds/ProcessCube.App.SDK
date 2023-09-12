@@ -79,7 +79,7 @@
     "@5minds/processcube_engine_client": "^4.3.1",
     "@5minds/processcube_engine_sdk": "^3.3.1",
     "client-only": "^0.0.1",
-    "esbuild": "^0.18.14",
+    "esbuild": "^0.19.0",
     "jwt-decode": "^3.1.2",
     "only-server": "^0.0.1",
     "openid-client": "^5.4.3"
