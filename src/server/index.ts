@@ -26,6 +26,7 @@ declare module 'next-auth' {
       /** The user's identity claims. */
       claims?: Record<string, unknown>;
     } & DefaultSession['user'];
+    error?: 'RefreshAccessTokenError';
   }
 }
 
@@ -38,5 +39,9 @@ declare module 'next-auth/jwt' {
     accessToken?: string;
     /** OpenID ID Token */
     idToken?: string;
+    /** OpenID Refresh Token */
+    refreshToken?: string;
+    expiresAt: number;
+    error?: 'RefreshAccessTokenError';
   }
 }
