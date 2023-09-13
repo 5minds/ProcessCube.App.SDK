@@ -1,4 +1,4 @@
-export * from './ExternalTaskAdapter';
+export { ExternalTaskConfig } from './ExternalTaskAdapter';
 export * from './getEngineClient';
 export * from './getIdentity';
 export * from './ProcessInstanceFunctions';
