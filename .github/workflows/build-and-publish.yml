@@ -44,9 +44,11 @@ jobs:
         run: npm ci
 
       - name: 'Prepare Version'
+        if: github.actor != 'renovate'
         run: ci_tools prepare-version --allow-dirty-workdir
 
       - name: 'Commit & Tag Version'
+        if: github.actor != 'renovate'
         env:
           GH_USER: ${{ secrets.GH_USER }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -55,7 +57,7 @@ jobs:
           ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
 
       - name: 'Publish Version'
-        if: github.actor != 'alexanderkasten'
+        if: github.actor != 'renovate'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: ci_tools publish-npm-package --create-tag-from-branch-name
