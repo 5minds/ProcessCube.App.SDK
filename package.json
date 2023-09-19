@@ -58,11 +58,11 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/5minds/ProcessCube.App.SDK/issues",
-    "email": "alexander.kasten@5minds.de"
+    "email": "product@5minds.de"
   },
-  "homepage": "https://github.com/5minds/ProcessCube.App.SDK#readme",
+  "homepage": "https://processcube.io/docs/develop-applications/application-sdk",
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "devDependencies": {
     "@types/react": "^18.2.13",
