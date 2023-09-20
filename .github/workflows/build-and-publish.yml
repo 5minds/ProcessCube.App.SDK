@@ -14,6 +14,7 @@ env:
   CI_TOOLS_STABLE_BRANCH: main
   # CI_TOOLS_BETA_BRANCH: next
   # CI_TOOLS_BETA_NPM_TAG: next
+  BOX_RELEASE_TAG: 2023-2
 
 jobs:
   build_and_publish:
@@ -61,3 +62,11 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: ci_tools publish-npm-package --create-tag-from-branch-name
+
+      - name: Add Box-Release Tag
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/next'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="$(ci_tools get-version)"
+          npm dist-tag add @5minds/processcube_app_sdk@$VERSION ${{ env.BOX_RELEASE_TAG }}
