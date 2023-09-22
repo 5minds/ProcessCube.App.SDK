@@ -134,7 +134,7 @@ async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Pro
 async function startRefreshingIdentity(
   tokenSet: TokenSet | null,
   externalTaskWorker: ExternalTaskWorker<any, any>,
-  retries: number = 5
+  retries: number = 5,
 ): Promise<void> {
   try {
     if (!authorityIsConfigured || tokenSet === null) {
@@ -212,7 +212,7 @@ async function getDirectories(source: PathLike): Promise<string[]> {
       const fullPath = join(source.toString(), dirent.name);
 
       return dirent.isDirectory() ? [fullPath, ...(await getDirectories(fullPath))] : [];
-    })
+    }),
   );
 
   return Array.prototype.concat(...directories);
