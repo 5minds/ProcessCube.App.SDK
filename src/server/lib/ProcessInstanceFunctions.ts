@@ -15,7 +15,7 @@ export async function getActiveProcessInstances(query?: {
       ...query?.query,
       state: DataModels.ProcessInstances.ProcessInstanceState.running,
     },
-    query?.options
+    query?.options,
   );
 
   return result;
