@@ -9,13 +9,15 @@ import { Identity } from '@5minds/processcube_engine_sdk';
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
  * @param filterBy.flowNodeId The UserTask FlowNode ID (BPMN)
+ * @param identity The Identity of the User
  * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The created UserTask.
  */
 export async function waitForUserTask(
   filterBy: {
     processInstanceId?: string;
     flowNodeId?: string;
-  } = {}
+  } = {},
+  identity?: Identity
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
   const { processInstanceId, flowNodeId } = filterBy;
 
@@ -40,36 +42,42 @@ export async function waitForUserTask(
         return;
       }
 
-      const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId as string);
-      Client.notification.removeSubscription(sub);
+      const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId as string, { identity: identity});
+      Client.notification.removeSubscription(sub, identity);
 
       if (userTask === null) {
         return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
       }
 
       return resolve(userTask);
+    }, {
+      identity: identity
     });
 
     const userTasks = await getUserTasks({
       processInstanceId: processInstanceId,
       flowNodeId: flowNodeId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    }, {
+      identity: identity
     });
     const userTask = userTasks.userTasks[0];
 
     if (userTask) {
-      Client.notification.removeSubscription(sub);
+      Client.notification.removeSubscription(sub, identity);
       resolve(userTask);
     }
   });
 }
 
-export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, result: any, flowNodeId: string, identity: Identity) {
+export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, result: any, flowNodeId: string, identity?: Identity) {
   await Client.userTasks.finishUserTask(flowNodeInstanceId, result, identity);
 
   const userTasks = await Client.userTasks.query({
     flowNodeId: flowNodeId,
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+  }, {
+    identity: identity,
   });
 
   if (userTasks.userTasks.length === 0) {
