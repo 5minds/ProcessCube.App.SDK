@@ -1,5 +1,6 @@
 import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
+import { Identity } from '@5minds/processcube_engine_sdk';
 
 /**
  * If there is no UserTask waiting, this function will wait for the next UserTask to be created.
@@ -63,8 +64,8 @@ export async function waitForUserTask(
   });
 }
 
-export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, result: any, flowNodeId: string) {
-  await Client.userTasks.finishUserTask(flowNodeInstanceId, result);
+export async function finishUserTaskAndGetNext(flowNodeInstanceId: string, result: any, flowNodeId: string, identity: Identity) {
+  await Client.userTasks.finishUserTask(flowNodeInstanceId, result, identity);
 
   const userTasks = await Client.userTasks.query({
     flowNodeId: flowNodeId,
