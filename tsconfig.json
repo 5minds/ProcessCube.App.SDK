@@ -1,8 +1,6 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2020",
-    "moduleResolution": "node",
     "outDir": "./server"
   },
   "watchOptions": {
@@ -16,7 +14,7 @@
     "synchronousWatchDirectory": true,
     // Finally, two additional settings for reducing the amount of possible
     // files to track  work from these directories
-    "excludeDirectories": ["**/node_modules", ".next"]
+    "excludeDirectories": ["**/node_modules"]
   },
   "include": ["./src/server"]
 }
