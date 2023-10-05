@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiBell, FiX } from 'react-icons/fi';
 import {
   IconButton,
@@ -51,7 +51,29 @@ export const NotificationComponent = ({
     console.log(result);
   });
 
+  useEffect(() => {
+    socketInitializer();
+  }, []);
+
   const shownTaskIds = new Set(JSON.parse(localStorage.getItem('shownTaskIds') as any) || []);
+
+  let socket: any;
+  const socketInitializer = async () => {
+    // We call this just to make sure we turn on the websocket server
+    await fetch('/api/socket');
+
+    socket = io('', {
+      path: '/api/socket/io',
+    });
+
+    socket.on('connect', () => {
+      console.log('Connected', socket.id);
+    });
+
+    socket.on('newIncomingMessage', (msg: any) => {
+      console.log('New message in client', msg);
+    });
+  };
 
   const { data, error } = useSWR(newTasksApiUrl, fetcher, {
     refreshInterval,
