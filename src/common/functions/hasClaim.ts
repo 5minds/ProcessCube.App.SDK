@@ -1,8 +1,11 @@
-import { Session, getServerSession, CallbacksOptions, Account } from 'next-auth';
+import { Session, getServerSession, CallbacksOptions, Account, TokenSet } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import type { JWT } from 'next-auth/jwt';
-
 import jwtDecode from 'jwt-decode';
+
+import { Logger } from '@5minds/processcube_engine_sdk';
+
+const logger = new Logger('processcube_app_sdk:next-auth_configuration');
 
 /**
  *
@@ -10,8 +13,9 @@ import jwtDecode from 'jwt-decode';
  */
 export async function hasClaim(claim: string): Promise<boolean> {
   let user: Session['user'] | undefined;
-  const isCalledInServerComponent = typeof window === 'undefined'
-  if (isCalledInServerComponent ) {
+  const isCalledInServerComponent = typeof window === 'undefined';
+
+  if (isCalledInServerComponent) {
     user = (
       await getServerSession({
         callbacks: {
@@ -44,8 +48,48 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
   if (account) {
     token.accessToken = account.access_token;
     token.idToken = account.id_token;
+    token.refreshToken = account.refresh_token;
+    token.expiresAt = account.expires_at ?? Math.floor(Date.now() / 1000 + (account.expires_in as number));
   }
-  
+
+  const necessaryEnvsGiven =
+    process.env.PROCESSCUBE_AUTHORITY_URL != null &&
+    process.env.NEXTAUTH_CLIENT_ID != null &&
+    process.env.NEXTAUTH_SECRET != null;
+
+  if (!necessaryEnvsGiven) {
+    logger.warn(
+      'In order for the Access Token to be automatically renewed, PROCESSCUBE_AUTHORITY_URL, NEXTAUTH_CLIENT_ID and NEXTAUTH_SECRET must be set as an environment variable',
+    );
+  }
+
+  if (necessaryEnvsGiven && Date.now() >= token.expiresAt * 1000) {
+    try {
+      const response = await fetch(`${process.env.PROCESSCUBE_AUTHORITY_URL}/token`, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: process.env.NEXTAUTH_CLIENT_ID as string,
+          client_secret: process.env.NEXTAUTH_SECRET as string,
+          grant_type: 'refresh_token',
+          refresh_token: token.refreshToken!,
+        }),
+        method: 'POST',
+      });
+
+      const tokens: TokenSet = await response.json();
+      if (!response.ok) throw tokens;
+
+      token.accessToken = tokens.access_token;
+      token.idToken = tokens.id_token;
+      token.expiresAt = Math.floor(Date.now() / 1000 + (tokens.expires_in as number));
+      token.refreshToken = tokens.refresh_token ?? token.refreshToken;
+    } catch (error) {
+      logger.error('Error refreshing access token', { err: error });
+
+      token.error = 'RefreshAccessTokenError';
+    }
+  }
+
   return token;
 }
 
@@ -69,6 +113,7 @@ export async function authConfigSessionCallback(args: Parameters<CallbacksOption
   delete claims.client_id;
 
   session.user.claims = claims;
+  session.error = token.error;
 
   return session;
 }
