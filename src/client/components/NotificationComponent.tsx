@@ -21,7 +21,10 @@ import {
 } from '@chakra-ui/react';
 
 import useSWR from 'swr';
+import io from 'socket.io-client';
 import { DataModels } from '@5minds/processcube_engine_client';
+
+let socket: any;
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
@@ -47,23 +50,22 @@ export const NotificationComponent = ({
   errorComponent?: React.ReactNode;
 }) => {
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
+  const [amount, setAmount] = useState(0);
   Notification.requestPermission().then((result) => {
     console.log(result);
   });
 
   useEffect(() => {
+    console.log('useEffect NotificationComponent');
     socketInitializer();
   }, []);
 
-  const shownTaskIds = new Set(JSON.parse(localStorage.getItem('shownTaskIds') as any) || []);
-
-  let socket: any;
   const socketInitializer = async () => {
     // We call this just to make sure we turn on the websocket server
     await fetch('/api/socket');
 
     socket = io('', {
-      path: '/api/socket/io',
+      path: '/api/socket/io' || '',
     });
 
     socket.on('connect', () => {
@@ -72,40 +74,50 @@ export const NotificationComponent = ({
 
     socket.on('newIncomingMessage', (msg: any) => {
       console.log('New message in client', msg);
+      setAmount(msg);
     });
   };
 
-  const { data, error } = useSWR(newTasksApiUrl, fetcher, {
-    refreshInterval,
-    refreshWhenHidden: true,
-    onSuccess: (taskList: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
-      setNewTasks(taskList);
-      taskList.forEach((task) => {
-        if (!shownTaskIds.has(task.flowNodeInstanceId)) {
-          shownTaskIds.add(task.flowNodeInstanceId);
+  const sendMessageHandler = async (e: any) => {
+    console.log('sendMessageHandler', e.target.value, socket);
+    if (!socket) return;
+    socket.emit('createdMessage', amount + 1);
+  };
 
-          const notificationInstance = new Notification(task.processModelId, {
-            body: task.flowNodeName,
-            tag: task.flowNodeInstanceId,
-          });
+  const shownTaskIds = new Set(JSON.parse(localStorage.getItem('shownTaskIds') as any) || []);
 
-          notificationInstance.onclose = () => {
-            shownTaskIds.delete(task.flowNodeInstanceId);
-            onTaskClick(task.flowNodeInstanceId);
-          };
-        }
-      });
+  // const { data, error } = useSWR(newTasksApiUrl, fetcher, {
+  //   refreshInterval,
+  //   refreshWhenHidden: true,
+  //   onSuccess: (taskList: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
+  //     setNewTasks(taskList);
+  //     taskList.forEach((task) => {
+  //       if (!shownTaskIds.has(task.flowNodeInstanceId)) {
+  //         shownTaskIds.add(task.flowNodeInstanceId);
 
-      localStorage.setItem('shownTaskIds', JSON.stringify([...shownTaskIds]));
-    },
-  });
+  //         const notificationInstance = new Notification(task.processModelId, {
+  //           body: task.flowNodeName,
+  //           tag: task.flowNodeInstanceId,
+  //         });
 
-  if (error && errorComponent) return errorComponent;
-  if (!data && loadingComponent) return loadingComponent;
+  //         notificationInstance.onclose = () => {
+  //           shownTaskIds.delete(task.flowNodeInstanceId);
+  //           onTaskClick(task.flowNodeInstanceId);
+  //         };
+  //       }
+  //     });
+
+  //     localStorage.setItem('shownTaskIds', JSON.stringify([...shownTaskIds]));
+  //   },
+  // });
+
+  // if (error && errorComponent) return errorComponent;
+  // if (!data && loadingComponent) return loadingComponent;
 
   return (
     <ChakraProvider theme={theme}>
       <Box>
+        <Button onClick={sendMessageHandler}>{amount}</Button>
         <Popover placement="right-end" closeOnBlur={false}>
           <PopoverTrigger>
             <Flex position="relative" align="center">
