@@ -67,6 +67,9 @@ export const NotificationComponent = ({
       console.log('New message in client', msg);
       setAmount(msg);
     });
+
+    socket.on('error', (error: any) => {
+      console.error('Socket error:', error);
     });
   };
 
