@@ -5,7 +5,6 @@ import {
   Box,
   Flex,
   Popover,
-  Button,
   PopoverHeader,
   PopoverContent,
   PopoverArrow,
@@ -46,8 +45,8 @@ export const NotificationComponent = ({
   loadingComponent?: React.ReactNode;
   errorComponent?: React.ReactNode;
 }) => {
+  const [socketInitialized, setSocketInitialized] = useState(false);
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
-  const [amount, setAmount] = useState(0);
   Notification.requestPermission().then((result) => {
     console.log(result);
   });
@@ -63,9 +62,17 @@ export const NotificationComponent = ({
       console.log('Connected', socket.id);
     });
 
-    socket.on('newIncomingMessage', (msg: any) => {
-      console.log('New message in client', msg);
-      setAmount(msg);
+    socket.on('waitingTasks', (usertasks: DataModels.FlowNodeInstances.UserTaskList) => {
+      if (!socketInitialized) {
+        console.log('waitingTasks', usertasks);
+        setNewTasks(usertasks.userTasks);
+        setSocketInitialized(true);
+      }
+    });
+
+    socket.on('newUserTaskWaiting', (usertask: any) => {
+      setNewTasks([...newTasks, usertask]);
+      console.log(newTasks);
     });
 
     socket.on('error', (error: any) => {
@@ -83,13 +90,7 @@ export const NotificationComponent = ({
         socket = null;
       }
     };
-  }, []);
-
-  const sendMessageHandler = async (e: any) => {
-    console.log('sendMessageHandler', e.target.value, socket);
-    if (!socket) return;
-    socket.emit('createdMessage', amount + 1);
-  };
+  }, [newTasks, socketInitialized]);
 
   const shownTaskIds = new Set(JSON.parse(localStorage.getItem('shownTaskIds') as any) || []);
 
@@ -123,117 +124,119 @@ export const NotificationComponent = ({
 
   return (
     <ChakraProvider theme={theme}>
-      <Box>
-        <Button onClick={sendMessageHandler}>{amount}</Button>
-        <Popover placement="right-end" closeOnBlur={false}>
-          <PopoverTrigger>
-            <Flex position="relative" align="center">
-              <IconButton icon={<FiBell fontSize={fontSize} />} aria-label="Settings" />
-              {newTasks.length > 0 && (
-                <Box
-                  bg="red"
-                  w="20px"
-                  h="20px"
-                  borderRadius="50%"
-                  position="absolute"
-                  top={badgeTop}
-                  right={badgeRight}
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  fontSize="0.8rem"
-                  color="white"
-                >
-                  {newTasks.length}
-                </Box>
+      {!socketInitialized && loadingComponent}
+      {socketInitialized && (
+        <Box>
+          <Popover placement="right-end" closeOnBlur={false}>
+            <PopoverTrigger>
+              <Flex position="relative" align="center">
+                <IconButton icon={<FiBell fontSize={fontSize} />} aria-label="Settings" />
+                {newTasks.length > 0 && (
+                  <Box
+                    bg="red"
+                    w="20px"
+                    h="20px"
+                    borderRadius="50%"
+                    position="absolute"
+                    top={badgeTop}
+                    right={badgeRight}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    fontSize="0.8rem"
+                    color="white"
+                  >
+                    {newTasks.length}
+                  </Box>
+                )}
+              </Flex>
+            </PopoverTrigger>
+            <PopoverContent color="black" bg="gray.100" borderColor="blue.800">
+              {newTasks.length === 0 && (
+                <>
+                  <PopoverHeader pt={4} fontWeight="bold" border="0">
+                    Keine neuen Aufgaben
+                  </PopoverHeader>
+                  <PopoverArrow bg="blue.800" />
+                  <PopoverCloseButton />
+                </>
               )}
-            </Flex>
-          </PopoverTrigger>
-          <PopoverContent color="black" bg="gray.100" borderColor="blue.800">
-            {newTasks.length === 0 && (
-              <>
-                <PopoverHeader pt={4} fontWeight="bold" border="0">
-                  Keine neuen Aufgaben
-                </PopoverHeader>
-                <PopoverArrow bg="blue.800" />
-                <PopoverCloseButton />
-              </>
-            )}
-            {newTasks.length > 0 && (
-              <>
-                <PopoverHeader pt={4} fontWeight="bold" border="0">
-                  Neue Aufgaben
-                </PopoverHeader>
-                <PopoverArrow bg="blue.800" />
-                <PopoverCloseButton />
-                <PopoverBody>
-                  <Center maxW="sm" mx="auto" py={{ base: '4', md: '8' }}>
-                    <Stack spacing="5" flex="1">
-                      <List listStyleType="none">
-                        <Stack spacing="3" width="full">
-                          {newTasks.map((task) =>
-                            task ? (
-                              <ListItem
-                                key={task.flowNodeInstanceId}
-                                value={task.flowNodeInstanceId}
-                                backgroundColor="white"
-                                p="4"
-                                boxShadow="sm"
-                                position="relative"
-                                borderRadius="lg"
-                              >
-                                <Stack shouldWrapChildren spacing="4">
-                                  <Flex justify="space-between" alignItems="center">
-                                    <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
-                                      {task.processModelId}
-                                    </Text>
-                                    <IconButton
-                                      size="xs"
-                                      icon={<FiX />}
-                                      aria-label="close"
-                                      color={'gray.900'}
-                                      onClick={() => {
-                                        onTaskClick(task.flowNodeInstanceId);
-                                        shownTaskIds.delete(task.flowNodeInstanceId);
-                                        setNewTasks(
-                                          newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId)
-                                        );
-                                      }}
-                                    />
-                                  </Flex>
-                                  <Flex justify="space-between" alignItems="center">
-                                    <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
-                                      {task.flowNodeName}
-                                    </Text>
-                                    {task.startedAt && (
-                                      <Text textStyle="xs" color="gray.500" textAlign="right">
-                                        {new Date(task.startedAt).toLocaleString(undefined, {
-                                          dateStyle: 'short',
-                                          timeStyle: 'short',
-                                        })}
+              {newTasks.length > 0 && (
+                <>
+                  <PopoverHeader pt={4} fontWeight="bold" border="0">
+                    Neue Aufgaben
+                  </PopoverHeader>
+                  <PopoverArrow bg="blue.800" />
+                  <PopoverCloseButton />
+                  <PopoverBody>
+                    <Center maxW="sm" mx="auto" py={{ base: '4', md: '8' }}>
+                      <Stack spacing="5" flex="1">
+                        <List listStyleType="none">
+                          <Stack spacing="3" width="full">
+                            {newTasks.map((task) =>
+                              task ? (
+                                <ListItem
+                                  key={task.flowNodeInstanceId}
+                                  value={task.flowNodeInstanceId}
+                                  backgroundColor="white"
+                                  p="4"
+                                  boxShadow="sm"
+                                  position="relative"
+                                  borderRadius="lg"
+                                >
+                                  <Stack shouldWrapChildren spacing="4">
+                                    <Flex justify="space-between" alignItems="center">
+                                      <Text textStyle="sm" fontWeight="medium" color="fg.emphasized">
+                                        {task.processModelId}
                                       </Text>
-                                    )}
-                                  </Flex>
-                                </Stack>
-                              </ListItem>
-                            ) : null
-                          )}
-                        </Stack>
-                      </List>
-                    </Stack>
-                  </Center>
-                </PopoverBody>
-              </>
-            )}
+                                      <IconButton
+                                        size="xs"
+                                        icon={<FiX />}
+                                        aria-label="close"
+                                        color={'gray.900'}
+                                        onClick={() => {
+                                          onTaskClick(task.flowNodeInstanceId);
+                                          shownTaskIds.delete(task.flowNodeInstanceId);
+                                          setNewTasks(
+                                            newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId)
+                                          );
+                                        }}
+                                      />
+                                    </Flex>
+                                    <Flex justify="space-between" alignItems="center">
+                                      <Text textStyle="xs" color="fg.subtle" fontWeight="medium">
+                                        {task.flowNodeName}
+                                      </Text>
+                                      {task.startedAt && (
+                                        <Text textStyle="xs" color="gray.500" textAlign="right">
+                                          {new Date(task.startedAt).toLocaleString(undefined, {
+                                            dateStyle: 'short',
+                                            timeStyle: 'short',
+                                          })}
+                                        </Text>
+                                      )}
+                                    </Flex>
+                                  </Stack>
+                                </ListItem>
+                              ) : null
+                            )}
+                          </Stack>
+                        </List>
+                      </Stack>
+                    </Center>
+                  </PopoverBody>
+                </>
+              )}
 
-            {/* <PopoverFooter border="0" display="flex" alignItems="center" justifyContent="space-between" pb={4}>
+              {/* <PopoverFooter border="0" display="flex" alignItems="center" justifyContent="space-between" pb={4}>
               <ButtonGroup size="sm" ml="auto">
                 <Button colorScheme="green">Alle Aufgaben als gelesen markieren</Button>
               </ButtonGroup>
             </PopoverFooter> */}
-          </PopoverContent>
-        </Popover>
-      </Box>
+            </PopoverContent>
+          </Popover>
+        </Box>
+      )}
     </ChakraProvider>
   );
 };
