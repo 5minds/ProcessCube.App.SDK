@@ -198,7 +198,7 @@ export const NotificationComponent = ({
                                           onTaskClick(task.flowNodeInstanceId);
                                           shownTaskIds.delete(task.flowNodeInstanceId);
                                           setNewTasks(
-                                            newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId)
+                                            newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId),
                                           );
                                         }}
                                       />
@@ -218,7 +218,7 @@ export const NotificationComponent = ({
                                     </Flex>
                                   </Stack>
                                 </ListItem>
-                              ) : null
+                              ) : null,
                             )}
                           </Stack>
                         </List>
