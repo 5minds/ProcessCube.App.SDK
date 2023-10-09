@@ -20,13 +20,10 @@ import {
   Stack,
 } from '@chakra-ui/react';
 
-import useSWR from 'swr';
 import io from 'socket.io-client';
 import { DataModels } from '@5minds/processcube_engine_client';
 
 let socket: any;
-
-const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
 export const NotificationComponent = ({
   onTaskClick,
@@ -55,13 +52,7 @@ export const NotificationComponent = ({
     console.log(result);
   });
 
-  useEffect(() => {
-    console.log('useEffect NotificationComponent');
-    socketInitializer();
-  }, []);
-
   const socketInitializer = async () => {
-    // We call this just to make sure we turn on the websocket server
     await fetch('/api/socket');
 
     socket = io('', {
@@ -76,7 +67,20 @@ export const NotificationComponent = ({
       console.log('New message in client', msg);
       setAmount(msg);
     });
+    });
   };
+
+  useEffect(() => {
+    console.log('useEffect NotificationComponent');
+    socketInitializer();
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+    };
+  }, []);
 
   const sendMessageHandler = async (e: any) => {
     console.log('sendMessageHandler', e.target.value, socket);
