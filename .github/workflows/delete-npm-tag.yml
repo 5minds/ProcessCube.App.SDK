@@ -13,6 +13,12 @@ jobs:
         run: |
           echo "Clean up for branch ${{ github.event.ref }}"
 
+      - name: Use Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Install CI Tools
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
