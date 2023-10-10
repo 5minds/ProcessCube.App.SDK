@@ -3,6 +3,8 @@ on: delete
 
 env:
   CI_TOOLS_VERSION: '4.1.0-feature-bad477-lnin9b9h'
+  CI_TOOLS_ALPHA_BRANCH: next
+  CI_TOOLS_STABLE_BRANCH: main
 
 jobs:
   delete:
@@ -32,5 +34,6 @@ jobs:
       - name: Delete npm tag
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: ci_tools delete-npm-tag --dry
+          GIT_BRANCH: ${{ github.event.ref }}
+        run: ci_tools delete-npm-tag --except-on-primary-branches --dry
 
