@@ -1,0 +1,25 @@
+name: Delete NPM tag on Branch Deletion
+on: delete
+
+env:
+  CI_TOOLS_VERSION: '4.1.0-feature-bad477-lnin9b9h'
+
+jobs:
+  delete:
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up
+        run: |
+          echo "Clean up for branch ${{ github.event.ref }}"
+
+      - name: Install CI Tools
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
+
+      - name: Delete npm tag
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: ci_tools delete-npm-tag --dry
+
