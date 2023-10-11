@@ -58,7 +58,9 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       ...module?.config,
     };
     const handler = module.default;
-    const topic = relative(externalTasksDirPath, directory).replace(/^\.\/+/, '');
+    const topic = relative(externalTasksDirPath, directory)
+      .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
+      .replace(/[\/]{2,}/g, '/');
 
     const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
     await startRefreshingIdentity(tokenSet, externalTaskWorker);
