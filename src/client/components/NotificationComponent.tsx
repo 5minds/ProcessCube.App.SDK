@@ -26,8 +26,6 @@ let socket: any;
 
 export const NotificationComponent = ({
   onTaskClick,
-  newTasksApiUrl,
-  refreshInterval = 5000,
   theme = {},
   fontSize = '1.5rem',
   badgeTop = '-10px',
@@ -35,9 +33,7 @@ export const NotificationComponent = ({
   loadingComponent = null,
   errorComponent = null,
 }: {
-  onTaskClick: (taskId: string) => void;
-  newTasksApiUrl: string;
-  refreshInterval?: number;
+  onTaskClick?: (taskId: string) => void;
   theme?: Record<string, any>;
   fontSize?: string;
   badgeTop?: string;
@@ -47,32 +43,45 @@ export const NotificationComponent = ({
 }) => {
   const [socketInitialized, setSocketInitialized] = useState(false);
   const [newTasks, setNewTasks] = useState([] as Array<DataModels.FlowNodeInstances.UserTaskInstance>);
+  const [userId, setUserId] = useState('');
   Notification.requestPermission().then((result) => {
-    console.log(result);
+    // console.log(result);
   });
 
   const socketInitializer = async () => {
+    if (!userId || userId === '') {
+      const userId = await getUserId();
+      console.log('USERID', userId);
+      setUserId(userId);
+    }
+
+    console.log('socketInitializer', userId);
+
     await fetch('/api/socket');
 
     socket = io('', {
       path: '/api/socket/io' || '',
+      query: { userId },
     });
 
     socket.on('connect', () => {
       console.log('Connected', socket.id);
     });
 
-    socket.on('waitingTasks', (usertasks: DataModels.FlowNodeInstances.UserTaskList) => {
+    socket.on('waitingTasks', (usertasks: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
       if (!socketInitialized) {
         console.log('waitingTasks', usertasks);
-        setNewTasks(usertasks.userTasks);
+        setNewTasks(usertasks);
         setSocketInitialized(true);
       }
     });
 
-    socket.on('newUserTaskWaiting', (usertask: any) => {
+    socket.on('newUserTaskWaiting', (usertask: DataModels.FlowNodeInstances.UserTaskInstance) => {
       setNewTasks([...newTasks, usertask]);
-      console.log(newTasks);
+    });
+
+    socket.on('removeTask', (taskId: string) => {
+      setNewTasks(newTasks.filter((task) => task.flowNodeInstanceId !== taskId));
     });
 
     socket.on('error', (error: any) => {
@@ -80,9 +89,19 @@ export const NotificationComponent = ({
     });
   };
 
+  const getUserId = async () => {
+    const response = await fetch('http://localhost:3000/api/userid');
+    let userId = await response.text();
+    userId = userId.replace(/"/g, '');
+
+    return userId;
+  };
+
   useEffect(() => {
-    console.log('useEffect NotificationComponent');
+    console.log(typeof window);
     socketInitializer();
+
+    console.log('useEffect', newTasks);
 
     return () => {
       if (socket) {
@@ -90,37 +109,7 @@ export const NotificationComponent = ({
         socket = null;
       }
     };
-  }, [newTasks, socketInitialized]);
-
-  const shownTaskIds = new Set(JSON.parse(localStorage.getItem('shownTaskIds') as any) || []);
-
-  // const { data, error } = useSWR(newTasksApiUrl, fetcher, {
-  //   refreshInterval,
-  //   refreshWhenHidden: true,
-  //   onSuccess: (taskList: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
-  //     setNewTasks(taskList);
-  //     taskList.forEach((task) => {
-  //       if (!shownTaskIds.has(task.flowNodeInstanceId)) {
-  //         shownTaskIds.add(task.flowNodeInstanceId);
-
-  //         const notificationInstance = new Notification(task.processModelId, {
-  //           body: task.flowNodeName,
-  //           tag: task.flowNodeInstanceId,
-  //         });
-
-  //         notificationInstance.onclose = () => {
-  //           shownTaskIds.delete(task.flowNodeInstanceId);
-  //           onTaskClick(task.flowNodeInstanceId);
-  //         };
-  //       }
-  //     });
-
-  //     localStorage.setItem('shownTaskIds', JSON.stringify([...shownTaskIds]));
-  //   },
-  // });
-
-  // if (error && errorComponent) return errorComponent;
-  // if (!data && loadingComponent) return loadingComponent;
+  }, [newTasks, socketInitialized, userId]);
 
   return (
     <ChakraProvider theme={theme}>
@@ -194,12 +183,8 @@ export const NotificationComponent = ({
                                         icon={<FiX />}
                                         aria-label="close"
                                         color={'gray.900'}
-                                        onClick={() => {
-                                          onTaskClick(task.flowNodeInstanceId);
-                                          shownTaskIds.delete(task.flowNodeInstanceId);
-                                          setNewTasks(
-                                            newTasks.filter((t) => t.flowNodeInstanceId !== task.flowNodeInstanceId),
-                                          );
+                                        onClick={async () => {
+                                          socket.emit('taskSeen', userId, task.flowNodeInstanceId);
                                         }}
                                       />
                                     </Flex>
