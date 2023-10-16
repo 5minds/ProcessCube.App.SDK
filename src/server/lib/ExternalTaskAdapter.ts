@@ -5,6 +5,7 @@ import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import jwtDecode from 'jwt-decode';
+import chokidar from 'chokidar';
 
 import { EngineURL } from './internal/EngineClient';
 
@@ -50,33 +51,52 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     }
 
     const fullWorkerFilePath = join(directory, workerFile);
-    const module = await transpileTypescriptFile(fullWorkerFilePath);
-    const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
-
-    const config: IExternalTaskWorkerConfig = {
-      identity: await getIdentityForExternalTaskWorkers(tokenSet),
-      ...module?.config,
-    };
-    const handler = module.default;
     const topic = relative(externalTasksDirPath, directory)
       .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
       .replace(/[\/]{2,}/g, '/');
 
-    const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-    await startRefreshingIdentity(tokenSet, externalTaskWorker);
+    let externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
 
-    externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
-      logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
-        err: error,
-        type: errorType,
-        externalTask: externalTask,
-      });
+    chokidar.watch(fullWorkerFilePath).on('all', async (event, path) => {
+      if (event === 'change') {
+        externalTaskWorker.dispose();
+        logger.info(`Stopped external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
+        if (externalTasksDirPath) {
+          externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
+        }
+      }
     });
-
-    externalTaskWorker.start();
-
-    logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
   }
+}
+
+async function startExternalTaskWorker(
+  fullWorkerFilePath: string,
+  topic: string,
+): Promise<ExternalTaskWorker<any, any>> {
+  const module = await transpileTypescriptFile(fullWorkerFilePath);
+  const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+
+  const config: IExternalTaskWorkerConfig = {
+    identity: await getIdentityForExternalTaskWorkers(tokenSet),
+    ...module?.config,
+  };
+  const handler = module.default;
+
+  const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
+  await startRefreshingIdentity(tokenSet, externalTaskWorker);
+
+  externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
+    logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
+      err: error,
+      type: errorType,
+      externalTask: externalTask,
+    });
+  });
+
+  externalTaskWorker.start();
+  logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
+
+  return externalTaskWorker;
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
