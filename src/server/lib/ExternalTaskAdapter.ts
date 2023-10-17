@@ -61,9 +61,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       if (event === 'change') {
         externalTaskWorker.dispose();
         logger.info(`Stopped external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
-        if (externalTasksDirPath) {
-          externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
-        }
+        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
       }
     });
   }
