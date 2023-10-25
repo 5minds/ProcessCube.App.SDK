@@ -1,0 +1,85 @@
+function Headline(props: { title?: React.ReactNode }) {
+  return (
+    <div className="flex space-x-3">
+      <div className="flex-1">
+        <h3
+          id="headline-title"
+          className="text-lg leading-6 font-medium text-[color:var(--uic-header-text-color)] dark:text-studio-gray-150"
+        >
+          {props.title}
+        </h3>
+      </div>
+      <div className="flex self-center">
+        <div id="dropdown" className="relative z-30 inline-block text-left">
+          <button
+            id="dropdown-toggle-button"
+            type="button"
+            className="-m-2 p-2 rounded-full flex items-center text-[color:var(--uic-header-dropdown-icon-text-color)] hover:text-[color:var(--uic-header-dropdown-icon-text-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-focus-color)] dark:text-studio-gray-150 dark:hover:text-studio-gray-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+              className="h-5 w-5"
+            >
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
+            </svg>
+          </button>
+          <div
+            className="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-[color:var(--uic-header-dropdown-menu-background-color)] ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-studio-gray-400"
+            id="dropdown-options"
+            role="menu"
+            tabIndex={0}
+          >
+            <div className="py-1" role="none">
+              <button
+                id="dropdown-option-suspend"
+                className="text-[color:var(--uic-header-dropdown-menu-suspend-entry-text-color)] flex w-full px-4 py-2 text-sm hover:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] focus-visible:outline-none focus-visible:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] dark:hover:bg-studio-gray-250 dark:focus-visible:bg-studio-gray-250 dark:text-studio-gray-50"
+                role="menuitem"
+                tabIndex={-1}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  className="mr-3 h-5 w-5 text-[color:var(--uic-header-dropdown-menu-suspend-entry-icon-color)] dark:text-gray-200"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+                <span>Suspend</span>
+              </button>
+              <button
+                id="dropdown-option-terminate"
+                className="text-[color:var(--uic-header-dropdown-menu-terminate-entry-text-color)] flex w-full px-4 py-2 text-sm hover:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] focus-visible:outline-none focus-visible:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] dark:hover:bg-studio-gray-250 dark:focus-visible:bg-studio-gray-250 dark:text-[#d6868d]"
+                role="menuitem"
+                tabIndex={-1}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  className="mr-3 h-5 w-5 text-[color:var(--uic-header-dropdown-menu-terminate-entry-icon-color)]"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+                <span>Terminate</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
