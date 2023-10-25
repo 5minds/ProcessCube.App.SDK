@@ -386,3 +386,162 @@ export const StringFormField: React.FC<IStringFormFieldProps> = ({ formField, st
   );
 };
 
+export interface IEnumFormFieldProps {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+  state?: string | Array<string> | null;
+}
+
+export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state }) => {
+  const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+
+  const label = formField.label;
+  const options = formField.enumValues;
+
+  let enumInput: JSX.Element;
+
+  switch (parsedCustomFormConfig?.displayAs) {
+    case 'checkbox':
+      let multipleStateOrDefaultValue;
+      if (Array.isArray(state) && state.length) {
+        multipleStateOrDefaultValue = state;
+      } else {
+        multipleStateOrDefaultValue = formField.defaultValue?.toString().split(',') ?? [];
+      }
+
+      enumInput = (
+        <fieldset
+          id={`${formField.id}-enum`}
+          className="mt-1 space-y-2"
+          data-type="checkbox"
+          aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
+        >
+          {options?.map((option) => {
+            const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
+
+            return (
+              <div key={option.id} className="relative flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    type="checkbox"
+                    checked={hasValueToBeChecked}
+                    // TODO: muss hier nicht die option.id als name gesetzt werden?
+                    name={formField.id}
+                    id={option.id}
+                    value={option.id}
+                    className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:text-[#007bff40]"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor={option.id} className="font-medium text-gray-700 dark:text-studio-gray-50">
+                    {option.name}
+                  </label>
+                </div>
+              </div>
+            );
+          })}
+        </fieldset>
+      );
+      break;
+    case 'radio':
+      enumInput = (
+        <fieldset
+          id={`${formField.id}-enum`}
+          className="mt-1 space-y-2"
+          data-type="radio"
+          aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
+        >
+          {options?.map((option) => {
+            return (
+              <div key={option.id} className="relative flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    type="radio"
+                    checked={(state || formField.defaultValue) == option.id}
+                    // TODO: muss hier nicht die option.id als name gesetzt werden?
+                    name={formField.id}
+                    id={option.id}
+                    value={option.id}
+                    className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:text-[#007bff40]"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor={option.id} className="font-medium text-gray-700 dark:text-studio-gray-50">
+                    {option.name}
+                  </label>
+                </div>
+              </div>
+            );
+          })}
+        </fieldset>
+      );
+      break;
+    default:
+      let noOptionForDefaultValue = true;
+      let selected;
+      const Select = (props: PropsWithChildren<any>) => (
+        <select
+          id={`${formField.id}-enum`}
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-[color:var(--uic-border-color)] focus:outline-none focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] sm:text-sm rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
+          onChange={(event) => (event.target.dataset.value = event.target.value)}
+          data-value
+          aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
+          {...props}
+        >
+          {props.children}
+        </select>
+      );
+
+      const DefaultOption = (props: PropsWithChildren<any>) => {
+        const { children, ...rest } = props;
+        return (
+          <option disabled hidden style={{ display: 'none' }} value="" {...rest}>
+            {children}
+          </option>
+        );
+      };
+
+      const Options = () => (
+        <Fragment>
+          {options?.map((option) => {
+            const defaultSelected = (state || formField.defaultValue) === option.id;
+            if (defaultSelected) {
+              noOptionForDefaultValue = false;
+              selected = option.id;
+            }
+
+            return (
+              <option key={option.id} value={option.id} selected={defaultSelected}>
+                {option.name}
+              </option>
+            );
+          })}
+        </Fragment>
+      );
+
+      enumInput = (
+        <Select data-value={selected}>
+          <DefaultOption selected={noOptionForDefaultValue ? true : false}>
+            {noOptionForDefaultValue && parsedCustomFormConfig?.placeholder}
+          </DefaultOption>
+          <Options />
+        </Select>
+      );
+      break;
+  }
+
+  const hint = parsedCustomFormConfig?.hint ? (
+    <p id={`${formField.id}-hint`} className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200">
+      {parsedCustomFormConfig.hint}
+    </p>
+  ) : null;
+
+  return (
+    <div>
+      <label className="block text-sm font-medium" htmlFor={`${formField.id}-enum`}>
+        {label}
+      </label>
+      {enumInput}
+      {hint}
+    </div>
+  );
+};
