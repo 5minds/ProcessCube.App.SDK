@@ -307,3 +307,42 @@ export const IntegerFormField: React.FC<IntegerFormFieldProps> = ({ formField, s
     </div>
   );
 };
+
+interface ParagraphFormFieldProps {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+}
+
+export const ParagraphFormField: React.FC<ParagraphFormFieldProps> = ({ formField }) => {
+  const markdownRenderer = new marked.Renderer();
+
+  markdownRenderer.link = function (href, title, text): string {
+    const link = marked.Renderer.prototype.link.apply(this, arguments);
+    return link.replace('<a', "<a target='_blank'");
+  };
+
+  markdownRenderer.html = function (html: string): string {
+    const result = marked.Renderer.prototype.html.apply(this, arguments) as string;
+    if (result.startsWith('<a ') && !result.includes('target=')) {
+      return result.replace('<a ', "<a target='_blank' ");
+    }
+
+    return result;
+  };
+
+  marked.setOptions({
+    renderer: markdownRenderer,
+  });
+
+  console.log(
+    'formField',
+    formField,
+    marked.parse(formField.defaultValue?.toString() ?? formField.label?.toString() ?? ''),
+  );
+  const paragraphContainer = (
+    <div className="text-sm">
+      {marked.parse(formField.defaultValue?.toString() ?? formField.label?.toString() ?? '')}
+    </div>
+  );
+
+  return paragraphContainer;
+};
