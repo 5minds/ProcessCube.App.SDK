@@ -168,3 +168,32 @@ function ConfirmFormField(props: { formField: DataModels.FlowNodeInstances.UserT
   return <p className="text-sm">{formField.label}</p>;
 }
 
+function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
+  const { formField } = props;
+  const id = `${formField.id}-date`;
+  const hintId = `${formField.id}-hint`;
+  const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+
+  return (
+    <div className="">
+      <label className="block text-sm font-medium" htmlFor={id}>
+        {formField.label}
+      </label>
+      <div className="mt-1">
+        <input
+          className="shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm border-[color:var(--uic-border-color)] rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
+          type="date"
+          value={formField.defaultValue?.toString()}
+          id={id}
+          name={id}
+          aria-describedby={hintId}
+        />
+      </div>
+      {parsedCustomFormConfig?.hint && (
+        <p className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200" id={hintId}>
+          {parsedCustomFormConfig?.hint}
+        </p>
+      )}
+    </div>
+  );
+}
