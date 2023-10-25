@@ -229,3 +229,47 @@ function DecimalFormField(props: { formField: DataModels.FlowNodeInstances.UserT
     </div>
   );
 }
+
+interface IHeaderFormFieldProps {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+}
+
+// TODO: styles setzen für header elemente
+export const HeaderFormField: React.FC<IHeaderFormFieldProps> = ({ formField }) => {
+  const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+
+  let headerElement: JSX.Element;
+
+  switch (parsedCustomFormConfig?.style) {
+    case 'heading_1':
+      headerElement = (
+        <h1 className="header-form-field__header">
+          {formField.defaultValue?.toString() || formField.label?.toString()}
+        </h1>
+      );
+      break;
+    case 'heading_2':
+      headerElement = (
+        <h2 className="header-form-field__header">
+          {formField.defaultValue?.toString() || formField.label?.toString()}
+        </h2>
+      );
+      break;
+    case 'heading_3':
+      headerElement = (
+        <h3 className="header-form-field__header">
+          {formField.defaultValue?.toString() || formField.label?.toString()}
+        </h3>
+      );
+      break;
+    default:
+      headerElement = (
+        <h1 className="header-form-field__header">
+          {formField.defaultValue?.toString() || formField.label?.toString()}
+        </h1>
+      );
+      break;
+  }
+
+  return <div className="header-form-field">{headerElement}</div>;
+};
