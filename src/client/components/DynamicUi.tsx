@@ -1,6 +1,25 @@
 import React, { Fragment, PropsWithChildren } from 'react';
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
+const FORM_FIELDS: {
+  [TFromFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: (props: {
+    formField: DataModels.FlowNodeInstances.UserTaskFormField;
+    state?: any;
+  }) => React.JSX.Element;
+} = {
+  boolean: (props) => <BooleanFormField {...props} />,
+  date: (props) => <DateFormField {...props} />,
+  enum: (props) => <EnumFormField {...props} />,
+  // longs are full numbers
+  long: (props) => <IntegerFormField {...props} />,
+  // numbers can be decimals
+  number: (props) => <DecimalFormField {...props} />,
+  string: (props) => <StringFormField {...props} />,
+  paragraph: (props) => <ParagraphFormField {...props} />,
+  header: (props) => <HeaderFormField {...props} />,
+  confirm: (props) => <ConfirmFormField {...props} />,
+};
+
 function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.UserTaskFormField }) {
   const { confirmFormField } = props;
 
