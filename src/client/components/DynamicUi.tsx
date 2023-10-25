@@ -161,3 +161,10 @@ function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserT
     </div>
   );
 }
+
+function ConfirmFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
+  const { formField } = props;
+
+  return <p className="text-sm">{formField.label}</p>;
+}
+
