@@ -64,6 +64,7 @@ export function DynamicUi(
     </div>
   );
 }
+
 const FORM_FIELDS: {
   [TFromFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: (props: {
     formField: DataModels.FlowNodeInstances.UserTaskFormField;
