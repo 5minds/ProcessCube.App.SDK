@@ -273,3 +273,37 @@ export const HeaderFormField: React.FC<IHeaderFormFieldProps> = ({ formField }) 
 
   return <div className="header-form-field">{headerElement}</div>;
 };
+
+interface IntegerFormFieldProps {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+  state?: number | null;
+}
+
+export const IntegerFormField: React.FC<IntegerFormFieldProps> = ({ formField, state }) => {
+  const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+
+  return (
+    <div>
+      <label htmlFor={`${formField.id}-integer`} className="block text-sm font-medium">
+        {formField.label}
+      </label>
+      <div className="mt-1">
+        <input
+          className="shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm border-[color:var(--uic-border-color)] rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
+          type="number"
+          step={1}
+          id={`${formField.id}-integer`}
+          name={`${formField.id}-integer`}
+          value={state ? `${state}` : formField.defaultValue?.toString() ?? ''}
+          placeholder={parsedCustomFormConfig?.placeholder ?? '0'}
+          aria-describedby={`${formField.id}-hint`}
+        />
+      </div>
+      {parsedCustomFormConfig?.hint && (
+        <p id={`${formField.id}-hint`} data-hint className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200">
+          {parsedCustomFormConfig.hint}
+        </p>
+      )}
+    </div>
+  );
+};
