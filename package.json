@@ -78,6 +78,7 @@
   "dependencies": {
     "@5minds/processcube_engine_client": "2023-2",
     "@5minds/processcube_engine_sdk": "2023-2",
+    "chokidar": "^3.5.3",
     "client-only": "^0.0.1",
     "esbuild": "^0.19.3",
     "jwt-decode": "^3.1.2",
