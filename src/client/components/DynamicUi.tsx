@@ -1,6 +1,69 @@
 import React, { Fragment, PropsWithChildren } from 'react';
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
+
+// TODO: state wie früher?
+// TODO: DynamicUI State hook?
+// TODO: resizing responsiveness
+// TODO: Alert vom alten Portal Aufbau anschauen
+// TODO: überschriebene Styles anpassen
+export function DynamicUi(
+  props: PropsWithChildren<{
+    task: DataModels.FlowNodeInstances.UserTaskInstance;
+    className?: string;
+    title?: React.ReactNode;
+    customFieldComponent?: React.ComponentType<{ formField: DataModels.FlowNodeInstances.UserTaskFormField }>;
+  }>,
+) {
+  const { userTaskConfig: config } = props.task;
+  const { formFields } = config;
+  const confirmFormField = formFields.find((field) => field.type === 'confirm');
+
+  console.log('config', config);
+  return (
+    <div
+      className={classNames(
+        `h-full w-full flex flex-col justify-center absolute px-80`,
+        props.className ? props.className : '',
+      )}
+    >
+      <form
+        className="flex flex-col rounded-lg bg-[color:var(--uic-background-color)] text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]  dark:bg-studio-gray-500 dark:text-studio-gray-50 dark:shadow-studio-gray-300"
+        data-user-task-id={props.task.flowNodeId}
+        data-user-task-instance-id={props.task.flowNodeInstanceId}
+      >
+        <header className="px-4 pt-4 pb-3 sm:px-6">
+          <Headline title={props.title ?? props.task.flowNodeName} />
+        </header>
+        <section className="px-4 py-3 sm:px-6 overflow-y-auto">
+          <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
+            {formFields.map((field) => {
+              if (field.type === 'custom' && props.customFieldComponent) {
+                console.log('props.customFieldComponent component', props.customFieldComponent);
+                console.log('props.customFieldComponent test', (props.customFieldComponent as any).test);
+                console.log('props.customFieldComponent.defaultProps', props.customFieldComponent.defaultProps);
+                console.log('getValue', (props.customFieldComponent.defaultProps as any).getValue());
+                const Domp = props.customFieldComponent as any;
+                return <Domp ref={(ref) => console.log('ref')} key={field.id} formField={field} />;
+              }
+              const Element = FORM_FIELDS[field.type];
+
+              console.log(Element, field);
+              if (Element) {
+                return <Element key={field.id} formField={field} />;
+              }
+
+              return <p key={field.id}>No Field</p>;
+            })}
+          </div>
+        </section>
+        <footer className="rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6 dark:bg-studio-gray-600">
+          <FormButtons confirmFormField={confirmFormField} />
+        </footer>
+      </form>
+    </div>
+  );
+}
 const FORM_FIELDS: {
   [TFromFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: (props: {
     formField: DataModels.FlowNodeInstances.UserTaskFormField;
@@ -55,6 +118,11 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
   }
   return <div className="space-y-2 sm:-space-x-2 sm:space-y-0 sm:flex sm:flex-row-reverse">{buttons}</div>;
 }
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
+
 function parseCustomFormConfig(customFormConfig?: string): Record<string, string> | null {
   if (customFormConfig != null && customFormConfig.trim() !== '') {
     try {
