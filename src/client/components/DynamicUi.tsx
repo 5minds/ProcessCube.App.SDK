@@ -33,6 +33,18 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
   }
   return <div className="space-y-2 sm:-space-x-2 sm:space-y-0 sm:flex sm:flex-row-reverse">{buttons}</div>;
 }
+function parseCustomFormConfig(customFormConfig?: string): Record<string, string> | null {
+  if (customFormConfig != null && customFormConfig.trim() !== '') {
+    try {
+      const parsedConfig = JSON.parse(customFormConfig);
+      return parsedConfig;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  return null;
+}
 function Headline(props: { title?: React.ReactNode }) {
   return (
     <div className="flex space-x-3">
@@ -118,3 +130,34 @@ function Headline(props: { title?: React.ReactNode }) {
   );
 }
 
+function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
+  const { formField } = props;
+  const id = `${formField.id}-boolean`;
+  const hintId = `${formField.id}-hint`;
+  const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+
+  return (
+    <div className="relative flex items-start">
+      <div className="flex items-center h-5">
+        <input
+          type="checkbox"
+          className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400"
+          checked={formField.defaultValue === 'true'}
+          id={id}
+          name={id}
+          aria-describedby={parsedCustomFormConfig?.hint ? hintId : undefined}
+        />
+      </div>
+      <div className="ml-3 text-sm">
+        <label className="font-medium" htmlFor={id}>
+          {formField.label}
+        </label>
+        {parsedCustomFormConfig?.hint && (
+          <p className="text-gray-500 dark:text-studio-gray-200" id={hintId}>
+            {parsedCustomFormConfig.hint}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
