@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren } from 'react';
+import React, { Fragment, PropsWithChildren, useRef } from 'react';
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
 
@@ -43,8 +43,19 @@ export function DynamicUi(
                 console.log('props.customFieldComponent test', (props.customFieldComponent as any).test);
                 console.log('props.customFieldComponent.defaultProps', props.customFieldComponent.defaultProps);
                 console.log('getValue', (props.customFieldComponent.defaultProps as any).getValue());
-                const Domp = props.customFieldComponent as any;
-                return <Domp ref={(ref) => console.log('ref')} key={field.id} formField={field} />;
+                // const Domp = props.customFieldComponent as any;
+                // return <props.customFieldComponent ref={(ref) => console.log('ref')} key={field.id} formField={field} />;
+                const Forwared = React.forwardRef(TestFunction);
+                const ref = useRef();
+
+                console.log('ref from forwared red', ref);
+                return (
+                  <Fragment>
+                    <TestComponent ref={(ref) => console.log(ref?.myFunction())} />
+                    <Forwared ref={ref} />
+                    {/* <TestFunction a={13} /> */}
+                  </Fragment>
+                );
               }
               const Element = FORM_FIELDS[field.type];
 
@@ -63,6 +74,27 @@ export function DynamicUi(
       </form>
     </div>
   );
+}
+
+function TestFunction(props: { a?: number }, ref) {
+  console.log('ref', ref);
+  function myFunction() {
+    console.log('myFunctiond from function component', this);
+  }
+  // oder ohne bind?
+  ref.myFunction = myFunction.bind(ref);
+
+  return <button ref={ref}>TestFunction</button>;
+}
+
+class TestComponent extends React.Component<{}> {
+  myFunction() {
+    console.log('myFunction called');
+  }
+
+  render() {
+    return <button>Test Component</button>;
+  }
 }
 
 const FORM_FIELDS: {
