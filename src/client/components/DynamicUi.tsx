@@ -4,9 +4,9 @@ import type { DataModels } from '@5minds/processcube_engine_sdk';
 
 // TODO: state wie früher?
 // TODO: DynamicUI State hook?
-// TODO: resizing responsiveness
 // TODO: Alert vom alten Portal Aufbau anschauen
 // TODO: überschriebene Styles anpassen
+// TODO: components überschreibbar machen siehe react-select
 export function DynamicUi(
   props: PropsWithChildren<{
     task: DataModels.FlowNodeInstances.UserTaskInstance;
@@ -21,14 +21,12 @@ export function DynamicUi(
 
   console.log('config', config);
   return (
-    <div
-      className={classNames(
-        `h-full w-full flex flex-col justify-center absolute px-80`,
-        props.className ? props.className : '',
-      )}
-    >
+    <div className="min-h-[200px] min-w-fit block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg">
       <form
-        className="flex flex-col rounded-lg bg-[color:var(--uic-background-color)] text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]  dark:bg-studio-gray-500 dark:text-studio-gray-50 dark:shadow-studio-gray-300"
+        className={classNames(
+          'flex flex-col rounded-lg max-h-full bg-[color:var(--uic-background-color)] text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]  dark:bg-studio-gray-500 dark:text-studio-gray-50 dark:shadow-studio-gray-300',
+          props.className ? props.className : '',
+        )}
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
       >
