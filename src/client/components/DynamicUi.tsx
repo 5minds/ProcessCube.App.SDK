@@ -81,7 +81,7 @@ function TestFunction(props: { a?: number }, ref) {
   function myFunction() {
     console.log('myFunctiond from function component', this);
   }
-  // oder ohne bind?
+  // oder ohne bind? und domElement übergeben?
   ref.myFunction = myFunction.bind(ref);
 
   return <button ref={ref}>TestFunction</button>;
