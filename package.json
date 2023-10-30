@@ -80,7 +80,7 @@
     "@5minds/processcube_engine_sdk": "2023-2",
     "client-only": "^0.0.1",
     "esbuild": "^0.19.3",
-    "jwt-decode": "^3.1.2",
+    "jwt-decode": "^4.0.0",
     "only-server": "^0.0.1",
     "openid-client": "^5.5.0"
   }
