@@ -1,6 +1,7 @@
 import React, { Fragment, PropsWithChildren, useRef } from 'react';
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
+import DOMPurify from 'isomorphic-dompurify';
 
 // TODO: state wie früher?
 // TODO: DynamicUI State hook?
@@ -442,22 +443,14 @@ export const ParagraphFormField: React.FC<ParagraphFormFieldProps> = ({ formFiel
     return result;
   };
 
-  marked.setOptions({
+  function postprocess(html) {
+    return DOMPurify.sanitize(html);
+  }
+
+  const html = marked.parse(formField.defaultValue?.toString() ?? formField.label?.toString() ?? '', {
     renderer: markdownRenderer,
+    hooks: { postprocess, preprocess: marked.Hooks.prototype.preprocess },
   });
-
-  console.log(
-    'formField',
-    formField,
-    marked.parse(formField.defaultValue?.toString() ?? formField.label?.toString() ?? ''),
-  );
-  const paragraphContainer = (
-    <div className="text-sm">
-      {marked.parse(formField.defaultValue?.toString() ?? formField.label?.toString() ?? '')}
-    </div>
-  );
-
-  return paragraphContainer;
 };
 
 export interface IStringFormFieldProps {

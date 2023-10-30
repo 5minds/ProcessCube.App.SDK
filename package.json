@@ -80,6 +80,7 @@
     "@5minds/processcube_engine_sdk": "2023-2",
     "client-only": "^0.0.1",
     "esbuild": "^0.19.3",
+    "isomorphic-dompurify": "^1.9.0",
     "jwt-decode": "^3.1.2",
     "marked": "^9.1.2",
     "only-server": "^0.0.1",
