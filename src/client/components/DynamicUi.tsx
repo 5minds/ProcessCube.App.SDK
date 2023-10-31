@@ -254,7 +254,6 @@ function Headline(props: { title?: React.ReactNode }) {
 
 function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
   const { formField } = props;
-  const id = `${formField.id}-boolean`;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
@@ -265,13 +264,14 @@ function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserT
           type="checkbox"
           className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400"
           checked={formField.defaultValue === 'true'}
-          id={id}
-          name={id}
+          id={formField.id}
+          name={formField.id}
           aria-describedby={parsedCustomFormConfig?.hint ? hintId : undefined}
+          data-form-field-type="boolean"
         />
       </div>
       <div className="ml-3 text-sm">
-        <label className="font-medium" htmlFor={id}>
+        <label className="font-medium" htmlFor={formField.id}>
           {formField.label}
         </label>
         {parsedCustomFormConfig?.hint && (
@@ -292,13 +292,12 @@ function ConfirmFormField(props: { formField: DataModels.FlowNodeInstances.UserT
 
 function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
   const { formField } = props;
-  const id = `${formField.id}-date`;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   return (
     <div className="">
-      <label className="block text-sm font-medium" htmlFor={id}>
+      <label className="block text-sm font-medium" htmlFor={formField.id}>
         {formField.label}
       </label>
       <div className="mt-1">
@@ -306,9 +305,10 @@ function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTask
           className="shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm border-[color:var(--uic-border-color)] rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
           type="date"
           value={formField.defaultValue?.toString()}
-          id={id}
-          name={id}
+          id={formField.id}
+          name={formField.id}
           aria-describedby={hintId}
+          data-form-field-type="date"
         />
       </div>
       {parsedCustomFormConfig?.hint && (
@@ -322,13 +322,12 @@ function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTask
 
 function DecimalFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
   const { formField } = props;
-  const id = `${formField.id}-decimal`;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   return (
     <div>
-      <label className="block text-sm font-medium" htmlFor={id}>
+      <label className="block text-sm font-medium" htmlFor={formField.id}>
         {formField.label}
       </label>
       <div className="mt-1">
@@ -338,9 +337,10 @@ function DecimalFormField(props: { formField: DataModels.FlowNodeInstances.UserT
           step="0.01"
           placeholder={parsedCustomFormConfig?.placeholder || '0.00'}
           value={formField.defaultValue?.toString()}
-          id={id}
-          name={id}
+          id={formField.id}
+          name={formField.id}
           aria-describedby={hintId}
+          data-form-field-type="decimal"
         />
       </div>
       {parsedCustomFormConfig?.hint && (
@@ -398,7 +398,7 @@ export const IntegerFormField: React.FC<IntegerFormFieldProps> = ({ formField, s
 
   return (
     <div>
-      <label htmlFor={`${formField.id}-integer`} className="block text-sm font-medium">
+      <label htmlFor={formField.id} className="block text-sm font-medium">
         {formField.label}
       </label>
       <div className="mt-1">
@@ -406,11 +406,12 @@ export const IntegerFormField: React.FC<IntegerFormFieldProps> = ({ formField, s
           className="shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm border-[color:var(--uic-border-color)] rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
           type="number"
           step={1}
-          id={`${formField.id}-integer`}
-          name={`${formField.id}-integer`}
+          id={formField.id}
+          name={formField.id}
           value={state ? `${state}` : formField.defaultValue?.toString() ?? ''}
           placeholder={parsedCustomFormConfig?.placeholder ?? '0'}
           aria-describedby={`${formField.id}-hint`}
+          data-form-field-type="integer"
         />
       </div>
       {parsedCustomFormConfig?.hint && (
@@ -481,13 +482,14 @@ export const StringFormField: React.FC<IStringFormFieldProps> = ({ formField, st
   const textInput = React.createElement(inputType, {
     className:
       'shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm rounded-md border-[color:var(--uic-border-color)] invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]',
-    id: `${formField.id}-string`,
-    name: `${formField.id}-string`,
+    id: formField.id,
+    name: formField.id,
     value: state || (formField.defaultValue?.toString() ?? ''),
     placeholder: parsedCustomFormConfig?.placeholder,
     'aria-describedby': parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined,
     type: inputType === 'input' ? 'text' : undefined,
     rows: inputType === 'textarea' ? 4 : undefined,
+    'data-form-field-type': 'string',
   });
 
   const hint = parsedCustomFormConfig?.hint ? (
@@ -498,7 +500,7 @@ export const StringFormField: React.FC<IStringFormFieldProps> = ({ formField, st
 
   return (
     <div>
-      <label className="block text-sm font-medium" htmlFor={`${formField.id}-string`}>
+      <label className="block text-sm font-medium" htmlFor={formField.id}>
         {label}
       </label>
       <div className="mt-1">{textInput}</div>
@@ -531,10 +533,11 @@ export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state 
 
       enumInput = (
         <fieldset
-          id={`${formField.id}-enum`}
+          id={formField.id}
           className="mt-1 space-y-2"
           data-type="checkbox"
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
+          data-form-field-type="enum"
         >
           {options?.map((option) => {
             const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
@@ -566,10 +569,11 @@ export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state 
     case 'radio':
       enumInput = (
         <fieldset
-          id={`${formField.id}-enum`}
+          id={formField.id}
           className="mt-1 space-y-2"
           data-type="radio"
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
+          data-form-field-type="enum"
         >
           {options?.map((option) => {
             return (
@@ -601,11 +605,12 @@ export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state 
       let selected;
       const Select = (props: PropsWithChildren<any>) => (
         <select
-          id={`${formField.id}-enum`}
+          id={formField.id}
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-[color:var(--uic-border-color)] focus:outline-none focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] sm:text-sm rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
           onChange={(event) => (event.target.dataset.value = event.target.value)}
           data-value
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
+          data-form-field-type="enum"
           {...props}
         >
           {props.children}
@@ -658,7 +663,7 @@ export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state 
 
   return (
     <div>
-      <label className="block text-sm font-medium" htmlFor={`${formField.id}-enum`}>
+      <label className="block text-sm font-medium" htmlFor={formField.id}>
         {label}
       </label>
       {enumInput}
