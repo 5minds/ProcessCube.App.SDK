@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, useRef } from 'react';
+import React, { Fragment, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
 import DOMPurify from 'isomorphic-dompurify';
@@ -426,31 +426,19 @@ interface ParagraphFormFieldProps {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
 }
 
-export const ParagraphFormField: React.FC<ParagraphFormFieldProps> = ({ formField }) => {
-  const markdownRenderer = new marked.Renderer();
+export const ParagraphFormField: React.FC<ParagraphFormFieldProps> = ({ formField: { defaultValue, label } }) => {
+  const [generatedHtml, setGeneratedHtml] = useState('');
+  useEffect(() => {
+    const html = marked.parse(defaultValue?.toString() ?? label?.toString() ?? '', {
+      renderer: new MarkdownRenderer(),
+      hooks: {
+        postprocess: (html) => DOMPurify.sanitize(html, { ADD_ATTR: ['target'] }),
+        preprocess: marked.Hooks.prototype.preprocess,
+      },
+    });
 
-  markdownRenderer.link = function (href, title, text): string {
-    const link = marked.Renderer.prototype.link.apply(this, arguments);
-    return link.replace('<a', "<a target='_blank'");
-  };
-
-  markdownRenderer.html = function (html: string): string {
-    const result = marked.Renderer.prototype.html.apply(this, arguments) as string;
-    if (result.startsWith('<a ') && !result.includes('target=')) {
-      return result.replace('<a ', "<a target='_blank' ");
-    }
-
-    return result;
-  };
-
-  function postprocess(html) {
-    return DOMPurify.sanitize(html);
-  }
-
-  const html = marked.parse(formField.defaultValue?.toString() ?? formField.label?.toString() ?? '', {
-    renderer: markdownRenderer,
-    hooks: { postprocess, preprocess: marked.Hooks.prototype.preprocess },
-  });
+    setGeneratedHtml(html);
+  }, [defaultValue, label]);
 
   return (
     <div
@@ -475,7 +463,7 @@ export const ParagraphFormField: React.FC<ParagraphFormFieldProps> = ({ formFiel
         // checkbox
         "[&_input[type='checkbox']]:h-4 [&_input[type='checkbox']]:w-4 [&_input[type='checkbox']]:rounded [&_input[type='checkbox']]:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:hover:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:text-sky-600 [&_input[type='checkbox']]:dark:bg-studio-gray-350 [&_input[type='checkbox']]:dark:border-2 [&_input[type='checkbox']]:dark:border-solid [&_input[type='checkbox']]:dark:border-transparent [&_input[type='checkbox']]:dark:text-[#007bff40] [&_input[type='checkbox']]:dark:hover:checked:bg-studio-gray-350",
       )}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>
   );
 };
@@ -678,3 +666,21 @@ export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state 
     </div>
   );
 };
+
+class MarkdownRenderer extends marked.Renderer {
+  link(href: string, title: string | null | undefined, text: string): string {
+    const link = super.link(href, title, text);
+
+    return link.replace('<a', "<a target='_blank'");
+  }
+
+  html(html: string, block?: boolean | undefined): string {
+    const result = super.html(html, block);
+
+    if (result.startsWith('<a ') && !result.includes('target=')) {
+      return result.replace('<a ', `<a target="_blank" `);
+    }
+
+    return result;
+  }
+}
