@@ -263,7 +263,7 @@ function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserT
         <input
           type="checkbox"
           className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400"
-          checked={formField.defaultValue === 'true'}
+          defaultChecked={formField.defaultValue === 'true'}
           id={formField.id}
           name={formField.id}
           aria-describedby={parsedCustomFormConfig?.hint ? hintId : undefined}
@@ -408,7 +408,7 @@ export const IntegerFormField: React.FC<IntegerFormFieldProps> = ({ formField, s
           step={1}
           id={formField.id}
           name={formField.id}
-          value={state ? `${state}` : formField.defaultValue?.toString() ?? ''}
+          defaultValue={state ? `${state}` : formField.defaultValue?.toString() ?? ''}
           placeholder={parsedCustomFormConfig?.placeholder ?? '0'}
           aria-describedby={`${formField.id}-hint`}
           data-form-field-type="integer"
@@ -484,7 +484,7 @@ export const StringFormField: React.FC<IStringFormFieldProps> = ({ formField, st
       'shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm rounded-md border-[color:var(--uic-border-color)] invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]',
     id: formField.id,
     name: formField.id,
-    value: state || (formField.defaultValue?.toString() ?? ''),
+    defaultValue: state || (formField.defaultValue?.toString() ?? ''),
     placeholder: parsedCustomFormConfig?.placeholder,
     'aria-describedby': parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined,
     type: inputType === 'input' ? 'text' : undefined,
@@ -620,7 +620,7 @@ export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state 
       const DefaultOption = (props: PropsWithChildren<any>) => {
         const { children, ...rest } = props;
         return (
-          <option disabled hidden style={{ display: 'none' }} value="" {...rest}>
+          <option disabled hidden style={{ display: 'none' }} defaultValue="" {...rest}>
             {children}
           </option>
         );
