@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, useEffect, useRef, useState } from 'react';
+import React, { FormEventHandler, Fragment, PropsWithChildren, forwardRef, useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
 import DOMPurify from 'isomorphic-dompurify';
@@ -8,28 +8,56 @@ import DOMPurify from 'isomorphic-dompurify';
 // TODO: Alert vom alten Portal Aufbau anschauen
 // TODO: überschriebene Styles anpassen
 // TODO: components überschreibbar machen siehe react-select
+// checkbox wird bei formdata nicht hinzugefügt wenn nicht angeklickt, falls angeklickt dann den wert "on"
 export function DynamicUi(
   props: PropsWithChildren<{
     task: DataModels.FlowNodeInstances.UserTaskInstance;
+    onSubmit: (result: DataModels.FlowNodeInstances.UserTaskResult) => void;
     className?: string;
     title?: React.ReactNode;
-    customFieldComponent?: React.ComponentType<{ formField: DataModels.FlowNodeInstances.UserTaskFormField }>;
+    customFieldComponents?: {
+      [type: string]: React.ComponentType<{ formField: DataModels.FlowNodeInstances.UserTaskFormField }>;
+    };
   }>,
 ) {
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
   const confirmFormField = formFields.find((field) => field.type === 'confirm');
+  const formRef = useRef<HTMLFormElement>(null);
 
-  console.log('config', config);
+  console.log('config task', props.task);
+  const FIELDS = { ...FORM_FIELDS, ...(props.customFieldComponents ? props.customFieldComponents : {}) };
+  const formFieldRefs = new Map<string, {}>();
+
+  console.log('formFieldRefs', formFieldRefs);
+
+  const onSubmit = (...args) => {
+    console.log('hallo', args);
+  };
+  // min-w-fit?
   return (
     <div className="min-h-[200px]  block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg">
       <form
+        ref={formRef}
         className={classNames(
           'flex flex-col rounded-lg max-h-full bg-[color:var(--uic-background-color)] text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]  dark:bg-studio-gray-500 dark:text-studio-gray-50 dark:shadow-studio-gray-300',
           props.className ? props.className : '',
         )}
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
+        action={(...dd) => {
+          console.log(
+            'dd',
+            dd[0].forEach((value, key) => console.log('key', key, value)),
+          );
+          console.log(formRef);
+          console.log(formRef.current?.checkValidity());
+
+          const formdataJSGenerated = new FormData(formRef.current!);
+
+          console.log(formdataJSGenerated);
+          // console.log(formRef.current?.reportValidity());
+        }}
       >
         <header className="px-4 pt-4 pb-3 sm:px-6">
           <Headline title={props.title ?? props.task.flowNodeName ?? 'User Task'} />
@@ -37,38 +65,46 @@ export function DynamicUi(
         <section className="px-4 py-3 sm:px-6 overflow-y-auto">
           <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
-              if (field.type === 'custom' && props.customFieldComponent) {
-                console.log('props.customFieldComponent component', props.customFieldComponent);
-                console.log('props.customFieldComponent test', (props.customFieldComponent as any).test);
-                console.log('props.customFieldComponent.defaultProps', props.customFieldComponent.defaultProps);
-                console.log('getValue', (props.customFieldComponent.defaultProps as any).getValue());
-                // const Domp = props.customFieldComponent as any;
-                // return <props.customFieldComponent ref={(ref) => console.log('ref')} key={field.id} formField={field} />;
-                const Forwared = React.forwardRef(TestFunction);
-                const ref = useRef();
+              // if (field.type === 'custom' && props.customFieldComponent) {
+              // console.log('props.customFieldComponent component', props.customFieldComponent);
+              // console.log('props.customFieldComponent test', (props.customFieldComponent as any).test);
+              // console.log('props.customFieldComponent.defaultProps', props.customFieldComponent.defaultProps);
+              // console.log('getValue', (props.customFieldComponent.defaultProps as any).getValue());
+              // const Domp = props.customFieldComponent as any;
+              // return <props.customFieldComponent ref={(ref) => console.log('ref')} key={field.id} formField={field} />;
+              // const Forwared = React.forwardRef(TestFunction);
+              // const ref = useRef();
 
-                console.log('ref from forwared red', ref);
-                return (
-                  <Fragment>
-                    <TestComponent ref={(ref) => console.log(ref?.myFunction())} />
-                    <Forwared ref={ref} />
-                    {/* <TestFunction a={13} /> */}
-                  </Fragment>
-                );
-              }
-              const Element = FORM_FIELDS[field.type];
+              // console.log('ref from forwared red', ref);
+              // return (
+              //   <Fragment>
+              //     <TestComponent ref={(ref) => console.log(ref?.myFunction())} />
+              //     <Forwared ref={ref} />
+              //     {/* <TestFunction a={13} /> */}
+              //   </Fragment>
+              // );
+              // }
+              const Element = FIELDS[field.type];
 
               console.log(Element, field);
               if (Element) {
-                return <Element key={field.id} formField={field} />;
+                const ForwaredComponent = forwardRef(Element as any) as any;
+                const ref = useRef();
+
+                formFieldRefs.set(field.id, { renderer: ForwaredComponent, ref });
+                return (
+                  <Fragment key={field.id}>
+                    <ForwaredComponent ref={ref} formField={field} />
+                  </Fragment>
+                );
               }
 
-              return <p key={field.id}>No Field</p>;
+              return null;
             })}
           </div>
         </section>
         <footer className="rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6 dark:bg-studio-gray-600">
-          <FormButtons confirmFormField={confirmFormField} />
+          <FormButtons confirmFormField={confirmFormField} onSubmit={onSubmit} />
         </footer>
       </form>
     </div>
@@ -115,14 +151,18 @@ const FORM_FIELDS: {
   confirm: (props) => <ConfirmFormField {...props} />,
 };
 
-function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.UserTaskFormField }) {
+function FormButtons(props: {
+  confirmFormField?: DataModels.FlowNodeInstances.UserTaskFormField;
+  onSubmit: FormEventHandler<HTMLButtonElement>;
+}) {
   const { confirmFormField } = props;
 
   let buttons: React.ReactNode = (
     <Fragment>
       <button
-        type="button"
+        type="submit"
         className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-transparent text-[color:var(--uic-footer-continue-button-text-color)] bg-[color:var(--uic-footer-continue-button-background-color)] hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
+        onSubmit={props.onSubmit}
       >
         OK
       </button>
@@ -134,14 +174,16 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
     buttons = (
       <Fragment>
         <button
-          type="button"
+          type="submit"
           className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-transparent text-[color:var(--uic-footer-continue-button-text-color)] bg-[color:var(--uic-footer-continue-button-background-color)] hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
+          onSubmit={props.onSubmit}
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
         </button>
         <button
-          type="button"
+          type="submit"
           className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-[color:var(--uic-border-color)] bg-[color:var(--uic-footer-decline-button-background-color)] text-[color:var(--uic-footer-decline-button-text-color)] hover:bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:ring-[color:var(--uic-footer-decline-button-focus-outline-color)] dark:bg-studio-gray-350 dark:border-transparent dark:text-studio-gray-50 dark:hover:bg-studio-gray-300 dark:focus:ring-studio-gray-300"
+          onSubmit={props.onSubmit}
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
         </button>
@@ -167,6 +209,8 @@ function parseCustomFormConfig(customFormConfig?: string): Record<string, string
 
   return null;
 }
+
+// TODO: Tailwind Components nutzen oder NextUI Components
 function Headline(props: { title?: React.ReactNode }) {
   return (
     <div className="flex space-x-3">
