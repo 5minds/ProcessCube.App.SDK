@@ -1,7 +1,8 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
-import { join, relative } from 'node:path';
 import { build as esBuild } from 'esbuild';
+import { join, relative } from 'node:path';
+import { ChildProcess, fork } from 'node:child_process';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import jwtDecode from 'jwt-decode';
@@ -55,46 +56,57 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
       .replace(/[\/]{2,}/g, '/');
 
-    let externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
+    let externalTaskWorkerWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
 
     chokidar.watch(fullWorkerFilePath).on('all', async (event, path) => {
       if (event === 'change') {
-        externalTaskWorker.dispose();
-        logger.info(`Stopped external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
-        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
+        externalTaskWorkerWorker.kill();
+        externalTaskWorkerWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
       }
     });
   }
 }
 
-async function startExternalTaskWorker(
-  fullWorkerFilePath: string,
-  topic: string,
-): Promise<ExternalTaskWorker<any, any>> {
-  const module = await transpileTypescriptFile(fullWorkerFilePath);
+async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string): Promise<ChildProcess> {
+  const workerFile = join(__dirname, 'lib/ExternalTaskWorkerWorker.cjs');
+  const externalTaskWorkerWorker = fork(workerFile);
+
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+  const identity = await getIdentityForExternalTaskWorkers(tokenSet);
 
-  const config: IExternalTaskWorkerConfig = {
-    identity: await getIdentityForExternalTaskWorkers(tokenSet),
-    ...module?.config,
-  };
-  const handler = module.default;
-
-  const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-  await startRefreshingIdentity(tokenSet, externalTaskWorker);
-
-  externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
-    logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
-      err: error,
-      type: errorType,
-      externalTask: externalTask,
-    });
+  externalTaskWorkerWorker.on('message', async (message: { action: 'createCompleted' }) => {
+    switch (message.action) {
+      case 'createCompleted':
+        await startRefreshingIdentity(tokenSet, externalTaskWorkerWorker);
+        externalTaskWorkerWorker.send({
+          action: 'start',
+        });
+        break;
+    }
   });
 
-  externalTaskWorker.start();
-  logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
+  const moduleString = await getModuleStringFromTypescriptFile(fullWorkerFilePath);
 
-  return externalTaskWorker;
+  externalTaskWorkerWorker.send({
+    action: 'create',
+    payload: {
+      EngineURL,
+      topic,
+      identity,
+      moduleString,
+      fullWorkerFilePath,
+    },
+  });
+
+  // externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
+  //   logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
+  //     err: error,
+  //     type: errorType,
+  //     externalTask: externalTask,
+  //   });
+  // });
+
+  return externalTaskWorkerWorker;
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
@@ -153,7 +165,7 @@ async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Pro
  * */
 async function startRefreshingIdentity(
   tokenSet: TokenSet | null,
-  externalTaskWorker: ExternalTaskWorker<any, any>,
+  externalTaskWorkerWorker: ChildProcess,
   retries: number = 5,
 ): Promise<void> {
   try {
@@ -167,56 +179,27 @@ async function startRefreshingIdentity(
     setTimeout(async () => {
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
-      externalTaskWorker.identity = newIdentity;
-      await startRefreshingIdentity(newTokenSet, externalTaskWorker);
+      externalTaskWorkerWorker.send({
+        action: 'updateIdentity',
+        payload: {
+          identity: newIdentity,
+        },
+      });
+      await startRefreshingIdentity(newTokenSet, externalTaskWorkerWorker);
     }, delay);
   } catch (error) {
     if (retries === 0) {
       throw error;
     }
 
-    logger.error(`Could not refresh identity for external task worker ${externalTaskWorker.workerId}`, {
+    logger.error(`Could not refresh identity for external task worker worker ${externalTaskWorkerWorker.pid}`, {
       err: error,
-      workerId: externalTaskWorker.workerId,
+      retriesLeft: retries,
     });
 
     const delay = 2 * 1000;
-    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorker, retries - 1), delay);
+    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorkerWorker, retries - 1), delay);
   }
-}
-
-/**
- * Transpile a typescript file to javascript.
- * @param {string} entryPoint The path to the typescript file
- * @returns {Promise<any>} A promise that resolves with the module exports of the transpiled file
- * */
-async function transpileTypescriptFile(entryPoint: string): Promise<any> {
-  const result = await esBuild({
-    entryPoints: [entryPoint],
-    write: false,
-    bundle: true,
-    platform: 'node',
-    target: 'node18',
-    format: 'cjs',
-  });
-
-  const moduleString = result.outputFiles[0].text;
-  const moduleExports = requireFromString(moduleString, entryPoint);
-
-  if (result.errors.length > 0) {
-    logger.error(`Could not transpile file at '${entryPoint}'`, {
-      errors: result.errors,
-    });
-    throw new Error(`Could not transpile file at '${entryPoint}'`);
-  }
-
-  if (result.warnings.length > 0) {
-    logger.warn(`Transpiled file at '${entryPoint}' with warnings`, {
-      warnings: result.warnings,
-    });
-  }
-
-  return moduleExports;
 }
 
 /**
@@ -257,23 +240,34 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
 }
 
 /**
- * Require a module from a string.
- * @param {string} src The source code of the module
- * @param {string} filename The filename of the module
- * @returns The module exports of the module
+ * Get the module string of a typescript file.
+ * @param {string} entryPoint The path to the typescript file
+ * @returns {Promise<string>} A promise that resolves with the module string of the transpiled file
  * */
-function requireFromString(src: string, filename: string) {
-  try {
-    var Module = module.constructor as any;
-    var m = new Module();
-    m._compile(src, filename);
+async function getModuleStringFromTypescriptFile(entryPoint: string): Promise<string> {
+  const result = await esBuild({
+    entryPoints: [entryPoint],
+    write: false,
+    bundle: true,
+    platform: 'node',
+    target: 'node18',
+    format: 'cjs',
+  });
 
-    return m.exports;
-  } catch (error) {
-    logger.error(`Could not require module from string`, {
-      err: error,
+  if (result.errors.length > 0) {
+    logger.error(`Could not transpile file at '${entryPoint}'`, {
+      errors: result.errors,
     });
-
-    throw error;
+    throw new Error(`Could not transpile file at '${entryPoint}'`);
   }
+
+  if (result.warnings.length > 0) {
+    logger.warn(`Transpiled file at '${entryPoint}' with warnings`, {
+      warnings: result.warnings,
+    });
+  }
+
+  const moduleString = result.outputFiles[0].text;
+
+  return moduleString;
 }
