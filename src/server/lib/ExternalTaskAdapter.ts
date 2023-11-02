@@ -56,29 +56,29 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
       .replace(/[\/]{2,}/g, '/');
 
-    let externalTaskWorkerWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
+    let externalTaskWorkerProcess = await startExternalTaskWorker(fullWorkerFilePath, topic);
 
     chokidar.watch(fullWorkerFilePath).on('all', async (event, path) => {
       if (event === 'change') {
-        externalTaskWorkerWorker.kill();
-        externalTaskWorkerWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
+        externalTaskWorkerProcess.kill();
+        externalTaskWorkerProcess = await startExternalTaskWorker(fullWorkerFilePath, topic);
       }
     });
   }
 }
 
 async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string): Promise<ChildProcess> {
-  const workerFile = join(__dirname, 'lib/ExternalTaskWorkerWorker.cjs');
-  const externalTaskWorkerWorker = fork(workerFile);
+  const workerFile = join(__dirname, 'lib/ExternalTaskWorkerProcess.cjs');
+  const externalTaskWorkerProcess = fork(workerFile);
 
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
   const identity = await getIdentityForExternalTaskWorkers(tokenSet);
 
-  externalTaskWorkerWorker.on('message', async (message: { action: 'createCompleted' }) => {
+  externalTaskWorkerProcess.on('message', async (message: { action: string }) => {
     switch (message.action) {
       case 'createCompleted':
-        await startRefreshingIdentity(tokenSet, externalTaskWorkerWorker);
-        externalTaskWorkerWorker.send({
+        await startRefreshingIdentity(tokenSet, externalTaskWorkerProcess);
+        externalTaskWorkerProcess.send({
           action: 'start',
         });
         break;
@@ -87,7 +87,7 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
 
   const moduleString = await getModuleStringFromTypescriptFile(fullWorkerFilePath);
 
-  externalTaskWorkerWorker.send({
+  externalTaskWorkerProcess.send({
     action: 'create',
     payload: {
       EngineURL,
@@ -106,7 +106,7 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
   //   });
   // });
 
-  return externalTaskWorkerWorker;
+  return externalTaskWorkerProcess;
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
@@ -165,7 +165,7 @@ async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Pro
  * */
 async function startRefreshingIdentity(
   tokenSet: TokenSet | null,
-  externalTaskWorkerWorker: ChildProcess,
+  externalTaskWorkerProcess: ChildProcess,
   retries: number = 5,
 ): Promise<void> {
   try {
@@ -179,26 +179,26 @@ async function startRefreshingIdentity(
     setTimeout(async () => {
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
-      externalTaskWorkerWorker.send({
+      externalTaskWorkerProcess.send({
         action: 'updateIdentity',
         payload: {
           identity: newIdentity,
         },
       });
-      await startRefreshingIdentity(newTokenSet, externalTaskWorkerWorker);
+      await startRefreshingIdentity(newTokenSet, externalTaskWorkerProcess);
     }, delay);
   } catch (error) {
     if (retries === 0) {
       throw error;
     }
 
-    logger.error(`Could not refresh identity for external task worker worker ${externalTaskWorkerWorker.pid}`, {
+    logger.error(`Could not refresh identity for external task worker worker ${externalTaskWorkerProcess.pid}`, {
       err: error,
       retriesLeft: retries,
     });
 
     const delay = 2 * 1000;
-    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorkerWorker, retries - 1), delay);
+    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorkerProcess, retries - 1), delay);
   }
 }
 

@@ -3,12 +3,9 @@ import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcu
 
 const logger = new Logger('processcube_app_sdk:external_task_worker_worker');
 
-console.log('child pid', process.pid);
-console.log('ppid', process.ppid);
-
 let externalTaskWorker: ExternalTaskWorker<any, any>;
 
-process.on('message', async (message: any) => {
+process.on('message', async (message: { action: string; payload: any }) => {
   switch (message.action) {
     case 'create':
       await create(message.payload);
@@ -31,7 +28,7 @@ async function create({
 }: {
   EngineURL: string;
   topic: string;
-  identity: string;
+  identity: Identity;
   moduleString: string;
   fullWorkerFilePath: string;
 }) {
@@ -42,7 +39,6 @@ async function create({
   };
   const handler = module.default;
   externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-  logger.info(`Created external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
   process.send?.({
     action: 'createCompleted',
   });
@@ -50,14 +46,10 @@ async function create({
 
 function start() {
   externalTaskWorker.start();
-  console.log('Started external task worker', externalTaskWorker.workerId);
 }
 
 function updateIdentity(identity: Identity) {
-  console.log('update identity', identity);
-  console.log('externalTaskWorker.identity', externalTaskWorker.identity);
   externalTaskWorker.identity = identity;
-  console.log('externalTaskWorker.identity', externalTaskWorker.identity);
 }
 
 /**
