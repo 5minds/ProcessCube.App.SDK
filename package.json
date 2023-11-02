@@ -29,13 +29,13 @@
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
-    "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
-    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
+    "build:esm": "NODE_ENV=development esbuild src/**/*.ts src/server/lib/ExternalTaskWorkerWorker.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
+    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts src/server/lib/ExternalTaskWorkerWorker.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
     "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
     "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\"",
-    "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
-    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify --drop:console",
-    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
+    "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts src/server/lib/ExternalTaskWorkerWorker.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
+    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts src/server/lib/ExternalTaskWorkerWorker.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify --drop:console",
+    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts src/server/lib/ExternalTaskWorkerWorker.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts src/server/lib/ExternalTaskWorkerWorker.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
   },
   "repository": {
     "type": "git",
