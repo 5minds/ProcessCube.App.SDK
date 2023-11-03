@@ -43,13 +43,17 @@ export async function hasClaim(claim: string): Promise<boolean> {
  * @returns A {@link JWT}
  */
 export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['jwt']>[0]): Promise<JWT> {
-  const { token, account } = args;
+  const { token, account, user } = args;
 
   if (account) {
     token.accessToken = account.access_token;
     token.idToken = account.id_token;
     token.refreshToken = account.refresh_token;
     token.expiresAt = account.expires_at ?? Math.floor(Date.now() / 1000 + (account.expires_in as number));
+  }
+
+  if (user) {
+    token.user = user;
   }
 
   const necessaryEnvsGiven =
@@ -112,6 +116,7 @@ export async function authConfigSessionCallback(args: Parameters<CallbacksOption
   delete claims.jti;
   delete claims.client_id;
 
+  session.user = token.user ?? {};
   session.user.claims = claims;
   session.error = token.error;
 
