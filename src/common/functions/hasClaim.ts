@@ -1,7 +1,7 @@
 import { Session, getServerSession, CallbacksOptions, Account, TokenSet } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import type { JWT } from 'next-auth/jwt';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 import { Logger } from '@5minds/processcube_engine_sdk';
 
@@ -102,8 +102,8 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
  */
 export async function authConfigSessionCallback(args: Parameters<CallbacksOptions['session']>[0]): Promise<Session> {
   const { session, token } = args;
-  const accessToken = await decodeJwt(token.accessToken!);
-  const idToken = await decodeJwt(token.idToken!);
+  const accessToken = decodeJwt(token.accessToken!);
+  const idToken = decodeJwt(token.idToken!);
 
   const idTokenKeys = Object.keys(idToken);
   const claims = Object.fromEntries(Object.entries(accessToken).filter(([key, value]) => !idTokenKeys.includes(key)));
@@ -118,6 +118,6 @@ export async function authConfigSessionCallback(args: Parameters<CallbacksOption
   return session;
 }
 
-async function decodeJwt(token: string) {
+function decodeJwt(token: string) {
   return jwtDecode<Record<string, unknown>>(token);
 }

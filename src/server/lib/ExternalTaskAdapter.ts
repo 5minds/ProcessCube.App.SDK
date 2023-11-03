@@ -4,7 +4,7 @@ import { join, relative } from 'node:path';
 import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 import { EngineURL } from './internal/EngineClient';
 
@@ -54,7 +54,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
 
     const config: IExternalTaskWorkerConfig = {
-      identity: await getIdentityForExternalTaskWorkers(tokenSet),
+      identity: getIdentityForExternalTaskWorkers(tokenSet),
       ...module?.config,
     };
     const handler = module.default;
@@ -112,7 +112,7 @@ async function getFreshTokenSet(): Promise<TokenSet> {
   return tokenSet;
 }
 
-async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Promise<Identity> {
+function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Identity {
   if (!authorityIsConfigured || tokenSet === null) {
     return DUMMY_IDENTITY;
   }
@@ -148,7 +148,7 @@ async function startRefreshingIdentity(
 
     setTimeout(async () => {
       const newTokenSet = await getFreshTokenSet();
-      const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
+      const newIdentity = getIdentityForExternalTaskWorkers(newTokenSet);
       externalTaskWorker.identity = newIdentity;
       await startRefreshingIdentity(newTokenSet, externalTaskWorker);
     }, delay);
