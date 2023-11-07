@@ -185,6 +185,7 @@ async function startRefreshingIdentity(
     logger.error(`Could not refresh identity for external task worker ${externalTaskWorker.workerId}`, {
       err: error,
       workerId: externalTaskWorker.workerId,
+      retryCount: retries,
     });
 
     const delay = 2 * 1000;
