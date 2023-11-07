@@ -5,7 +5,7 @@ import { build as esBuild } from 'esbuild';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import jwtDecode from 'jwt-decode';
-import chokidar from 'chokidar';
+import { watch } from 'chokidar';
 
 import { EngineURL } from './internal/EngineClient';
 
@@ -57,7 +57,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 
     let externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
 
-    chokidar.watch(fullWorkerFilePath).on('all', async (event, path) => {
+    watch(fullWorkerFilePath).on('all', async (event, path) => {
       if (event === 'change') {
         externalTaskWorker.dispose();
         logger.info(`Stopped external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
