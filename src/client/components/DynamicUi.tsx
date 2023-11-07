@@ -31,7 +31,7 @@ export function DynamicUi(
 
   console.log('formFieldRefs', formFieldRefs);
 
-  const onSubmit = (...args) => {
+  const onSubmit = (...args: any) => {
     console.log('hallo', args);
   };
   // min-w-fit?
@@ -111,10 +111,10 @@ export function DynamicUi(
   );
 }
 
-function TestFunction(props: { a?: number }, ref) {
+function TestFunction(props: any, ref: any) {
   console.log('ref', ref);
   function myFunction() {
-    console.log('myFunctiond from function component', this);
+    console.log('myFunctiond from function component');
   }
   // oder ohne bind? und domElement übergeben?
   ref.myFunction = myFunction.bind(ref);
@@ -193,7 +193,7 @@ function FormButtons(props: {
   return <div className="space-y-2 sm:-space-x-2 sm:space-y-0 sm:flex sm:flex-row-reverse">{buttons}</div>;
 }
 
-function classNames(...classes) {
+function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
@@ -568,7 +568,7 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps) {
 
   switch (parsedCustomFormConfig?.displayAs) {
     case 'checkbox':
-      let multipleStateOrDefaultValue;
+      let multipleStateOrDefaultValue: any[];
       if (Array.isArray(state) && state.length) {
         multipleStateOrDefaultValue = state;
       } else {
