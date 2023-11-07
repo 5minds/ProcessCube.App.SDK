@@ -60,11 +60,14 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     watch(fullWorkerFilePath).on('all', async (event, path) => {
       if (event === 'change') {
         externalTaskWorker.dispose();
+        externalTaskWorker.stop();
+
         logger.info(`Restarting external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
           reason: 'code changes detected',
           workerId: externalTaskWorker.workerId,
           topic: topic,
         });
+
         externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
       }
     });
