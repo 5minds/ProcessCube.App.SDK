@@ -57,8 +57,8 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 
     let externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
 
-    watch(fullWorkerFilePath).on('all', async (event, path) => {
-      if (event === 'change') {
+    watch(fullWorkerFilePath)
+      .on('change', async (path) => {
         externalTaskWorker.dispose();
         externalTaskWorker.stop();
 
@@ -69,8 +69,18 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         });
 
         externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
-      }
-    });
+      })
+      .on('unlink', async (path) => {
+        externalTaskWorker.dispose();
+        externalTaskWorker.stop();
+
+        logger.info(`Stopping external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
+          reason: `ETW ${path} was removed`,
+          workerId: externalTaskWorker.workerId,
+          topic: topic,
+        });
+      })
+      .on('error', (error) => logger.info(`Watcher error: ${error}`));
   }
 }
 
