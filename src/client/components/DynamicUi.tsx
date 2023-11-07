@@ -396,12 +396,12 @@ function DecimalFormField(props: { formField: DataModels.FlowNodeInstances.UserT
   );
 }
 
-interface IHeaderFormFieldProps {
+type IHeaderFormFieldProps = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
-}
+};
 
 // TODO: styles setzen für header elemente
-export const HeaderFormField: React.FC<IHeaderFormFieldProps> = ({ formField }) => {
+function HeaderFormField({ formField }: IHeaderFormFieldProps) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   let headerElement: JSX.Element;
@@ -430,14 +430,14 @@ export const HeaderFormField: React.FC<IHeaderFormFieldProps> = ({ formField }) 
   }
 
   return <div className="header-form-field">{headerElement}</div>;
-};
-
-interface IntegerFormFieldProps {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  state?: number | null;
 }
 
-export const IntegerFormField: React.FC<IntegerFormFieldProps> = ({ formField, state }) => {
+type IntegerFormFieldProps = {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+  state?: number | null;
+};
+
+function IntegerFormField({ formField, state }: IntegerFormFieldProps) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   return (
@@ -465,13 +465,13 @@ export const IntegerFormField: React.FC<IntegerFormFieldProps> = ({ formField, s
       )}
     </div>
   );
-};
-
-interface ParagraphFormFieldProps {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
 }
 
-export const ParagraphFormField: React.FC<ParagraphFormFieldProps> = ({ formField: { defaultValue, label } }) => {
+type ParagraphFormFieldProps = {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+};
+
+function ParagraphFormField({ formField: { defaultValue, label } }: ParagraphFormFieldProps) {
   const [generatedHtml, setGeneratedHtml] = useState('');
   useEffect(() => {
     const html = marked.parse(defaultValue?.toString() ?? label?.toString() ?? '', {
@@ -511,14 +511,14 @@ export const ParagraphFormField: React.FC<ParagraphFormFieldProps> = ({ formFiel
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>
   );
-};
-
-export interface IStringFormFieldProps {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  state?: string | null;
 }
 
-export const StringFormField: React.FC<IStringFormFieldProps> = ({ formField, state }) => {
+type IStringFormFieldProps = {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+  state?: string | null;
+};
+
+function StringFormField({ formField, state }: IStringFormFieldProps) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
@@ -551,14 +551,14 @@ export const StringFormField: React.FC<IStringFormFieldProps> = ({ formField, st
       {hint}
     </div>
   );
-};
-
-export interface IEnumFormFieldProps {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  state?: string | Array<string> | null;
 }
 
-export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state }) => {
+type IEnumFormFieldProps = {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+  state?: string | Array<string> | null;
+};
+
+function EnumFormField({ formField, state }: IEnumFormFieldProps) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
@@ -714,7 +714,7 @@ export const EnumFormField: React.FC<IEnumFormFieldProps> = ({ formField, state 
       {hint}
     </div>
   );
-};
+}
 
 class MarkdownRenderer extends marked.Renderer {
   link(href: string, title: string | null | undefined, text: string): string {
