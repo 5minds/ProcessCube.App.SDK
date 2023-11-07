@@ -68,7 +68,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
           topic: topic,
         });
 
-        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
+        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
       }
     });
   }
@@ -77,14 +77,23 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 async function startExternalTaskWorker(
   fullWorkerFilePath: string,
   topic: string,
+  externalTaskWorkerID?: string,
 ): Promise<ExternalTaskWorker<any, any>> {
   const module = await transpileTypescriptFile(fullWorkerFilePath);
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
 
-  const config: IExternalTaskWorkerConfig = {
+  let config: IExternalTaskWorkerConfig = {
     identity: await getIdentityForExternalTaskWorkers(tokenSet),
     ...module?.config,
   };
+
+  if (externalTaskWorkerID) {
+    config = {
+      ...config,
+      workerId: externalTaskWorkerID,
+    };
+  }
+
   const handler = module.default;
 
   const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
