@@ -62,7 +62,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         externalTaskWorker.dispose();
         externalTaskWorker.stop();
 
-        logger.info(`Restarting external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
+        logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
           reason: `Code changes in ETW for ${topic}`,
           workerId: externalTaskWorker.workerId,
           topic: topic,
@@ -74,7 +74,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         externalTaskWorker.dispose();
         externalTaskWorker.stop();
 
-        logger.info(`Stopping external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
+        logger.info(`Stopping external task ${externalTaskWorker.workerId} for topic ${topic}`, {
           reason: `ETW for ${topic} was removed`,
           workerId: externalTaskWorker.workerId,
           topic: topic,
@@ -82,7 +82,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       })
       .on('add', async () => {
         if (!externalTaskWorker.pollingIsActive) {
-          logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
+          logger.info(`Starting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
             reason: `ETW for ${topic} was added`,
             workerId: externalTaskWorker.workerId,
             topic: topic,
@@ -132,7 +132,7 @@ async function startExternalTaskWorker(
   externalTaskWorker.start();
   await startRefreshingIdentityCycle(tokenSet, externalTaskWorker);
 
-  logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
+  logger.info(`Started external task ${externalTaskWorker.workerId} for topic ${topic}`);
 
   return externalTaskWorker;
 }
