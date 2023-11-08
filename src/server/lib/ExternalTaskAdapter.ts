@@ -80,15 +80,6 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
           topic: topic,
         });
       })
-      .on('add', async (path) => {
-        logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
-          reason: `ETW for ${topic} was added`,
-          workerId: externalTaskWorker.workerId,
-          topic: topic,
-        });
-
-        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
-      })
       .on('error', (error) => logger.info(`Watcher error: ${error}`));
   }
 }
