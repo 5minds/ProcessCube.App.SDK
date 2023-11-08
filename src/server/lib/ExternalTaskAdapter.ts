@@ -63,7 +63,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         externalTaskWorker.stop();
 
         logger.info(`Restarting external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
-          reason: 'code changes detected',
+          reason: `Code changes in ETW for ${topic}`,
           workerId: externalTaskWorker.workerId,
           topic: topic,
         });
@@ -75,14 +75,14 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         externalTaskWorker.stop();
 
         logger.info(`Stopping external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
-          reason: `ETW ${path} was removed`,
+          reason: `ETW for ${topic} was removed`,
           workerId: externalTaskWorker.workerId,
           topic: topic,
         });
       })
       .on('add', async (path) => {
         logger.info(`Starting external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
-          reason: `ETW ${path} was added`,
+          reason: `ETW for ${topic} was added`,
           workerId: externalTaskWorker.workerId,
           topic: topic,
         });
