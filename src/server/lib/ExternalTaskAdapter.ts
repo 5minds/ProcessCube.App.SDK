@@ -90,10 +90,12 @@ async function startExternalTaskWorker(
   externalTaskWorkerID?: string,
 ): Promise<ExternalTaskWorker<any, any>> {
   const module = await transpileTypescriptFile(fullWorkerFilePath);
+
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+  const identity = await getIdentityForExternalTaskWorkers(tokenSet);
 
   let config: IExternalTaskWorkerConfig = {
-    identity: await getIdentityForExternalTaskWorkers(tokenSet),
+    identity: identity,
     ...module?.config,
   };
 
@@ -107,7 +109,6 @@ async function startExternalTaskWorker(
   const handler = module.default;
 
   const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-  await startRefreshingIdentity(tokenSet, externalTaskWorker);
 
   externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
     logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
@@ -118,6 +119,8 @@ async function startExternalTaskWorker(
   });
 
   externalTaskWorker.start();
+  await startRefreshingIdentityCycle(tokenSet, externalTaskWorker);
+
   logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${topic}`);
 
   return externalTaskWorker;
@@ -177,7 +180,7 @@ async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Pro
  * @param {number} retries The number of retries to refresh the identity
  * @returns {Promise<void>} A promise that resolves when the identity is refreshed
  * */
-async function startRefreshingIdentity(
+async function startRefreshingIdentityCycle(
   tokenSet: TokenSet | null,
   externalTaskWorker: ExternalTaskWorker<any, any>,
   retries: number = 5,
@@ -187,14 +190,26 @@ async function startRefreshingIdentity(
       return;
     }
 
+    console.log(externalTaskWorker.pollingIsActive, externalTaskWorker.identity, 'Läuft?');
+
+    // Falls was beim Starten schiefgegangen ist
+    if (!externalTaskWorker.pollingIsActive) {
+      return;
+    }
+
     const expiresIn = await getExpiresInForExternalTaskWorkers(tokenSet);
     const delay = expiresIn * DELAY_FACTOR * 1000;
 
     setTimeout(async () => {
+      // Um nach dem Timeout sofort zu stoppen
+      if (!externalTaskWorker.pollingIsActive) {
+        return;
+      }
+
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
       externalTaskWorker.identity = newIdentity;
-      await startRefreshingIdentity(newTokenSet, externalTaskWorker);
+      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorker, retries);
     }, delay);
   } catch (error) {
     if (retries === 0) {
@@ -208,7 +223,7 @@ async function startRefreshingIdentity(
     });
 
     const delay = 2 * 1000;
-    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorker, retries - 1), delay);
+    setTimeout(async () => await startRefreshingIdentityCycle(tokenSet, externalTaskWorker, retries - 1), delay);
   }
 }
 
