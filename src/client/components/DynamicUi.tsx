@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { marked } from 'marked';
-import type { DataModels } from '@5minds/processcube_engine_sdk';
+import { DataModels } from '@5minds/processcube_engine_sdk';
 import DOMPurify from 'isomorphic-dompurify';
 import * as ReactIs from 'react-is';
 
@@ -28,9 +28,27 @@ type DynamicUiComponentType = React.ComponentClass<DynamicUiComponentProps>;
 type DynamicUiFormFieldComponent =
   | DynamicUiForwardedRefRenderFunction
   | typeof DynamicUiComponent<DynamicUiComponentProps, {}>;
-type DynamicUiFormFieldComponentMap = {
-  [TFormFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: DynamicUiFormFieldComponent;
+
+enum MissingFormFieldType {
+  paragraph = 'paragraph',
+  header = 'header',
+  confirm = 'confirm',
+}
+
+const UserTaskFormFieldType = {
+  ...DataModels.FlowNodeInstances.UserTaskFormFieldType,
+  ...MissingFormFieldType,
 };
+
+type CommonFormFieldTypeComponentMap = {
+  [TFormFieldType in keyof typeof UserTaskFormFieldType]: DynamicUiFormFieldComponent;
+};
+
+type GenericFormFieldTypeComponentMap = {
+  [type: string]: DynamicUiFormFieldComponent;
+};
+
+type DynamicUiFormFieldComponentMap = CommonFormFieldTypeComponentMap | GenericFormFieldTypeComponentMap;
 type DynamicUiRefFunctions = Omit<DynamicUiComponent, keyof React.Component>;
 
 export abstract class DynamicUiComponent<
@@ -70,7 +88,7 @@ export function DynamicUi(
   };
   // min-w-fit?
   return (
-    <div className="min-h-[200px]  block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg">
+    <div className="min-h-[200px] block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg">
       <form
         ref={formRef}
         className={classNames(
@@ -99,7 +117,7 @@ export function DynamicUi(
         <section className="px-4 py-3 sm:px-6 overflow-y-auto">
           <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
-              const dynamicUiFormFieldComponent = FIELDS[field.type];
+              const dynamicUiFormFieldComponent = (FIELDS as GenericFormFieldTypeComponentMap)[field.type];
 
               if (dynamicUiFormFieldComponent) {
                 if (!ReactIs.isValidElementType(dynamicUiFormFieldComponent)) {
