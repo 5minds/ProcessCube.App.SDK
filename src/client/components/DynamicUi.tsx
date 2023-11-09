@@ -75,6 +75,12 @@ export function DynamicUi(
 ) {
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
+  const moreThanOneConfirm = formFields.filter((field) => field.type === 'confirm').length > 1;
+  if (moreThanOneConfirm) {
+    console.warn(
+      `[@5minds/processcube_app_sdk:DynamicUi]\t\tWarning while rendering UserTask "${props.task.flowNodeId}"!\n The UserTask has more than one confirm form field. Please use only one confirm form field per User Task.\n\nThe first confirm form field is used for rendering.`,
+    );
+  }
   const confirmFormField = formFields.find((field) => field.type === 'confirm');
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -241,15 +247,19 @@ function FormButtons(props: {
       <Fragment>
         <button
           type="submit"
+          name={confirmFormField.id}
           className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-transparent text-[color:var(--uic-footer-continue-button-text-color)] bg-[color:var(--uic-footer-continue-button-background-color)] hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
           onSubmit={props.onSubmit}
+          value="true"
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
         </button>
         <button
           type="submit"
+          name={confirmFormField.id}
           className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-[color:var(--uic-border-color)] bg-[color:var(--uic-footer-decline-button-background-color)] text-[color:var(--uic-footer-decline-button-text-color)] hover:bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:ring-[color:var(--uic-footer-decline-button-focus-outline-color)] dark:bg-studio-gray-350 dark:border-transparent dark:text-studio-gray-50 dark:hover:bg-studio-gray-300 dark:focus:ring-studio-gray-300"
           onSubmit={props.onSubmit}
+          value="false"
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
         </button>
