@@ -328,13 +328,13 @@ function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserT
   );
 }
 
-function ConfirmFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
+function ConfirmFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }, ref) {
   const { formField } = props;
 
   return <p className="text-sm">{formField.label}</p>;
 }
 
-function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
+function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }, ref) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -364,7 +364,7 @@ function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTask
   );
 }
 
-function DecimalFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
+function DecimalFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }, ref) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -401,7 +401,7 @@ type IHeaderFormFieldProps = {
 };
 
 // TODO: styles setzen für header elemente
-function HeaderFormField({ formField }: IHeaderFormFieldProps) {
+function HeaderFormField({ formField }: IHeaderFormFieldProps, ref) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   let headerElement: JSX.Element;
@@ -437,7 +437,7 @@ type IntegerFormFieldProps = {
   state?: number | null;
 };
 
-function IntegerFormField({ formField, state }: IntegerFormFieldProps) {
+function IntegerFormField({ formField, state }: IntegerFormFieldProps, ref) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   return (
@@ -471,7 +471,7 @@ type ParagraphFormFieldProps = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
 };
 
-function ParagraphFormField({ formField: { defaultValue, label } }: ParagraphFormFieldProps) {
+function ParagraphFormField({ formField: { defaultValue, label } }: ParagraphFormFieldProps, ref) {
   const [generatedHtml, setGeneratedHtml] = useState('');
   useEffect(() => {
     const html = marked.parse(defaultValue?.toString() ?? label?.toString() ?? '', {
@@ -518,7 +518,7 @@ type IStringFormFieldProps = {
   state?: string | null;
 };
 
-function StringFormField({ formField, state }: IStringFormFieldProps) {
+function StringFormField({ formField, state }: IStringFormFieldProps, ref) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
