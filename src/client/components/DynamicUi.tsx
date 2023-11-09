@@ -11,6 +11,7 @@ import React, {
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
 import DOMPurify from 'isomorphic-dompurify';
+import * as ReactIs from 'react-is';
 
 // TODO: state wie früher?
 // TODO: DynamicUI State hook?
@@ -19,6 +20,19 @@ import DOMPurify from 'isomorphic-dompurify';
 // TODO: components überschreibbar machen siehe react-select
 // checkbox wird bei formdata nicht hinzugefügt wenn nicht angeklickt, falls angeklickt dann den wert "on"
 
+interface DynamicUiForwardedRefRenderFunction
+  extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
+  (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
+}
+type DynamicUiComponentType = React.ComponentClass<DynamicUiComponentProps>;
+type DynamicUiFormFieldComponent =
+  | DynamicUiForwardedRefRenderFunction
+  | typeof DynamicUiComponent<DynamicUiComponentProps, {}>;
+type DynamicUiFormFieldComponentMap = {
+  [TFormFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: DynamicUiFormFieldComponent;
+};
+type DynamicUiRefFunctions = Omit<DynamicUiComponent, keyof React.Component>;
+
 export abstract class DynamicUiComponent<
   P extends DynamicUiComponentProps = DynamicUiComponentProps,
   S = {},
@@ -26,21 +40,7 @@ export abstract class DynamicUiComponent<
 > extends React.Component<P, S, SS> {
   getValue?(): any;
 }
-type DynamicUiRefFunctions = Omit<DynamicUiComponent, keyof React.Component>;
 export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
-interface DynamicUiForwardedRefRenderFunction
-  extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
-  (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
-}
-type DynamicUiFormFieldComponent = {
-  // [TFromFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: React.ComponentType<{
-  //   formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  //   state?: any;
-  // }>;
-  [TFormFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]:
-    | DynamicUiForwardedRefRenderFunction
-    | typeof DynamicUiComponent<DynamicUiComponentProps, {}>;
-};
 export type DynamicUiComponentProps = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
   state?: any;
@@ -52,7 +52,7 @@ export function DynamicUi(
     onSubmit: (result: DataModels.FlowNodeInstances.UserTaskResult) => void;
     className?: string;
     title?: React.ReactNode;
-    customFieldComponents?: DynamicUiFormFieldComponent;
+    customFieldComponents?: DynamicUiFormFieldComponentMap;
   }>,
 ) {
   const { userTaskConfig: config } = props.task;
@@ -65,7 +65,6 @@ export function DynamicUi(
   const formFieldRefs = new Map<string, {}>();
 
   console.log('formFieldRefs', formFieldRefs);
-
   const onSubmit = (...args: any) => {
     console.log('hallo', args);
   };
@@ -100,36 +99,32 @@ export function DynamicUi(
         <section className="px-4 py-3 sm:px-6 overflow-y-auto">
           <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
-              // if (field.type === 'custom' && props.customFieldComponent) {
-              // console.log('props.customFieldComponent component', props.customFieldComponent);
-              // console.log('props.customFieldComponent test', (props.customFieldComponent as any).test);
-              // console.log('props.customFieldComponent.defaultProps', props.customFieldComponent.defaultProps);
-              // console.log('getValue', (props.customFieldComponent.defaultProps as any).getValue());
-              // const Domp = props.customFieldComponent as any;
-              // return <props.customFieldComponent ref={(ref) => console.log('ref')} key={field.id} formField={field} />;
-              // const Forwared = React.forwardRef(TestFunction);
-              // const ref = useRef();
+              const dynamicUiFormFieldComponent = FIELDS[field.type];
 
-              // console.log('ref from forwared red', ref);
-              // return (
-              //   <Fragment>
-              //     <TestComponent ref={(ref) => console.log(ref?.myFunction())} />
-              //     <Forwared ref={ref} />
-              //     {/* <TestFunction a={13} /> */}
-              //   </Fragment>
-              // );
-              // }
-              const Element = FIELDS[field.type];
+              if (dynamicUiFormFieldComponent) {
+                let ReactElement:
+                  | React.ForwardRefExoticComponent<
+                      DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>
+                    >
+                  | DynamicUiComponentType;
 
-              console.log(Element, field);
-              if (Element) {
-                const ForwaredComponent = forwardRef(Element as any) as any;
-                const ref = useRef();
+                if (isReactClassComponent(dynamicUiFormFieldComponent)) {
+                  assertElementIsReactComponent(dynamicUiFormFieldComponent);
 
-                formFieldRefs.set(field.id, { renderer: ForwaredComponent, ref });
+                  ReactElement = dynamicUiFormFieldComponent;
+                } else {
+                  assertElementIsRenderFunction(dynamicUiFormFieldComponent);
+
+                  ReactElement = forwardRef(dynamicUiFormFieldComponent);
+                }
+
+                const ref = useRef<DynamicUiRefFunctions>(null);
+
+                formFieldRefs.set(field.id, { renderer: ReactElement, ref });
+
                 return (
                   <Fragment key={field.id}>
-                    <ForwaredComponent ref={ref} formField={field} />
+                    <ReactElement ref={ref} formField={field} />
                   </Fragment>
                 );
               }
@@ -151,7 +146,6 @@ function TestFunction(props: any, ref: any) {
   function myFunction() {
     console.log('myFunctiond from function component');
   }
-  // oder ohne bind? und domElement übergeben?
   ref.myFunction = myFunction.bind(ref);
 
   return <button ref={ref}>TestFunction</button>;
@@ -177,7 +171,7 @@ class TestComponentTwo
   }
 }
 
-const FORM_FIELDS: DynamicUiFormFieldComponent = {
+const FORM_FIELDS: DynamicUiFormFieldComponentMap = {
   boolean: BooleanFormField,
   date: DateFormField,
   enum: EnumFormField,
@@ -189,7 +183,6 @@ const FORM_FIELDS: DynamicUiFormFieldComponent = {
   paragraph: ParagraphFormField,
   header: HeaderFormField,
   confirm: ConfirmFormField,
-  // component anderetr typer oder class type mit implements interface von ref functions?
   test: TestComponent,
   testzwei: TestComponentTwo,
   bla: TestFunction,
@@ -791,4 +784,28 @@ class MarkdownRenderer extends marked.Renderer {
 
     return result;
   }
+}
+
+function isReactClassComponent(element: DynamicUiFormFieldComponent): boolean {
+  return element.prototype.isReactComponent != null;
+}
+
+function assertElementIsReactComponent(
+  element: DynamicUiFormFieldComponent,
+): asserts element is DynamicUiComponentType {
+  if (ReactIs.isValidElementType(element) && isReactClassComponent(element)) {
+    return;
+  }
+
+  throw new Error(`Expected Element to be a React Component`);
+}
+
+function assertElementIsRenderFunction(
+  element: DynamicUiFormFieldComponent,
+): asserts element is DynamicUiForwardedRefRenderFunction {
+  if (ReactIs.isValidElementType(element) && !isReactClassComponent(element)) {
+    return;
+  }
+
+  throw new Error(`Expected Element to be a functional Component`);
 }
