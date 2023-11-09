@@ -1,4 +1,13 @@
-import React, { FormEventHandler, Fragment, PropsWithChildren, forwardRef, useEffect, useRef, useState } from 'react';
+import React, {
+  FormEventHandler,
+  Fragment,
+  PropsWithChildren,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { marked } from 'marked';
 import type { DataModels } from '@5minds/processcube_engine_sdk';
 import DOMPurify from 'isomorphic-dompurify';
