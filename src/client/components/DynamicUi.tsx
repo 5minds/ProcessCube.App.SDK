@@ -9,15 +9,41 @@ import DOMPurify from 'isomorphic-dompurify';
 // TODO: überschriebene Styles anpassen
 // TODO: components überschreibbar machen siehe react-select
 // checkbox wird bei formdata nicht hinzugefügt wenn nicht angeklickt, falls angeklickt dann den wert "on"
+
+export abstract class DynamicUiComponent<
+  P extends DynamicUiComponentProps = DynamicUiComponentProps,
+  S = {},
+  SS = any,
+> extends React.Component<P, S, SS> {
+  getValue?(): any;
+}
+type DynamicUiRefFunctions = Omit<DynamicUiComponent, keyof React.Component>;
+export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
+interface DynamicUiForwardedRefRenderFunction
+  extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
+  (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
+}
+type DynamicUiFormFieldComponent = {
+  // [TFromFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: React.ComponentType<{
+  //   formField: DataModels.FlowNodeInstances.UserTaskFormField;
+  //   state?: any;
+  // }>;
+  [TFormFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]:
+    | DynamicUiForwardedRefRenderFunction
+    | typeof DynamicUiComponent<DynamicUiComponentProps, {}>;
+};
+export type DynamicUiComponentProps = {
+  formField: DataModels.FlowNodeInstances.UserTaskFormField;
+  state?: any;
+};
+
 export function DynamicUi(
   props: PropsWithChildren<{
     task: DataModels.FlowNodeInstances.UserTaskInstance;
     onSubmit: (result: DataModels.FlowNodeInstances.UserTaskResult) => void;
     className?: string;
     title?: React.ReactNode;
-    customFieldComponents?: {
-      [type: string]: React.ComponentType<{ formField: DataModels.FlowNodeInstances.UserTaskFormField }>;
-    };
+    customFieldComponents?: DynamicUiFormFieldComponent;
   }>,
 ) {
   const { userTaskConfig: config } = props.task;
@@ -122,9 +148,9 @@ function TestFunction(props: any, ref: any) {
   return <button ref={ref}>TestFunction</button>;
 }
 
-class TestComponent extends React.Component<{}> {
-  myFunction() {
-    console.log('myFunction called');
+class TestComponent extends DynamicUiComponent<DynamicUiComponentProps & { test: 1 }> {
+  getValue() {
+    console.log('getValue called');
   }
 
   render() {
@@ -132,23 +158,32 @@ class TestComponent extends React.Component<{}> {
   }
 }
 
-const FORM_FIELDS: {
-  [TFromFieldType in DataModels.FlowNodeInstances.UserTaskFormFieldType | string]: (props: {
-    formField: DataModels.FlowNodeInstances.UserTaskFormField;
-    state?: any;
-  }) => React.JSX.Element;
-} = {
-  boolean: (props) => <BooleanFormField {...props} />,
-  date: (props) => <DateFormField {...props} />,
-  enum: (props) => <EnumFormField {...props} />,
+class TestComponentTwo
+  extends React.Component<DynamicUiComponentProps, { test: 1 }>
+  implements DynamicUiComponent<DynamicUiComponentProps>
+{
+  getValue() {}
+  render() {
+    return <button>Test Component</button>;
+  }
+}
+
+const FORM_FIELDS: DynamicUiFormFieldComponent = {
+  boolean: BooleanFormField,
+  date: DateFormField,
+  enum: EnumFormField,
   // longs are full numbers
-  long: (props) => <IntegerFormField {...props} />,
+  long: IntegerFormField,
   // numbers can be decimals
-  number: (props) => <DecimalFormField {...props} />,
-  string: (props) => <StringFormField {...props} />,
-  paragraph: (props) => <ParagraphFormField {...props} />,
-  header: (props) => <HeaderFormField {...props} />,
-  confirm: (props) => <ConfirmFormField {...props} />,
+  number: DecimalFormField,
+  string: StringFormField,
+  paragraph: ParagraphFormField,
+  header: HeaderFormField,
+  confirm: ConfirmFormField,
+  // component anderetr typer oder class type mit implements interface von ref functions?
+  test: TestComponent,
+  testzwei: TestComponentTwo,
+  bla: TestFunction,
 };
 
 function FormButtons(props: {
@@ -296,7 +331,10 @@ function Headline(props: { title?: React.ReactNode }) {
   );
 }
 
-function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }) {
+function BooleanFormField(
+  props: { formField: DataModels.FlowNodeInstances.UserTaskFormField },
+  ref: DynamicUiFormFieldRef,
+): JSX.Element {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -328,13 +366,19 @@ function BooleanFormField(props: { formField: DataModels.FlowNodeInstances.UserT
   );
 }
 
-function ConfirmFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }, ref) {
+function ConfirmFormField(
+  props: { formField: DataModels.FlowNodeInstances.UserTaskFormField },
+  ref: DynamicUiFormFieldRef,
+) {
   const { formField } = props;
 
   return <p className="text-sm">{formField.label}</p>;
 }
 
-function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }, ref) {
+function DateFormField(
+  props: { formField: DataModels.FlowNodeInstances.UserTaskFormField },
+  ref: DynamicUiFormFieldRef,
+) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -364,7 +408,10 @@ function DateFormField(props: { formField: DataModels.FlowNodeInstances.UserTask
   );
 }
 
-function DecimalFormField(props: { formField: DataModels.FlowNodeInstances.UserTaskFormField }, ref) {
+function DecimalFormField(
+  props: { formField: DataModels.FlowNodeInstances.UserTaskFormField },
+  ref: DynamicUiFormFieldRef,
+) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -401,7 +448,7 @@ type IHeaderFormFieldProps = {
 };
 
 // TODO: styles setzen für header elemente
-function HeaderFormField({ formField }: IHeaderFormFieldProps, ref) {
+function HeaderFormField({ formField }: IHeaderFormFieldProps, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   let headerElement: JSX.Element;
@@ -437,7 +484,7 @@ type IntegerFormFieldProps = {
   state?: number | null;
 };
 
-function IntegerFormField({ formField, state }: IntegerFormFieldProps, ref) {
+function IntegerFormField({ formField, state }: IntegerFormFieldProps, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   return (
@@ -471,7 +518,10 @@ type ParagraphFormFieldProps = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
 };
 
-function ParagraphFormField({ formField: { defaultValue, label } }: ParagraphFormFieldProps, ref) {
+function ParagraphFormField(
+  { formField: { defaultValue, label } }: ParagraphFormFieldProps,
+  ref: DynamicUiFormFieldRef,
+) {
   const [generatedHtml, setGeneratedHtml] = useState('');
   useEffect(() => {
     const html = marked.parse(defaultValue?.toString() ?? label?.toString() ?? '', {
@@ -518,7 +568,7 @@ type IStringFormFieldProps = {
   state?: string | null;
 };
 
-function StringFormField({ formField, state }: IStringFormFieldProps, ref) {
+function StringFormField({ formField, state }: IStringFormFieldProps, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
@@ -558,7 +608,7 @@ type IEnumFormFieldProps = {
   state?: string | Array<string> | null;
 };
 
-function EnumFormField({ formField, state }: IEnumFormFieldProps, ref) {
+function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
