@@ -102,6 +102,17 @@ export function DynamicUi(
               const dynamicUiFormFieldComponent = FIELDS[field.type];
 
               if (dynamicUiFormFieldComponent) {
+                if (!ReactIs.isValidElementType(dynamicUiFormFieldComponent)) {
+                  console.warn(
+                    `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe given DynamicUiFormFieldComponent is not a valid React Element Type.\n\nFormField:\t${JSON.stringify(
+                      field,
+                      null,
+                      2,
+                    )}\nDynamicUiFormFieldComponent:\t${dynamicUiFormFieldComponent.toString()}\n\nRendering 'null' as fallback`,
+                  );
+                  return null;
+                }
+
                 let ReactElement:
                   | React.ForwardRefExoticComponent<
                       DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>
@@ -787,7 +798,7 @@ class MarkdownRenderer extends marked.Renderer {
 }
 
 function isReactClassComponent(element: DynamicUiFormFieldComponent): boolean {
-  return element.prototype.isReactComponent != null;
+  return element?.prototype?.isReactComponent != null;
 }
 
 function assertElementIsReactComponent(
