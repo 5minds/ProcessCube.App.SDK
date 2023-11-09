@@ -558,7 +558,7 @@ type IEnumFormFieldProps = {
   state?: string | Array<string> | null;
 };
 
-function EnumFormField({ formField, state }: IEnumFormFieldProps) {
+function EnumFormField({ formField, state }: IEnumFormFieldProps, ref) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
@@ -645,13 +645,16 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps) {
       );
       break;
     default:
-      let noOptionForDefaultValue = true;
-      let selected;
+      const [defaultSelected, setDefaultSelected] = useState<string>('');
       const Select = (props: PropsWithChildren<any>) => (
         <select
           id={formField.id}
+          name={formField.id}
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-[color:var(--uic-border-color)] focus:outline-none focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] sm:text-sm rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
-          onChange={(event) => (event.target.dataset.value = event.target.value)}
+          onChange={(event) => {
+            event.target.dataset.value = event.target.value;
+            setDefaultSelected(event.target.value);
+          }}
           data-value
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
           data-form-field-type="enum"
@@ -664,7 +667,7 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps) {
       const DefaultOption = (props: PropsWithChildren<any>) => {
         const { children, ...rest } = props;
         return (
-          <option disabled hidden style={{ display: 'none' }} defaultValue="" {...rest}>
+          <option disabled hidden style={{ display: 'none' }} value="" {...rest}>
             {children}
           </option>
         );
@@ -675,12 +678,11 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps) {
           {options?.map((option) => {
             const defaultSelected = (state || formField.defaultValue) === option.id;
             if (defaultSelected) {
-              noOptionForDefaultValue = false;
-              selected = option.id;
+              setDefaultSelected(option.id);
             }
 
             return (
-              <option key={option.id} value={option.id} selected={defaultSelected}>
+              <option key={option.id} value={option.id}>
                 {option.name}
               </option>
             );
@@ -689,10 +691,8 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps) {
       );
 
       enumInput = (
-        <Select data-value={selected}>
-          <DefaultOption selected={noOptionForDefaultValue ? true : false}>
-            {noOptionForDefaultValue && parsedCustomFormConfig?.placeholder}
-          </DefaultOption>
+        <Select data-value={defaultSelected} value={defaultSelected}>
+          <DefaultOption>{!defaultSelected && parsedCustomFormConfig?.placeholder}</DefaultOption>
           <Options />
         </Select>
       );
