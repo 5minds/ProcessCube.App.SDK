@@ -22,7 +22,6 @@ process.on('message', async (message: { action: string; payload: any }) => {
   }
 });
 
-// TODO graceful shutdown
 process.on('SIGTERM', () => {
   logger.info(`Stopping external task ${externalTaskWorker.workerId} for topic TODO TOPIC`, {
     reason: `External Task for TODO TOPIC was removed`,
@@ -129,5 +128,3 @@ function requireFromString(src: string, filename: string) {
     throw error;
   }
 }
-
-// TODO: Restart mechanism

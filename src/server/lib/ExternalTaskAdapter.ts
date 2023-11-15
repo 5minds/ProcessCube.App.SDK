@@ -60,28 +60,10 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 
     watch(fullWorkerFilePath)
       .on('change', async () => {
-        // logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-        //   reason: `Code changes in External Task for ${topic}`,
-        //   workerId: externalTaskWorker.workerId,
-        //   topic: topic,
-        // });
-        // TODO: Restart external task worker with same workerId
-        // externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
         restartExternalTaskWorker(externalTaskWorkerProcess, fullWorkerFilePath, topic);
       })
       .on('unlink', async () => {
         externalTaskWorkerProcess.kill();
-      })
-      .on('add', async () => {
-        // if (!externalTaskWorker.pollingIsActive) {
-        //   logger.info(`Starting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-        //     reason: `External Task for ${topic} was added`,
-        //     workerId: externalTaskWorker.workerId,
-        //     topic: topic,
-        //   });
-        //   externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
-        // }
-        //TODO start external task worker
       })
       .on('error', (error) => logger.info(`Watcher error: ${error}`));
   }
