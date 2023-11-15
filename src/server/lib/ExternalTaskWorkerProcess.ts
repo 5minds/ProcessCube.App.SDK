@@ -4,6 +4,7 @@ import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcu
 const logger = new Logger('processcube_app_sdk:external_task_worker_worker');
 
 let externalTaskWorker: ExternalTaskWorker<any, any>;
+let topic: string;
 
 process.on('message', async (message: { action: string; payload: any }) => {
   switch (message.action) {
@@ -32,6 +33,7 @@ async function create({
   moduleString: string;
   fullWorkerFilePath: string;
 }) {
+  topic = topic;
   const module = await requireFromString(moduleString, fullWorkerFilePath);
   const config: IExternalTaskWorkerConfig = {
     identity,
@@ -73,3 +75,18 @@ function requireFromString(src: string, filename: string) {
     throw error;
   }
 }
+
+// TODO: Restart mechanism
+
+// TODO graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info(`Stopping external task ${externalTaskWorker.workerId} for topic ${topic}`, {
+    reason: `External Task for ${topic} was removed`,
+    workerId: externalTaskWorker.workerId,
+    topic: topic,
+  });
+
+  externalTaskWorker.dispose();
+  externalTaskWorker.stop();
+  process.exit(0);
+});

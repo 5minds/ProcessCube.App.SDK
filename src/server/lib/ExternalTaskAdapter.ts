@@ -1,12 +1,12 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
-import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
+import { IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 import { build as esBuild } from 'esbuild';
 import { join, relative } from 'node:path';
 import { ChildProcess, fork } from 'node:child_process';
 import { promises as fsp, PathLike, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import jwtDecode from 'jwt-decode';
-import chokidar from 'chokidar';
+import { watch } from 'chokidar';
 
 import { EngineURL } from './internal/EngineClient';
 
@@ -58,12 +58,31 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 
     let externalTaskWorkerProcess = await startExternalTaskWorker(fullWorkerFilePath, topic);
 
-    chokidar.watch(fullWorkerFilePath).on('all', async (event, path) => {
-      if (event === 'change') {
+    watch(fullWorkerFilePath)
+      .on('change', async () => {
+        // logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
+        //   reason: `Code changes in External Task for ${topic}`,
+        //   workerId: externalTaskWorker.workerId,
+        //   topic: topic,
+        // });
+        // TODO: Restart external task worker with same workerId
+        // externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
+      })
+      .on('unlink', async () => {
         externalTaskWorkerProcess.kill();
-        externalTaskWorkerProcess = await startExternalTaskWorker(fullWorkerFilePath, topic);
-      }
-    });
+      })
+      .on('add', async () => {
+        // if (!externalTaskWorker.pollingIsActive) {
+        //   logger.info(`Starting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
+        //     reason: `External Task for ${topic} was added`,
+        //     workerId: externalTaskWorker.workerId,
+        //     topic: topic,
+        //   });
+        //   externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
+        // }
+        //TODO start external task worker
+      })
+      .on('error', (error) => logger.info(`Watcher error: ${error}`));
   }
 }
 
@@ -77,7 +96,7 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
   externalTaskWorkerProcess.on('message', async (message: { action: string }) => {
     switch (message.action) {
       case 'createCompleted':
-        await startRefreshingIdentity(tokenSet, externalTaskWorkerProcess);
+        await startRefreshingIdentityCycle(tokenSet, externalTaskWorkerProcess);
         externalTaskWorkerProcess.send({
           action: 'start',
         });
@@ -97,14 +116,6 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
       fullWorkerFilePath,
     },
   });
-
-  // externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
-  //   logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
-  //     err: error,
-  //     type: errorType,
-  //     externalTask: externalTask,
-  //   });
-  // });
 
   return externalTaskWorkerProcess;
 }
@@ -163,7 +174,7 @@ async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Pro
  * @param {number} retries The number of retries to refresh the identity
  * @returns {Promise<void>} A promise that resolves when the identity is refreshed
  * */
-async function startRefreshingIdentity(
+async function startRefreshingIdentityCycle(
   tokenSet: TokenSet | null,
   externalTaskWorkerProcess: ChildProcess,
   retries: number = 5,
@@ -185,7 +196,7 @@ async function startRefreshingIdentity(
           identity: newIdentity,
         },
       });
-      await startRefreshingIdentity(newTokenSet, externalTaskWorkerProcess);
+      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorkerProcess);
     }, delay);
   } catch (error) {
     if (retries === 0) {
@@ -198,7 +209,7 @@ async function startRefreshingIdentity(
     });
 
     const delay = 2 * 1000;
-    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorkerProcess, retries - 1), delay);
+    setTimeout(async () => await startRefreshingIdentityCycle(tokenSet, externalTaskWorkerProcess, retries - 1), delay);
   }
 }
 
