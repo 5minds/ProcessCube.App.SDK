@@ -67,6 +67,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         // });
         // TODO: Restart external task worker with same workerId
         // externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
+        restartExternalTaskWorker(externalTaskWorkerProcess, fullWorkerFilePath, topic);
       })
       .on('unlink', async () => {
         externalTaskWorkerProcess.kill();
@@ -99,6 +100,9 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
         await startRefreshingIdentityCycle(tokenSet, externalTaskWorkerProcess);
         externalTaskWorkerProcess.send({
           action: 'start',
+          payload: {
+            topic,
+          },
         });
         break;
     }
@@ -118,6 +122,27 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
   });
 
   return externalTaskWorkerProcess;
+}
+
+async function restartExternalTaskWorker(
+  externalTaskWorkerProcess: ChildProcess,
+  fullWorkerFilePath: string,
+  topic: string,
+): Promise<void> {
+  const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+  const identity = await getIdentityForExternalTaskWorkers(tokenSet);
+  const moduleString = await getModuleStringFromTypescriptFile(fullWorkerFilePath);
+
+  externalTaskWorkerProcess.send({
+    action: 'restart',
+    payload: {
+      EngineURL,
+      topic,
+      identity,
+      moduleString,
+      fullWorkerFilePath,
+    },
+  });
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
