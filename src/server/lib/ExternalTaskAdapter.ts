@@ -184,14 +184,19 @@ async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Pro
 async function startRefreshingIdentityCycle(
   tokenSet: TokenSet | null,
   externalTaskWorkerProcess: ChildProcess,
+  addDisconnectListener = true,
   retries: number = 5,
 ): Promise<void> {
   let timeout: NodeJS.Timeout;
 
-  externalTaskWorkerProcess.on('disconnect', () => {
-    logger.info('External task worker process was disconnected, stopping identity refresh cycle');
-    clearTimeout(timeout);
-  });
+  if (addDisconnectListener) {
+    externalTaskWorkerProcess.once('disconnect', () => {
+      logger.info('External task worker process IPC channel was disconnected, stopping identity refresh cycle', {
+        pid: externalTaskWorkerProcess.pid,
+      });
+      clearTimeout(timeout);
+    });
+  }
 
   try {
     if (!authorityIsConfigured || tokenSet === null || externalTaskWorkerProcess.killed) {
@@ -216,7 +221,7 @@ async function startRefreshingIdentityCycle(
         },
       });
 
-      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorkerProcess);
+      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorkerProcess, false);
     }, delay);
   } catch (error) {
     if (retries === 0) {
@@ -229,7 +234,10 @@ async function startRefreshingIdentityCycle(
     });
 
     const delay = 2 * 1000;
-    setTimeout(async () => await startRefreshingIdentityCycle(tokenSet, externalTaskWorkerProcess, retries - 1), delay);
+    setTimeout(
+      async () => await startRefreshingIdentityCycle(tokenSet, externalTaskWorkerProcess, false, retries - 1),
+      delay,
+    );
   }
 }
 
