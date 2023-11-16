@@ -1,7 +1,7 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 
-const logger = new Logger('processcube_app_sdk:external_task_worker_worker');
+const logger = new Logger('processcube_app_sdk:external_task_worker_process');
 
 let externalTaskWorker: ExternalTaskWorker<any, any>;
 
