@@ -101,7 +101,7 @@ function start({ topic }: { topic: string }) {
   logger.info(`Started external task ${externalTaskWorker.workerId} for topic ${topic}`);
 }
 
-function updateIdentity(identity: Identity) {
+function updateIdentity({ identity }: { identity: Identity }) {
   externalTaskWorker.identity = identity;
 }
 
