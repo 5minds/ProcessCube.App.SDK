@@ -29,8 +29,7 @@ process.on('SIGTERM', () => {
     // topic: topic,
   });
 
-  shutdownExternalTaskWorker();
-  process.exit(0);
+  quit();
 });
 
 async function create({
@@ -103,6 +102,11 @@ function start({ topic }: { topic: string }) {
 
 function updateIdentity({ identity }: { identity: Identity }) {
   externalTaskWorker.identity = identity;
+}
+
+function quit(code = 0) {
+  shutdownExternalTaskWorker();
+  process.exit(code);
 }
 
 function shutdownExternalTaskWorker() {
