@@ -56,7 +56,10 @@ async function create({
   };
   const handler = module.default;
   externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-  process.send?.({
+
+  assertNotNull(process.send, 'process.send');
+
+  process.send({
     action: 'createCompleted',
   });
 }
@@ -126,5 +129,17 @@ function requireFromString(src: string, filename: string) {
     });
 
     throw error;
+  }
+}
+
+/**
+ * Used for those situations where you *know* that a value cannot possibly be `null`.
+ *
+ * But you want/need to check at runtime to fail early and produce a clear error message.
+ */
+function assertNotNull<T = any>(value: T, nameForErrorMessage: string, context?: any): asserts value is NonNullable<T> {
+  if (value == null) {
+    const suffix = context == null ? '' : `\n\nContext:\n\n${JSON.stringify(context, null, 2)}`;
+    throw new Error(`Unexpected value: \`${nameForErrorMessage}\` should not be null here.${suffix}`);
   }
 }
