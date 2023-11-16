@@ -228,10 +228,13 @@ async function startRefreshingIdentityCycle(
       throw error;
     }
 
-    logger.error(`Could not refresh identity for external task worker worker ${externalTaskWorkerProcess.pid}`, {
-      err: error,
-      retriesLeft: retries,
-    });
+    logger.error(
+      `Could not refresh identity for external task worker worker process ${externalTaskWorkerProcess.pid}`,
+      {
+        err: error,
+        retriesLeft: retries,
+      },
+    );
 
     const delay = 2 * 1000;
     setTimeout(
