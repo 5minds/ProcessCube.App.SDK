@@ -57,13 +57,17 @@ type FormFieldRefsMapObj = {
   renderer: FormFieldRenderer;
   ref: React.MutableRefObject<DynamicUiRefFunctions | null>;
 };
+type JSONPrimitive = string | number | boolean | null;
+type JSONValue = JSONPrimitive | JSONObject | JSONArray;
+type JSONObject = { [member: string]: JSONValue };
+interface JSONArray extends Array<JSONValue> {}
 
 export abstract class DynamicUiComponent<
   P extends DynamicUiComponentProps = DynamicUiComponentProps,
   S = {},
   SS = any,
 > extends React.Component<P, S, SS> {
-  getValue?(): any;
+  getValue?(): JSONValue | void;
 }
 export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
 export type DynamicUiComponentProps = {
