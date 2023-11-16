@@ -50,6 +50,13 @@ type GenericFormFieldTypeComponentMap = {
 
 type DynamicUiFormFieldComponentMap = CommonFormFieldTypeComponentMap | GenericFormFieldTypeComponentMap;
 type DynamicUiRefFunctions = Omit<DynamicUiComponent, keyof React.Component>;
+type FormFieldRenderer =
+  | React.ForwardRefExoticComponent<DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>>
+  | DynamicUiComponentType;
+type FormFieldRefsMapObj = {
+  renderer: FormFieldRenderer;
+  ref: React.MutableRefObject<DynamicUiRefFunctions | null>;
+};
 
 export abstract class DynamicUiComponent<
   P extends DynamicUiComponentProps = DynamicUiComponentProps,
@@ -86,7 +93,7 @@ export function DynamicUi(
 
   console.log('config task', props.task);
   const FIELDS = { ...FORM_FIELDS, ...(props.customFieldComponents ? props.customFieldComponents : {}) };
-  const formFieldRefs = new Map<string, {}>();
+  const formFieldRefs = new Map<string, FormFieldRefsMapObj>();
 
   console.log('formFieldRefs', formFieldRefs);
   const onSubmit = (...args: any) => {
@@ -137,11 +144,7 @@ export function DynamicUi(
                   return null;
                 }
 
-                let ReactElement:
-                  | React.ForwardRefExoticComponent<
-                      DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>
-                    >
-                  | DynamicUiComponentType;
+                let ReactElement: FormFieldRenderer;
 
                 if (isReactClassComponent(dynamicUiFormFieldComponent)) {
                   assertElementIsReactComponent(dynamicUiFormFieldComponent);
