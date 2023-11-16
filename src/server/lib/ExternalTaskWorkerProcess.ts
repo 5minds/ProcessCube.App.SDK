@@ -22,11 +22,28 @@ process.on('message', async (message: { action: string; payload: any }) => {
   }
 });
 
-process.on('SIGTERM', () => {
-  logger.info(`Stopping external task ${externalTaskWorker.workerId} for topic TODO TOPIC`, {
-    reason: `External Task for TODO TOPIC was removed`,
+process.once('SIGTERM', () => {
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
+    reason: `External Task Worker Process received SIGTERM`,
     workerId: externalTaskWorker.workerId,
-    // topic: topic,
+  });
+
+  quit();
+});
+
+process.once('SIGINT', () => {
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
+    reason: `External Task Worker Process received SIGINT`,
+    workerId: externalTaskWorker.workerId,
+  });
+
+  quit();
+});
+
+process.once('SIGHUP', () => {
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
+    reason: `External Task Worker Process received SIGHUP`,
+    workerId: externalTaskWorker.workerId,
   });
 
   quit();
