@@ -74,11 +74,12 @@ export type DynamicUiComponentProps = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
   state?: any;
 };
+export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
 
 export function DynamicUi(
   props: PropsWithChildren<{
     task: DataModels.FlowNodeInstances.UserTaskInstance;
-    onSubmit: (result: DataModels.FlowNodeInstances.UserTaskResult) => void;
+    onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
     className?: string;
     title?: React.ReactNode;
     customFieldComponents?: DynamicUiFormFieldComponentMap;
@@ -100,8 +101,11 @@ export function DynamicUi(
   const formFieldRefs = new Map<string, FormFieldRefsMapObj>();
 
   console.log('formFieldRefs', formFieldRefs);
-  const onSubmit = (...args: any) => {
-    console.log('hallo', args);
+  const onSubmit = (formData: FormData) => {
+    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
+
+    // start transition
+    props.onSubmit(userTaskResult, formData);
   };
   // min-w-fit?
   return (
@@ -114,19 +118,8 @@ export function DynamicUi(
         )}
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
-        action={(...dd) => {
-          console.log(
-            'dd',
-            dd[0].forEach((value, key) => console.log('key', key, value)),
-          );
-          console.log(formRef);
-          console.log(formRef.current?.checkValidity());
-
-          const formdataJSGenerated = new FormData(formRef.current!);
-
-          console.log(formdataJSGenerated);
-          // console.log(formRef.current?.reportValidity());
-        }}
+        action={onSubmit}
+        // dd[0].forEach((value, key) => console.log('key', key, value)),
       >
         <header className="px-4 pt-4 pb-3 sm:px-6">
           <Headline title={props.title ?? props.task.flowNodeName ?? 'User Task'} />
@@ -176,7 +169,7 @@ export function DynamicUi(
           </div>
         </section>
         <footer className="rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6 dark:bg-studio-gray-600">
-          <FormButtons confirmFormField={confirmFormField} onSubmit={onSubmit} />
+          <FormButtons confirmFormField={confirmFormField} />
         </footer>
       </form>
     </div>
@@ -230,10 +223,7 @@ const FORM_FIELDS: DynamicUiFormFieldComponentMap = {
   bla: TestFunction,
 };
 
-function FormButtons(props: {
-  confirmFormField?: DataModels.FlowNodeInstances.UserTaskFormField;
-  onSubmit: FormEventHandler<HTMLButtonElement>;
-}) {
+function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.UserTaskFormField }) {
   const { confirmFormField } = props;
 
   let buttons: React.ReactNode = (
@@ -241,7 +231,6 @@ function FormButtons(props: {
       <button
         type="submit"
         className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-transparent text-[color:var(--uic-footer-continue-button-text-color)] bg-[color:var(--uic-footer-continue-button-background-color)] hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
-        onSubmit={props.onSubmit}
       >
         OK
       </button>
@@ -256,7 +245,6 @@ function FormButtons(props: {
           type="submit"
           name={confirmFormField.id}
           className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-transparent text-[color:var(--uic-footer-continue-button-text-color)] bg-[color:var(--uic-footer-continue-button-background-color)] hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
-          onSubmit={props.onSubmit}
           value="true"
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
@@ -265,7 +253,6 @@ function FormButtons(props: {
           type="submit"
           name={confirmFormField.id}
           className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-[color:var(--uic-border-color)] bg-[color:var(--uic-footer-decline-button-background-color)] text-[color:var(--uic-footer-decline-button-text-color)] hover:bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:ring-[color:var(--uic-footer-decline-button-focus-outline-color)] dark:bg-studio-gray-350 dark:border-transparent dark:text-studio-gray-50 dark:hover:bg-studio-gray-300 dark:focus:ring-studio-gray-300"
-          onSubmit={props.onSubmit}
           value="false"
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
@@ -854,4 +841,74 @@ function assertElementIsRenderFunction(
   }
 
   throw new Error(`Expected Element to be a functional Component`);
+}
+
+function transformFormDataToUserTaskResult(
+  formData: FormData,
+  formFields: DataModels.FlowNodeInstances.UserTaskFormField[],
+  formFieldRefs: Map<string, FormFieldRefsMapObj>,
+): DataModels.FlowNodeInstances.UserTaskResult {
+  const userTaskResult: DataModels.FlowNodeInstances.UserTaskResult = {};
+
+  for (const key of formData.keys()) {
+    const data = formData.getAll(key);
+
+    if (data.length === 1) {
+      userTaskResult[key] = data[0];
+    } else {
+      userTaskResult[key] = data;
+    }
+
+    if (userTaskResult[key] == '') {
+      delete userTaskResult[key];
+    }
+
+    if (userTaskResult[key]) {
+      const type = formFields.find((field) => field.id === key)?.type;
+      if (type === 'boolean' || type === 'confirm') {
+        userTaskResult[key] = Boolean(userTaskResult[key]);
+
+        continue;
+      }
+
+      if (type === 'number') {
+        userTaskResult[key] = parseFloat(userTaskResult[key]);
+
+        continue;
+      }
+
+      if (type === 'long') {
+        userTaskResult[key] = parseInt(userTaskResult[key]);
+
+        continue;
+      }
+    }
+  }
+
+  const booleanFields = formFields.filter((field) => field.type === 'boolean');
+  if (booleanFields.length) {
+    booleanFields.forEach((field) => {
+      if (!userTaskResult[field.id]) {
+        userTaskResult[field.id] = false;
+      }
+    });
+  }
+
+  formFieldRefs.forEach((obj, formFieldId) => {
+    if (typeof obj.ref.current?.getValue === 'function') {
+      const value = obj.ref.current.getValue();
+      if (
+        typeof value === 'boolean' ||
+        typeof value === 'number' ||
+        typeof value === 'string' ||
+        Array.isArray(value) ||
+        value == null ||
+        value?.toString() === '[object Object]'
+      ) {
+        userTaskResult[formFieldId] = value;
+      }
+    }
+  });
+
+  return userTaskResult;
 }
