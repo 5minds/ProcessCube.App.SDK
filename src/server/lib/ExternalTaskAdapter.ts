@@ -186,23 +186,36 @@ async function startRefreshingIdentityCycle(
   externalTaskWorkerProcess: ChildProcess,
   retries: number = 5,
 ): Promise<void> {
+  let timeout: NodeJS.Timeout;
+
+  externalTaskWorkerProcess.on('disconnect', () => {
+    logger.info('External task worker process was disconnected, stopping identity refresh cycle');
+    clearTimeout(timeout);
+  });
+
   try {
-    if (!authorityIsConfigured || tokenSet === null) {
+    if (!authorityIsConfigured || tokenSet === null || externalTaskWorkerProcess.killed) {
       return;
     }
 
     const expiresIn = await getExpiresInForExternalTaskWorkers(tokenSet);
     const delay = expiresIn * DELAY_FACTOR * 1000;
 
-    setTimeout(async () => {
+    timeout = setTimeout(async () => {
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
+
+      if (externalTaskWorkerProcess.killed) {
+        return;
+      }
+
       externalTaskWorkerProcess.send({
         action: 'updateIdentity',
         payload: {
           identity: newIdentity,
         },
       });
+
       await startRefreshingIdentityCycle(newTokenSet, externalTaskWorkerProcess);
     }, delay);
   } catch (error) {
