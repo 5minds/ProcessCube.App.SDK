@@ -55,6 +55,13 @@ async function create({
   };
   const handler = module.default;
   externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
+  externalTaskWorker.onWorkerError((error) => {
+    logger.error(`External task ${externalTaskWorker.workerId} for topic ${topic} ran into an error`, {
+      error,
+      workerId: externalTaskWorker.workerId,
+      topic: topic,
+    });
+  });
 
   assertNotNull(process.send, 'process.send');
 
