@@ -110,10 +110,10 @@ async function startExternalTaskWorker(
     ...module?.config,
   };
 
-  if (externalTaskWorkerID) {
+  if (externalTaskWorkerId) {
     config = {
       ...config,
-      workerId: externalTaskWorkerID,
+      workerId: externalTaskWorkerId,
     };
   }
 
