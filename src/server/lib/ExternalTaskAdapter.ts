@@ -98,7 +98,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 async function startExternalTaskWorker(
   fullWorkerFilePath: string,
   topic: string,
-  externalTaskWorkerID?: string,
+  externalTaskWorkerId?: string,
 ): Promise<ExternalTaskWorker<any, any>> {
   const module = await transpileTypescriptFile(fullWorkerFilePath);
 
@@ -200,7 +200,6 @@ async function startRefreshingIdentityCycle(
     if (!authorityIsConfigured || tokenSet === null) {
       return;
     }
-
 
     // Falls was beim Starten schiefgegangen ist
     if (!externalTaskWorker.pollingIsActive) {
