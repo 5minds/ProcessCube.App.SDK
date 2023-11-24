@@ -220,7 +220,7 @@ async function startRefreshingIdentityCycle(
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = await getIdentityForExternalTaskWorkers(newTokenSet);
       externalTaskWorker.identity = newIdentity;
-      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorker, retries);
+      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorker);
     }, delay);
   } catch (error) {
     if (retries === 0) {
