@@ -197,12 +197,7 @@ async function startRefreshingIdentityCycle(
   retries: number = 5,
 ): Promise<void> {
   try {
-    if (!authorityIsConfigured || tokenSet === null) {
-      return;
-    }
-
-    // Falls was beim Starten schiefgegangen ist
-    if (!externalTaskWorker.pollingIsActive) {
+    if (!authorityIsConfigured || tokenSet === null || !externalTaskWorker.pollingIsActive) {
       return;
     }
 
