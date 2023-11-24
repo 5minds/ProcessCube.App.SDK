@@ -201,7 +201,6 @@ async function startRefreshingIdentityCycle(
       return;
     }
 
-    console.log(externalTaskWorker.pollingIsActive, externalTaskWorker.identity, 'Läuft?');
 
     // Falls was beim Starten schiefgegangen ist
     if (!externalTaskWorker.pollingIsActive) {
