@@ -29,22 +29,32 @@ export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'w
 export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
   let externalTasksDirPath = await getExternalTasksDirPath(customExternalTasksDirPath ?? undefined);
 
-  watch(externalTasksDirPath).on('add', async (path) => {
+  const globalExternalTaskWatcher = watch(externalTasksDirPath);
+
+  globalExternalTaskWatcher.on('add', async (path) => {
     const file = path.split('/').pop();
     let directory = '';
 
     let isExternalTaskFile = file === EXTERNAL_TASK_FILE_NAME;
-    if (isExternalTaskFile && file) {
-      directory = path.replace(file, '');
-    } else {
+
+    if (!isExternalTaskFile || !file) {
       return;
+    } else {
+      directory = path.replace(file, '');
+      if (directory === externalTasksDirPath) return;
     }
 
     startExternalTask(externalTasksDirPath, directory);
   });
 }
 
-async function startExternalTask(externalTasksDirPath: string, directory: string) {
+/**
+ * Start an external task.
+ * @param externalTasksDirPath The chosen directory for the external tasks
+ * @param directory The directory of the external task which will be started
+ * @returns {Promise<void>} A promise that resolves when the external tasks and their watchers are started
+ */
+async function startExternalTask(externalTasksDirPath: string, directory: string): Promise<void> {
   const workerFile = await getExternalTaskFile(directory);
 
   if (!workerFile) {
@@ -62,13 +72,22 @@ async function startExternalTask(externalTasksDirPath: string, directory: string
   addExternalTaskWatcher(directory, externalTaskWorker, fullWorkerFilePath, topic);
 }
 
+/**
+ * Add a watcher for an external task.
+ * @param directory The directory of the external task which will be watched
+ * @param externalTaskWorker The Instance of the external task worker
+ * @param fullWorkerFilePath The Full Path to the external task
+ * @param topic The Topic on which the external task is subscribed
+ */
 async function addExternalTaskWatcher(
   directory: string,
   externalTaskWorker: ExternalTaskWorker<any, any>,
   fullWorkerFilePath: string,
   topic: string,
 ) {
-  watch(directory)
+  const etwWatcher = watch(directory);
+
+  etwWatcher
     .on('change', async () => {
       externalTaskWorker.dispose();
       externalTaskWorker.stop();
@@ -90,24 +109,19 @@ async function addExternalTaskWatcher(
         workerId: externalTaskWorker.workerId,
         topic: topic,
       });
-    })
-    .on('add', async () => {
-      if (!externalTaskWorker.pollingIsActive) {
-        logger.info(`Starting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-          reason: `External Task for ${topic} was added`,
-          workerId: externalTaskWorker.workerId,
-          topic: topic,
-        });
-
-        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
-      }
+      etwWatcher.close();
     })
     .on('error', (error) => logger.info(`Watcher error: ${error}`));
 }
 
+/**
+ * Get the path to the external tasks directory.
+ * @param customExternalTasksDirPath Optional path to the external tasks directory. Uses the Next.js app directory by default.
+ * @returns {Promise<string>} A promise that resolves when the external tasks directory is determined
+ */
 async function getExternalTasksDirPath(customExternalTasksDirPath?: string): Promise<string> {
   let externalTasksDirPath: string | undefined;
-  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
+  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app/'), join(process.cwd(), 'src', 'app/')];
 
   for (const path of potentialPaths) {
     if (path && existsSync(path)) {
@@ -123,6 +137,13 @@ async function getExternalTasksDirPath(customExternalTasksDirPath?: string): Pro
   return externalTasksDirPath;
 }
 
+/**
+ * start an external task worker for an external task.
+ * @param fullWorkerFilePath
+ * @param topic
+ * @param externalTaskWorkerId
+ * @returns
+ */
 async function startExternalTaskWorker(
   fullWorkerFilePath: string,
   topic: string,
