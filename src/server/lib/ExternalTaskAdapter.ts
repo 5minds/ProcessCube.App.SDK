@@ -219,6 +219,11 @@ async function getFreshTokenSet(): Promise<TokenSet> {
   return tokenSet;
 }
 
+/**
+ * get the identity for external task workers
+ * @param tokenSet the tokenset to get the identity for External Task Workers, if not provided a dummy identity is returned
+ * @returns {Promise<Identity>} A promise that resolves with the identity for external task workers
+ */
 async function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Promise<Identity> {
   if (!authorityIsConfigured || tokenSet === null) {
     return DUMMY_IDENTITY;
