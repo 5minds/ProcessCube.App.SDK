@@ -9,7 +9,7 @@
   "prHourlyLimit": 5,
   "prConcurrentLimit": 10,
   "reviewers": [
-    "alexander.kasten@5minds.de"
+    "alexanderkasten"
   ],
   "updateLockFiles": true
 }
