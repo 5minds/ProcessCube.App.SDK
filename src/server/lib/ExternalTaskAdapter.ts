@@ -76,7 +76,7 @@ async function startExternalTask(externalTasksDirPath: string, directory: string
  * Add a watcher for an external task.
  * @param directory The directory of the external task which will be watched
  * @param externalTaskWorker The Instance of the external task worker
- * @param fullWorkerFilePath The Full Path to the external task
+ * @param fullWorkerFilePath The Full Path to the external task file
  * @param topic The Topic on which the external task is subscribed
  */
 async function addExternalTaskWatcher(
@@ -139,10 +139,10 @@ async function getExternalTasksDirPath(customExternalTasksDirPath?: string): Pro
 
 /**
  * start an external task worker for an external task.
- * @param fullWorkerFilePath
- * @param topic
- * @param externalTaskWorkerId
- * @returns
+ * @param fullWorkerFilePath The full path to the external task file
+ * @param topic The topic on which the external task should be subscribed
+ * @param externalTaskWorkerId optional ID to restart a specific external task worker
+ * @returns {Promise<ExternalTaskWorker<any, any>>} A promise that resolves when the external task worker is started
  */
 async function startExternalTaskWorker(
   fullWorkerFilePath: string,
