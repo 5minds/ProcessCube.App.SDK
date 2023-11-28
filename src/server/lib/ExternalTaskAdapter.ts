@@ -27,6 +27,85 @@ export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'w
  * @returns {Promise<void>} A promise that resolves when the external tasks are subscribed
  * */
 export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
+  let externalTasksDirPath = await getExternalTasksDirPath(customExternalTasksDirPath ?? undefined);
+
+  watch(externalTasksDirPath).on('add', async (path) => {
+    const file = path.split('/').pop();
+    let directory = '';
+
+    let isExternalTaskFile = file === EXTERNAL_TASK_FILE_NAME;
+    if (isExternalTaskFile && file) {
+      directory = path.replace(file, '');
+    } else {
+      return;
+    }
+
+    startExternalTask(externalTasksDirPath, directory);
+  });
+}
+
+async function startExternalTask(externalTasksDirPath: string, directory: string) {
+  const workerFile = await getExternalTaskFile(directory);
+
+  if (!workerFile) {
+    return;
+  }
+
+  const fullWorkerFilePath = join(directory, workerFile);
+
+  const topic = relative(externalTasksDirPath, directory)
+    .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
+    .replace(/[\/]{2,}/g, '/');
+
+  let externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
+
+  addExternalTaskWatcher(directory, externalTaskWorker, fullWorkerFilePath, topic);
+}
+
+async function addExternalTaskWatcher(
+  directory: string,
+  externalTaskWorker: ExternalTaskWorker<any, any>,
+  fullWorkerFilePath: string,
+  topic: string,
+) {
+  watch(directory)
+    .on('change', async () => {
+      externalTaskWorker.dispose();
+      externalTaskWorker.stop();
+
+      logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
+        reason: `Code changes in External Task for ${topic}`,
+        workerId: externalTaskWorker.workerId,
+        topic: topic,
+      });
+
+      externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
+    })
+    .on('unlink', async () => {
+      externalTaskWorker.dispose();
+      externalTaskWorker.stop();
+
+      logger.info(`Stopping external task ${externalTaskWorker.workerId} for topic ${topic}`, {
+        reason: `External Task for ${topic} was removed`,
+        workerId: externalTaskWorker.workerId,
+        topic: topic,
+      });
+    })
+    .on('add', async () => {
+      if (!externalTaskWorker.pollingIsActive) {
+        logger.info(`Starting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
+          reason: `External Task for ${topic} was added`,
+          workerId: externalTaskWorker.workerId,
+          topic: topic,
+        });
+
+        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
+      }
+    })
+    .on('error', (error) => logger.info(`Watcher error: ${error}`));
+}
+
+async function getExternalTasksDirPath(customExternalTasksDirPath?: string): Promise<string> {
   let externalTasksDirPath: string | undefined;
   const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
 
@@ -41,58 +120,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     throw new Error('Could not find external tasks directory');
   }
 
-  const directories = await getDirectories(externalTasksDirPath);
-
-  for (const directory of directories) {
-    const workerFile = await getExternalTaskFile(directory);
-
-    if (!workerFile) {
-      continue;
-    }
-
-    const fullWorkerFilePath = join(directory, workerFile);
-    const topic = relative(externalTasksDirPath, directory)
-      .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
-      .replace(/[\/]{2,}/g, '/');
-
-    let externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
-
-    watch(fullWorkerFilePath)
-      .on('change', async () => {
-        externalTaskWorker.dispose();
-        externalTaskWorker.stop();
-
-        logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-          reason: `Code changes in External Task for ${topic}`,
-          workerId: externalTaskWorker.workerId,
-          topic: topic,
-        });
-
-        externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
-      })
-      .on('unlink', async () => {
-        externalTaskWorker.dispose();
-        externalTaskWorker.stop();
-
-        logger.info(`Stopping external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-          reason: `External Task for ${topic} was removed`,
-          workerId: externalTaskWorker.workerId,
-          topic: topic,
-        });
-      })
-      .on('add', async () => {
-        if (!externalTaskWorker.pollingIsActive) {
-          logger.info(`Starting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-            reason: `External Task for ${topic} was added`,
-            workerId: externalTaskWorker.workerId,
-            topic: topic,
-          });
-
-          externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
-        }
-      })
-      .on('error', (error) => logger.info(`Watcher error: ${error}`));
-  }
+  return externalTasksDirPath;
 }
 
 async function startExternalTaskWorker(
@@ -263,25 +291,6 @@ async function transpileTypescriptFile(entryPoint: string): Promise<any> {
   }
 
   return moduleExports;
-}
-
-/**
- * Recursively get all directories in a directory.
- * It gives the full path to the directory.
- * @param {PathLike} source The directory to search in
- * @returns A list of all directories in the directory
- **/
-async function getDirectories(source: PathLike): Promise<string[]> {
-  const dirents = await fsp.readdir(source, { withFileTypes: true });
-  const directories = await Promise.all(
-    dirents.map(async (dirent) => {
-      const fullPath = join(source.toString(), dirent.name);
-
-      return dirent.isDirectory() ? [fullPath, ...(await getDirectories(fullPath))] : [];
-    }),
-  );
-
-  return Array.prototype.concat(...directories);
 }
 
 /**
