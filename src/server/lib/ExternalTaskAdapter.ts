@@ -154,7 +154,6 @@ async function startExternalTaskWorker(
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
 
   const fullWorkerFilePath = join(directory, workerFile);
-
   const module = await createModule(await transpileFile(fullWorkerFilePath), fullWorkerFilePath);
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
 
