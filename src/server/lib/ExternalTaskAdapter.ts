@@ -100,10 +100,19 @@ async function getFreshTokenSet(): Promise<TokenSet> {
   }
 
   const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
+
+  if (
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID ||
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
+  ) {
+    throw new Error('Could not create client. CLIENT_ID and CLIENT_SECRET are required in the .env file.');
+  }
+
   const client = new issuer.Client({
     client_id: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
   });
+
   const tokenSet = await client.grant({
     grant_type: 'client_credentials',
     scope: 'engine_etw',
