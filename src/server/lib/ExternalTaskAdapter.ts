@@ -36,6 +36,14 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     }
   }
 
+  if (customExternalTasksDirPath) {
+    if (!existsSync(customExternalTasksDirPath)) {
+      throw new Error(
+        `Invalid customExternalTasksDirPath. Could not find external tasks directory at '${customExternalTasksDirPath}'`,
+      );
+    }
+  }
+
   if (!externalTasksDirPath) {
     throw new Error('Could not find external tasks directory');
   }
