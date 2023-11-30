@@ -105,7 +105,9 @@ async function getFreshTokenSet(): Promise<TokenSet> {
     !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID ||
     !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
   ) {
-    throw new Error('Could not create client. CLIENT_ID and CLIENT_SECRET are required in the .env file.');
+    throw new Error(
+      'Could not create client. CLIENT_ID and CLIENT_SECRET are required. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/configuration/environment-variables',
+    );
   }
 
   const client = new issuer.Client({
