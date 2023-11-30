@@ -50,7 +50,8 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     }
 
     const fullWorkerFilePath = join(directory, workerFile);
-    const module = await transpileTypescriptFile(fullWorkerFilePath);
+
+    const module = await createModule(await transpileFile(fullWorkerFilePath), fullWorkerFilePath);
     const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
 
     const config: IExternalTaskWorkerConfig = {
@@ -168,11 +169,11 @@ async function startRefreshingIdentity(
 }
 
 /**
- * Transpile a typescript file to javascript.
- * @param {string} entryPoint The path to the typescript file
+ * Transpile a file to javascript.
+ * @param {string} entryPoint The path to the file
  * @returns {Promise<any>} A promise that resolves with the module exports of the transpiled file
  * */
-async function transpileTypescriptFile(entryPoint: string): Promise<any> {
+async function transpileFile(entryPoint: string): Promise<any> {
   const result = await esBuild({
     entryPoints: [entryPoint],
     write: false,
@@ -181,9 +182,6 @@ async function transpileTypescriptFile(entryPoint: string): Promise<any> {
     target: 'node18',
     format: 'cjs',
   });
-
-  const moduleString = result.outputFiles[0].text;
-  const moduleExports = requireFromString(moduleString, entryPoint);
 
   if (result.errors.length > 0) {
     logger.error(`Could not transpile file at '${entryPoint}'`, {
@@ -198,7 +196,29 @@ async function transpileTypescriptFile(entryPoint: string): Promise<any> {
     });
   }
 
-  return moduleExports;
+  return result.outputFiles[0].text;
+}
+
+/**
+ * Require a module from a string.
+ * @param {string} src The source code of the module
+ * @param {string} filename The filename of the module
+ * @returns The module exports of the module
+ * */
+async function createModule(src: string, filename: string) {
+  try {
+    var Module = module.constructor as any;
+    var m = new Module();
+    m._compile(src, filename);
+
+    return m.exports;
+  } catch (error) {
+    logger.error(`Could not require module from string`, {
+      err: error,
+    });
+
+    throw error;
+  }
 }
 
 /**
@@ -244,18 +264,3 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
  * @param {string} filename The filename of the module
  * @returns The module exports of the module
  * */
-function requireFromString(src: string, filename: string) {
-  try {
-    var Module = module.constructor as any;
-    var m = new Module();
-    m._compile(src, filename);
-
-    return m.exports;
-  } catch (error) {
-    logger.error(`Could not require module from string`, {
-      err: error,
-    });
-
-    throw error;
-  }
-}
