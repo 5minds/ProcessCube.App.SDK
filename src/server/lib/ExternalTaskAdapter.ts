@@ -270,10 +270,3 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
 
   return expiresIn;
 }
-
-/**
- * Require a module from a string.
- * @param {string} src The source code of the module
- * @param {string} filename The filename of the module
- * @returns The module exports of the module
- * */
