@@ -154,7 +154,8 @@ async function startExternalTaskWorker(
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
 
   const fullWorkerFilePath = join(directory, workerFile);
-  const module = await createModule(await transpileFile(fullWorkerFilePath), fullWorkerFilePath);
+  const transpiledFile = await transpileFile(fullWorkerFilePath);
+  const module = await createModule(transpiledFile, fullWorkerFilePath);
   const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
 
   if (externalTaskWorkerId) {
@@ -314,12 +315,6 @@ async function transpileFile(entryPoint: string): Promise<any> {
   return result.outputFiles[0].text;
 }
 
-/**
- * Require a module from a string.
- * @param {string} src The source code of the module
- * @param {string} filename The filename of the module
- * @returns The module exports of the module
- * */
 async function createModule(src: string, filename: string) {
   try {
     var Module = module.constructor as any;
