@@ -36,10 +36,10 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     }
   }
 
-  if (customExternalTasksDirPath) {
-    if (!existsSync(customExternalTasksDirPath)) {
-      throw new Error(`Invalid customExternalTasksDirPath. Your Path '${customExternalTasksDirPath}' does not exist`);
-    }
+  if (customExternalTasksDirPath && !existsSync(customExternalTasksDirPath)) {
+    throw new Error(
+      `Invalid customExternalTasksDirPath. The given path '${customExternalTasksDirPath}' does not exist`,
+    );
   }
 
   if (!externalTasksDirPath) {
