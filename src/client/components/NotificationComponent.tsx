@@ -61,6 +61,7 @@ export const NotificationComponent = ({
 
     socket = io('', {
       path: '/api/socket/io' || '',
+      transports: ['websocket', 'polling'],
       query: { userId },
     });
 
