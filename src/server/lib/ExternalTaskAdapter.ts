@@ -9,6 +9,7 @@ import jwtDecode from 'jwt-decode';
 import { watch } from 'chokidar';
 
 import { EngineURL } from './internal/EngineClient';
+import { type IPCMessageType } from '../../types';
 
 const DUMMY_IDENTITY: Identity = {
   token: 'ZHVtbXlfdG9rZW4=',
@@ -85,7 +86,7 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
           payload: {
             topic,
           },
-        });
+        } satisfies IPCMessageType);
         break;
     }
   });
@@ -101,7 +102,7 @@ async function startExternalTaskWorker(fullWorkerFilePath: string, topic: string
       moduleString,
       fullWorkerFilePath,
     },
-  });
+  } satisfies IPCMessageType);
 
   return externalTaskWorkerProcess;
 }
@@ -124,7 +125,7 @@ async function restartExternalTaskWorker(
       moduleString,
       fullWorkerFilePath,
     },
-  });
+  } satisfies IPCMessageType);
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
@@ -219,7 +220,7 @@ async function startRefreshingIdentityCycle(
         payload: {
           identity: newIdentity,
         },
-      });
+      } satisfies IPCMessageType);
 
       await startRefreshingIdentityCycle(newTokenSet, externalTaskWorkerProcess, false);
     }, delay);

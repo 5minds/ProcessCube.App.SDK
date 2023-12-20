@@ -1,11 +1,13 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 
+import { type IPCMessageType } from '../../types';
+
 const logger = new Logger('processcube_app_sdk:external_task_worker_process');
 
 let externalTaskWorker: ExternalTaskWorker<any, any>;
 
-process.on('message', async (message: { action: string; payload: any }) => {
+process.on('message', async (message: IPCMessageType) => {
   switch (message.action) {
     case 'create':
       await create(message.payload);
