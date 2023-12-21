@@ -80,7 +80,11 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
  * @param externalTasksDirPath The path to the directory containing external tasks.
  * @returns A Promise that resolves when the external task worker has started.
  */
-async function startExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
+async function startExternalTaskWorker(
+  pathToExternalTask: string,
+  externalTasksDirPath: string,
+  customConfig?: IExternalTaskWorkerConfig,
+): Promise<void> {
   const directory = dirname(pathToExternalTask);
   const workerfile = getExternalTaskFile(directory);
 
@@ -108,6 +112,7 @@ async function startExternalTaskWorker(pathToExternalTask: string, externalTasks
   const handler = module.default;
   const config: IExternalTaskWorkerConfig = {
     identity: identity,
+    ...customConfig,
     ...module?.config,
   };
   const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
@@ -135,8 +140,9 @@ async function startExternalTaskWorker(pathToExternalTask: string, externalTasks
  * @returns A promise that resolves when the external task worker has been restarted.
  */
 async function restartExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
+  const workerId = externalTaskWorkerByPath[pathToExternalTask]?.workerId;
   stopExternalTaskWorker(pathToExternalTask, externalTasksDirPath);
-  await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath);
+  await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath, { workerId });
 }
 
 /**
