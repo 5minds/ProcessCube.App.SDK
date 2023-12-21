@@ -1,8 +1,8 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
-import { join, relative } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
 import { build as esBuild } from 'esbuild';
-import { promises as fsp, PathLike, existsSync } from 'node:fs';
+import { promises as fsp, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import { jwtDecode } from 'jwt-decode';
 import { watch } from 'chokidar';
@@ -14,10 +14,11 @@ const DUMMY_IDENTITY: Identity = {
   userId: 'dummy_token',
 };
 const DELAY_FACTOR = 0.85;
-const EXTERNAL_TASK_FILE_NAMES = ['external_task.ts', 'external_task.js'];
+const EXTERNAL_TASK_FILE_NAMES: ReadonlyArray<string> = ['external_task.ts', 'external_task.js'];
 
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
+const externalTaskWorkerByPath: Record<string, ExternalTaskWorker<any, any>> = {};
 
 export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
 
@@ -134,41 +135,69 @@ async function getExternalTasksDirPath(customExternalTasksDirPath?: string): Pro
     throw new Error('Could not find external tasks directory');
   }
 
-  return externalTasksDirPath;
+  watch(externalTasksDirPath)
+    .on('add', async (path) => {
+      if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
+        return;
+      }
+
+      startExternalTaskWorker(path, externalTasksDirPath as string);
+    })
+    .on('change', async (path) => {
+      if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
+        return;
+      }
+
+      restartExternalTaskWorker(path, externalTasksDirPath as string);
+    })
+    .on('unlink', async (path) => {
+      if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
+        return;
+      }
+
+      stopExternalTaskWorker(path, externalTasksDirPath as string);
+    })
+    .on('error', (error) => logger.info(`Watcher error: ${error}`));
 }
 
 /**
- * start an external task worker for an external task.
- * @param fullWorkerFilePath The full path to the external task file
- * @param topic The topic on which the external task should be subscribed
- * @param externalTaskWorkerId optional ID to restart a specific external task worker
- * @returns {Promise<ExternalTaskWorker<any, any>>} A promise that resolves when the external task worker is started
+ * Starts an external task worker.
+ *
+ * @param pathToExternalTask The path to the external task file.
+ * @param externalTasksDirPath The path to the directory containing external tasks.
+ * @returns A Promise that resolves when the external task worker has started.
  */
-async function startExternalTaskWorker(
-  fullWorkerFilePath: string,
-  topic: string,
-  externalTaskWorkerId?: string,
-): Promise<ExternalTaskWorker<any, any>> {
-  const module = await transpileTypescriptFile(fullWorkerFilePath);
+async function startExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
+  const directory = dirname(pathToExternalTask);
+  const workerfile = getExternalTaskFile(directory);
 
-  const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
-
-  const fullWorkerFilePath = join(directory, workerFile);
-  const transpiledFile = await transpileFile(fullWorkerFilePath);
-  const module = await createModule(transpiledFile, fullWorkerFilePath);
-  const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
-
-  if (externalTaskWorkerId) {
-    config = {
-      ...config,
-      workerId: externalTaskWorkerId,
-    };
+  if (!workerfile) {
+    logger.error(`Could not find external task file in directory '${directory}'`);
+    return;
   }
 
+  const transpiledFile = await transpileFile(pathToExternalTask);
+  const module = await createModule(transpiledFile, pathToExternalTask);
+
+  if (module.default === undefined) {
+    logger.info(
+      `External task file recognized at ${pathToExternalTask}. Please export a default handler function. For more information see https://processcube.io/docs/app-sdk/samples/external-task-adapter#external-tasks-entwickeln`,
+    );
+    return;
+  }
+
+  const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+  const identity = getIdentityForExternalTaskWorkers(tokenSet);
+
+  const relativePath = relative(externalTasksDirPath, directory);
+
+  const topic = getExternalTaskTopicByPath(relativePath);
   const handler = module.default;
-
+  const config: IExternalTaskWorkerConfig = {
+    identity: identity,
+    ...module?.config,
+  };
   const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-
   externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
     logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
       err: error,
@@ -182,7 +211,48 @@ async function startExternalTaskWorker(
 
   logger.info(`Started external task ${externalTaskWorker.workerId} for topic ${topic}`);
 
-  return externalTaskWorker;
+  externalTaskWorkerByPath[pathToExternalTask] = externalTaskWorker;
+}
+
+/**
+ * Restarts the external task worker by stopping and then starting it again.
+ *
+ * @param pathToExternalTask - The path to the external task.
+ * @param externalTasksDirPath - The path to the directory containing external tasks.
+ * @returns A promise that resolves when the external task worker has been restarted.
+ */
+async function restartExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
+  stopExternalTaskWorker(pathToExternalTask, externalTasksDirPath);
+  await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath);
+}
+
+/**
+ * Stops the external task worker associated with the given path and disposes it.
+ * If the worker does not exist, the function returns early.
+ *
+ * @param pathToExternalTask - The path to the external task.
+ * @param externalTasksDirPath - The path to the directory containing external tasks.
+ */
+function stopExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): void {
+  const externalTaskWorker = externalTaskWorkerByPath[pathToExternalTask];
+
+  if (!externalTaskWorker) {
+    return;
+  }
+
+  externalTaskWorker.stop();
+  externalTaskWorker.dispose();
+  delete externalTaskWorkerByPath[pathToExternalTask];
+
+  const directory = dirname(pathToExternalTask);
+  const relativePath = relative(externalTasksDirPath, directory);
+  const topic = getExternalTaskTopicByPath(relativePath);
+
+  logger.info(`Stopped external task ${externalTaskWorker.workerId} for topic '${topic}'`, {
+    reason: `External Task for topic '${topic}' was removed`,
+    workerId: externalTaskWorker.workerId,
+    topic: topic,
+  });
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
@@ -250,7 +320,12 @@ async function startRefreshingIdentityCycle(
   retries: number = 5,
 ): Promise<void> {
   try {
-    if (!authorityIsConfigured || tokenSet === null || !externalTaskWorker.pollingIsActive) {
+    if (!authorityIsConfigured || tokenSet === null) {
+      return;
+    }
+
+    // Falls was beim Starten schiefgegangen ist
+    if (!externalTaskWorker.pollingIsActive) {
       return;
     }
 
@@ -315,6 +390,13 @@ async function transpileFile(entryPoint: string): Promise<any> {
   return result.outputFiles[0].text;
 }
 
+/**
+ * Creates a module from a given source code string and filename.
+ * @param src - The source code string of the module.
+ * @param filename - The filename of the module.
+ * @returns The exported object from the compiled module.
+ * @throws If there is an error while compiling or requiring the module.
+ */
 async function createModule(src: string, filename: string) {
   try {
     var Module = module.constructor as any;
@@ -350,8 +432,11 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
 }
 
 /**
- * Require a module from a string.
- * @param {string} src The source code of the module
- * @param {string} filename The filename of the module
- * @returns The module exports of the module
- * */
+ * Returns the external task topic derived from the given path.
+ *
+ * @param path - The path to derive the external task topic from.
+ * @returns The external task topic.
+ */
+function getExternalTaskTopicByPath(path: string): string {
+  return path.replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '').replace(/[\/]{2,}/g, '/');
+}
