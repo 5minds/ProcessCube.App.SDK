@@ -238,7 +238,6 @@ async function startRefreshingIdentityCycle(
       return;
     }
 
-    // Falls was beim Starten schiefgegangen ist
     if (!externalTaskWorker.pollingIsActive) {
       return;
     }
@@ -247,7 +246,6 @@ async function startRefreshingIdentityCycle(
     const delay = expiresIn * DELAY_FACTOR * 1000;
 
     setTimeout(async () => {
-      // Um nach dem Timeout sofort zu stoppen
       if (!externalTaskWorker.pollingIsActive) {
         return;
       }
