@@ -28,101 +28,8 @@ export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'w
  * @returns {Promise<void>} A promise that resolves when the external tasks are subscribed
  * */
 export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
-  let externalTasksDirPath = await getExternalTasksDirPath(customExternalTasksDirPath ?? undefined);
-
-  const globalExternalTaskWatcher = watch(externalTasksDirPath);
-
-  globalExternalTaskWatcher.on('add', async (path) => {
-    const file = path.split('/').pop();
-    let directory = '';
-
-    let isExternalTaskFile = file === EXTERNAL_TASK_FILE_NAME;
-
-    if (!isExternalTaskFile || !file) {
-      return;
-    } else {
-      directory = path.replace(file, '');
-      if (directory === externalTasksDirPath) return;
-    }
-
-    startExternalTask(externalTasksDirPath, directory);
-  });
-}
-
-/**
- * Start an external task.
- * @param externalTasksDirPath The chosen directory for the external tasks
- * @param directory The directory of the external task which will be started
- * @returns {Promise<void>} A promise that resolves when the external tasks and their watchers are started
- */
-async function startExternalTask(externalTasksDirPath: string, directory: string): Promise<void> {
-  const workerFile = await getExternalTaskFile(directory);
-
-  if (!workerFile) {
-    return;
-  }
-
-  const fullWorkerFilePath = join(directory, workerFile);
-
-  const topic = relative(externalTasksDirPath, directory)
-    .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
-    .replace(/[\/]{2,}/g, '/');
-
-  let externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic);
-
-  addExternalTaskWatcher(directory, externalTaskWorker, fullWorkerFilePath, topic);
-}
-
-/**
- * Add a watcher for an external task.
- * @param directory The directory of the external task which will be watched
- * @param externalTaskWorker The Instance of the external task worker
- * @param fullWorkerFilePath The Full Path to the external task file
- * @param topic The Topic on which the external task is subscribed
- */
-async function addExternalTaskWatcher(
-  directory: string,
-  externalTaskWorker: ExternalTaskWorker<any, any>,
-  fullWorkerFilePath: string,
-  topic: string,
-) {
-  const etwWatcher = watch(directory);
-
-  etwWatcher
-    .on('change', async () => {
-      externalTaskWorker.dispose();
-      externalTaskWorker.stop();
-
-      logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-        reason: `Code changes in External Task for ${topic}`,
-        workerId: externalTaskWorker.workerId,
-        topic: topic,
-      });
-
-      externalTaskWorker = await startExternalTaskWorker(fullWorkerFilePath, topic, externalTaskWorker.workerId);
-    })
-    .on('unlink', async () => {
-      externalTaskWorker.dispose();
-      externalTaskWorker.stop();
-
-      logger.info(`Stopping external task ${externalTaskWorker.workerId} for topic ${topic}`, {
-        reason: `External Task for ${topic} was removed`,
-        workerId: externalTaskWorker.workerId,
-        topic: topic,
-      });
-      etwWatcher.close();
-    })
-    .on('error', (error) => logger.info(`Watcher error: ${error}`));
-}
-
-/**
- * Get the path to the external tasks directory.
- * @param customExternalTasksDirPath Optional path to the external tasks directory. Uses the Next.js app directory by default.
- * @returns {Promise<string>} A promise that resolves when the external tasks directory is determined
- */
-async function getExternalTasksDirPath(customExternalTasksDirPath?: string): Promise<string> {
   let externalTasksDirPath: string | undefined;
-  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app/'), join(process.cwd(), 'src', 'app/')];
+  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
 
   for (const path of potentialPaths) {
     if (path && existsSync(path)) {
@@ -288,11 +195,6 @@ async function getFreshTokenSet(): Promise<TokenSet> {
   return tokenSet;
 }
 
-/**
- * get the identity for external task workers
- * @param tokenSet the tokenset to get the identity for External Task Workers, if not provided a dummy identity is returned
- * @returns {Promise<Identity>} A promise that resolves with the identity for external task workers
- */
 function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Identity {
   if (!authorityIsConfigured || tokenSet === null) {
     return DUMMY_IDENTITY;
@@ -341,7 +243,7 @@ async function startRefreshingIdentityCycle(
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = getIdentityForExternalTaskWorkers(newTokenSet);
       externalTaskWorker.identity = newIdentity;
-      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorker);
+      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorker, retries);
     }, delay);
   } catch (error) {
     if (retries === 0) {
