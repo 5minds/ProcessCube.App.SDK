@@ -28,25 +28,13 @@ export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'w
  * @returns {Promise<void>} A promise that resolves when the external tasks are subscribed
  * */
 export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
-  let externalTasksDirPath: string | undefined;
-  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
-
-  for (const path of potentialPaths) {
-    if (path && existsSync(path)) {
-      externalTasksDirPath = path;
-      break;
-    }
-  }
-
   if (customExternalTasksDirPath && !existsSync(customExternalTasksDirPath)) {
     throw new Error(
       `Invalid customExternalTasksDirPath. The given path '${customExternalTasksDirPath}' does not exist`,
     );
   }
 
-  if (!externalTasksDirPath) {
-    throw new Error('Could not find external tasks directory');
-  }
+  const externalTasksDirPath = getExternalTasksDirPath(customExternalTasksDirPath);
 
   watch(externalTasksDirPath)
     .on('add', async (path) => {
@@ -58,21 +46,21 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         return;
       }
 
-      startExternalTaskWorker(path, externalTasksDirPath as string);
+      startExternalTaskWorker(path, externalTasksDirPath);
     })
     .on('change', async (path) => {
       if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
         return;
       }
 
-      restartExternalTaskWorker(path, externalTasksDirPath as string);
+      restartExternalTaskWorker(path, externalTasksDirPath);
     })
     .on('unlink', async (path) => {
       if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
         return;
       }
 
-      stopExternalTaskWorker(path, externalTasksDirPath as string);
+      stopExternalTaskWorker(path, externalTasksDirPath);
     })
     .on('error', (error) => logger.info(`Watcher error: ${error}`));
 }
@@ -355,4 +343,22 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
  */
 function getExternalTaskTopicByPath(path: string): string {
   return path.replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '').replace(/[\/]{2,}/g, '/');
+}
+
+function getExternalTasksDirPath(customExternalTasksDirPath?: string): string {
+  let externalTasksDirPath: string | undefined;
+  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
+
+  for (const path of potentialPaths) {
+    if (path && existsSync(path)) {
+      externalTasksDirPath = path;
+      break;
+    }
+  }
+
+  if (!externalTasksDirPath) {
+    throw new Error('Could not find external tasks directory');
+  }
+
+  return externalTasksDirPath;
 }
