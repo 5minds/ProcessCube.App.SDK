@@ -54,6 +54,10 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         return;
       }
 
+      if (externalTaskWorkerByPath[path]) {
+        return;
+      }
+
       startExternalTaskWorker(path, externalTasksDirPath as string);
     })
     .on('change', async (path) => {
