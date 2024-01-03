@@ -18,6 +18,25 @@ const EXTERNAL_TASK_FILE_NAMES = ['external_task.ts', 'external_task.js'];
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 
+if (authorityIsConfigured) {
+  if (
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID ||
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
+  ) {
+    const error = new Error(
+      'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/external-task-adapter#authority',
+    );
+
+    logger.error(
+      `Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing`,
+      {
+        err: error,
+      },
+    );
+    throw error;
+  }
+}
+
 export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
 
 /**
@@ -58,7 +77,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
     const fullWorkerFilePath = join(directory, workerFile);
     const transpiledFile = await transpileFile(fullWorkerFilePath);
     const module = await createModule(transpiledFile, fullWorkerFilePath);
-    const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+    const tokenSet = await getFreshTokenSet();
 
     const config: IExternalTaskWorkerConfig = {
       identity: getIdentityForExternalTaskWorkers(tokenSet),
@@ -101,16 +120,18 @@ async function getExternalTaskFile(directory: string): Promise<string | null> {
   return externalTaskFiles[0];
 }
 
-async function getFreshTokenSet(): Promise<TokenSet> {
+async function getFreshTokenSet(): Promise<TokenSet | null> {
   if (!authorityIsConfigured) {
-    throw new Error('No authority is configured');
+    return null;
   }
 
   const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
+
   const client = new issuer.Client({
     client_id: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
   });
+
   const tokenSet = await client.grant({
     grant_type: 'client_credentials',
     scope: 'engine_etw',
@@ -257,10 +278,3 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
 
   return expiresIn;
 }
-
-/**
- * Require a module from a string.
- * @param {string} src The source code of the module
- * @param {string} filename The filename of the module
- * @returns The module exports of the module
- * */
