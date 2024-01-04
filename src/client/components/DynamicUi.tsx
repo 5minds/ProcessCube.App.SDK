@@ -81,6 +81,7 @@ export function DynamicUi(
     task: DataModels.FlowNodeInstances.UserTaskInstance;
     onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
     className?: string;
+    classNames?: Partial<Record<'wrapper' | 'base' | 'header' | 'body' | 'footer', string>>;
     title?: React.ReactNode;
     customFieldComponents?: DynamicUiFormFieldComponentMap;
   }>,
@@ -109,22 +110,34 @@ export function DynamicUi(
   };
   // min-w-fit?
   return (
-    <div className="min-h-[200px] block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg">
+    <div
+      className={classNames(
+        'min-h-[200px] block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg',
+        props.classNames?.wrapper ? props.classNames?.wrapper : '',
+      )}
+    >
       <form
         ref={formRef}
         className={classNames(
           'flex flex-col rounded-lg max-h-full bg-[color:var(--uic-background-color)] text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]  dark:bg-studio-gray-500 dark:text-studio-gray-50 dark:shadow-studio-gray-300',
-          props.className ? props.className : '',
+          props.classNames?.base ? props.classNames?.base : '',
         )}
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
         action={onSubmit}
         // dd[0].forEach((value, key) => console.log('key', key, value)),
       >
-        <header className="px-4 pt-4 pb-3 sm:px-6">
+        <header
+          className={classNames('px-4 pt-4 pb-3 sm:px-6', props.classNames?.header ? props.classNames.header : '')}
+        >
           <Headline title={props.title ?? props.task.flowNodeName ?? 'User Task'} />
         </header>
-        <section className="px-4 py-3 sm:px-6 overflow-y-auto">
+        <section
+          className={classNames(
+            'px-4 py-3 sm:px-6 overflow-y-auto',
+            props.classNames?.body ? props.classNames.body : '',
+          )}
+        >
           <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
               const dynamicUiFormFieldComponent = (FIELDS as GenericFormFieldTypeComponentMap)[field.type];
@@ -168,7 +181,12 @@ export function DynamicUi(
             })}
           </div>
         </section>
-        <footer className="rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6 dark:bg-studio-gray-600">
+        <footer
+          className={classNames(
+            'rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6 dark:bg-studio-gray-600',
+            props.classNames?.footer ? props.classNames.footer : '',
+          )}
+        >
           <FormButtons confirmFormField={confirmFormField} />
         </footer>
       </form>
