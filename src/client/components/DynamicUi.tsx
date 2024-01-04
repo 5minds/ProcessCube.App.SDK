@@ -12,13 +12,13 @@ import { marked } from 'marked';
 import { DataModels } from '@5minds/processcube_engine_sdk';
 import DOMPurify from 'isomorphic-dompurify';
 import * as ReactIs from 'react-is';
+import { Menu, Transition } from '@headlessui/react';
 
 // TODO: state wie früher?
 // TODO: DynamicUI State hook?
 // TODO: Alert vom alten Portal Aufbau anschauen
 // TODO: überschriebene Styles anpassen
 // TODO: components überschreibbar machen siehe react-select
-// checkbox wird bei formdata nicht hinzugefügt wenn nicht angeklickt, falls angeklickt dann den wert "on"
 
 interface DynamicUiForwardedRefRenderFunction
   extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
@@ -80,6 +80,10 @@ export function DynamicUi(
   props: PropsWithChildren<{
     task: DataModels.FlowNodeInstances.UserTaskInstance;
     onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
+    showHeaderMenu?: boolean;
+    onSuspend?: (result: UserTaskResult, rawFormData: FormData) => void | Promise<void>;
+    showTerminateOption?: boolean;
+    onTerminate?: () => void | Promise<void>;
     className?: string;
     classNames?: Partial<Record<'wrapper' | 'base' | 'header' | 'body' | 'footer', string>>;
     title?: React.ReactNode;
@@ -106,7 +110,14 @@ export function DynamicUi(
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
     // start transition
-    props.onSubmit(userTaskResult, formData);
+  };
+  const onSuspend = () => {
+    console.log('onSuspendCalled');
+    const formData = new FormData(formRef.current!);
+    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
+
+    console.log('userTaskResult', userTaskResult, formData);
+    props.onSuspend?.(userTaskResult, formData);
   };
   // min-w-fit?
   return (
@@ -114,6 +125,7 @@ export function DynamicUi(
       className={classNames(
         'min-h-[200px] block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg',
         props.classNames?.wrapper ? props.classNames?.wrapper : '',
+        props.className ? props.className : '',
       )}
     >
       <form
@@ -125,12 +137,17 @@ export function DynamicUi(
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
         action={onSubmit}
-        // dd[0].forEach((value, key) => console.log('key', key, value)),
       >
         <header
           className={classNames('px-4 pt-4 pb-3 sm:px-6', props.classNames?.header ? props.classNames.header : '')}
         >
-          <Headline title={props.title ?? props.task.flowNodeName ?? 'User Task'} />
+          <Headline
+            title={props.title ?? props.task.flowNodeName ?? 'User Task'}
+            onSuspend={onSuspend}
+            showHeaderMenu={props.showHeaderMenu}
+            showTerminateOption={props.showTerminateOption}
+            onTerminate={props.onTerminate}
+          />
         </header>
         <section
           className={classNames(
@@ -299,7 +316,15 @@ function parseCustomFormConfig(customFormConfig?: string): Record<string, string
 }
 
 // TODO: Tailwind Components nutzen oder NextUI Components
-function Headline(props: { title?: React.ReactNode }) {
+function Headline(props: {
+  title?: React.ReactNode;
+  onSuspend?: () => void;
+  onTerminate?: () => void | Promise<void>;
+  showTerminateOption?: boolean;
+  showHeaderMenu?: boolean;
+}) {
+  const showHeaderMenu = props.showHeaderMenu ?? true;
+
   return (
     <div className="flex space-x-3">
       <div className="flex-1">
@@ -311,74 +336,69 @@ function Headline(props: { title?: React.ReactNode }) {
         </h3>
       </div>
       <div className="flex self-center">
-        <div id="dropdown" className="relative z-30 inline-block text-left">
-          <button
-            id="dropdown-toggle-button"
-            type="button"
-            className="-m-2 p-2 rounded-full flex items-center text-[color:var(--uic-header-dropdown-icon-text-color)] hover:text-[color:var(--uic-header-dropdown-icon-text-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-focus-color)] dark:text-studio-gray-150 dark:hover:text-studio-gray-100"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-              className="h-5 w-5"
-            >
-              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
-            </svg>
-          </button>
-          <div
-            className="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-[color:var(--uic-header-dropdown-menu-background-color)] ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-studio-gray-400"
-            id="dropdown-options"
-            role="menu"
-            tabIndex={0}
-          >
-            <div className="py-1" role="none">
-              <button
-                id="dropdown-option-suspend"
-                className="text-[color:var(--uic-header-dropdown-menu-suspend-entry-text-color)] flex w-full px-4 py-2 text-sm hover:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] focus-visible:outline-none focus-visible:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] dark:hover:bg-studio-gray-250 dark:focus-visible:bg-studio-gray-250 dark:text-studio-gray-50"
-                role="menuitem"
-                tabIndex={-1}
-              >
+        {showHeaderMenu && (
+          <Menu as="div" className="relative inline-block text-left">
+            <div>
+              <Menu.Button className="flex items-center rounded-full text-[color:var(--uic-header-dropdown-icon-text-color)] hover:text-[color:var(--uic-header-dropdown-icon-text-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-focus-color)] dark:text-studio-gray-150 dark:hover:text-studio-gray-100  ">
+                <span className="sr-only">Open options</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
-                  className="mr-3 h-5 w-5 text-[color:var(--uic-header-dropdown-menu-suspend-entry-icon-color)] dark:text-gray-200"
+                  className="h-5 w-5"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  ></path>
+                  <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
                 </svg>
-                <span>Suspend</span>
-              </button>
-              <button
-                id="dropdown-option-terminate"
-                className="text-[color:var(--uic-header-dropdown-menu-terminate-entry-text-color)] flex w-full px-4 py-2 text-sm hover:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] focus-visible:outline-none focus-visible:bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)] dark:hover:bg-studio-gray-250 dark:focus-visible:bg-studio-gray-250 dark:text-[#d6868d]"
-                role="menuitem"
-                tabIndex={-1}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  className="mr-3 h-5 w-5 text-[color:var(--uic-header-dropdown-menu-terminate-entry-icon-color)]"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span>Terminate</span>
-              </button>
+              </Menu.Button>
             </div>
-          </div>
-        </div>
+
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[color:var(--uic-header-dropdown-menu-background-color)] shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-studio-gray-400">
+                <div className="py-1">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        type="button"
+                        onClick={() => props.onSuspend?.()}
+                        className={classNames(
+                          active ? 'bg-gray-100 dark:bg-studio-gray-250' : '',
+                          'block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-studio-gray-50',
+                        )}
+                      >
+                        Suspend
+                      </button>
+                    )}
+                  </Menu.Item>
+                  {props.showTerminateOption && (
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          type="button"
+                          onClick={() => props.onTerminate?.()}
+                          className={classNames(
+                            active ? 'bg-gray-100 dark:bg-studio-gray-250' : '',
+                            'block w-full text-left px-4 py-2 text-sm text-[color:var(--uic-header-dropdown-menu-terminate-entry-text-color)] dark:text-[#d6868d] ',
+                          )}
+                        >
+                          Terminate
+                        </button>
+                      )}
+                    </Menu.Item>
+                  )}
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
+        )}
       </div>
     </div>
   );
