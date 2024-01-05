@@ -1,13 +1,4 @@
-import React, {
-  FormEventHandler,
-  Fragment,
-  PropsWithChildren,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
+import React, { Fragment, PropsWithChildren, forwardRef, useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import { DataModels } from '@5minds/processcube_engine_sdk';
 import DOMPurify from 'isomorphic-dompurify';
@@ -101,25 +92,22 @@ export function DynamicUi(
   const confirmFormField = formFields.find((field) => field.type === 'confirm');
   const formRef = useRef<HTMLFormElement>(null);
 
-  console.log('config task', props.task);
   const FIELDS = { ...FORM_FIELDS, ...(props.customFieldComponents ? props.customFieldComponents : {}) };
   const formFieldRefs = new Map<string, FormFieldRefsMapObj>();
 
-  console.log('formFieldRefs', formFieldRefs);
   const onSubmit = (formData: FormData) => {
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
-    // start transition
+    props.onSubmit(userTaskResult, formData);
   };
+
   const onSuspend = () => {
-    console.log('onSuspendCalled');
     const formData = new FormData(formRef.current!);
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
-    console.log('userTaskResult', userTaskResult, formData);
     props.onSuspend?.(userTaskResult, formData);
   };
-  // min-w-fit?
+
   return (
     <div
       className={classNames(
@@ -212,36 +200,6 @@ export function DynamicUi(
   );
 }
 
-function TestFunction(props: any, ref: any) {
-  console.log('ref', ref);
-  function myFunction() {
-    console.log('myFunctiond from function component');
-  }
-  ref.myFunction = myFunction.bind(ref);
-
-  return <button ref={ref}>TestFunction</button>;
-}
-
-class TestComponent extends DynamicUiComponent<DynamicUiComponentProps & { test: 1 }> {
-  getValue() {
-    console.log('getValue called');
-  }
-
-  render() {
-    return <button>Test Component</button>;
-  }
-}
-
-class TestComponentTwo
-  extends React.Component<DynamicUiComponentProps, { test: 1 }>
-  implements DynamicUiComponent<DynamicUiComponentProps>
-{
-  getValue() {}
-  render() {
-    return <button>Test Component</button>;
-  }
-}
-
 const FORM_FIELDS: DynamicUiFormFieldComponentMap = {
   boolean: BooleanFormField,
   date: DateFormField,
@@ -254,9 +212,6 @@ const FORM_FIELDS: DynamicUiFormFieldComponentMap = {
   paragraph: ParagraphFormField,
   header: HeaderFormField,
   confirm: ConfirmFormField,
-  test: TestComponent,
-  testzwei: TestComponentTwo,
-  bla: TestFunction,
 };
 
 function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.UserTaskFormField }) {
@@ -316,7 +271,6 @@ function parseCustomFormConfig(customFormConfig?: string): Record<string, string
   return null;
 }
 
-// TODO: Tailwind Components nutzen oder NextUI Components
 function Headline(props: {
   title?: React.ReactNode;
   onSuspend?: () => void;
@@ -521,7 +475,6 @@ type IHeaderFormFieldProps = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
 };
 
-// TODO: styles setzen für header elemente
 function HeaderFormField({ formField }: IHeaderFormFieldProps, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
