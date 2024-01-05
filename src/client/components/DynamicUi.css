@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --uic-background-color: var(
+      --user-interaction-component-background-color,
+      var(--background-color, theme('colors.white'))
+    );
+    --uic-text-color: var(--user-interaction-component-text-color, var(--text-bright-color, theme('colors.gray.700')));
+    --uic-link-color: var(--user-interaction-component-link-color, var(--link-color, theme('colors.sky.600')));
+    --uic-link-hover-color: var(
+      --user-interaction-component-link-hover-color,
+      var(--link-hover-color, theme('colors.sky.900'))
+    );
+    --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, theme('colors.gray.300')));
+    --uic-focus-color: var(--user-interaction-component-focus-color, var(--focus-color, theme('colors.sky.700')));
+    --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.gray.400'));
+
+    /* HEADER */
+    --uic-header-text-color: var(
+      --user-interaction-component-header-text-color,
+      var(--text-color, theme('colors.gray.900'))
+    );
+    --uic-header-dropdown-icon-text-color: var(
+      --user-interaction-component-header-dropdown-icon-text-color,
+      var(--icon-color, theme('colors.gray.400'))
+    );
+    --uic-header-dropdown-icon-text-hover-color: var(
+      --user-interaction-component-header-dropdown-icon-text-hover-color,
+      var(--icon-hover-color, theme('colors.gray.500'))
+    );
+
+    --uic-header-dropdown-menu-background-color: var(
+      --user-interaction-component-header-dropdown-menu-background-color,
+      var(--dropdown-menu-background-color, theme('colors.white'))
+    );
+    --uic-header-dropdown-menu-entry-background-hover-color: var(
+      --user-interaction-component-header-dropdown-menu-entry-background-hover-color,
+      var(--dropdown-menu-entry-background-hover-color, theme('colors.gray.100'))
+    );
+    --uic-header-dropdown-menu-suspend-entry-text-color: var(
+      --user-interaction-component-header-dropdown-menu-suspend-entry-text-color,
+      var(--uic-text-color)
+    );
+    --uic-header-dropdown-menu-suspend-entry-icon-color: var(
+      --user-interaction-component-header-dropdown-menu-suspend-entry-icon-color,
+      var(--uic-header-dropdown-icon-text-color)
+    );
+    --uic-header-dropdown-menu-terminate-entry-text-color: var(
+      --user-interaction-component-header-dropdown-menu-terminate-entry-text-color,
+      theme('colors.red.700')
+    );
+    --uic-header-dropdown-menu-terminate-entry-icon-color: var(
+      --user-interaction-component-header-dropdown-menu-terminate-entry-icon-color,
+      theme('colors.red.400')
+    );
+
+    /* FOOTER */
+    --uic-footer-background-color: var(--user-interaction-component-footer-background-color, theme('colors.gray.50'));
+
+    --uic-footer-continue-button-text-color: var(
+      --user-interaction-component-footer-continue-button-text-color,
+      theme('colors.white')
+    );
+    --uic-footer-continue-button-background-color: var(
+      --user-interaction-component-footer-continue-button-background-color,
+      theme('colors.sky.600')
+    );
+    --uic-footer-continue-button-background-hover-color: var(
+      --user-interaction-component-footer-continue-button-background-hover-color,
+      theme('colors.sky.700')
+    );
+    --uic-footer-continue-button-focus-outline-color: var(
+      --user-interaction-component-footer-continue-button-focus-outline-color,
+      theme('colors.sky.500')
+    );
+
+    --uic-footer-decline-button-text-color: var(
+      --user-interaction-component-footer-decline-button-text-color,
+      theme('colors.gray.700')
+    );
+    --uic-footer-decline-button-background-color: var(
+      --user-interaction-component-footer-decline-button-background-color,
+      theme('colors.white')
+    );
+    --uic-footer-decline-button-background-hover-color: var(
+      --user-interaction-component-footer-decline-button-background-hover-color,
+      theme('colors.gray.50')
+    );
+    --uic-footer-decline-button-focus-outline-color: var(
+      --user-interaction-component-footer-decline-button-focus-outline-color,
+      theme('colors.gray.300')
+    );
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}

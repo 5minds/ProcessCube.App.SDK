@@ -22,20 +22,27 @@
       "types": "./client/index.d.ts",
       "require": "./client/index.cjs",
       "default": "./client/index.mjs"
+    },
+    "./client/components/*.css": {
+      "import": "./client/components/*.css",
+      "require": "./client/components/*.css",
+      "default": "./client/components/*.css"
     }
   },
   "scripts": {
     "clean": "rm -rf server common client",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
+    "build": "concurrently -n=build:esm,build:commonjs,build:types,build:css \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\" \"npm run build:types\"",
     "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
     "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
     "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\"",
+    "build:css": "node build-css.cjs",
+    "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types,build:prod:css \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\" \"npm run build:prod:css\"",
     "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
     "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify --drop:console",
-    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
+    "build:prod:css": "NODE_ENV=production node build-css.cjs",
+    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client,build:css \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"npm run build:css -- --watch\""
   },
   "repository": {
     "type": "git",
@@ -44,7 +51,8 @@
   "files": [
     "client",
     "server",
-    "common"
+    "common",
+    "!**.EMPTY"
   ],
   "keywords": [
     "SDK",
@@ -64,12 +72,19 @@
   "engines": {
     "node": ">=18"
   },
+  "sideEffects": [
+    "*.css"
+  ],
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "@types/react": "^18.2.22",
     "@types/react-is": "^18.2.4",
+    "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.0",
+    "esbuild-style-plugin": "^1.6.3",
     "prettier": "^3.0.0",
     "prettier-plugin-tailwindcss": "^0.5.10",
+    "tailwindcss": "^3.4.0",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
