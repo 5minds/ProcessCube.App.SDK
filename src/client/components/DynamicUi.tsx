@@ -127,6 +127,7 @@ export function DynamicUi(
         props.classNames?.wrapper ? props.classNames?.wrapper : '',
         props.className ? props.className : '',
       )}
+      data-dynamic-ui
     >
       <form
         ref={formRef}
@@ -417,7 +418,7 @@ function BooleanFormField(
       <div className="flex h-5 items-center">
         <input
           type="checkbox"
-          className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark h-4 w-4 rounded border-[color:var(--uic-border-color)] text-sky-600 focus:ring-[color:var(--uic-focus-color)] dark:border-2 dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
+          className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark h-4 w-4 rounded border-[color:var(--uic-border-color)] text-sky-600 focus:ring-[color:var(--uic-focus-color)] dark:border-2 dark:border-solid dark:border-transparent dark:text-[#007bff40] dark:placeholder-gray-400   dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] "
           defaultChecked={formField.defaultValue === 'true'}
           id={formField.id}
           name={formField.id}
@@ -629,7 +630,7 @@ function ParagraphFormField(
         // list styles
         '[&_ol]:list-decimal [&_ol_p]:my-2 first-of-type:[&_ol_p]:my-4 [&_ul]:list-disc [&_ul_p]:my-2 first-of-type:[&_ul_p]:my-4',
         // checkbox
-        "[&_input[type='checkbox']]:dark:bg-studio-gray-350 [&_input[type='checkbox']]:dark:hover:checked:bg-studio-gray-350 [&_input[type='checkbox']]:h-4 [&_input[type='checkbox']]:w-4 [&_input[type='checkbox']]:rounded [&_input[type='checkbox']]:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:text-sky-600 [&_input[type='checkbox']]:hover:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:dark:border-2 [&_input[type='checkbox']]:dark:border-solid [&_input[type='checkbox']]:dark:border-transparent [&_input[type='checkbox']]:dark:text-[#007bff40]",
+        "[&_input[type='checkbox']]:dark:bg-studio-gray-350 [&_input[type='checkbox']]:dark:hover:checked:bg-studio-gray-350 [&_input[type='checkbox']]:h-4 [&_input[type='checkbox']]:w-4 [&_input[type='checkbox']]:rounded [&_input[type='checkbox']]:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:text-sky-600 [&_input[type='checkbox']]:hover:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:dark:border-2 [&_input[type='checkbox']]:dark:border-solid [&_input[type='checkbox']]:dark:border-transparent [&_input[type='checkbox']]:dark:text-[#007bff40] [&_input[type='checkbox']]:dark:hover:border-transparent",
       )}
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>
