@@ -123,7 +123,7 @@ export function DynamicUi(
   return (
     <div
       className={classNames(
-        'min-h-[200px] block sm:max-w-lg sm:w-full mx-auto h-full shadow-lg shadow-[color:var(--uic-shadow-color)] dark:shadow-studio-gray-300 rounded-lg',
+        'dark:shadow-studio-gray-300 mx-auto block h-full min-h-[200px] rounded-lg shadow-lg shadow-[color:var(--uic-shadow-color)] sm:w-full sm:max-w-lg',
         props.classNames?.wrapper ? props.classNames?.wrapper : '',
         props.className ? props.className : '',
       )}
@@ -131,7 +131,7 @@ export function DynamicUi(
       <form
         ref={formRef}
         className={classNames(
-          'flex flex-col rounded-lg max-h-full bg-[color:var(--uic-background-color)] text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]  dark:bg-studio-gray-500 dark:text-studio-gray-50 dark:shadow-studio-gray-300',
+          'dark:bg-studio-gray-500 dark:text-studio-gray-50 dark:shadow-studio-gray-300 flex max-h-full flex-col rounded-lg bg-[color:var(--uic-background-color)]  text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]',
           props.classNames?.base ? props.classNames?.base : '',
         )}
         data-user-task-id={props.task.flowNodeId}
@@ -139,7 +139,7 @@ export function DynamicUi(
         action={onSubmit}
       >
         <header
-          className={classNames('px-4 pt-4 pb-3 sm:px-6', props.classNames?.header ? props.classNames.header : '')}
+          className={classNames('px-4 pb-3 pt-4 sm:px-6', props.classNames?.header ? props.classNames.header : '')}
         >
           <Headline
             title={props.title ?? props.task.flowNodeName ?? 'User Task'}
@@ -151,7 +151,7 @@ export function DynamicUi(
         </header>
         <section
           className={classNames(
-            'px-4 py-3 sm:px-6 overflow-y-auto',
+            'overflow-y-auto px-4 py-3 sm:px-6',
             props.classNames?.body ? props.classNames.body : '',
           )}
         >
@@ -200,7 +200,7 @@ export function DynamicUi(
         </section>
         <footer
           className={classNames(
-            'rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6 dark:bg-studio-gray-600',
+            'dark:bg-studio-gray-600 rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6',
             props.classNames?.footer ? props.classNames.footer : '',
           )}
         >
@@ -265,7 +265,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
     <Fragment>
       <button
         type="submit"
-        className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-transparent text-[color:var(--uic-footer-continue-button-text-color)] bg-[color:var(--uic-footer-continue-button-background-color)] hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
+        className="inline-flex w-full justify-center rounded-md border border-transparent bg-[color:var(--uic-footer-continue-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-continue-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
       >
         OK
       </button>
@@ -279,7 +279,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-transparent text-[color:var(--uic-footer-continue-button-text-color)] bg-[color:var(--uic-footer-continue-button-background-color)] hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
+          className="inline-flex w-full justify-center rounded-md border border-transparent bg-[color:var(--uic-footer-continue-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-continue-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
           value="true"
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
@@ -287,7 +287,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="w-full inline-flex justify-center px-3 py-2 border text-base leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm sm:ml-2 border-[color:var(--uic-border-color)] bg-[color:var(--uic-footer-decline-button-background-color)] text-[color:var(--uic-footer-decline-button-text-color)] hover:bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:ring-[color:var(--uic-footer-decline-button-focus-outline-color)] dark:bg-studio-gray-350 dark:border-transparent dark:text-studio-gray-50 dark:hover:bg-studio-gray-300 dark:focus:ring-studio-gray-300"
+          className="dark:bg-studio-gray-350 dark:text-studio-gray-50 dark:hover:bg-studio-gray-300 dark:focus:ring-studio-gray-300 inline-flex w-full justify-center rounded-md border border-[color:var(--uic-border-color)] bg-[color:var(--uic-footer-decline-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-decline-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-decline-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm dark:border-transparent"
           value="false"
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
@@ -295,7 +295,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
       </Fragment>
     );
   }
-  return <div className="space-y-2 sm:-space-x-2 sm:space-y-0 sm:flex sm:flex-row-reverse">{buttons}</div>;
+  return <div className="space-y-2 sm:flex sm:flex-row-reverse sm:-space-x-2 sm:space-y-0">{buttons}</div>;
 }
 
 function classNames(...classes: any) {
@@ -330,7 +330,7 @@ function Headline(props: {
       <div className="flex-1">
         <h3
           id="headline-title"
-          className="text-lg leading-6 font-medium text-[color:var(--uic-header-text-color)] dark:text-studio-gray-150"
+          className="dark:text-studio-gray-150 text-lg font-medium leading-6 text-[color:var(--uic-header-text-color)]"
         >
           {props.title}
         </h3>
@@ -339,7 +339,7 @@ function Headline(props: {
         {showHeaderMenu && (
           <Menu as="div" className="relative inline-block text-left">
             <div>
-              <Menu.Button className="flex items-center rounded-full text-[color:var(--uic-header-dropdown-icon-text-color)] hover:text-[color:var(--uic-header-dropdown-icon-text-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-focus-color)] dark:text-studio-gray-150 dark:hover:text-studio-gray-100  ">
+              <Menu.Button className="dark:text-studio-gray-150 dark:hover:text-studio-gray-100 flex items-center rounded-full text-[color:var(--uic-header-dropdown-icon-text-color)] hover:text-[color:var(--uic-header-dropdown-icon-text-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-focus-color)]  ">
                 <span className="sr-only">Open options</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -362,7 +362,7 @@ function Headline(props: {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[color:var(--uic-header-dropdown-menu-background-color)] shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-studio-gray-400">
+              <Menu.Items className="dark:bg-studio-gray-400 absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[color:var(--uic-header-dropdown-menu-background-color)] shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
@@ -370,8 +370,8 @@ function Headline(props: {
                         type="button"
                         onClick={() => props.onSuspend?.()}
                         className={classNames(
-                          active ? 'bg-gray-100 dark:bg-studio-gray-250' : '',
-                          'block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-studio-gray-50',
+                          active ? 'dark:bg-studio-gray-250 bg-gray-100' : '',
+                          'dark:text-studio-gray-50 block w-full px-4 py-2 text-left text-sm text-gray-700',
                         )}
                       >
                         Suspend
@@ -385,8 +385,8 @@ function Headline(props: {
                           type="button"
                           onClick={() => props.onTerminate?.()}
                           className={classNames(
-                            active ? 'bg-gray-100 dark:bg-studio-gray-250' : '',
-                            'block w-full text-left px-4 py-2 text-sm text-[color:var(--uic-header-dropdown-menu-terminate-entry-text-color)] dark:text-[#d6868d] ',
+                            active ? 'dark:bg-studio-gray-250 bg-gray-100' : '',
+                            'block w-full px-4 py-2 text-left text-sm text-[color:var(--uic-header-dropdown-menu-terminate-entry-text-color)] dark:text-[#d6868d] ',
                           )}
                         >
                           Terminate
@@ -414,10 +414,10 @@ function BooleanFormField(
 
   return (
     <div className="relative flex items-start">
-      <div className="flex items-center h-5">
+      <div className="flex h-5 items-center">
         <input
           type="checkbox"
-          className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400"
+          className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark h-4 w-4 rounded border-[color:var(--uic-border-color)] text-sky-600 focus:ring-[color:var(--uic-focus-color)] dark:border-2 dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
           defaultChecked={formField.defaultValue === 'true'}
           id={formField.id}
           name={formField.id}
@@ -430,7 +430,7 @@ function BooleanFormField(
           {formField.label}
         </label>
         {parsedCustomFormConfig?.hint && (
-          <p className="text-gray-500 dark:text-studio-gray-200" id={hintId}>
+          <p className="dark:text-studio-gray-200 text-gray-500" id={hintId}>
             {parsedCustomFormConfig.hint}
           </p>
         )}
@@ -463,7 +463,7 @@ function DateFormField(
       </label>
       <div className="mt-1">
         <input
-          className="shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm border-[color:var(--uic-border-color)] rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
+          className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:invalid:shadow-studio-dark-invalid block w-full rounded-md border-[color:var(--uic-border-color)] shadow-sm invalid:border-red-500 invalid:ring-1 invalid:ring-red-500 focus:border-[color:var(--uic-focus-color)] focus:ring-[color:var(--uic-focus-color)] sm:text-sm dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f] dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
           type="date"
           value={formField.defaultValue?.toString()}
           id={formField.id}
@@ -473,7 +473,7 @@ function DateFormField(
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200" id={hintId}>
+        <p className="dark:text-studio-gray-200 mt-2 text-sm text-gray-500" id={hintId}>
           {parsedCustomFormConfig?.hint}
         </p>
       )}
@@ -496,7 +496,7 @@ function DecimalFormField(
       </label>
       <div className="mt-1">
         <input
-          className="shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm border-[color:var(--uic-border-color)] rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
+          className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:invalid:shadow-studio-dark-invalid block w-full rounded-md border-[color:var(--uic-border-color)] shadow-sm invalid:border-red-500 invalid:ring-1 invalid:ring-red-500 focus:border-[color:var(--uic-focus-color)] focus:ring-[color:var(--uic-focus-color)] sm:text-sm dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f] dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
           type="number"
           step="0.01"
           placeholder={parsedCustomFormConfig?.placeholder || '0.00'}
@@ -508,7 +508,7 @@ function DecimalFormField(
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200" id={hintId}>
+        <p className="dark:text-studio-gray-200 mt-2 text-sm text-gray-500" id={hintId}>
           {parsedCustomFormConfig?.hint}
         </p>
       )}
@@ -567,7 +567,7 @@ function IntegerFormField({ formField, state }: IntegerFormFieldProps, ref: Dyna
       </label>
       <div className="mt-1">
         <input
-          className="shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm border-[color:var(--uic-border-color)] rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
+          className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:invalid:shadow-studio-dark-invalid block w-full rounded-md border-[color:var(--uic-border-color)] shadow-sm invalid:border-red-500 invalid:ring-1 invalid:ring-red-500 focus:border-[color:var(--uic-focus-color)] focus:ring-[color:var(--uic-focus-color)] sm:text-sm dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f] dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
           type="number"
           step={1}
           id={formField.id}
@@ -579,7 +579,7 @@ function IntegerFormField({ formField, state }: IntegerFormFieldProps, ref: Dyna
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p id={`${formField.id}-hint`} data-hint className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200">
+        <p id={`${formField.id}-hint`} data-hint className="dark:text-studio-gray-200 mt-2 text-sm text-gray-500">
           {parsedCustomFormConfig.hint}
         </p>
       )}
@@ -615,21 +615,21 @@ function ParagraphFormField(
         // base
         'text-sm',
         // paragraph elements
-        '[&_p]:my-4 first-of-type:[&_p]:mt-0 first-of-type:[&_p]:mb-4',
+        '[&_p]:my-4 first-of-type:[&_p]:mb-4 first-of-type:[&_p]:mt-0',
         // links/anchor
-        '[&_a]:text-[color:var(--uic-link-color)] hover:[&_a]:text-[color:var(--uic-link-hover-color)] [&_a]:underline',
+        '[&_a]:text-[color:var(--uic-link-color)] [&_a]:underline hover:[&_a]:text-[color:var(--uic-link-hover-color)]',
         // headings
-        '[&_h1]:font-bold [&_h1]:text-2xl [&_h2]:font-bold [&_h2]:text-xl [&_h3]:font-bold [&_h3]:text-lg [&_h4]:font-bold [&_h4]:text-base [&_h5]:font-bold [&_h5]:text-sm [&_h6]:font-bold [&_h6]:text-xs',
+        '[&_h1]:text-2xl [&_h1]:font-bold [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-bold [&_h4]:text-base [&_h4]:font-bold [&_h5]:text-sm [&_h5]:font-bold [&_h6]:text-xs [&_h6]:font-bold',
         // code blocks
-        '[&_code]:text-[#e83e8c] [&_pre]:my-4 [&_pre]:bg-gray-100 [&_pre]:dark:bg-studio-gray-700 [&_pre_code]:text-inherit',
+        '[&_pre]:dark:bg-studio-gray-700 [&_code]:text-[#e83e8c] [&_pre]:my-4 [&_pre]:bg-gray-100 [&_pre_code]:text-inherit',
         // revert margin
-        '[&_h1]:m-[revert] [&_h2]:m-[revert] [&_h3]:m-[revert] [&_h4]:m-[revert] [&_h5]:m-[revert] [&_h6]:m-[revert] [&_blockquote]:m-[revert] [&_ol]:m-[revert] [&_ul]:m-[revert] [&_fieldset]:m-[revert] [&_menu]:m-[revert]',
+        '[&_blockquote]:m-[revert] [&_fieldset]:m-[revert] [&_h1]:m-[revert] [&_h2]:m-[revert] [&_h3]:m-[revert] [&_h4]:m-[revert] [&_h5]:m-[revert] [&_h6]:m-[revert] [&_menu]:m-[revert] [&_ol]:m-[revert] [&_ul]:m-[revert]',
         // revert padding
-        '[&_ol]:p-[revert] [&_ul]:p-[revert] [&_fieldset]:p-[revert] [&_menu]:p-[revert]',
+        '[&_fieldset]:p-[revert] [&_menu]:p-[revert] [&_ol]:p-[revert] [&_ul]:p-[revert]',
         // list styles
         '[&_ol]:list-decimal [&_ol_p]:my-2 first-of-type:[&_ol_p]:my-4 [&_ul]:list-disc [&_ul_p]:my-2 first-of-type:[&_ul_p]:my-4',
         // checkbox
-        "[&_input[type='checkbox']]:h-4 [&_input[type='checkbox']]:w-4 [&_input[type='checkbox']]:rounded [&_input[type='checkbox']]:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:hover:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:text-sky-600 [&_input[type='checkbox']]:dark:bg-studio-gray-350 [&_input[type='checkbox']]:dark:border-2 [&_input[type='checkbox']]:dark:border-solid [&_input[type='checkbox']]:dark:border-transparent [&_input[type='checkbox']]:dark:text-[#007bff40] [&_input[type='checkbox']]:dark:hover:checked:bg-studio-gray-350",
+        "[&_input[type='checkbox']]:dark:bg-studio-gray-350 [&_input[type='checkbox']]:dark:hover:checked:bg-studio-gray-350 [&_input[type='checkbox']]:h-4 [&_input[type='checkbox']]:w-4 [&_input[type='checkbox']]:rounded [&_input[type='checkbox']]:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:text-sky-600 [&_input[type='checkbox']]:hover:border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:dark:border-2 [&_input[type='checkbox']]:dark:border-solid [&_input[type='checkbox']]:dark:border-transparent [&_input[type='checkbox']]:dark:text-[#007bff40]",
       )}
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>
@@ -660,7 +660,7 @@ function StringFormField({ formField, state }: IStringFormFieldProps, ref: Dynam
   });
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200">
+    <p id={`${formField.id}-hint`} className="dark:text-studio-gray-200 mt-2 text-sm text-gray-500">
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;
@@ -711,7 +711,7 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUi
 
             return (
               <div key={option.id} className="relative flex items-start">
-                <div className="flex items-center h-5">
+                <div className="flex h-5 items-center">
                   <input
                     type="checkbox"
                     checked={hasValueToBeChecked}
@@ -719,11 +719,11 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUi
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:text-[#007bff40]"
+                    className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark h-4 w-4 rounded border-[color:var(--uic-border-color)] text-sky-600 focus:ring-[color:var(--uic-focus-color)] dark:border-2 dark:border-solid dark:border-transparent dark:text-[#007bff40] dark:placeholder-gray-400 dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor={option.id} className="font-medium text-gray-700 dark:text-studio-gray-50">
+                  <label htmlFor={option.id} className="dark:text-studio-gray-50 font-medium text-gray-700">
                     {option.name}
                   </label>
                 </div>
@@ -745,7 +745,7 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUi
           {options?.map((option) => {
             return (
               <div key={option.id} className="relative flex items-start">
-                <div className="flex items-center h-5">
+                <div className="flex h-5 items-center">
                   <input
                     type="radio"
                     checked={(state || formField.defaultValue) == option.id}
@@ -753,11 +753,11 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUi
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="focus:ring-[color:var(--uic-focus-color)] h-4 w-4 text-sky-600 border-[color:var(--uic-border-color)] rounded dark:border-2 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:text-[#007bff40]"
+                    className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark h-4 w-4 rounded border-[color:var(--uic-border-color)] text-sky-600 focus:ring-[color:var(--uic-focus-color)] dark:border-2 dark:border-solid dark:border-transparent dark:text-[#007bff40] dark:placeholder-gray-400 dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor={option.id} className="font-medium text-gray-700 dark:text-studio-gray-50">
+                  <label htmlFor={option.id} className="dark:text-studio-gray-50 font-medium text-gray-700">
                     {option.name}
                   </label>
                 </div>
@@ -773,7 +773,7 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUi
         <select
           id={formField.id}
           name={formField.id}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-[color:var(--uic-border-color)] focus:outline-none focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] sm:text-sm rounded-md invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-studio-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]"
+          className="dark:bg-studio-gray-350 dark:focus:shadow-studio-dark dark:invalid:shadow-studio-dark-invalid mt-1 block w-full rounded-md border-[color:var(--uic-border-color)] py-2 pl-3 pr-10 text-base invalid:border-red-500 invalid:ring-1 invalid:ring-red-500 focus:border-[color:var(--uic-focus-color)] focus:outline-none focus:ring-[color:var(--uic-focus-color)] sm:text-sm dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f] dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
           onChange={(event) => {
             event.target.dataset.value = event.target.value;
             setDefaultSelected(event.target.value);
@@ -823,7 +823,7 @@ function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUi
   }
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="mt-2 text-sm text-gray-500 dark:text-studio-gray-200">
+    <p id={`${formField.id}-hint`} className="dark:text-studio-gray-200 mt-2 text-sm text-gray-500">
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;
