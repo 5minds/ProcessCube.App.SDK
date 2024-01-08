@@ -80,25 +80,42 @@ export async function waitForUserTask(
 
 export async function finishUserTaskAndGetNext(
   flowNodeInstanceId: string,
-  result: UserTaskResult,
-  flowNodeId: string,
+  flowNodeId?: string,
+  correlationId?: string,
+  processInstanceId?: string,
+  result: UserTaskResult = {},
   identity?: Identity,
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance | null> {
   await Client.userTasks.finishUserTask(flowNodeInstanceId, result, identity);
 
-  const userTasks = await Client.userTasks.query(
-    {
-      flowNodeId: flowNodeId,
-      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-    },
-    {
-      identity: identity,
-    },
-  );
+  const queryOptions: {
+    state: DataModels.FlowNodeInstances.FlowNodeInstanceState;
+    flowNodeId?: string | undefined;
+    correlationId?: string | undefined;
+    processInstanceId?: string | undefined;
+  } = {
+    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+  };
 
-  if (userTasks.userTasks.length === 0) {
-    return null;
+  if (flowNodeId) {
+    queryOptions.flowNodeId = flowNodeId;
   }
+
+  if (correlationId) {
+    queryOptions.correlationId = correlationId;
+  }
+
+  if (processInstanceId) {
+    queryOptions.processInstanceId = processInstanceId;
+  }
+
+  console.log('queryOptions', queryOptions);
+
+  const userTasks = await Client.userTasks.query(queryOptions, {
+    identity: identity,
+  });
+
+  console.log(userTasks.totalCount);
 
   return userTasks.userTasks[0];
 }
