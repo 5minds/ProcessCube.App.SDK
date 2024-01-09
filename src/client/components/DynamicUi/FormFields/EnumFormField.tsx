@@ -1,16 +1,12 @@
 import React, { Fragment, PropsWithChildren, useState } from 'react';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
-
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
-import { DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 
-type IEnumFormFieldProps = {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  state?: string | Array<string> | null;
-};
-
-export function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: DynamicUiFormFieldRef) {
+export function EnumFormField(
+  { formField, state }: DynamicUiComponentProps<string | Array<string> | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
@@ -43,8 +39,8 @@ export function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: Dy
                 <div className="flex h-5 items-center">
                   <input
                     type="checkbox"
-                    checked={hasValueToBeChecked}
-                    // TODO: muss hier nicht die option.id als name gesetzt werden?
+                    defaultChecked={hasValueToBeChecked}
+                    // Use the formField id to set the value to the correct id on FormData
                     name={formField.id}
                     id={option.id}
                     value={option.id}
@@ -62,6 +58,7 @@ export function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: Dy
         </fieldset>
       );
       break;
+    // state wiederherstellung testen
     case 'radio':
       enumInput = (
         <fieldset
@@ -78,7 +75,6 @@ export function EnumFormField({ formField, state }: IEnumFormFieldProps, ref: Dy
                   <input
                     type="radio"
                     checked={(state || formField.defaultValue) == option.id}
-                    // TODO: muss hier nicht die option.id als name gesetzt werden?
                     name={formField.id}
                     id={option.id}
                     value={option.id}

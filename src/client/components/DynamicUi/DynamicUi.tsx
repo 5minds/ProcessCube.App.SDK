@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, forwardRef, useEffect, useRef, useState } from 'react';
+import React, { Fragment, PropsWithChildren, forwardRef, useRef } from 'react';
 import { DataModels } from '@5minds/processcube_engine_sdk';
 import * as ReactIs from 'react-is';
 import { Menu, Transition } from '@headlessui/react';
@@ -44,26 +44,32 @@ export abstract class DynamicUiComponent<
   SS = any,
 > extends React.Component<P, S, SS> {
   getValue?(): JSONValue | void;
+  getState?(): JSONValue | void;
 }
 export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
-export type DynamicUiComponentProps = {
+export type DynamicUiComponentProps<TState = any> = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  state?: any;
+  state?: TState;
 };
 export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
+export type FormState = {
+  [formFieldId: string]: JSONValue;
+};
 
 export function DynamicUi(
   props: PropsWithChildren<{
     task: DataModels.FlowNodeInstances.UserTaskInstance;
     onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
     showHeaderMenu?: boolean;
-    onSuspend?: (result: UserTaskResult, rawFormData: FormData) => void | Promise<void>;
+    onSuspend?: () => void | Promise<void>;
     showTerminateOption?: boolean;
     onTerminate?: () => void | Promise<void>;
     className?: string;
     classNames?: Partial<Record<'wrapper' | 'base' | 'header' | 'body' | 'footer', string>>;
     title?: React.ReactNode;
     customFieldComponents?: DynamicUiFormFieldComponentMap;
+    state?: FormState;
+    onStateChange?: (newValue: string, formFieldId: string, formState: FormState) => void | Promise<void>;
   }>,
 ) {
   const { userTaskConfig: config } = props.task;
@@ -86,17 +92,38 @@ export function DynamicUi(
   const formFieldRefs = new Map<string, FormFieldRefsMapObj>();
 
   const onSubmit = (formData: FormData) => {
-    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
+    // geht es in production?
+    const isServerAction = props.onSubmit.name === 'proxy';
+    console.log('isServerAction', isServerAction);
+    console.log('props.onSubmit', props.onSubmit);
+
+    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs, isServerAction);
 
     props.onSubmit(userTaskResult, formData);
   };
 
   const onSuspend = () => {
-    const formData = new FormData(formRef.current!);
-    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
-
-    props.onSuspend?.(userTaskResult, formData);
+    props.onSuspend?.();
   };
+
+  const timeoutRef = useRef<number>();
+
+  function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
+    const target = event.target as HTMLInputElement;
+    if (timeoutRef.current != null) {
+      window.clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = window.setTimeout(() => {
+      timeoutRef.current = undefined;
+      if (formRef.current == null) {
+        return;
+      }
+      const isServerAction = props.onStateChange?.name === 'proxy';
+      const formData = new FormData(formRef.current);
+      const formState = transformFormDataToFormState(formData, formFieldRefs, isServerAction);
+      props.onStateChange?.(target.value, target.name, formState);
+    }, 100);
+  }
 
   return (
     <div
@@ -115,6 +142,7 @@ export function DynamicUi(
         )}
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
+        onChange={onFormDataChange}
         action={onSubmit}
       >
         <header
@@ -166,7 +194,7 @@ export function DynamicUi(
 
                 return (
                   <Fragment key={field.id}>
-                    <ReactElement ref={ref} formField={field} />
+                    <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
                   </Fragment>
                 );
               }
@@ -340,15 +368,63 @@ function assertElementIsRenderFunction(
   throw new Error(`Expected Element to be a functional Component`);
 }
 
+function transformFormDataToFormState(
+  formData: FormData,
+  formFieldRefs: Map<string, FormFieldRefsMapObj>,
+  isServerAction = false,
+) {
+  const formState: Record<string, any> = {};
+  formData.forEach((value, key) => {
+    if (value instanceof File && isServerAction) {
+      console.warn(
+        `[@5minds/processcube_app_sdk:DynamicUi]\t\tOnly plain objects can be passed to Server Components from Client Components. File objects are not supported. Add a getState Function to your component to return a JSON Primitive value as state.\n\nFormField: ${key} with ${value} `,
+      );
+      return;
+    }
+
+    if (!formState[key]) {
+      formState[key] = value;
+    } else {
+      formState[key] = Array.isArray(formState[key]) ? [...formState[key], value] : [formState[key], value];
+    }
+  });
+
+  formFieldRefs.forEach((obj, formFieldId) => {
+    if (typeof obj.ref.current?.getState === 'function') {
+      const state = obj.ref.current.getState();
+      if (
+        typeof state === 'boolean' ||
+        typeof state === 'number' ||
+        typeof state === 'string' ||
+        Array.isArray(state) ||
+        state == null ||
+        state?.toString() === '[object Object]'
+      ) {
+        formState[formFieldId] = state;
+      }
+    }
+  });
+
+  return formState;
+}
+
 function transformFormDataToUserTaskResult(
   formData: FormData,
   formFields: DataModels.FlowNodeInstances.UserTaskFormField[],
   formFieldRefs: Map<string, FormFieldRefsMapObj>,
+  isServerAction = false,
 ): DataModels.FlowNodeInstances.UserTaskResult {
   const userTaskResult: DataModels.FlowNodeInstances.UserTaskResult = {};
 
   for (const key of formData.keys()) {
     const data = formData.getAll(key);
+
+    if (data[0] instanceof File && isServerAction) {
+      console.warn(
+        `[@5minds/processcube_app_sdk:DynamicUi]\t\tOnly plain objects can be passed to Server Components from Client Components. File objects are not supported. Use the raw FormData instance to process files instead.\n\nFormField: ${key} with ${data} `,
+      );
+      continue;
+    }
 
     if (data.length === 1) {
       userTaskResult[key] = data[0];
