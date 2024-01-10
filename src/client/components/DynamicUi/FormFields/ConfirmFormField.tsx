@@ -1,14 +1,7 @@
 import React from 'react';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 
-import { DynamicUiFormFieldRef } from '../DynamicUi';
-
-export function ConfirmFormField(
-  props: { formField: DataModels.FlowNodeInstances.UserTaskFormField },
-  ref: DynamicUiFormFieldRef,
-) {
-  const { formField } = props;
-
-  return <p className="text-sm">{formField.label}</p>;
+export function ConfirmFormField(props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) {
+  return <p className="text-sm">{props.formField.label}</p>;
 }
