@@ -74,7 +74,7 @@ export function EnumFormField(
                 <div className="flex h-5 items-center">
                   <input
                     type="radio"
-                    checked={(state || formField.defaultValue) == option.id}
+                    defaultChecked={(state || formField.defaultValue) == option.id}
                     name={formField.id}
                     id={option.id}
                     value={option.id}
