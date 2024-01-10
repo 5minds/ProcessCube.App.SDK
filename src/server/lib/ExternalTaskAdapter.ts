@@ -61,11 +61,12 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         return;
       }
 
-      startExternalTaskWorker(path, externalTasksDirPath);
+      await startExternalTaskWorker(path, externalTasksDirPath);
 
       const directory = dirname(path);
       const relativePath = relative(externalTasksDirPath, directory);
       const topic = getExternalTaskTopicByPath(relativePath);
+
       logger.info(`Started external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
     })
     .on('change', async (path) => {
@@ -73,11 +74,12 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         return;
       }
 
-      restartExternalTaskWorker(path, externalTasksDirPath);
+      await restartExternalTaskWorker(path, externalTasksDirPath);
 
       const directory = dirname(path);
       const relativePath = relative(externalTasksDirPath, directory);
       const topic = getExternalTaskTopicByPath(relativePath);
+
       logger.info(`Restarted external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
     })
     .on('unlink', async (path) => {
@@ -85,16 +87,19 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
         return;
       }
 
-      stopExternalTaskWorker(path, externalTasksDirPath);
+      stopExternalTaskWorker(path);
 
       const directory = dirname(path);
       const relativePath = relative(externalTasksDirPath, directory);
       const topic = getExternalTaskTopicByPath(relativePath);
+
       logger.info(`Stopped external task ${externalTaskWorkerByPath[path].workerId} for topic '${topic}'`, {
         reason: `External Task for topic '${topic}' was removed`,
         workerId: externalTaskWorkerByPath[path].workerId,
         topic: topic,
       });
+
+      delete externalTaskWorkerByPath[path];
     })
     .on('error', (error) => logger.info(`Watcher error: ${error}`));
 }
@@ -165,7 +170,7 @@ async function startExternalTaskWorker(
  */
 async function restartExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
   const workerId = externalTaskWorkerByPath[pathToExternalTask]?.workerId;
-  stopExternalTaskWorker(pathToExternalTask, externalTasksDirPath);
+  stopExternalTaskWorker(pathToExternalTask);
   await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath, { workerId });
 }
 
@@ -174,9 +179,8 @@ async function restartExternalTaskWorker(pathToExternalTask: string, externalTas
  * If the worker does not exist, the function returns early.
  *
  * @param pathToExternalTask - The path to the external task.
- * @param externalTasksDirPath - The path to the directory containing external tasks.
  */
-function stopExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): void {
+function stopExternalTaskWorker(pathToExternalTask: string): void {
   const externalTaskWorker = externalTaskWorkerByPath[pathToExternalTask];
 
   if (!externalTaskWorker) {
@@ -185,7 +189,6 @@ function stopExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath
 
   externalTaskWorker.stop();
   externalTaskWorker.dispose();
-  delete externalTaskWorkerByPath[pathToExternalTask];
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
