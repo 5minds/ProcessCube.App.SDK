@@ -1,12 +1,10 @@
 import React from 'react';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
-
-import { DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
 export function BooleanFormField(
-  props: { formField: DataModels.FlowNodeInstances.UserTaskFormField },
+  props: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ): JSX.Element {
   const { formField } = props;
@@ -19,7 +17,7 @@ export function BooleanFormField(
         <input
           type="checkbox"
           className="dark:bg-dynamicui-gray-350 dark:focus:shadow-dynamicui-dark h-4 w-4 rounded border-[color:var(--uic-border-color)] text-sky-600 focus:ring-[color:var(--uic-focus-color)] dark:border-2 dark:border-solid dark:border-transparent dark:text-[#007bff40] dark:placeholder-gray-400   dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] "
-          defaultChecked={formField.defaultValue === 'true'}
+          defaultChecked={(props.state && props.state !== 'false') || formField.defaultValue === 'true'}
           id={formField.id}
           name={formField.id}
           aria-describedby={parsedCustomFormConfig?.hint ? hintId : undefined}
