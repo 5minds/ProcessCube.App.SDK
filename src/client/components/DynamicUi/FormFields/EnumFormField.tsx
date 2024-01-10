@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, useState } from 'react';
+import React from 'react';
 
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
@@ -93,56 +93,28 @@ export function EnumFormField(
       );
       break;
     default:
-      const [defaultSelected, setDefaultSelected] = useState<string>('');
-      const Select = (props: PropsWithChildren<any>) => (
+      const defaultSelect = state || options?.find((option) => option.id === formField.defaultValue)?.id || '';
+
+      enumInput = (
         <select
           id={formField.id}
           name={formField.id}
           className="dark:bg-dynamicui-gray-350 dark:focus:shadow-dynamicui-dark dark:invalid:shadow-dynamicui-dark-invalid dark:bg-dynamicui-dropdown-dark mt-1 block w-full rounded-md border-[color:var(--uic-border-color)] py-2 pl-3 pr-10 text-base invalid:border-red-500 invalid:ring-1 invalid:ring-red-500 focus:border-[color:var(--uic-focus-color)] focus:outline-none focus:ring-[color:var(--uic-focus-color)] sm:text-sm dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f] dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
-          onChange={(event) => {
-            event.target.dataset.value = event.target.value;
-            setDefaultSelected(event.target.value);
-          }}
-          data-value
+          onChange={(event) => (event.target.dataset.value = event.target.value)}
+          data-value={defaultSelect}
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
           data-form-field-type="enum"
-          {...props}
+          defaultValue={defaultSelect}
         >
-          {props.children}
-        </select>
-      );
-
-      const DefaultOption = (props: PropsWithChildren<any>) => {
-        const { children, ...rest } = props;
-        return (
-          <option disabled hidden style={{ display: 'none' }} value="" {...rest}>
-            {children}
-          </option>
-        );
-      };
-
-      const Options = () => (
-        <Fragment>
+          <option value="">{!defaultSelect && parsedCustomFormConfig?.placeholder}</option>
           {options?.map((option) => {
-            const defaultSelected = (state || formField.defaultValue) === option.id;
-            if (defaultSelected) {
-              setDefaultSelected(option.id);
-            }
-
             return (
               <option key={option.id} value={option.id}>
                 {option.name}
               </option>
             );
           })}
-        </Fragment>
-      );
-
-      enumInput = (
-        <Select data-value={defaultSelected} value={defaultSelected}>
-          <DefaultOption>{!defaultSelected && parsedCustomFormConfig?.placeholder}</DefaultOption>
-          <Options />
-        </Select>
+        </select>
       );
       break;
   }
