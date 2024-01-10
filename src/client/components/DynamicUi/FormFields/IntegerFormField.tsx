@@ -1,17 +1,20 @@
 import React from 'react';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
-
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
-import { DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import { isNumber } from '../utils/isNumber';
 
-type IntegerFormFieldProps = {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  state?: number | null;
-};
-
-export function IntegerFormField({ formField, state }: IntegerFormFieldProps, ref: DynamicUiFormFieldRef) {
+export function IntegerFormField(
+  { formField, state }: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+
+  if (!isNumber(formField.defaultValue)) {
+    console.warn(
+      `[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for integer field "${formField.id}"`,
+    );
+  }
 
   return (
     <div>
@@ -25,7 +28,7 @@ export function IntegerFormField({ formField, state }: IntegerFormFieldProps, re
           step={1}
           id={formField.id}
           name={formField.id}
-          defaultValue={state ? `${state}` : formField.defaultValue?.toString() ?? ''}
+          defaultValue={state || formField.defaultValue?.toString()}
           placeholder={parsedCustomFormConfig?.placeholder ?? '0'}
           aria-describedby={`${formField.id}-hint`}
           data-form-field-type="integer"
