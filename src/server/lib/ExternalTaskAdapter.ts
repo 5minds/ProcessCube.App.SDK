@@ -20,6 +20,25 @@ const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
 const externalTaskWorkerByPath: Record<string, ExternalTaskWorker<any, any>> = {};
 
+if (authorityIsConfigured) {
+  if (
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID ||
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
+  ) {
+    const error = new Error(
+      'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/external-task-adapter#authority',
+    );
+
+    logger.error(
+      `Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing`,
+      {
+        err: error,
+      },
+    );
+    throw error;
+  }
+}
+
 export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
 
 /**
@@ -91,7 +110,7 @@ async function startExternalTaskWorker(
     return;
   }
 
-  const tokenSet = authorityIsConfigured ? await getFreshTokenSet() : null;
+  const tokenSet = await getFreshTokenSet();
   const identity = getIdentityForExternalTaskWorkers(tokenSet);
 
   const relativePath = relative(externalTasksDirPath, directory);
@@ -177,16 +196,18 @@ async function getExternalTaskFile(directory: string): Promise<string | null> {
   return externalTaskFiles[0];
 }
 
-async function getFreshTokenSet(): Promise<TokenSet> {
+async function getFreshTokenSet(): Promise<TokenSet | null> {
   if (!authorityIsConfigured) {
-    throw new Error('No authority is configured');
+    return null;
   }
 
   const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
+
   const client = new issuer.Client({
     client_id: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID as string,
     client_secret: process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET as string,
   });
+
   const tokenSet = await client.grant({
     grant_type: 'client_credentials',
     scope: 'engine_etw',
