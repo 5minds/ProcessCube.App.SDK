@@ -30,7 +30,6 @@ type FormFieldRenderer =
   | React.ForwardRefExoticComponent<DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>>
   | DynamicUiComponentType;
 type FormFieldRefsMapObj = {
-  renderer: FormFieldRenderer;
   ref: React.MutableRefObject<DynamicUiRefFunctions | null>;
 };
 type JSONPrimitive = string | number | boolean | null;
@@ -74,6 +73,11 @@ export function DynamicUi(
 ) {
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
+  const timeoutRef = useRef<number>();
+  const formRef = useRef<HTMLFormElement>(null);
+  const formFieldRefs = new Map<string, FormFieldRefsMapObj>(
+    formFields.map((field) => [field.id, { ref: React.createRef<DynamicUiRefFunctions>() }]),
+  );
 
   const moreThanOneConfirm = formFields.filter((field) => field.type === 'confirm').length > 1;
   if (moreThanOneConfirm) {
@@ -83,13 +87,11 @@ export function DynamicUi(
   }
 
   const confirmFormField = formFields.find((field) => field.type === 'confirm');
-  const formRef = useRef<HTMLFormElement>(null);
 
   const formFieldComponentMap = {
     ...FormFieldComponentMap,
     ...(props.customFieldComponents ? props.customFieldComponents : {}),
   };
-  const formFieldRefs = new Map<string, FormFieldRefsMapObj>();
 
   const onSubmit = (formData: FormData) => {
     // geht es in production?
@@ -105,8 +107,6 @@ export function DynamicUi(
   const onSuspend = () => {
     props.onSuspend?.();
   };
-
-  const timeoutRef = useRef<number>();
 
   function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
     const target = event.target as HTMLInputElement;
@@ -189,8 +189,7 @@ export function DynamicUi(
                   ReactElement = forwardRef(dynamicUiFormFieldComponent);
                 }
 
-                const ref = useRef<DynamicUiRefFunctions>(null);
-                formFieldRefs.set(field.id, { renderer: ReactElement, ref });
+                const ref = formFieldRefs.get(field.id)?.ref;
 
                 return (
                   <Fragment key={field.id}>
