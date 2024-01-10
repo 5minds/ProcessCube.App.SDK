@@ -62,6 +62,11 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       }
 
       startExternalTaskWorker(path, externalTasksDirPath);
+
+      const directory = dirname(path);
+      const relativePath = relative(externalTasksDirPath, directory);
+      const topic = getExternalTaskTopicByPath(relativePath);
+      logger.info(`Started external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
     })
     .on('change', async (path) => {
       if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
@@ -69,6 +74,11 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       }
 
       restartExternalTaskWorker(path, externalTasksDirPath);
+
+      const directory = dirname(path);
+      const relativePath = relative(externalTasksDirPath, directory);
+      const topic = getExternalTaskTopicByPath(relativePath);
+      logger.info(`Restarted external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
     })
     .on('unlink', async (path) => {
       if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
@@ -76,6 +86,15 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       }
 
       stopExternalTaskWorker(path, externalTasksDirPath);
+
+      const directory = dirname(path);
+      const relativePath = relative(externalTasksDirPath, directory);
+      const topic = getExternalTaskTopicByPath(relativePath);
+      logger.info(`Stopped external task ${externalTaskWorkerByPath[path].workerId} for topic '${topic}'`, {
+        reason: `External Task for topic '${topic}' was removed`,
+        workerId: externalTaskWorkerByPath[path].workerId,
+        topic: topic,
+      });
     })
     .on('error', (error) => logger.info(`Watcher error: ${error}`));
 }
@@ -134,8 +153,6 @@ async function startExternalTaskWorker(
   externalTaskWorker.start();
   await startRefreshingIdentityCycle(tokenSet, externalTaskWorker);
 
-  logger.info(`Started external task ${externalTaskWorker.workerId} for topic ${topic}`);
-
   externalTaskWorkerByPath[pathToExternalTask] = externalTaskWorker;
 }
 
@@ -169,16 +186,6 @@ function stopExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath
   externalTaskWorker.stop();
   externalTaskWorker.dispose();
   delete externalTaskWorkerByPath[pathToExternalTask];
-
-  const directory = dirname(pathToExternalTask);
-  const relativePath = relative(externalTasksDirPath, directory);
-  const topic = getExternalTaskTopicByPath(relativePath);
-
-  logger.info(`Stopped external task ${externalTaskWorker.workerId} for topic '${topic}'`, {
-    reason: `External Task for topic '${topic}' was removed`,
-    workerId: externalTaskWorker.workerId,
-    topic: topic,
-  });
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
