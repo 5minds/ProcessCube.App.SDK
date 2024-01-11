@@ -39,8 +39,8 @@
     "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
     "build:css": "node build-css.cjs",
     "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types,build:prod:css \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\" \"npm run build:prod:css\"",
-    "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
-    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify --drop:console",
+    "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --out-extension:.js=.mjs",
+    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify",
     "build:prod:css": "NODE_ENV=production node build-css.cjs",
     "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client,build:css \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"npm run build:css -- --watch\""
   },
