@@ -3,17 +3,11 @@ import { useEffect, useState } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 import { marked } from 'marked';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
-
-import { DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { classNames } from '../../../utils/classNames';
 
-type ParagraphFormFieldProps = {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-};
-
 export function ParagraphFormField(
-  { formField: { defaultValue, label } }: ParagraphFormFieldProps,
+  { formField: { defaultValue, label } }: DynamicUiComponentProps,
   ref: DynamicUiFormFieldRef,
 ) {
   const [generatedHtml, setGeneratedHtml] = useState('');

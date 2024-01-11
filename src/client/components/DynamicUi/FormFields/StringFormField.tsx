@@ -1,16 +1,12 @@
 import React from 'react';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
-
-import { DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-type IStringFormFieldProps = {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-  state?: string | null;
-};
-
-export function StringFormField({ formField, state }: IStringFormFieldProps, ref: DynamicUiFormFieldRef) {
+export function StringFormField(
+  { formField, state }: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;

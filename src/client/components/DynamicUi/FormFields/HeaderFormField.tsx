@@ -1,14 +1,9 @@
 import React from 'react';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
-import { DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-type IHeaderFormFieldProps = {
-  formField: DataModels.FlowNodeInstances.UserTaskFormField;
-};
-
-export function HeaderFormField({ formField }: IHeaderFormFieldProps, ref: DynamicUiFormFieldRef) {
+export function HeaderFormField({ formField }: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   let headerElement: JSX.Element;
