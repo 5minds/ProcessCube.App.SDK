@@ -1,15 +1,10 @@
 import React from 'react';
 
-import type { DataModels } from '@5minds/processcube_engine_sdk';
-
-import { DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 import { isNumber } from '../utils/isNumber';
 
-export function DecimalFormField(
-  props: { formField: DataModels.FlowNodeInstances.UserTaskFormField },
-  ref: DynamicUiFormFieldRef,
-) {
+export function DecimalFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -31,7 +26,7 @@ export function DecimalFormField(
           type="number"
           step="0.01"
           placeholder={parsedCustomFormConfig?.placeholder || '0.00'}
-          defaultValue={formField.defaultValue?.toString()}
+          defaultValue={props.state || formField.defaultValue?.toString()}
           id={formField.id}
           name={formField.id}
           aria-describedby={hintId}
