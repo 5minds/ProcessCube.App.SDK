@@ -20,7 +20,8 @@ export function EnumFormField(
       if (Array.isArray(state) && state.length) {
         multipleStateOrDefaultValue = state;
       } else {
-        multipleStateOrDefaultValue = formField.defaultValue?.toString().split(',') ?? [];
+        multipleStateOrDefaultValue =
+          ((state as string | null) || formField.defaultValue?.toString())?.split(',') ?? [];
       }
 
       enumInput = (
