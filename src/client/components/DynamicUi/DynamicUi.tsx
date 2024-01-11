@@ -88,6 +88,7 @@ export function DynamicUi(
 
   const confirmFormField = formFields.find((field) => field.type === 'confirm');
 
+  // ein und auskommentieren für den style check
   const formFieldComponentMap = {
     ...FormFieldComponentMap,
     ...(props.customFieldComponents ? props.customFieldComponents : {}),
@@ -164,29 +165,38 @@ export function DynamicUi(
         >
           <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
-              const dynamicUiFormFieldComponent = (formFieldComponentMap as GenericFormFieldTypeComponentMap)[
+              const DynamicUiFormFieldComponent = (formFieldComponentMap as GenericFormFieldTypeComponentMap)[
                 field.type
               ];
 
-              if (dynamicUiFormFieldComponent) {
-                if (!ReactIs.isValidElementType(dynamicUiFormFieldComponent)) {
+              if (DynamicUiFormFieldComponent) {
+                if (!ReactIs.isValidElementType(DynamicUiFormFieldComponent)) {
                   console.warn(
                     `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe given DynamicUiFormFieldComponent is not a valid React Element Type.\n\nFormField:\t${JSON.stringify(
                       field,
                       null,
                       2,
-                    )}\nDynamicUiFormFieldComponent:\t${dynamicUiFormFieldComponent.toString()}\n\nRendering 'null' as fallback`,
+                    )}\nDynamicUiFormFieldComponent:\t${DynamicUiFormFieldComponent.toString()}\n\nRendering 'null' as fallback`,
                   );
                   return null;
                 }
 
                 let ReactElement: FormFieldRenderer;
-                if (isReactClassComponent(dynamicUiFormFieldComponent)) {
-                  assertElementIsReactComponent(dynamicUiFormFieldComponent);
-                  ReactElement = dynamicUiFormFieldComponent;
+                if (isReactClassComponent(DynamicUiFormFieldComponent)) {
+                  assertElementIsReactComponent(DynamicUiFormFieldComponent);
+                  ReactElement = DynamicUiFormFieldComponent;
                 } else {
-                  assertElementIsRenderFunction(dynamicUiFormFieldComponent);
-                  ReactElement = forwardRef(dynamicUiFormFieldComponent);
+                  let formFieldComponentToUse = DynamicUiFormFieldComponent;
+
+                  // has only one parameter => wrap to function with two params because, forwardRef needs 0 or 2.
+                  if (DynamicUiFormFieldComponent.length === 1) {
+                    formFieldComponentToUse = (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) => (
+                      <DynamicUiFormFieldComponent {...props} />
+                    );
+                  }
+
+                  assertElementIsRenderFunction(formFieldComponentToUse);
+                  ReactElement = forwardRef(formFieldComponentToUse);
                 }
 
                 const ref = formFieldRefs.get(field.id)?.ref;
