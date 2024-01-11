@@ -10,8 +10,6 @@ import {
 import { classNames } from '../../utils/classNames';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
-// TODO: state wie früher?
-// TODO: DynamicUI State hook?
 // TODO: Alert vom alten Portal Aufbau anschauen
 // TODO: überschriebene Styles anpassen
 // TODO: components überschreibbar machen siehe react-select
@@ -95,12 +93,7 @@ export function DynamicUi(
   };
 
   const onSubmit = (formData: FormData) => {
-    // geht es in production?
-    const isServerAction = props.onSubmit.name === 'proxy';
-    console.log('isServerAction', isServerAction);
-    console.log('props.onSubmit', props.onSubmit);
-
-    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs, isServerAction);
+    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
     props.onSubmit(userTaskResult, formData);
   };
@@ -119,9 +112,8 @@ export function DynamicUi(
       if (formRef.current == null) {
         return;
       }
-      const isServerAction = props.onStateChange?.name === 'proxy';
       const formData = new FormData(formRef.current);
-      const formState = transformFormDataToFormState(formData, formFieldRefs, isServerAction);
+      const formState = transformFormDataToFormState(formData, formFieldRefs);
       props.onStateChange?.(target.value, target.name, formState);
     }, 100);
   }
@@ -377,14 +369,10 @@ function assertElementIsRenderFunction(
   throw new Error(`Expected Element to be a functional Component`);
 }
 
-function transformFormDataToFormState(
-  formData: FormData,
-  formFieldRefs: Map<string, FormFieldRefsMapObj>,
-  isServerAction = false,
-) {
+function transformFormDataToFormState(formData: FormData, formFieldRefs: Map<string, FormFieldRefsMapObj>) {
   const formState: Record<string, any> = {};
   formData.forEach((value, key) => {
-    if (value instanceof File && isServerAction) {
+    if (value instanceof File) {
       console.warn(
         `[@5minds/processcube_app_sdk:DynamicUi]\t\tOnly plain objects can be passed to Server Components from Client Components. File objects are not supported. Add a getState Function to your component to return a JSON Primitive value as state.\n\nFormField: ${key} with ${value} `,
       );
@@ -421,14 +409,13 @@ function transformFormDataToUserTaskResult(
   formData: FormData,
   formFields: DataModels.FlowNodeInstances.UserTaskFormField[],
   formFieldRefs: Map<string, FormFieldRefsMapObj>,
-  isServerAction = false,
 ): DataModels.FlowNodeInstances.UserTaskResult {
   const userTaskResult: DataModels.FlowNodeInstances.UserTaskResult = {};
 
   for (const key of formData.keys()) {
     const data = formData.getAll(key);
 
-    if (data[0] instanceof File && isServerAction) {
+    if (data[0] instanceof File) {
       console.warn(
         `[@5minds/processcube_app_sdk:DynamicUi]\t\tOnly plain objects can be passed to Server Components from Client Components. File objects are not supported. Use the raw FormData instance to process files instead.\n\nFormField: ${key} with ${data} `,
       );
