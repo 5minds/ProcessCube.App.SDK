@@ -1,10 +1,11 @@
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
-import { join, relative } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
 import { build as esBuild } from 'esbuild';
-import { promises as fsp, PathLike, existsSync } from 'node:fs';
+import { promises as fsp, existsSync } from 'node:fs';
 import { Issuer, TokenSet } from 'openid-client';
 import { jwtDecode } from 'jwt-decode';
+import { watch } from 'chokidar';
 
 import { EngineURL } from './internal/EngineClient';
 
@@ -13,10 +14,11 @@ const DUMMY_IDENTITY: Identity = {
   userId: 'dummy_token',
 };
 const DELAY_FACTOR = 0.85;
-const EXTERNAL_TASK_FILE_NAMES = ['external_task.ts', 'external_task.js'];
+const EXTERNAL_TASK_FILE_NAMES: ReadonlyArray<string> = ['external_task.ts', 'external_task.js'];
 
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
+const externalTaskWorkerByPath: Record<string, ExternalTaskWorker<any, any>> = {};
 
 if (authorityIsConfigured) {
   if (
@@ -45,64 +47,148 @@ export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'w
  * @returns {Promise<void>} A promise that resolves when the external tasks are subscribed
  * */
 export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
-  let externalTasksDirPath: string | undefined;
-  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
-
-  for (const path of potentialPaths) {
-    if (path && existsSync(path)) {
-      externalTasksDirPath = path;
-      break;
-    }
-  }
-
   if (customExternalTasksDirPath && !existsSync(customExternalTasksDirPath)) {
     throw new Error(
       `Invalid customExternalTasksDirPath. The given path '${customExternalTasksDirPath}' does not exist`,
     );
   }
 
-  if (!externalTasksDirPath) {
-    throw new Error('Could not find external tasks directory');
-  }
+  const externalTasksDirPath = getExternalTasksDirPath(customExternalTasksDirPath);
 
-  const directories = await getDirectories(externalTasksDirPath);
+  watch(externalTasksDirPath)
+    .on('add', async (path) => {
+      if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
+        return;
+      }
 
-  for (const directory of directories) {
-    const workerFile = await getExternalTaskFile(directory);
+      await startExternalTaskWorker(path, externalTasksDirPath);
 
-    if (!workerFile) {
-      continue;
-    }
+      const directory = dirname(path);
+      const relativePath = relative(externalTasksDirPath, directory);
+      const topic = getExternalTaskTopicByPath(relativePath);
 
-    const fullWorkerFilePath = join(directory, workerFile);
-    const transpiledFile = await transpileFile(fullWorkerFilePath);
-    const module = await createModule(transpiledFile, fullWorkerFilePath);
-    const tokenSet = await getFreshTokenSet();
+      logger.info(`Started external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
+    })
+    .on('change', async (path) => {
+      if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
+        return;
+      }
 
-    const config: IExternalTaskWorkerConfig = {
-      identity: getIdentityForExternalTaskWorkers(tokenSet),
-      ...module?.config,
-    };
-    const handler = module.default;
-    const topic = relative(externalTasksDirPath, directory)
-      .replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '')
-      .replace(/[\/]{2,}/g, '/');
+      await restartExternalTaskWorker(path, externalTasksDirPath);
 
-    const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-    await startRefreshingIdentity(tokenSet, externalTaskWorker);
+      const directory = dirname(path);
+      const relativePath = relative(externalTasksDirPath, directory);
+      const topic = getExternalTaskTopicByPath(relativePath);
 
-    externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
-      logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
-        err: error,
-        type: errorType,
-        externalTask: externalTask,
+      logger.info(`Restarted external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
+    })
+    .on('unlink', async (path) => {
+      if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
+        return;
+      }
+
+      stopExternalTaskWorker(path);
+
+      const directory = dirname(path);
+      const relativePath = relative(externalTasksDirPath, directory);
+      const topic = getExternalTaskTopicByPath(relativePath);
+
+      logger.info(`Stopped external task ${externalTaskWorkerByPath[path].workerId} for topic '${topic}'`, {
+        reason: `External Task for topic '${topic}' was removed`,
+        workerId: externalTaskWorkerByPath[path].workerId,
+        topic: topic,
       });
-    });
 
-    externalTaskWorker.start();
+      delete externalTaskWorkerByPath[path];
+    })
+    .on('error', (error) => logger.info(`Watcher error: ${error}`));
+}
 
-    logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic '${topic}'`);
+/**
+ * Starts an external task worker.
+ *
+ * @param pathToExternalTask The path to the external task file.
+ * @param externalTasksDirPath The path to the directory containing external tasks.
+ * @returns A Promise that resolves when the external task worker has started.
+ */
+async function startExternalTaskWorker(
+  pathToExternalTask: string,
+  externalTasksDirPath: string,
+  customConfig?: IExternalTaskWorkerConfig,
+): Promise<void> {
+  const directory = dirname(pathToExternalTask);
+  const workerfile = getExternalTaskFile(directory);
+
+  if (!workerfile) {
+    logger.error(`Could not find external task file in directory '${directory}'`);
+    return;
   }
+
+  const transpiledFile = await transpileFile(pathToExternalTask);
+  const module = await createModule(transpiledFile, pathToExternalTask);
+
+  if (module.default === undefined) {
+    logger.info(
+      `External task file recognized at ${pathToExternalTask}. Please export a default handler function. For more information see https://processcube.io/docs/app-sdk/samples/external-task-adapter#external-tasks-entwickeln`,
+    );
+    return;
+  }
+
+  const tokenSet = await getFreshTokenSet();
+  const identity = getIdentityForExternalTaskWorkers(tokenSet);
+
+  const relativePath = relative(externalTasksDirPath, directory);
+
+  const topic = getExternalTaskTopicByPath(relativePath);
+  const handler = module.default;
+  const config: IExternalTaskWorkerConfig = {
+    identity: identity,
+    ...customConfig,
+    ...module?.config,
+  };
+  const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
+  externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
+    logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
+      err: error,
+      type: errorType,
+      externalTask: externalTask,
+    });
+  });
+
+  externalTaskWorker.start();
+  await startRefreshingIdentityCycle(tokenSet, externalTaskWorker);
+
+  externalTaskWorkerByPath[pathToExternalTask] = externalTaskWorker;
+}
+
+/**
+ * Restarts the external task worker by stopping and then starting it again.
+ *
+ * @param pathToExternalTask - The path to the external task.
+ * @param externalTasksDirPath - The path to the directory containing external tasks.
+ * @returns A promise that resolves when the external task worker has been restarted.
+ */
+async function restartExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
+  const workerId = externalTaskWorkerByPath[pathToExternalTask]?.workerId;
+  stopExternalTaskWorker(pathToExternalTask);
+  await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath, { workerId });
+}
+
+/**
+ * Stops the external task worker associated with the given path and disposes it.
+ * If the worker does not exist, the function returns early.
+ *
+ * @param pathToExternalTask - The path to the external task.
+ */
+function stopExternalTaskWorker(pathToExternalTask: string): void {
+  const externalTaskWorker = externalTaskWorkerByPath[pathToExternalTask];
+
+  if (!externalTaskWorker) {
+    return;
+  }
+
+  externalTaskWorker.stop();
+  externalTaskWorker.dispose();
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
@@ -161,7 +247,7 @@ function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Identity 
  * @param {number} retries The number of retries to refresh the identity
  * @returns {Promise<void>} A promise that resolves when the identity is refreshed
  * */
-async function startRefreshingIdentity(
+async function startRefreshingIdentityCycle(
   tokenSet: TokenSet | null,
   externalTaskWorker: ExternalTaskWorker<any, any>,
   retries: number = 5,
@@ -171,14 +257,22 @@ async function startRefreshingIdentity(
       return;
     }
 
+    if (!externalTaskWorker.pollingIsActive) {
+      return;
+    }
+
     const expiresIn = await getExpiresInForExternalTaskWorkers(tokenSet);
     const delay = expiresIn * DELAY_FACTOR * 1000;
 
     setTimeout(async () => {
+      if (!externalTaskWorker.pollingIsActive) {
+        return;
+      }
+
       const newTokenSet = await getFreshTokenSet();
       const newIdentity = getIdentityForExternalTaskWorkers(newTokenSet);
       externalTaskWorker.identity = newIdentity;
-      await startRefreshingIdentity(newTokenSet, externalTaskWorker);
+      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorker);
     }, delay);
   } catch (error) {
     if (retries === 0) {
@@ -188,10 +282,11 @@ async function startRefreshingIdentity(
     logger.error(`Could not refresh identity for external task worker ${externalTaskWorker.workerId}`, {
       err: error,
       workerId: externalTaskWorker.workerId,
+      retryCount: retries,
     });
 
     const delay = 2 * 1000;
-    setTimeout(async () => await startRefreshingIdentity(tokenSet, externalTaskWorker, retries - 1), delay);
+    setTimeout(async () => await startRefreshingIdentityCycle(tokenSet, externalTaskWorker, retries - 1), delay);
   }
 }
 
@@ -226,6 +321,13 @@ async function transpileFile(entryPoint: string): Promise<any> {
   return result.outputFiles[0].text;
 }
 
+/**
+ * Creates a module from a given source code string and filename.
+ * @param src - The source code string of the module.
+ * @param filename - The filename of the module.
+ * @returns The exported object from the compiled module.
+ * @throws If there is an error while compiling or requiring the module.
+ */
 async function createModule(src: string, filename: string) {
   try {
     var Module = module.constructor as any;
@@ -240,25 +342,6 @@ async function createModule(src: string, filename: string) {
 
     throw error;
   }
-}
-
-/**
- * Recursively get all directories in a directory.
- * It gives the full path to the directory.
- * @param {PathLike} source The directory to search in
- * @returns A list of all directories in the directory
- **/
-async function getDirectories(source: PathLike): Promise<string[]> {
-  const dirents = await fsp.readdir(source, { withFileTypes: true });
-  const directories = await Promise.all(
-    dirents.map(async (dirent) => {
-      const fullPath = join(source.toString(), dirent.name);
-
-      return dirent.isDirectory() ? [fullPath, ...(await getDirectories(fullPath))] : [];
-    }),
-  );
-
-  return Array.prototype.concat(...directories);
 }
 
 /**
@@ -277,4 +360,32 @@ async function getExpiresInForExternalTaskWorkers(tokenSet: TokenSet): Promise<n
   }
 
   return expiresIn;
+}
+
+/**
+ * Returns the external task topic derived from the given path.
+ *
+ * @param path - The path to derive the external task topic from.
+ * @returns The external task topic.
+ */
+function getExternalTaskTopicByPath(path: string): string {
+  return path.replace(/^\.\/+|\([^)]+\)|^\/*|\/*$/g, '').replace(/[\/]{2,}/g, '/');
+}
+
+function getExternalTasksDirPath(customExternalTasksDirPath?: string): string {
+  let externalTasksDirPath: string | undefined;
+  const potentialPaths = [customExternalTasksDirPath, join(process.cwd(), 'app'), join(process.cwd(), 'src', 'app')];
+
+  for (const path of potentialPaths) {
+    if (path && existsSync(path)) {
+      externalTasksDirPath = path;
+      break;
+    }
+  }
+
+  if (!externalTasksDirPath) {
+    throw new Error('Could not find external tasks directory');
+  }
+
+  return externalTasksDirPath;
 }
