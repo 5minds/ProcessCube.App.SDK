@@ -78,15 +78,23 @@ export async function waitForUserTask(
   });
 }
 
+export type filterBy = {
+  processInstanceId?: string;
+  flowNodeId?: string;
+  correlationId?: string;
+};
+
 export async function finishUserTaskAndGetNext(
   flowNodeInstanceId: string,
-  flowNodeId?: string,
-  correlationId?: string,
-  processInstanceId?: string,
-  result: UserTaskResult = {},
+  filterBy: filterBy = {},
+  result?: UserTaskResult,
   identity?: Identity,
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance | null> {
+  result ??= {};
+
   await Client.userTasks.finishUserTask(flowNodeInstanceId, result, identity);
+
+  const { processInstanceId, flowNodeId, correlationId } = filterBy;
 
   const queryOptions: {
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState;
@@ -108,8 +116,6 @@ export async function finishUserTaskAndGetNext(
   if (processInstanceId) {
     queryOptions.processInstanceId = processInstanceId;
   }
-
-  console.log('queryOptions', queryOptions);
 
   const userTasks = await Client.userTasks.query(queryOptions, {
     identity: identity,
