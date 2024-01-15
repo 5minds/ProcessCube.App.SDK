@@ -121,8 +121,6 @@ export async function finishUserTaskAndGetNext(
     identity: identity,
   });
 
-  console.log(userTasks.totalCount);
-
   return userTasks.userTasks[0];
 }
 
