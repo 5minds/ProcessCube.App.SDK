@@ -7,6 +7,7 @@ import type { Identity, UserTaskResult } from '@5minds/processcube_engine_sdk';
  * If there is already a UserTask waiting, this function will return it.
  *
  * @param filterBy Additional filter options
+ * @param filterBy.correlationId The ID of every UserTask which correlates with this UserTask
  * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
  * @param filterBy.flowNodeId The UserTask FlowNode ID (BPMN)
  * @param identity The Identity of the User
