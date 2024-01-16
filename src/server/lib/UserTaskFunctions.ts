@@ -7,6 +7,7 @@ import type { Identity, UserTaskResult } from '@5minds/processcube_engine_sdk';
  * If there is already a UserTask waiting, this function will return it.
  *
  * @param filterBy Additional filter options
+ * @param filterBy.correlationId The ID of the correlation which contains the UserTask
  * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
  * @param filterBy.flowNodeId The UserTask FlowNode ID (BPMN)
  * @param identity The Identity of the User
@@ -14,31 +15,28 @@ import type { Identity, UserTaskResult } from '@5minds/processcube_engine_sdk';
  */
 export async function waitForUserTask(
   filterBy: {
+    correlationId?: string;
     processInstanceId?: string;
     flowNodeId?: string;
   } = {},
   identity?: Identity,
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance> {
-  const { processInstanceId, flowNodeId } = filterBy;
+  const { correlationId, processInstanceId, flowNodeId } = filterBy;
 
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(
       async (event) => {
+        const correlationIdGivenButNotMatching = correlationId !== undefined && event.correlationId !== correlationId;
         const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
         const processInstanceIdGivenButNotMatching =
           processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
         const flowNodeIdGivenButNotMatching = flowNodeId !== undefined && event.flowNodeId !== flowNodeId;
-        const processInstanceIdAndFlowNodeIdGivenButNotMatching =
-          processInstanceId !== undefined &&
-          flowNodeId !== undefined &&
-          event.processInstanceId !== processInstanceId &&
-          event.flowNodeId !== flowNodeId;
 
         if (
+          correlationIdGivenButNotMatching ||
           flowNodeInstanceIdIsUndefined ||
           processInstanceIdGivenButNotMatching ||
-          flowNodeIdGivenButNotMatching ||
-          processInstanceIdAndFlowNodeIdGivenButNotMatching
+          flowNodeIdGivenButNotMatching
         ) {
           return;
         }
@@ -61,6 +59,7 @@ export async function waitForUserTask(
 
     const userTasks = await getUserTasks(
       {
+        correlationId: correlationId,
         processInstanceId: processInstanceId,
         flowNodeId: flowNodeId,
         state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
