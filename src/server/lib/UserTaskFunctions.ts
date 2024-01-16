@@ -31,16 +31,12 @@ export async function waitForUserTask(
         const processInstanceIdGivenButNotMatching =
           processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
         const flowNodeIdGivenButNotMatching = flowNodeId !== undefined && event.flowNodeId !== flowNodeId;
-        const processInstanceIdAndFlowNodeIdGivenButNotMatching =
-          processInstanceIdGivenButNotMatching &&
-          flowNodeIdGivenButNotMatching;
 
         if (
           correlationIdGivenButNotMatching ||
           flowNodeInstanceIdIsUndefined ||
           processInstanceIdGivenButNotMatching ||
-          flowNodeIdGivenButNotMatching ||
-          processInstanceIdAndFlowNodeIdGivenButNotMatching
+          flowNodeIdGivenButNotMatching
         ) {
           return;
         }
