@@ -31,7 +31,7 @@ export async function waitForUserTask(
           processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
         const flowNodeIdGivenButNotMatching = flowNodeId !== undefined && event.flowNodeId !== flowNodeId;
         const processInstanceIdAndFlowNodeIdGivenButNotMatching =
-          processInstanceIdGivenButNotMatching
+          processInstanceIdGivenButNotMatching &&
           flowNodeIdGivenButNotMatching;
 
         if (
