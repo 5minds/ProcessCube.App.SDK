@@ -25,17 +25,17 @@ export async function waitForUserTask(
   return new Promise<DataModels.FlowNodeInstances.UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(
       async (event) => {
+        const correlationIdGivenButNotMatching = correlationId !== undefined && event.correlationId !== correlationId;
         const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
         const processInstanceIdGivenButNotMatching =
           processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
         const flowNodeIdGivenButNotMatching = flowNodeId !== undefined && event.flowNodeId !== flowNodeId;
         const processInstanceIdAndFlowNodeIdGivenButNotMatching =
-          processInstanceId !== undefined &&
-          flowNodeId !== undefined &&
-          event.processInstanceId !== processInstanceId &&
-          event.flowNodeId !== flowNodeId;
+          processInstanceIdGivenButNotMatching
+          flowNodeIdGivenButNotMatching;
 
         if (
+          correlationIdGivenButNotMatching ||
           flowNodeInstanceIdIsUndefined ||
           processInstanceIdGivenButNotMatching ||
           flowNodeIdGivenButNotMatching ||
