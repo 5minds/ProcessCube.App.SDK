@@ -62,6 +62,7 @@ export async function waitForUserTask(
 
     const userTasks = await getUserTasks(
       {
+        correlationId: correlationId,
         processInstanceId: processInstanceId,
         flowNodeId: flowNodeId,
         state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
