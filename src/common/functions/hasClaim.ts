@@ -75,8 +75,9 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
 
   if (necessaryEnvsGiven && Date.now() >= token.expiresAt * 1000) {
     if (token.refreshToken === undefined) {
-      logger.error('Error refreshing access token. ' + MISSING_REFRESH_TOKEN_MESSAGE);
+      logger.error('Error refreshing access token.', { err: MISSING_REFRESH_TOKEN_MESSAGE });
       token.error = 'RefreshAccessTokenError';
+
       return token;
     }
     try {
