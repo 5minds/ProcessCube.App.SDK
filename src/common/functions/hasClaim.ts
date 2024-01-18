@@ -6,6 +6,8 @@ import { jwtDecode } from 'jwt-decode';
 import { Logger } from '@5minds/processcube_engine_sdk';
 
 const logger = new Logger('processcube_app_sdk:next-auth_configuration');
+const MISSING_REFRESH_TOKEN_MESSAGE =
+  'No refresh token present. Your authority might be configured incorrectly. For more information see https://processcube.io/docs/app-sdk/samples/authority/authentication-with-nextauth';
 
 /**
  *
@@ -67,7 +69,16 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
     );
   }
 
+  if (token.refreshToken === undefined) {
+    logger.warn(MISSING_REFRESH_TOKEN_MESSAGE);
+  }
+
   if (necessaryEnvsGiven && Date.now() >= token.expiresAt * 1000) {
+    if (token.refreshToken === undefined) {
+      logger.error('Error refreshing access token. ' + MISSING_REFRESH_TOKEN_MESSAGE);
+      token.error = 'RefreshAccessTokenError';
+      return token;
+    }
     try {
       const response = await fetch(`${process.env.PROCESSCUBE_AUTHORITY_URL}/token`, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
