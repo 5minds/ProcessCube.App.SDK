@@ -99,8 +99,6 @@ export async function finishUserTaskAndGetNext(
     ...filterBy,
   };
 
-  console.log('queryOptions', queryOptions);
-
   const userTasks = await Client.userTasks.query(queryOptions, {
     identity: identity,
   });
