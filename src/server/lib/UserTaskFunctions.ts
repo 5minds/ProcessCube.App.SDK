@@ -78,7 +78,7 @@ export async function waitForUserTask(
   });
 }
 
-export type filterBy = {
+export type FilterBy = {
   processInstanceId?: string;
   flowNodeId?: string;
   correlationId?: string;
@@ -86,36 +86,20 @@ export type filterBy = {
 
 export async function finishUserTaskAndGetNext(
   flowNodeInstanceId: string,
-  filterBy: filterBy = {},
-  result?: UserTaskResult,
+  filterBy: FilterBy = {},
+  result: UserTaskResult = {},
   identity?: Identity,
 ): Promise<DataModels.FlowNodeInstances.UserTaskInstance | null> {
-  result ??= {};
-
   await Client.userTasks.finishUserTask(flowNodeInstanceId, result, identity);
-
-  const { processInstanceId, flowNodeId, correlationId } = filterBy;
 
   const queryOptions: {
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState;
-    flowNodeId?: string | undefined;
-    correlationId?: string | undefined;
-    processInstanceId?: string | undefined;
-  } = {
+  } & FilterBy = {
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    ...filterBy,
   };
 
-  if (flowNodeId) {
-    queryOptions.flowNodeId = flowNodeId;
-  }
-
-  if (correlationId) {
-    queryOptions.correlationId = correlationId;
-  }
-
-  if (processInstanceId) {
-    queryOptions.processInstanceId = processInstanceId;
-  }
+  console.log('queryOptions', queryOptions);
 
   const userTasks = await Client.userTasks.query(queryOptions, {
     identity: identity,
