@@ -78,12 +78,26 @@ export async function waitForUserTask(
   });
 }
 
+/**
+ * The FilterBy object can be used to filter the result set of the finishUserTaskAndGetNext function.
+ * The next UserTask will be returned based on the given filter options.
+ */
 export type FilterBy = {
   processInstanceId?: string;
   flowNodeId?: string;
   correlationId?: string;
 };
 
+/**
+ * Finishes the UserTask with the given flowNodeInstanceId and returns the next UserTask.
+ * The next UserTask will be returned based on the given filter options.
+ *
+ * @param flowNodeInstanceId The ID of the flowNodeInstance to finish
+ * @param FilterBy Additional filter options for the next UserTask
+ * @param result The result of the UserTask
+ * @param identity The Identity of the User
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The next UserTask based on the given filter options.
+ */
 export async function finishUserTaskAndGetNext(
   flowNodeInstanceId: string,
   filterBy: FilterBy = {},
