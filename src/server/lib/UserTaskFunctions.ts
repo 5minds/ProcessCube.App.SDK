@@ -77,27 +77,44 @@ export async function waitForUserTask(
   });
 }
 
+/**
+ * The FilterBy object can be used to filter the result set of the finishUserTaskAndGetNext function.
+ * The next UserTask will be returned based on the given filter options.
+ */
+export type FilterBy = {
+  processInstanceId?: string;
+  flowNodeId?: string;
+  correlationId?: string;
+};
+
+/**
+ * Finishes the UserTask with the given flowNodeInstanceId and returns the next UserTask.
+ * The next UserTask will be returned based on the given filter options.
+ *
+ * @param flowNodeInstanceId The ID of the flowNodeInstance to finish
+ * @param FilterBy Additional filter options for the next UserTask
+ * @param result The result of the UserTask
+ * @param identity The Identity of the User
+ * @returns {Promise<DataModels.FlowNodeInstances.UserTaskInstance>} The next UserTask based on the given filter options.
+ */
 export async function finishUserTaskAndGetNext(
   flowNodeInstanceId: string,
-  result: UserTaskResult,
-  flowNodeId: string,
+  filterBy: FilterBy = {},
+  result: UserTaskResult = {},
   identity?: Identity,
-) {
+): Promise<DataModels.FlowNodeInstances.UserTaskInstance | null> {
   await Client.userTasks.finishUserTask(flowNodeInstanceId, result, identity);
 
-  const userTasks = await Client.userTasks.query(
-    {
-      flowNodeId: flowNodeId,
-      state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
-    },
-    {
-      identity: identity,
-    },
-  );
+  const queryOptions: {
+    state: DataModels.FlowNodeInstances.FlowNodeInstanceState;
+  } & FilterBy = {
+    state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
+    ...filterBy,
+  };
 
-  if (userTasks.userTasks.length === 0) {
-    return null;
-  }
+  const userTasks = await Client.userTasks.query(queryOptions, {
+    identity: identity,
+  });
 
   return userTasks.userTasks[0];
 }
