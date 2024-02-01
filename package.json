@@ -67,8 +67,8 @@
   "devDependencies": {
     "bufferutil": "^4.0.7",
     "esbuild": "0.18.11",
-    "socket.io": "^4.7.2",
-    "socket.io-client": "^4.7.2",
+    "socket.io": "^4.7.4",
+    "socket.io-client": "^4.7.4",
     "utf-8-validate": "^5.0.10",
     "@types/react": "^18.2.22",
     "concurrently": "^8.2.0",
