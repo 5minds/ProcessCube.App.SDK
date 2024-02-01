@@ -14,7 +14,7 @@ env:
   CI_TOOLS_STABLE_BRANCH: main
   # CI_TOOLS_BETA_BRANCH: next
   # CI_TOOLS_BETA_NPM_TAG: next
-  BOX_RELEASE_TAG: 2024-1
+  BOX_RELEASE_TAG: 2023-2
 
 jobs:
   build_and_publish:
@@ -29,7 +29,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Use Node.js 18
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'

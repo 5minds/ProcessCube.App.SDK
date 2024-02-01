@@ -1,6 +1,6 @@
 {
   "name": "@5minds/processcube_app_sdk",
-  "version": "5.1.0-alpha.1",
+  "version": "5.1.0",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
   "main": "common/index.cjs",
@@ -60,7 +60,7 @@
     "url": "https://github.com/5minds/ProcessCube.App.SDK/issues",
     "email": "product@5minds.de"
   },
-  "homepage": "https://processcube.io/docs/app-sdk",
+  "homepage": "https://processcube.io/docs/develop-applications/application-sdk",
   "engines": {
     "node": ">=18"
   },
@@ -81,14 +81,13 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "2024-1",
-    "@5minds/processcube_engine_sdk": "2024-1",
-    "chokidar": "^3.5.3",
+    "@5minds/processcube_engine_client": "2023-2",
+    "@5minds/processcube_engine_sdk": "2023-2",
     "@chakra-ui/pro-theme": "^0.0.66",
     "@chakra-ui/react": "^2.6.1",
     "client-only": "^0.0.1",
     "esbuild": "^0.19.3",
-    "jwt-decode": "^4.0.0",
+    "jwt-decode": "^3.1.2",
     "only-server": "^0.0.1",
     "react-icons": "^4.10.1",
     "swr": "^2.2.0",

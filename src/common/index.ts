@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-import NextAuth, { DefaultSession, User } from 'next-auth';
+import NextAuth, { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
   /**
@@ -20,7 +20,7 @@ declare module 'next-auth' {
     user: {
       /** The user's identity claims. */
       claims?: Record<string, unknown>;
-    } & DefaultSession['user'] & { [profile_property: string]: any };
+    } & DefaultSession['user'];
     error?: 'RefreshAccessTokenError';
   }
 }
@@ -38,6 +38,5 @@ declare module 'next-auth/jwt' {
     refreshToken?: string;
     expiresAt: number;
     error?: 'RefreshAccessTokenError';
-    user?: User;
   }
 }

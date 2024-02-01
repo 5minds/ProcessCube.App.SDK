@@ -1,13 +1,11 @@
 import { Session, getServerSession, CallbacksOptions, Account, TokenSet } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import type { JWT } from 'next-auth/jwt';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 import { Logger } from '@5minds/processcube_engine_sdk';
 
 const logger = new Logger('processcube_app_sdk:next-auth_configuration');
-const MISSING_REFRESH_TOKEN_MESSAGE =
-  'No refresh token present. Your authority might be configured incorrectly. For more information see https://processcube.io/docs/app-sdk/samples/authority/authentication-with-nextauth';
 
 /**
  *
@@ -45,17 +43,13 @@ export async function hasClaim(claim: string): Promise<boolean> {
  * @returns A {@link JWT}
  */
 export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['jwt']>[0]): Promise<JWT> {
-  const { token, account, user } = args;
+  const { token, account } = args;
 
   if (account) {
     token.accessToken = account.access_token;
     token.idToken = account.id_token;
     token.refreshToken = account.refresh_token;
     token.expiresAt = account.expires_at ?? Math.floor(Date.now() / 1000 + (account.expires_in as number));
-  }
-
-  if (user) {
-    token.user = user;
   }
 
   const necessaryEnvsGiven =
@@ -69,17 +63,7 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
     );
   }
 
-  if (token.refreshToken === undefined) {
-    logger.warn(MISSING_REFRESH_TOKEN_MESSAGE);
-  }
-
   if (necessaryEnvsGiven && Date.now() >= token.expiresAt * 1000) {
-    if (token.refreshToken === undefined) {
-      logger.error('Error refreshing access token.', { err: MISSING_REFRESH_TOKEN_MESSAGE });
-      token.error = 'RefreshAccessTokenError';
-
-      return token;
-    }
     try {
       const response = await fetch(`${process.env.PROCESSCUBE_AUTHORITY_URL}/token`, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -118,8 +102,8 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
  */
 export async function authConfigSessionCallback(args: Parameters<CallbacksOptions['session']>[0]): Promise<Session> {
   const { session, token } = args;
-  const accessToken = decodeJwt(token.accessToken!);
-  const idToken = decodeJwt(token.idToken!);
+  const accessToken = await decodeJwt(token.accessToken!);
+  const idToken = await decodeJwt(token.idToken!);
 
   const idTokenKeys = Object.keys(idToken);
   const claims = Object.fromEntries(Object.entries(accessToken).filter(([key, value]) => !idTokenKeys.includes(key)));
@@ -128,13 +112,12 @@ export async function authConfigSessionCallback(args: Parameters<CallbacksOption
   delete claims.jti;
   delete claims.client_id;
 
-  session.user = token.user ?? {};
   session.user.claims = claims;
   session.error = token.error;
 
   return session;
 }
 
-function decodeJwt(token: string) {
+async function decodeJwt(token: string) {
   return jwtDecode<Record<string, unknown>>(token);
 }

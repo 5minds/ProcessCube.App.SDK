@@ -14,18 +14,14 @@ interface NextConfigFn {
   (phase: string, context?: any): Promise<NextConfig> | NextConfig;
 }
 
-let isSubscribedToExternalTasks = false;
-
 export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = {}): NextConfigFn {
   const { applicationSdk: applicationSdkConfig, ...nextConfig } = config;
 
   return async (phase, context) => {
     const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
-    const shouldSubscribeToExternalTasks =
-      applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks;
+    const shouldSubscribeToExternalTasks = applicationSdkConfig?.useExternalTasks && isStartingServer;
 
     if (shouldSubscribeToExternalTasks) {
-      isSubscribedToExternalTasks = true;
       await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
     }
 
