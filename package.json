@@ -83,9 +83,6 @@
   "dependencies": {
     "@5minds/processcube_engine_client": "2024-1",
     "@5minds/processcube_engine_sdk": "2024-1",
-    "@fortawesome/fontawesome-svg-core": "^6.5.1",
-    "@fortawesome/free-solid-svg-icons": "^6.5.1",
-    "@fortawesome/react-fontawesome": "^0.2.0",
     "@monaco-editor/react": "^4.6.0",
     "@nextui-org/react": "^2.2.9",
     "@types/react-dom": "18.2.18",
