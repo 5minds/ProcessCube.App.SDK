@@ -1,15 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
-  ],
-    "schedule": [
-    "before 7am on Monday"
-  ],
+  "extends": ["config:base"],
+  "schedule": ["before 7am on Monday"],
   "prHourlyLimit": 5,
   "prConcurrentLimit": 10,
-  "reviewers": [
-    "alexander.kasten@5minds.de"
-  ],
+  "reviewers": ["alexanderkasten"],
   "updateLockFiles": true
 }
