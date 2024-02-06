@@ -10,6 +10,7 @@ export class FlowNode {
     private readonly id: string;
     private readonly flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstance[];
     private readonly processInstanceState: string;
+    private readonly documentation: string;
     private type: string;
 
     get Id() {
@@ -44,6 +45,10 @@ export class FlowNode {
         const lastFlowNodeInstance = this.flowNodeInstances.at(-1);
 
         return lastFlowNodeInstance?.state ?? '';
+    }
+
+    get Documentation(): string {
+        return this.documentation;
     }
 
     get ProcessInstanceState(): string {
@@ -81,10 +86,11 @@ export class FlowNode {
         return lastFlowNodeInstance?.processInstanceId ?? ''; 
     }
 
-    constructor(id: string, processInstanceState: string) {
+    constructor(id: string, processInstanceState: string, documentation: string) {
         this.id = id;
         this.flowNodeInstances = [];
         this.processInstanceState = processInstanceState;
+        this.documentation = documentation;
         this.type = "";
     }
 
@@ -118,7 +124,6 @@ export default class BpmnViewerOverlayCreator {
 
         for (const executedFlowNode of executedFlowNodes) {
             const flowNodeShape = this.elementRegistry.get(executedFlowNode.Id);
-            console.log(JSON.stringify(flowNodeShape));
 
             const root = this.getOrCreateOverlayRoot(executedFlowNode);
             root?.render(React.createElement(FlowNodeOverlay, { flowNode: executedFlowNode, width: flowNodeShape.width, height: flowNodeShape.height, retryAction: retryAction }));
@@ -180,10 +185,12 @@ export default class BpmnViewerOverlayCreator {
         const executedFlowNodes: FlowNode[] = [];
 
         for (const flowNodeInstance of flowNodeInstances) {
+
             let executedFlowNode = executedFlowNodes.find(f => f.Id === flowNodeInstance.flowNodeId);
 
             if (!executedFlowNode) {
-                executedFlowNode = new FlowNode(flowNodeInstance.flowNodeId, processInstanceState);
+                const flowNodeShape = this.elementRegistry.get(flowNodeInstance.flowNodeId);
+                executedFlowNode = new FlowNode(flowNodeInstance.flowNodeId, processInstanceState, flowNodeShape.businessObject.documentation);
                 executedFlowNodes.push(executedFlowNode);
             }
 

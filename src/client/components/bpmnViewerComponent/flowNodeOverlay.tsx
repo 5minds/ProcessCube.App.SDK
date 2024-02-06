@@ -126,7 +126,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                     </div>
                                     <div>
                                         <p>Dokumentation:</p>
-                                        <MDXEditor markdown=''
+                                        <MDXEditor markdown={props.flowNode.Documentation}
                                             plugins={[
                                                 headingsPlugin()
                                             ]
