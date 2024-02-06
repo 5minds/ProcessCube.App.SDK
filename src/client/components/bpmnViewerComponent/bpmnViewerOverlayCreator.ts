@@ -190,7 +190,7 @@ export default class BpmnViewerOverlayCreator {
 
             if (!executedFlowNode) {
                 const flowNodeShape = this.elementRegistry.get(flowNodeInstance.flowNodeId);
-                executedFlowNode = new FlowNode(flowNodeInstance.flowNodeId, processInstanceState, flowNodeShape.businessObject.documentation);
+                executedFlowNode = new FlowNode(flowNodeInstance.flowNodeId, processInstanceState, flowNodeShape.businessObject.documentation ?? '');
                 executedFlowNodes.push(executedFlowNode);
             }
 
