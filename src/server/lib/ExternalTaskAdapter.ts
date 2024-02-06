@@ -17,6 +17,7 @@ const EXTERNAL_TASK_FILE_NAME = 'external_task.ts';
 
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
+const externalTaskWorkerByPath: Record<string, ExternalTaskWorker<any, any>> = {};
 
 export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
 
@@ -95,6 +96,23 @@ async function getExternalTaskFile(directory: string): Promise<string | null> {
 async function getFreshTokenSet(): Promise<TokenSet> {
   if (!authorityIsConfigured) {
     throw new Error('No authority is configured');
+  }
+
+  if (
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID ||
+    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
+  ) {
+    const error = new Error(
+      'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/external-task-adapter#authority',
+    );
+
+    logger.error(
+      `Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing`,
+      {
+        err: error,
+      },
+    );
+    throw error;
   }
 
   const issuer = await Issuer.discover(process.env.PROCESSCUBE_AUTHORITY_URL as string);
