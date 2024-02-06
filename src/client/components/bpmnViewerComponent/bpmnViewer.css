@@ -105,6 +105,7 @@
     background-color: #607d8b;
     color: #fff;
     cursor: pointer;
+    line-height: 16px;
   
     &:hover .action-icon-hovered,
     .action-icon {
