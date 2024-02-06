@@ -81,6 +81,7 @@
     "@tailwindcss/forms": "^0.5.7",
     "@types/react": "^18.2.22",
     "@types/react-is": "^18.2.4",
+    "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.0",
     "esbuild-style-plugin": "^1.6.3",
@@ -106,6 +107,7 @@
     "esbuild": "^0.20.0",
     "jwt-decode": "^4.0.0",
     "only-server": "^0.0.1",
-    "openid-client": "^5.5.0"
+    "openid-client": "^5.5.0",
+    "uuid": "^9.0.1"
   }
 }
