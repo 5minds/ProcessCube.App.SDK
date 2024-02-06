@@ -10,7 +10,7 @@ import {
     MDXEditor,
     type MDXEditorMethods,
     type MDXEditorProps
-  } from '@mdxeditor/editor'
+} from '@mdxeditor/editor'
 import '@mdxeditor/editor/style.css'
 
 import Editor from '@monaco-editor/react';
@@ -85,7 +85,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                     )}
                 </ModalContent>
             </Modal>
-            <Modal isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
+            <Modal className="flownode-info" isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -94,38 +94,38 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                 <Divider className="my-2" />
                                 <div className="flex-row">
                                     <div>
-                                    <p>Start Token:</p>
-                                    <Editor
-                                        className='monaco-editor'
-                                        height="25vh"
-                                        defaultLanguage="json"
-                                        theme="vs-light"
-                                        defaultValue={JSON.stringify(props.flowNode.CurrentStartToken)}
-                                        onMount={handleOnMount}
-                                        options={{
-                                            formatOnPaste: true,
-                                            formatOnType: true,
-                                            minimap: { enabled: false },
-                                            lineNumbers: 'off',
-                                        }} />
-                                    <Divider className="my-2" />
-                                    <p>End Token:</p>
-                                    <Editor
-                                        className='monaco-editor'
-                                        height="25vh"
-                                        defaultLanguage="json"
-                                        theme="vs-light"
-                                        defaultValue={JSON.stringify(props.flowNode.CurrentEndToken)}
-                                        onMount={handleOnMount}
-                                        options={{
-                                            formatOnPaste: true,
-                                            formatOnType: true,
-                                            minimap: { enabled: false },
-                                            lineNumbers: 'off'
-                                        }} />
+                                        <p>Start Token:</p>
+                                        <Editor
+                                            className='monaco-editor'
+                                            height="25vh"
+                                            defaultLanguage="json"
+                                            theme="vs-light"
+                                            defaultValue={JSON.stringify(props.flowNode.CurrentStartToken)}
+                                            onMount={handleOnMount}
+                                            options={{
+                                                formatOnPaste: true,
+                                                formatOnType: true,
+                                                minimap: { enabled: false },
+                                                lineNumbers: 'off',
+                                            }} />
+                                        <Divider className="my-2" />
+                                        <p>End Token:</p>
+                                        <Editor
+                                            className='monaco-editor'
+                                            height="25vh"
+                                            defaultLanguage="json"
+                                            theme="vs-light"
+                                            defaultValue={JSON.stringify(props.flowNode.CurrentEndToken)}
+                                            onMount={handleOnMount}
+                                            options={{
+                                                formatOnPaste: true,
+                                                formatOnType: true,
+                                                minimap: { enabled: false },
+                                                lineNumbers: 'off'
+                                            }} />
                                     </div>
                                     <MDXEditor markdown=''
-                                        plugins={ [
+                                        plugins={[
                                             headingsPlugin()
                                         ]
                                         }
