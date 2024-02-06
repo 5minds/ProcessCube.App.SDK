@@ -85,7 +85,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                     )}
                 </ModalContent>
             </Modal>
-            <Modal isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
+            <Modal size="4xl" isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
