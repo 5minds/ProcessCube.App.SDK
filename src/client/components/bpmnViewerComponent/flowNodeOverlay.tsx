@@ -124,12 +124,15 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                                 lineNumbers: 'off'
                                             }} />
                                     </div>
-                                    <MDXEditor markdown=''
-                                        plugins={[
-                                            headingsPlugin()
-                                        ]
-                                        }
-                                    />
+                                    <div>
+                                        <p>Dokumentation:</p>
+                                        <MDXEditor markdown=''
+                                            plugins={[
+                                                headingsPlugin()
+                                            ]
+                                            }
+                                        />
+                                    </div>
                                 </div>
                             </ModalBody>
                             <ModalFooter>

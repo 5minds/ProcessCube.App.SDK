@@ -118,6 +118,7 @@ export default class BpmnViewerOverlayCreator {
 
         for (const executedFlowNode of executedFlowNodes) {
             const flowNodeShape = this.elementRegistry.get(executedFlowNode.Id);
+            console.log(JSON.stringify(flowNodeShape));
 
             const root = this.getOrCreateOverlayRoot(executedFlowNode);
             root?.render(React.createElement(FlowNodeOverlay, { flowNode: executedFlowNode, width: flowNodeShape.width, height: flowNodeShape.height, retryAction: retryAction }));
