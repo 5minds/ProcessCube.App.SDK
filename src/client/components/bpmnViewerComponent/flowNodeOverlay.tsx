@@ -1,5 +1,18 @@
 import { Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { useState } from 'react';
+
+import {
+    headingsPlugin,
+    listsPlugin,
+    quotePlugin,
+    thematicBreakPlugin,
+    markdownShortcutPlugin,
+    MDXEditor,
+    type MDXEditorMethods,
+    type MDXEditorProps
+  } from '@mdxeditor/editor'
+import '@mdxeditor/editor/style.css'
+
 import Editor from '@monaco-editor/react';
 import { FlowNode } from "./bpmnViewerOverlayCreator";
 import FlowNodeButtonArea from "./flowNodeButtonArea";
@@ -21,7 +34,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         setTimeout(() => {
             editor.getAction('editor.action.formatDocument').run();
         }, 300);
-        
+
     }
     const style = {
         width: props.width,
@@ -46,7 +59,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                 </p>
                                 <Divider className="my-2" />
                                 <Editor
-                                    className='border-1 border-solid border-black'
+                                    className='monaco-editor'
                                     height="25vh"
                                     defaultLanguage="json"
                                     theme="vs-light"
@@ -79,35 +92,45 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                             <ModalHeader className="flex flex-col gap-1">FlowNode: {props.flowNode.Name ?? props.flowNode.Id}</ModalHeader>
                             <ModalBody>
                                 <Divider className="my-2" />
-                                <p>Start Token:</p>
-                                <Editor
-                                    className='border-1 border-solid border-black'
-                                    height="25vh"
-                                    defaultLanguage="json"
-                                    theme="vs-light"
-                                    defaultValue={JSON.stringify(props.flowNode.CurrentStartToken)}
-                                    onMount={handleOnMount}
-                                    options={{
-                                        formatOnPaste: true,
-                                        formatOnType: true,
-                                        minimap: { enabled: false },
-                                        lineNumbers: 'off',
-                                    }} />
-                                <Divider className="my-2" />
-                                <p>End Token:</p>
-                                <Editor
-                                    className='border-1 border-solid border-black'
-                                    height="25vh"
-                                    defaultLanguage="json"
-                                    theme="vs-light"
-                                    defaultValue={JSON.stringify(props.flowNode.CurrentEndToken)}
-                                    onMount={handleOnMount}
-                                    options={{
-                                        formatOnPaste: true,
-                                        formatOnType: true,
-                                        minimap: { enabled: false },
-                                        lineNumbers: 'off'
-                                    }} />
+                                <div className="flex-row">
+                                    <div>
+                                    <p>Start Token:</p>
+                                    <Editor
+                                        className='monaco-editor'
+                                        height="25vh"
+                                        defaultLanguage="json"
+                                        theme="vs-light"
+                                        defaultValue={JSON.stringify(props.flowNode.CurrentStartToken)}
+                                        onMount={handleOnMount}
+                                        options={{
+                                            formatOnPaste: true,
+                                            formatOnType: true,
+                                            minimap: { enabled: false },
+                                            lineNumbers: 'off',
+                                        }} />
+                                    <Divider className="my-2" />
+                                    <p>End Token:</p>
+                                    <Editor
+                                        className='monaco-editor'
+                                        height="25vh"
+                                        defaultLanguage="json"
+                                        theme="vs-light"
+                                        defaultValue={JSON.stringify(props.flowNode.CurrentEndToken)}
+                                        onMount={handleOnMount}
+                                        options={{
+                                            formatOnPaste: true,
+                                            formatOnType: true,
+                                            minimap: { enabled: false },
+                                            lineNumbers: 'off'
+                                        }} />
+                                    </div>
+                                    <MDXEditor markdown=''
+                                        plugins={ [
+                                            headingsPlugin()
+                                        ]
+                                        }
+                                    />
+                                </div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="primary" onPress={onClose}>
