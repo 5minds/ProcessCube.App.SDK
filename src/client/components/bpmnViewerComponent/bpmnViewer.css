@@ -1,3 +1,6 @@
+@tailwind components;
+@tailwind utilities;
+
 .flow-node-running-state-overlay {
     background-color: rgb(84, 200, 255, 0.5); /* color elements as green */
     opacity: 0.4;
