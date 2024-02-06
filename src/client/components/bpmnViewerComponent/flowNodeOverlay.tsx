@@ -7,11 +7,15 @@ import {
     quotePlugin,
     thematicBreakPlugin,
     markdownShortcutPlugin,
+    linkPlugin,
+    linkDialogPlugin,
+    tablePlugin,
+    codeBlockPlugin,
+    codeMirrorPlugin,
     MDXEditor,
     type MDXEditorMethods,
     type MDXEditorProps
 } from '@mdxeditor/editor'
-import '@mdxeditor/editor/style.css'
 
 import Editor from '@monaco-editor/react';
 import { FlowNode } from "./bpmnViewerOverlayCreator";
@@ -85,7 +89,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                     )}
                 </ModalContent>
             </Modal>
-            <Modal size="4xl" isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
+            <Modal size="4xl"  isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -128,7 +132,16 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                         <p>Dokumentation:</p>
                                         <MDXEditor markdown={props.flowNode.Documentation}
                                             plugins={[
-                                                headingsPlugin()
+                                                headingsPlugin(),
+                                                listsPlugin(),
+                                                quotePlugin(),
+                                                thematicBreakPlugin(),
+                                                markdownShortcutPlugin(),
+                                                linkPlugin(),
+                                                linkDialogPlugin(),
+                                                tablePlugin(),
+                                                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+                                                codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript' } })
                                             ]
                                             }
                                         />
