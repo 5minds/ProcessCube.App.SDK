@@ -85,7 +85,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                     )}
                 </ModalContent>
             </Modal>
-            <Modal className="flownode-info" isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
+            <Modal isOpen={flowNodeInfoModal.isOpen} onOpenChange={flowNodeInfoModal.onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -93,7 +93,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                             <ModalBody>
                                 <Divider className="my-2" />
                                 <div className="flex-row">
-                                    <div>
+                                    <div className='token-area'>
                                         <p>Start Token:</p>
                                         <Editor
                                             className='monaco-editor'
