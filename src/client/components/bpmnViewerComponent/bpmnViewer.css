@@ -147,7 +147,11 @@
 
 .documentation-area {
   margin-left: 20px;
-  max-height: 478px;
+}
+
+#markdown-container {
+  max-height: 450px;
+  width: 60%;
   overflow-y: auto;
 }
 
