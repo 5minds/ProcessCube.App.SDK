@@ -24,7 +24,6 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
     function handleOnMount(editor: any) {
         setTimeout(() => {
             editor.getAction('editor.action.formatDocument').run();
-            editor.updateOptions({readOnly: true});
         }, 300);
 
     }
