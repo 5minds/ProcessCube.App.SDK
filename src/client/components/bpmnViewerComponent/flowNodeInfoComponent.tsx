@@ -49,7 +49,7 @@ export default function FlowNodeInfoComponent(props: FlowNodeInfoComponentProps)
                         height="25vh"
                         defaultLanguage="json"
                         theme="vs-light"
-                        defaultValue={JSON.stringify(props.flowNode.CurrentStartToken)}
+                        defaultValue={JSON.stringify(props.flowNode.CurrentStartToken, null, 2)}
                         onMount={handleOnMount}
                         options={{
                             formatOnPaste: true,
@@ -64,7 +64,7 @@ export default function FlowNodeInfoComponent(props: FlowNodeInfoComponentProps)
                         height="25vh"
                         defaultLanguage="json"
                         theme="vs-light"
-                        defaultValue={JSON.stringify(props.flowNode.CurrentEndToken)}
+                        defaultValue={JSON.stringify(props.flowNode.CurrentEndToken, null, 2)}
                         onMount={handleOnMount}
                         options={{
                             formatOnPaste: true,

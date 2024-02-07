@@ -14,6 +14,7 @@ type FlowNodeOverlayProps = {
     width: number;
     height: number;
     retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
+    gotoProcessAction: (processInstanceId: string) => void;
 }
 
 export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
@@ -36,7 +37,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         <>
             <div style={style}>
                 <FlowNodeColorArea onClick={flowNodeInfoModal.onOpen} {...props}></FlowNodeColorArea>
-                <FlowNodeButtonArea onRetryClick={retryModal.onOpen} flowNode={props.flowNode}></FlowNodeButtonArea>
+                <FlowNodeButtonArea onRetryClick={retryModal.onOpen} onGotoClick={() => props.gotoProcessAction(props.flowNode.ChildProcessInstanceId)} flowNode={props.flowNode}></FlowNodeButtonArea>
             </div>
             <Modal isOpen={retryModal.isOpen} onOpenChange={retryModal.onOpenChange}>
                 <ModalContent>
@@ -54,7 +55,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                     height="25vh"
                                     defaultLanguage="json"
                                     theme="vs-light"
-                                    defaultValue={JSON.stringify(props.flowNode.CurrentStartToken)}
+                                    defaultValue={JSON.stringify(props.flowNode.CurrentStartToken, null, 2)}
                                     onChange={(value, event) => setNewToken(value ?? '')}
                                     onMount={handleOnMount}
                                     options={{

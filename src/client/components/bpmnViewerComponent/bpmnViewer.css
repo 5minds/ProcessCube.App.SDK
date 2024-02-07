@@ -147,6 +147,7 @@
 
 .documentation-area {
   margin-left: 20px;
+  flex: 1 1 100%;
 }
 
 #markdown-container {

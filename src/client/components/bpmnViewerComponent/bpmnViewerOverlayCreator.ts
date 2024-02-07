@@ -41,6 +41,12 @@ export class FlowNode {
         return lastFlowNodeInstance?.endToken;
     }
 
+    get ChildProcessInstanceId(): string {
+        const lastFlowNodeInstance = this.flowNodeInstances.at(-1);
+
+        return (lastFlowNodeInstance as any).childProcessInstanceId;
+    }
+
     get State(): string {
         const lastFlowNodeInstance = this.flowNodeInstances.at(-1);
 
@@ -72,6 +78,13 @@ export class FlowNode {
             this.type === "bpmn:IntermediateCatchEvent" ||
             this.type === "bpmn:IntermediateThrowEvent" ||
             this.type === "bpmn:BoundaryEvent"
+        );
+
+    }
+
+    get IsCallActivity(): boolean {
+        return (
+            this.type === "bpmn:CallActivity"
         );
 
     }
@@ -117,7 +130,8 @@ export default class BpmnViewerOverlayCreator {
 
     public createOverlaysFlowNodeInstances(processInstanceState: string, 
                                            flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstance[], 
-                                           retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: string) => void): void {
+                                           retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: string) => void,
+                                           gotoProcessAction: (processInstanceId: string) => void): void {
         const executedFlowNodes: FlowNode[] = this.getExecutedFlowNodes(flowNodeInstances, processInstanceState);
 
         this.overlayIds = [];
@@ -126,7 +140,7 @@ export default class BpmnViewerOverlayCreator {
             const flowNodeShape = this.elementRegistry.get(executedFlowNode.Id);
 
             const root = this.getOrCreateOverlayRoot(executedFlowNode);
-            root?.render(React.createElement(FlowNodeOverlay, { flowNode: executedFlowNode, width: flowNodeShape.width, height: flowNodeShape.height, retryAction: retryAction }));
+            root?.render(React.createElement(FlowNodeOverlay, { flowNode: executedFlowNode, width: flowNodeShape.width, height: flowNodeShape.height, retryAction: retryAction, gotoProcessAction: gotoProcessAction }));
 
             this.setSequenceFlowsColor(flowNodeShape, executedFlowNodes);
         }

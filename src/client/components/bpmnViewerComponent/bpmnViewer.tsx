@@ -2,6 +2,8 @@ import React from 'react';
 
 import { DataModels } from '@5minds/processcube_engine_client';
 import BpmnViewer from 'bpmn-js/lib/Viewer';
+import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
+import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 import BpmnViewerOverlayCreator from './bpmnViewerOverlayCreator';
 
 import './bpmnViewer.css';
@@ -12,6 +14,7 @@ type BpmnViewerComponentProps = {
     processInstanceState: string;
     flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstance[];
     retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
+    gotoProcessAction: (processInstanceId: string) => void;
 };
 
 type BpmnViewerComponentState = {
@@ -38,7 +41,7 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
 
         const container = this.containerRef.current as HTMLElement;
 
-        this.bpmnViewer = new BpmnViewer({ container, height: 600 });
+        this.bpmnViewer = new BpmnViewer({ container, height: 600, additionalModules: [ZoomScrollModule, MoveCanvasModule] });
         this.bpmnViewerOverlayCreator = new BpmnViewerOverlayCreator(this.bpmnViewer);
 
         if (diagramXML) {
@@ -65,7 +68,7 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
         }
 
 
-        this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, props.retryAction);
+        this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, props.retryAction, props.gotoProcessAction);
     }
 
     private displayDiagram(diagramXML: string) {
@@ -73,7 +76,7 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
         this.bpmnViewer.importXML(diagramXML).then(() => {
 
             this.bpmnViewer.get('canvas').zoom('fit-viewport');
-            this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, this.props.retryAction);
+            this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, this.props.retryAction, this.props.gotoProcessAction);
         });
     }
 
