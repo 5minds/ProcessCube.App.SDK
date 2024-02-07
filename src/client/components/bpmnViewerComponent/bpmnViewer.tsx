@@ -70,7 +70,7 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
         }
 
 
-        //this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, props.retryAction, props.gotoProcessAction);
+        this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, props.retryAction, props.gotoProcessAction);
     }
 
     private displayDiagram(diagramXML: string) {
