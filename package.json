@@ -25,21 +25,12 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf server common client",
+    "clean": "concurrently -n clean:server,clean:client,clean:common \"cd packages/client && npm run clean\" \"cd packages/common && npm run clean\" \"cd packages/server && npm run clean\"",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
-    "build:esm:server": "NODE_ENV=development esbuild src/server/*.ts --outdir=./server --bundle --platform=node --format=esm --external:@opentelemetry --external:fsevents --external:@5minds/* --external:next --external:next-auth --external:react --external:jwt-decode --external:openid-client --external:esbuild --analyze=verbose --out-extension:.js=.mjs",
-    "build:esm:client/common": "NODE_ENV=development esbuild src/client/*.ts src/common/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
-    "build:esm": "npm run build:esm:server && npm run build:esm:client/common",
-    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
-    "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\"",
-    "build:prod:esm:server": "NODE_ENV=production esbuild src/server/*.ts --outdir=./server --bundle --platform=node --format=esm --external:@opentelemetry --external:fsevents --external:@5minds/* --external:next --external:next-auth --external:react --external:jwt-decode --external:openid-client --external:esbuild --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
-    "build:prod:esm:client/common": "NODE_ENV=production esbuild src/client/*.ts src/common/*.ts --outdir=. --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
-    "build:prod:esm": "npm run build:prod:esm:server && npm run build:prod:esm:client/common",
-    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify --drop:console",
-    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
+    "build:prod": "npm run clean && cd packages/common && npm run build && cd ../.. && concurrently -n build:client,build:server \"cd packages/client && npm run build\" \"cd packages/server && npm run build\"",
+    "build": "cd packages/common && npm run build && cd ../.. && concurrently -n build:client,build:server \"cd packages/client && npm run build\" \"cd packages/server && npm run build\"",
+    "watch": "concurrently -n watch:client,watch:server,watch:common \"cd packages/client && npm run watch\" \"cd packages/common && npm run watch\" \"cd packages/server && npm run watch\""
   },
   "repository": {
     "type": "git",
@@ -68,6 +59,9 @@
   "engines": {
     "node": ">=18"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@types/react": "^18.2.22",
     "concurrently": "^8.2.0",
@@ -80,13 +74,10 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
+    "@app_sdk_internal/client": "^1.0.0",
+    "@app_sdk_internal/common": "^1.0.0",
+    "@app_sdk_internal/server": "^1.0.0",
     "@5minds/processcube_engine_client": "2024-1",
-    "@5minds/processcube_engine_sdk": "2024-1",
-    "chokidar": "^3.5.3",
-    "client-only": "^0.0.1",
-    "esbuild": "^0.20.0",
-    "jwt-decode": "^4.0.0",
-    "only-server": "^0.0.1",
-    "openid-client": "^5.5.0"
+    "@5minds/processcube_engine_sdk": "2024-1"
   }
 }
