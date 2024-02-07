@@ -20,3 +20,23 @@ export async function getActiveProcessInstances(query?: {
 
   return result;
 }
+
+export async function getProcessInstanceById(processInstanceId: string): Promise<DataModels.ProcessInstances.ProcessInstance> {
+
+  const result = await Client.processInstances.query({ processInstanceId: processInstanceId});
+
+  return result.processInstances[0];
+}
+
+export async function getFlowNodeInstancesByProcessInstanceId(processInstanceId: string): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+  const result = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId}, { sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' }});
+
+  return result.flowNodeInstances;
+}
+
+export async function retryProcessInstance(processInstanceId: string, flowNodeInstanceId?: string, newStartToken?: any) {
+  await Client.processInstances.retryProcessInstance(processInstanceId, { 
+      flowNodeInstanceId: flowNodeInstanceId, 
+      newStartToken: newStartToken
+  });
+}
