@@ -71,6 +71,7 @@ export default function FlowNodeInfoComponent(props: FlowNodeInfoComponentProps)
                             lineNumbers: 'off'
                         }} />
                 </div>
+                <Divider orientation="vertical" />
                 <div>
                     <p>Dokumentation:</p>
                     <div id="markdown-container"></div>
