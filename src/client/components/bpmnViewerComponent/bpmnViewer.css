@@ -147,6 +147,7 @@
 
 .documentation-area {
   margin-left: 20px;
-  overflow-y:auto
+  max-height: 478px;
+  overflow-y: auto;
 }
 
