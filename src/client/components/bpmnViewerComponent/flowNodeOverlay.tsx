@@ -17,6 +17,8 @@ import {
     type MDXEditorProps
 } from '@mdxeditor/editor'
 
+import Markdown from 'react-markdown';
+
 import Editor from '@monaco-editor/react';
 import { FlowNode } from "./bpmnViewerOverlayCreator";
 import FlowNodeButtonArea from "./flowNodeButtonArea";
@@ -44,6 +46,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         width: props.width,
         height: props.height + 10
     };
+
 
     return (
         <>
@@ -130,21 +133,9 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                     </div>
                                     <div>
                                         <p>Dokumentation:</p>
-                                        <MDXEditor markdown={props.flowNode.Documentation}
-                                            plugins={[
-                                                headingsPlugin(),
-                                                listsPlugin(),
-                                                quotePlugin(),
-                                                thematicBreakPlugin(),
-                                                markdownShortcutPlugin(),
-                                                linkPlugin(),
-                                                linkDialogPlugin(),
-                                                tablePlugin(),
-                                                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-                                                codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript' } })
-                                            ]
-                                            }
-                                        />
+                                        <Markdown>
+                                            {props.flowNode.Documentation}
+                                        </Markdown>
                                     </div>
                                 </div>
                             </ModalBody>
