@@ -1,29 +1,13 @@
 import { Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
-import { Fragment, useEffect, useState } from 'react';
-import { createRoot } from "react-dom/client";
+import { useState } from 'react';
 
-import {
-    headingsPlugin,
-    listsPlugin,
-    quotePlugin,
-    thematicBreakPlugin,
-    markdownShortcutPlugin,
-    linkPlugin,
-    linkDialogPlugin,
-    tablePlugin,
-    codeBlockPlugin,
-    codeMirrorPlugin,
-    MDXEditor,
-    type MDXEditorMethods,
-    type MDXEditorProps
-} from '@mdxeditor/editor'
 
-import Markdown from 'react-markdown';
 
 import Editor from '@monaco-editor/react';
 import { FlowNode } from "./bpmnViewerOverlayCreator";
 import FlowNodeButtonArea from "./flowNodeButtonArea";
 import FlowNodeColorArea from "./flowNodeColorArea";
+import FlowNodeInfoComponent from './flowNodeInfoComponent';
 
 type FlowNodeOverlayProps = {
     flowNode: FlowNode;
@@ -47,20 +31,6 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         width: props.width,
         height: props.height + 10
     };
-
-    useEffect(() => {
-        const markdownEditor = <Markdown>{props.flowNode.Documentation}</Markdown>;
-
-        const markdownContainer = document.getElementById("markdown-container");
-
-        if (markdownContainer) {
-            const shadowRoot = markdownContainer.attachShadow({ mode: "open" });
-            const root = createRoot(shadowRoot);
-            root.render(markdownEditor);
-        }
-
-    }, []);
-
 
     return (
         <>
@@ -112,44 +82,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                         <>
                             <ModalHeader className="flex flex-col gap-1">FlowNode: {props.flowNode.Name ?? props.flowNode.Id}</ModalHeader>
                             <ModalBody>
-                                <Divider className="my-2" />
-                                <div className="flex-row">
-                                    <div className='token-area'>
-                                        <p>Start Token:</p>
-                                        <Editor
-                                            className='monaco-editor'
-                                            height="25vh"
-                                            defaultLanguage="json"
-                                            theme="vs-light"
-                                            defaultValue={JSON.stringify(props.flowNode.CurrentStartToken)}
-                                            onMount={handleOnMount}
-                                            options={{
-                                                formatOnPaste: true,
-                                                formatOnType: true,
-                                                minimap: { enabled: false },
-                                                lineNumbers: 'off',
-                                            }} />
-                                        <Divider className="my-2" />
-                                        <p>End Token:</p>
-                                        <Editor
-                                            className='monaco-editor'
-                                            height="25vh"
-                                            defaultLanguage="json"
-                                            theme="vs-light"
-                                            defaultValue={JSON.stringify(props.flowNode.CurrentEndToken)}
-                                            onMount={handleOnMount}
-                                            options={{
-                                                formatOnPaste: true,
-                                                formatOnType: true,
-                                                minimap: { enabled: false },
-                                                lineNumbers: 'off'
-                                            }} />
-                                    </div>
-                                    <Fragment>
-                                        <p>Dokumentation:</p>
-                                        <div id="markdown-container"></div>
-                                    </Fragment>
-                                </div>
+                                <FlowNodeInfoComponent flowNode={props.flowNode}></FlowNodeInfoComponent>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="primary" onPress={onClose}>
