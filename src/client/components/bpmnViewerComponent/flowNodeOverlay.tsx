@@ -1,5 +1,6 @@
 import { Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { createRoot } from "react-dom/client";
 
 import {
     headingsPlugin,
@@ -46,6 +47,19 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         width: props.width,
         height: props.height + 10
     };
+
+    useEffect(() => {
+        const markdownEditor = <Markdown>{props.flowNode.Documentation}</Markdown>;
+
+        const markdownContainer = document.getElementById("markdown-container");
+
+        if (markdownContainer) {
+            const shadowRoot = markdownContainer.attachShadow({ mode: "open" });
+            const root = createRoot(shadowRoot);
+            root.render(markdownEditor);
+        }
+
+    }, []);
 
 
     return (
@@ -133,9 +147,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                     </div>
                                     <Fragment>
                                         <p>Dokumentation:</p>
-                                        <Markdown>
-                                            {props.flowNode.Documentation}
-                                        </Markdown>
+                                        <div id="markdown-container"></div>
                                     </Fragment>
                                 </div>
                             </ModalBody>
