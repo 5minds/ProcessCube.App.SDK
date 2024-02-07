@@ -1,0 +1,37 @@
+{
+  "name": "@app_sdk_internal/client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "clean": "rm -rf ../../build/client",
+    "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
+    "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=../../build/client --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
+    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=../../build/client --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
+    "build:types": "tsc --emitDeclarationOnly",
+    "watch": "concurrently -n=watch:esm,watch:commonjs,watch:types \"npm run watch:esm\" \"npm run watch:commonjs\" \"npm run watch:types\"",
+    "watch:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=../../build/client --packages=external --bundle --format=esm --watch --analyse=verbose --out-extension:.js=.mjs",
+    "watch:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=../../build/client --packages=external --bundle --platform=node --watch --out-extension:.js=.cjs --analyse=verbose",
+    "watch:types": "tsc --watch --emitDeclarationOnly"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "client-only": "^0.0.1",
+    "esbuild": "^0.19.3",
+    "jwt-decode": "^4.0.0",
+    "openid-client": "^5.5.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.22",
+    "concurrently": "^8.2.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.2.2"
+  },
+  "peerDependencies": {
+    "next": ">=13.4",
+    "next-auth": "^4.23.1",
+    "react": ">=18.0.0"
+  }
+}

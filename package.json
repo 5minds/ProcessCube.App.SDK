@@ -3,25 +3,25 @@
   "version": "5.1.0-alpha.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
-  "main": "common/index.cjs",
-  "module": "common/index.mjs",
-  "browser": "client/index.mjs",
-  "types": "common/index.d.ts",
+  "main": "build/common/index.cjs",
+  "module": "build/common/index.mjs",
+  "browser": "build/client/index.mjs",
+  "types": "build/common/index.d.ts",
   "exports": {
     ".": {
-      "types": "./common/index.d.ts",
-      "require": "./common/index.cjs",
-      "default": "./common/index.mjs"
+      "types": "./build/common/index.d.ts",
+      "require": "./build/common/index.cjs",
+      "default": "./build/common/index.mjs"
     },
     "./server": {
-      "types": "./server/index.d.ts",
-      "require": "./server/index.cjs",
-      "default": "./server/index.mjs"
+      "types": "./build/server/index.d.ts",
+      "require": "./build/server/index.cjs",
+      "default": "./build/server/index.mjs"
     },
     "./client": {
-      "types": "./client/index.d.ts",
-      "require": "./client/index.cjs",
-      "default": "./client/index.mjs"
+      "types": "./build/client/index.d.ts",
+      "require": "./build/client/index.cjs",
+      "default": "./build/client/index.mjs"
     }
   },
   "scripts": {
