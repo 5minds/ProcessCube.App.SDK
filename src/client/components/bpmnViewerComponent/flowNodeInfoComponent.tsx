@@ -7,6 +7,7 @@ import { Divider } from '@nextui-org/react';
 import Editor from '@monaco-editor/react';
 
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'
 
 import { FlowNode } from "./bpmnViewerOverlayCreator";
 
@@ -23,7 +24,7 @@ export default function FlowNodeInfoComponent(props: FlowNodeInfoComponentProps)
     }
 
     useEffect(() => {
-        const markdownEditor = <Markdown>{props.flowNode.Documentation}</Markdown>;
+        const markdownEditor = <Markdown remarkPlugins={[remarkGfm]}>{props.flowNode.Documentation}</Markdown>;
 
         const markdownContainer = document.getElementById("markdown-container");
 
