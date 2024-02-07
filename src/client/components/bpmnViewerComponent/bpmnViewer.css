@@ -144,6 +144,10 @@
 }
 
 .token-area {
-  width: 50%
+  width: 40%
+}
+
+.documentation-area {
+  margin-left: 5px;
 }
 
