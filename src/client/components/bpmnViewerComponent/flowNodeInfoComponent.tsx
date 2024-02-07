@@ -71,8 +71,10 @@ export default function FlowNodeInfoComponent(props: FlowNodeInfoComponentProps)
                             lineNumbers: 'off'
                         }} />
                 </div>
-                <p>Dokumentation:</p>
-                <div id="markdown-container"></div>
+                <div>
+                    <p>Dokumentation:</p>
+                    <div id="markdown-container"></div>
+                </div>
             </div>
         </>
     )
