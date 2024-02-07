@@ -1,5 +1,5 @@
 import { Button, Divider, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import {
     headingsPlugin,
@@ -131,12 +131,12 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                                                 lineNumbers: 'off'
                                             }} />
                                     </div>
-                                    <div>
+                                    <Fragment>
                                         <p>Dokumentation:</p>
                                         <Markdown>
                                             {props.flowNode.Documentation}
                                         </Markdown>
-                                    </div>
+                                    </Fragment>
                                 </div>
                             </ModalBody>
                             <ModalFooter>
