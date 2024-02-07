@@ -1,5 +1,3 @@
-@import '@mdxeditor/editor/style.css';
-
 .flow-node-running-state-overlay {
   background-color: rgb(84, 200, 255, 0.5);
   /* color elements as green */
