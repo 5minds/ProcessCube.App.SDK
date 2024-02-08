@@ -20,7 +20,7 @@
   "dependencies": {
     "@5minds/processcube_engine_sdk": "2024-1",
     "@5minds/processcube_engine_client": "2024-1",
-    "@app_sdk_internal/common": "file:../common",
+    "@app_sdk_internal/common": "^1.0.0",
     "esbuild": "^0.19.3",
     "jwt-decode": "^4.0.0",
     "chokidar": "^3.5.3",

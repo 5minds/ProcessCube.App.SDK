@@ -74,9 +74,9 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@app_sdk_internal/client": "file:./packages/client",
-    "@app_sdk_internal/common": "file:./packages/common",
-    "@app_sdk_internal/server": "file:./packages/server",
+    "@app_sdk_internal/client": "^1.0.0",
+    "@app_sdk_internal/common": "^1.0.0",
+    "@app_sdk_internal/server": "^1.0.0",
     "@5minds/processcube_engine_client": "2024-1",
     "@5minds/processcube_engine_sdk": "2024-1"
   }
