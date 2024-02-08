@@ -15,11 +15,13 @@ export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
         marginTop: "7px",
     };
 
-    const showRetryButton = !props.flowNode.IsGateway &&
-        props.flowNode.ProcessInstanceState !== 'running' &&
-        props.flowNode.ProcessInstanceState !== 'finished';
+    const flowNode = props.flowNode;
 
-    const showGotoButton = props.flowNode.IsCallActivity;
+    const showRetryButton = !flowNode.IsGateway &&
+        flowNode.ProcessInstanceState !== 'running' &&
+        flowNode.ProcessInstanceState !== 'finished';
+
+    const showGotoButton = flowNode.IsCallActivity || ((flowNode.IsEventReceiver || flowNode.IsEventSender) && flowNode.LinkedProcessInstanceId);
 
     return (
         <div className="flownode-overlay" style={style}>

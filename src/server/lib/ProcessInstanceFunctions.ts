@@ -34,6 +34,22 @@ export async function getFlowNodeInstancesByProcessInstanceId(processInstanceId:
   return result.flowNodeInstances;
 }
 
+export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
+  flowNodeInstanceIds: string[],
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+    const queryResult = await Client.flowNodeInstances.query(
+      {
+        triggeredByFlowNodeInstance: flowNodeInstanceIds,
+      }
+    );
+
+    if (queryResult.totalCount > 0) {
+      return queryResult.flowNodeInstances;
+    }
+
+    return [];
+}
+
 export async function retryProcessInstance(processInstanceId: string, flowNodeInstanceId?: string, newStartToken?: any) {
   await Client.processInstances.retryProcessInstance(processInstanceId, { 
       flowNodeInstanceId: flowNodeInstanceId, 
