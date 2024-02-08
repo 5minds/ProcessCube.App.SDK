@@ -6,8 +6,8 @@
   "scripts": {
     "clean": "rm -rf ../../build/common",
     "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
-    "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=../../build/common --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
-    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=../../build/common --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
+    "build:esm": "NODE_ENV=development esbuild src/index.ts --outdir=../../build/common --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
+    "build:commonjs": "NODE_ENV=development esbuild src/index.ts --outdir=../../build/common --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
     "build:types": "tsc --emitDeclarationOnly",
     "watch": "concurrently -n=watch:esm,watch:commonjs,watch:types \"npm run watch:esm\" \"npm run watch:commonjs\" \"npm run watch:types\"",
     "watch:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=../../build/common --packages=external --bundle --format=esm --watch --analyse=verbose --out-extension:.js=.mjs",
