@@ -37,9 +37,7 @@
     "url": "git+ssh://git@github.com/5minds/ProcessCube.App.SDK.git"
   },
   "files": [
-    "client",
-    "server",
-    "common"
+    "build"
   ],
   "keywords": [
     "SDK",
@@ -74,10 +72,8 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@app_sdk_internal/client": "^1.0.0",
-    "@app_sdk_internal/common": "^1.0.0",
-    "@app_sdk_internal/server": "^1.0.0",
     "@5minds/processcube_engine_client": "2024-1",
-    "@5minds/processcube_engine_sdk": "2024-1"
+    "@5minds/processcube_engine_sdk": "2024-1",
+    "esbuild": "^0.19.3"
   }
 }
