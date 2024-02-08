@@ -28,7 +28,7 @@
     "clean": "concurrently -n clean:server,clean:client,clean:common \"cd packages/client && npm run clean\" \"cd packages/common && npm run clean\" \"cd packages/server && npm run clean\"",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:prod": "npm run clean && cd packages/common && npm run build && cd ../.. && concurrently -n build:client,build:server \"cd packages/client && npm run build\" \"cd packages/server && npm run build\"",
+    "build:prod": "npm run clean && cd packages/common && npm run build && cd ../.. && concurrently -n build:client,build:server \"cd packages/client && npm run build\" \"cd packages/server && npm run build\" && cp packages/server/package.json build/server/package.json && cp packages/common/package.json build/common/package.json && cp packages/client/package.json build/client/package.json",
     "build": "cd packages/common && npm run build && cd ../.. && concurrently -n build:client,build:server \"cd packages/client && npm run build\" \"cd packages/server && npm run build\"",
     "watch": "concurrently -n watch:client,watch:server,watch:common \"cd packages/client && npm run watch\" \"cd packages/common && npm run watch\" \"cd packages/server && npm run watch\""
   },
@@ -72,8 +72,10 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
+    "@app_sdk_internal/client": "file:./build/client",
+    "@app_sdk_internal/common": "file:./build/common",
+    "@app_sdk_internal/server": "file:./build/server",
     "@5minds/processcube_engine_client": "2024-1",
-    "@5minds/processcube_engine_sdk": "2024-1",
-    "esbuild": "^0.19.3"
+    "@5minds/processcube_engine_sdk": "2024-1"
   }
 }
