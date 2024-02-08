@@ -2,6 +2,7 @@
   "name": "@app_sdk_internal/common",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "main": "src/index.ts",
   "scripts": {
     "clean": "rm -rf ../../build/common",
