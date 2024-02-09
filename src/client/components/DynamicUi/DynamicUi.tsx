@@ -9,6 +9,10 @@ import {
 } from './FormFields';
 import { classNames } from '../../utils/classNames';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
+import root from 'react-shadow';
+import styles from 'inline:./DynamicUi.css';
+import rootStyles from 'inline:./DynamicUiRoot.css';
+// console.log('styles', styles);
 
 // TODO: Alert vom alten Portal Aufbau anschauen
 // TODO: überschriebene Styles anpassen
@@ -118,89 +122,111 @@ export function DynamicUi(
     }, 100);
   }
 
+  const isDark = props.className?.split(' ').find((classname) => classname.trim().toLowerCase() === 'dark') != null;
+
   return (
-    <div
-      className={classNames(
-        'dark:shadow-dynamicui-gray-300 mx-auto block h-full min-h-[200px] rounded-lg shadow-lg shadow-[color:var(--uic-shadow-color)] sm:w-full sm:max-w-lg',
-        props.classNames?.wrapper ? props.classNames?.wrapper : '',
-        props.className ? props.className : '',
-      )}
-      data-dynamic-ui
-    >
-      <form
-        ref={formRef}
+    <>
+      <style scoped>{rootStyles}</style>
+      <root.div
         className={classNames(
-          'dark:bg-dynamicui-gray-500 dark:text-dynamicui-gray-50 dark:shadow-dynamicui-gray-300 flex max-h-full flex-col rounded-lg bg-[color:var(--uic-background-color)]  text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]',
-          props.classNames?.base ? props.classNames?.base : '',
+          'dynamic-ui-root',
+          props.classNames?.wrapper ? props.classNames?.wrapper : '',
+          props.className ? props.className : '',
         )}
-        data-user-task-id={props.task.flowNodeId}
-        data-user-task-instance-id={props.task.flowNodeInstanceId}
-        onChange={onFormDataChange}
-        action={onSubmit}
+        data-dynamic-ui
       >
-        <header
-          className={classNames('px-4 pb-3 pt-4 sm:px-6', props.classNames?.header ? props.classNames.header : '')}
-        >
-          <Headline
-            title={props.title ?? props.task.flowNodeName ?? 'User Task'}
-            onSuspend={onSuspend}
-            showHeaderMenu={props.showHeaderMenu}
-            showTerminateOption={props.showTerminateOption}
-            onTerminate={props.onTerminate}
-          />
-        </header>
-        <section
+        <style type="text/css" suppressHydrationWarning>
+          {styles}
+        </style>
+        <form
+          ref={formRef}
           className={classNames(
-            'overflow-y-auto px-4 py-3 sm:px-6',
-            props.classNames?.body ? props.classNames.body : '',
+            isDark ? 'dark' : '',
+            'flex max-h-full flex-col rounded-lg bg-[color:var(--uic-background-color)]  text-[color:var(--uic-text-color)] shadow-lg shadow-[color:var(--uic-shadow-color)]',
+            props.classNames?.base ? props.classNames?.base : '',
           )}
+          data-user-task-id={props.task.flowNodeId}
+          data-user-task-instance-id={props.task.flowNodeInstanceId}
+          onChange={onFormDataChange}
+          action={onSubmit}
         >
-          <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
-            {formFields.map((field) => {
-              const DynamicUiFormFieldComponent = (formFieldComponentMap as GenericFormFieldTypeComponentMap)[
-                field.type
-              ];
+          <header
+            className={classNames('px-4 pb-3 pt-4 sm:px-6', props.classNames?.header ? props.classNames.header : '')}
+          >
+            <Headline
+              title={props.title ?? props.task.flowNodeName ?? 'User Task'}
+              onSuspend={onSuspend}
+              showHeaderMenu={props.showHeaderMenu}
+              showTerminateOption={props.showTerminateOption}
+              onTerminate={props.onTerminate}
+            />
+          </header>
+          <section
+            className={classNames(
+              'overflow-y-auto px-4 py-3 sm:px-6',
+              props.classNames?.body ? props.classNames.body : '',
+            )}
+          >
+            <div className="flex flex-col space-y-6 dark:[color-scheme:dark]">
+              {formFields.map((field) => {
+                const DynamicUiFormFieldComponent = (formFieldComponentMap as GenericFormFieldTypeComponentMap)[
+                  field.type
+                ];
 
-              if (DynamicUiFormFieldComponent) {
-                if (!ReactIs.isValidElementType(DynamicUiFormFieldComponent)) {
-                  console.warn(
-                    `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe given DynamicUiFormFieldComponent is not a valid React Element Type.\n\nFormField:\t${JSON.stringify(
-                      field,
-                      null,
-                      2,
-                    )}\nDynamicUiFormFieldComponent:\t${DynamicUiFormFieldComponent.toString()}\n\nRendering 'null' as fallback`,
-                  );
-                  return null;
-                }
-
-                let ReactElement: FormFieldRenderer;
-                if (isReactClassComponent(DynamicUiFormFieldComponent)) {
-                  assertElementIsReactComponent(DynamicUiFormFieldComponent);
-                  ReactElement = DynamicUiFormFieldComponent;
-                } else {
-                  let formFieldComponentToUse = DynamicUiFormFieldComponent;
-
-                  // has only one parameter => wrap to function with two params because, forwardRef needs 0 or 2.
-                  if (DynamicUiFormFieldComponent.length === 1) {
-                    formFieldComponentToUse = (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) => (
-                      <DynamicUiFormFieldComponent {...props} />
+                if (DynamicUiFormFieldComponent) {
+                  if (!ReactIs.isValidElementType(DynamicUiFormFieldComponent)) {
+                    console.warn(
+                      `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe given DynamicUiFormFieldComponent is not a valid React Element Type.\n\nFormField:\t${JSON.stringify(
+                        field,
+                        null,
+                        2,
+                      )}\nDynamicUiFormFieldComponent:\t${DynamicUiFormFieldComponent.toString()}\n\nRendering 'null' as fallback`,
                     );
+                    return null;
                   }
 
-                  assertElementIsRenderFunction(formFieldComponentToUse);
-                  ReactElement = forwardRef(formFieldComponentToUse);
+                  let ReactElement: FormFieldRenderer;
+                  if (isReactClassComponent(DynamicUiFormFieldComponent)) {
+                    assertElementIsReactComponent(DynamicUiFormFieldComponent);
+                    ReactElement = DynamicUiFormFieldComponent;
+                  } else {
+                    let formFieldComponentToUse = DynamicUiFormFieldComponent;
+
+                    // has only one parameter => wrap to function with two params because, forwardRef needs 0 or 2.
+                    if (DynamicUiFormFieldComponent.length === 1) {
+                      formFieldComponentToUse = (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) => (
+                        <DynamicUiFormFieldComponent {...props} />
+                      );
+                    }
+
+                    assertElementIsRenderFunction(formFieldComponentToUse);
+                    ReactElement = forwardRef(formFieldComponentToUse);
+                  }
+
+                  const ref = formFieldRefs.get(field.id)?.ref;
+
+                  return (
+                    <Fragment key={field.id}>
+                      <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
+                    </Fragment>
+                  );
                 }
 
-                const ref = formFieldRefs.get(field.id)?.ref;
-
-                return (
-                  <Fragment key={field.id}>
-                    <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
-                  </Fragment>
-                );
-              }
-
+                return null;
+              })}
+            </div>
+          </section>
+          <footer
+            className={classNames(
               'rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6',
+              props.classNames?.footer ? props.classNames.footer : '',
+            )}
+          >
+            <FormButtons confirmFormField={confirmFormField} />
+          </footer>
+        </form>
+      </root.div>
+    </>
   );
 }
 
