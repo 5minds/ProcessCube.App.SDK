@@ -8,6 +8,12 @@ import BpmnViewerOverlayCreator from './bpmnViewerOverlayCreator';
 
 import './bpmnViewer.css';
 
+type BpmnViewerComponentOptions = {
+    height?: number;
+    fillColor?: string;
+    strokeColor?: string;
+}
+
 type BpmnViewerComponentProps = {
     diagramXML: string;
     className: string;
@@ -16,7 +22,7 @@ type BpmnViewerComponentProps = {
     flowNodeInstancesTriggeredByThisProcessInstance: DataModels.FlowNodeInstances.FlowNodeInstance[];
     retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
     gotoProcessAction: (processInstanceId: string) => void;
-    height?: number;
+    options?: BpmnViewerComponentOptions;
 };
 
 type BpmnViewerComponentState = {
@@ -39,12 +45,21 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
 
         const {
             diagramXML,
-            height
+            options
         } = this.props;
 
         const container = this.containerRef.current as HTMLElement;
 
-        this.bpmnViewer = new BpmnViewer({ container, height: height ?? 600, additionalModules: [ZoomScrollModule, MoveCanvasModule] });
+        this.bpmnViewer = new BpmnViewer(
+            { 
+                container, 
+                height: options?.height ?? 600, 
+                bpmnRenderer: {
+                    defaultFillColor: options?.fillColor,
+                    defaultStrokeColor: options?.strokeColor,
+                },  
+                additionalModules: [ZoomScrollModule, MoveCanvasModule] 
+            });
         this.bpmnViewerOverlayCreator = new BpmnViewerOverlayCreator(this.bpmnViewer);
 
         if (diagramXML) {
