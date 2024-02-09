@@ -3,7 +3,51 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  .dark,
+  .dark * {
+    --uic-background-color: var(--user-interaction-component-background-color, theme('colors.dynamicui-gray.500'));
+    --uic-text-color: var(--user-interaction-component-text-color, theme('colors.dynamicui-gray.50'));
+    --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.dynamicui-gray.300'));
+
+    --uic-footer-background-color: var(
+      --user-interaction-component-footer-background-color,
+      theme('colors.dynamicui-gray.600')
+    );
+    --uic-footer-continue-button-background-color: var(
+      --user-interaction-component-footer-continue-button-background-color,
+      #33609a
+    );
+    --uic-footer-continue-button-background-hover-color: var(
+      --user-interaction-component-footer-continue-button-background-hover-color,
+      #3666a5
+    );
+    --uic-footer-continue-button-focus-outline-color: var(
+      --user-interaction-component-footer-continue-button-focus-outline-color,
+      #3666a5
+    );
+
+    --uic-footer-decline-button-text-color: var(
+      --user-interaction-component-footer-decline-button-text-color,
+      theme('colors.dynamicui-gray.50')
+    );
+    --uic-footer-decline-button-background-color: var(
+      --user-interaction-component-footer-decline-button-background-color,
+      theme('colors.dynamicui-gray.350')
+    );
+    --uic-footer-decline-button-background-hover-color: var(
+      --user-interaction-component-footer-decline-button-background-hover-color,
+      theme('colors.dynamicui-gray.300')
+    );
+    --uic-footer-decline-button-focus-outline-color: var(
+      --user-interaction-component-footer-decline-button-focus-outline-color,
+      theme('colors.dynamicui-gray.300')
+    );
+  }
+
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
     --uic-background-color: var(
       --user-interaction-component-background-color,
       var(--background-color, theme('colors.white'))
@@ -93,9 +137,5 @@
       --user-interaction-component-footer-decline-button-focus-outline-color,
       theme('colors.gray.300')
     );
-  }
-
-  * {
-    box-sizing: border-box;
   }
 }

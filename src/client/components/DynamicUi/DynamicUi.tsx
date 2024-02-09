@@ -200,20 +200,7 @@ export function DynamicUi(
                 );
               }
 
-              return null;
-            })}
-          </div>
-        </section>
-        <footer
-          className={classNames(
-            'dark:bg-dynamicui-gray-600 rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6',
-            props.classNames?.footer ? props.classNames.footer : '',
-          )}
-        >
-          <FormButtons confirmFormField={confirmFormField} />
-        </footer>
-      </form>
-    </div>
+              'rounded-b-lg bg-[color:var(--uic-footer-background-color)] px-4 py-3 sm:px-6',
   );
 }
 
@@ -224,7 +211,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
     <Fragment>
       <button
         type="submit"
-        className="inline-flex w-full justify-center rounded-md border border-transparent bg-[color:var(--uic-footer-continue-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-continue-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
+        className="inline-flex w-full justify-center rounded-md border border-transparent bg-[color:var(--uic-footer-continue-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-continue-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm "
       >
         OK
       </button>
@@ -238,7 +225,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="inline-flex w-full justify-center rounded-md border border-transparent bg-[color:var(--uic-footer-continue-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-continue-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm dark:bg-[#33609a] dark:hover:bg-[#3666a5] dark:focus:ring-[#3666a5]"
+          className="inline-flex w-full justify-center rounded-md border border-transparent bg-[color:var(--uic-footer-continue-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-continue-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm "
           value="true"
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
@@ -246,7 +233,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="dark:bg-dynamicui-gray-350 dark:text-dynamicui-gray-50 dark:hover:bg-dynamicui-gray-300 dark:focus:ring-dynamicui-gray-300 inline-flex w-full justify-center rounded-md border border-[color:var(--uic-border-color)] bg-[color:var(--uic-footer-decline-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-decline-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-decline-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm dark:border-transparent"
+          className="inline-flex w-full justify-center rounded-md border border-[color:var(--uic-border-color)] bg-[color:var(--uic-footer-decline-button-background-color)] px-3 py-2 text-base font-medium leading-4 text-[color:var(--uic-footer-decline-button-text-color)] shadow-sm hover:bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:outline-none focus:ring-2 focus:ring-[color:var(--uic-footer-decline-button-focus-outline-color)] focus:ring-offset-2 sm:ml-2 sm:w-auto sm:text-sm dark:border-transparent"
           value="false"
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
