@@ -17,9 +17,9 @@
     "build:prod:commonjs": "NODE_ENV=production esbuild src/index.ts --outdir=./build --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
     "build:prod:esm": "NODE_ENV=production esbuild src/index.ts --outdir=./build --bundle --platform=node --format=esm --external:@opentelemetry --external:fsevents --external:@5minds/* --external:next --external:next-auth --external:react --external:jwt-decode --external:openid-client --external:esbuild --analyze=verbose --out-extension:.js=.mjs",
     "watch": "concurrently -n=watch:esm,watch:commonjs,watch:types \"npm run watch:esm\" \"npm run watch:commonjs\" \"npm run watch:types\"",
-    "watch:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=./build --watch --bundle --platform=node --format=esm --external:@opentelemetry --external:fsevents --external:@5minds/* --external:next --external:next-auth --external:react --external:jwt-decode --external:openid-client --external:esbuild --analyze=verbose",
-    "watch:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=./build --packages=external --bundle --platform=node --watch --out-extension:.js=.cjs --analyse=verbose",
-    "watch:types": "tsc --watch --emitDeclarationOnly"
+    "watch:esm": "NODE_ENV=development esbuild src/index.ts --outdir=./build --watch --bundle --platform=node --format=esm --external:@opentelemetry --external:fsevents --external:@5minds/* --external:next --external:next-auth --external:react --external:jwt-decode --external:openid-client --external:esbuild --analyze=verbose",
+    "watch:commonjs": "NODE_ENV=development esbuild src/index.ts --outdir=./build --packages=external --bundle --platform=node --watch --out-extension:.js=.cjs --analyze=verbose",
+    "watch:types": "tsc --watch --emitDeclarationOnly --preserveWatchOutput"
   },
   "keywords": [],
   "author": "",

@@ -17,9 +17,9 @@
     "build:prod:esm": "NODE_ENV=production esbuild src/index.ts --outdir=./build --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
     "build:prod:commonjs": "NODE_ENV=production esbuild src/index.ts --outdir=./build --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
     "watch": "concurrently -n=watch:esm,watch:commonjs,watch:types \"npm run watch:esm\" \"npm run watch:commonjs\" \"npm run watch:types\"",
-    "watch:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=./build --packages=external --bundle --format=esm --watch --analyse=verbose --out-extension:.js=.mjs",
-    "watch:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=./build --packages=external --bundle --platform=node --watch --out-extension:.js=.cjs --analyse=verbose",
-    "watch:types": "tsc --watch --emitDeclarationOnly"
+    "watch:esm": "NODE_ENV=development esbuild src/index.ts --outdir=./build --packages=external --bundle --format=esm --watch --analyze=verbose --out-extension:.js=.mjs",
+    "watch:commonjs": "NODE_ENV=development esbuild src/index.ts --outdir=./build --packages=external --bundle --platform=node --watch --out-extension:.js=.cjs --analyze=verbose",
+    "watch:types": "tsc --watch --emitDeclarationOnly --preserveWatchOutput"
   },
   "keywords": [],
   "author": "",
