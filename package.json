@@ -26,7 +26,7 @@
   },
   "scripts": {
     "clean": "concurrently -n clean:server,clean:client,clean:common \"npm run --prefix packages/client clean\" \"npm run --prefix packages/common clean\" \"npm run --prefix packages/server clean\"",
-    "postinstall": "npm i && npm i --prefix packages/common && npm i --prefix packages/client && npm i --prefix packages/server",
+    "postinstall": "npm i --prefix packages/common && npm i --prefix packages/client && npm i --prefix packages/server",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:prod": "npm run --prefix packages/common build:prod && concurrently -n build:client,build:server \"npm run --prefix packages/client build:prod\" \"npm run --prefix packages/server build:prod\"",
