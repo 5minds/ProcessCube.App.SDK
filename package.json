@@ -3,41 +3,43 @@
   "version": "5.1.0-alpha.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
-  "main": "build/common/index.cjs",
-  "module": "build/common/index.mjs",
-  "browser": "build/client/index.mjs",
-  "types": "build/common/index.d.ts",
+  "main": "./packages/common/build/index.cjs",
+  "module": "./packages/common/build/index.mjs",
+  "browser": "./packages/client/build/index.mjs",
+  "types": "./packages/common/build/index.d.ts",
   "exports": {
     ".": {
-      "types": "./build/common/index.d.ts",
-      "require": "./build/common/index.cjs",
-      "default": "./build/common/index.mjs"
+      "types": "./packages/common/build/index.d.ts",
+      "require": "./packages/common/build/index.cjs",
+      "default": "./packages/common/build/index.mjs"
     },
     "./server": {
-      "types": "./build/server/index.d.ts",
-      "require": "./build/server/index.cjs",
-      "default": "./build/server/index.mjs"
+      "types": "./packages/server/build/index.d.ts",
+      "require": "./packages/server/build/index.cjs",
+      "default": "./packages/server/build/index.mjs"
     },
     "./client": {
-      "types": "./build/client/index.d.ts",
-      "require": "./build/client/index.cjs",
-      "default": "./build/client/index.mjs"
+      "types": "./packages/client/build/index.d.ts",
+      "require": "./packages/client/build/index.cjs",
+      "default": "./packages/client/build/index.mjs"
     }
   },
   "scripts": {
-    "clean": "concurrently -n clean:server,clean:client,clean:common \"cd packages/client && npm run clean\" \"cd packages/common && npm run clean\" \"cd packages/server && npm run clean\"",
+    "clean": "concurrently -n clean:server,clean:client,clean:common \"npm run --prefix packages/client clean\" \"npm run --prefix packages/common clean\" \"npm run --prefix packages/server clean\"",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:prod": "npm run clean && cd packages/common && npm run build && cd ../.. && concurrently -n build:client,build:server \"cd packages/client && npm run build\" \"cd packages/server && npm run build\"",
-    "build": "cd packages/common && npm run build && cd ../.. && concurrently -n build:client,build:server \"cd packages/client && npm run build\" \"cd packages/server && npm run build\"",
-    "watch": "concurrently -n watch:client,watch:server,watch:common \"cd packages/client && npm run watch\" \"cd packages/common && npm run watch\" \"cd packages/server && npm run watch\""
+    "build:prod": "npm run --prefix packages/common build:prod && concurrently -n build:client,build:server \"npm run --prefix packages/client build:prod\" \"npm run --prefix packages/server build:prod\"",
+    "build": "npm run --prefix packages/common build && concurrently -n build:client,build:server \"npm run --prefix packages/client build\" \"npm run --prefix packages/server build\"",
+    "watch": "concurrently -n watch:client,watch:server,watch:common \"npm run --prefix packages/client watch\" \"npm run --prefix packages/common watch\" \"npm run --prefix packages/server watch\""
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/5minds/ProcessCube.App.SDK.git"
   },
   "files": [
-    "build"
+    "packages/common/build",
+    "packages/client/build",
+    "packages/server/build"
   ],
   "keywords": [
     "SDK",

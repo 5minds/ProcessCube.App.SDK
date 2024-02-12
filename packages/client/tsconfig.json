@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../build/client",
+    "outDir": "./build",
     "lib": ["DOM", "DOM.Iterable", "ESNext"]
   },
   "include": ["./src"]

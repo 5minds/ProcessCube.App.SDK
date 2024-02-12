@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../build/common",
+    "outDir": "./build",
 
   },
   "include": ["./src"],
