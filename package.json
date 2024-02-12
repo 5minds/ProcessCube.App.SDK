@@ -38,8 +38,11 @@
   },
   "files": [
     "packages/common/build",
+    "packages/common/package.json",
     "packages/client/build",
-    "packages/server/build"
+    "packages/client/package.json",
+    "packages/server/build",
+    "packages/server/package.json"
   ],
   "keywords": [
     "SDK",
