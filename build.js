@@ -46,6 +46,9 @@ await esbuild.build({
   },
   format: 'esm',
   plugins: [myPlug],
+  external: [
+    "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
+  ],
 });
 
 await esbuild.build({
@@ -107,6 +110,9 @@ await esbuild.build({
     '.js': '.cjs',
   },
   plugins: [myPlug],
+  external: [
+    "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
+  ],
 });
 
 await esbuild.build({

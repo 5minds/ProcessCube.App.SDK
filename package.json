@@ -61,6 +61,7 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@types/node": "^20.11.17",
     "@types/react": "^18.2.22",
     "concurrently": "^8.2.0",
     "prettier": "^3.0.0",
