@@ -1,6 +1,17 @@
 import * as esbuild from 'esbuild'
 
 const productionBuild = process.env.NODE_ENV === 'production';
+const PRODUCTION_CONFIG = {
+  treeShaking: true,
+  splitting: true,
+  minify: true,
+  drop: ['console'],
+};
+const COMMON_CONFIG = {
+  bundle: true,
+  platform: 'node',
+  ...(productionBuild ? PRODUCTION_CONFIG : {})
+};
 
 function getPlugin(pathToCommon) {
   return {
@@ -14,21 +25,7 @@ function getPlugin(pathToCommon) {
       }})
     },
   }
-
 }
-
-const PRODUCTION_CONFIG = {
-  treeShaking: true,
-  splitting: true,
-  minify: true,
-  drop: ['console'],
-};
-
-const COMMON_CONFIG = {
-  bundle: true,
-  platform: 'node',
-  ...(productionBuild ? PRODUCTION_CONFIG : {})
-};
 
 /*    ESModules    */
 
@@ -40,41 +37,41 @@ const ESMODULE_CONFIG = {
   },
 };
 
-//common
-const moduleBuildResult = await esbuild.build({
+let commonOutputFile = (await esbuild.build({
   ...ESMODULE_CONFIG,
   entryPoints: ['src/common/index.ts'],
   outdir: 'build/common',
   packages: 'external',
   write: false,
-});
-await esbuild.build({
-  ...ESMODULE_CONFIG,
-  entryPoints: ['src/common/index.ts'],
-  outdir: 'build/common',
-  packages: 'external',
-});
+})).outputFiles[0].path;
 
-//server
-await esbuild.build({
-  ...ESMODULE_CONFIG,
-  entryPoints: ['src/server/index.ts'],
-  outdir: 'build/server',
-  plugins: [getPlugin(moduleBuildResult.outputFiles[0].path)],
-  external: [
-    "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
-  ],
-});
-
-//client
-await esbuild.build({
-  ...ESMODULE_CONFIG,
-  entryPoints: ['src/client/index.ts'],
-  outdir: 'build/client',
-  plugins: [getPlugin(moduleBuildResult.outputFiles[0].path)],
-  packages: 'external',
-});
-
+const esmoduleBuildPromises = [
+  //common
+  esbuild.build({
+    ...ESMODULE_CONFIG,
+    entryPoints: ['src/common/index.ts'],
+    outdir: 'build/common',
+    packages: 'external',
+  }),
+  //server
+  esbuild.build({
+    ...ESMODULE_CONFIG,
+    entryPoints: ['src/server/index.ts'],
+    outdir: 'build/server',
+    plugins: [getPlugin(commonOutputFile)],
+    external: [
+      "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
+    ],
+  }),
+  //client
+  esbuild.build({
+    ...ESMODULE_CONFIG,
+    entryPoints: ['src/client/index.ts'],
+    outdir: 'build/client',
+    plugins: [getPlugin(commonOutputFile)],
+    packages: 'external',
+  })
+];
 
 /*    CommonJS    */
 
@@ -87,31 +84,35 @@ const COMMONJS_CONFIG = {
   splitting: false,
 };
 
-//common
-const commonBuildResult = await esbuild.build({
+//common output file
+commonOutputFile = (await esbuild.build({
   ...COMMONJS_CONFIG,
   entryPoints: ['src/common/index.ts'],
   outdir: 'build/common',
   write: false,
-});
-await esbuild.build({
-  ...COMMONJS_CONFIG,
-  entryPoints: ['src/common/index.ts'],
-  outdir: 'build/common',
-});
+})).outputFiles[0].path;
 
-//server
-await esbuild.build({
-  ...COMMONJS_CONFIG,
-  entryPoints: ['src/server/index.ts'],
-  outdir: 'build/server',
-  plugins: [getPlugin(commonBuildResult.outputFiles[0].path)],
-});
+const commonBuildPromises = [
+  //common
+  esbuild.build({
+    ...COMMONJS_CONFIG,
+    entryPoints: ['src/common/index.ts'],
+    outdir: 'build/common',
+  }),
+  //server
+  esbuild.build({
+    ...COMMONJS_CONFIG,
+    entryPoints: ['src/server/index.ts'],
+    outdir: 'build/server',
+    plugins: [getPlugin(commonOutputFile)],
+  }),
+  //client
+  esbuild.build({
+    ...COMMONJS_CONFIG,
+    entryPoints: ['src/client/index.ts'],
+    outdir: 'build/client',
+    plugins: [getPlugin(commonOutputFile)],
+  })
+];
 
-//client
-await esbuild.build({
-  ...COMMONJS_CONFIG,
-  entryPoints: ['src/client/index.ts'],
-  outdir: 'build/client',
-  plugins: [getPlugin(commonBuildResult.outputFiles[0].path)],
-});
+await Promise.all([...commonBuildPromises, ...esmoduleBuildPromises]);
