@@ -13,7 +13,7 @@ const COMMON_CONFIG = {
   ...(productionBuild ? PRODUCTION_CONFIG : {})
 };
 
-function getPlugin(pathToCommon) {
+function getMarkCommonAsExternal(pathToCommon) {
   return {
     name: 'markCommonAsExternal',
     setup(build) {
@@ -58,7 +58,7 @@ const esmoduleBuildPromises = [
     ...ESMODULE_CONFIG,
     entryPoints: ['src/server/index.ts'],
     outdir: 'build/server',
-    plugins: [getPlugin(commonOutputFile)],
+    plugins: [getMarkCommonAsExternal(commonOutputFile)],
     external: [
       "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
     ],
@@ -68,7 +68,7 @@ const esmoduleBuildPromises = [
     ...ESMODULE_CONFIG,
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
-    plugins: [getPlugin(commonOutputFile)],
+    plugins: [getMarkCommonAsExternal(commonOutputFile)],
     packages: 'external',
   })
 ];
@@ -104,14 +104,14 @@ const commonBuildPromises = [
     ...COMMONJS_CONFIG,
     entryPoints: ['src/server/index.ts'],
     outdir: 'build/server',
-    plugins: [getPlugin(commonOutputFile)],
+    plugins: [getMarkCommonAsExternal(commonOutputFile)],
   }),
   //client
   esbuild.build({
     ...COMMONJS_CONFIG,
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
-    plugins: [getPlugin(commonOutputFile)],
+    plugins: [getMarkCommonAsExternal(commonOutputFile)],
   })
 ];
 
