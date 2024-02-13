@@ -1,13 +1,10 @@
 # Directories
 node_modules
 out
-client
-server
-common
+build
 
 !src/client
 !src/server
 !src/common
 
 # Files
-.tsbuildinfo

@@ -4,6 +4,8 @@ export * from './lib';
 export * from './plugin';
 export * from './server-actions';
 
+import { hasClaim } from '../common';
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -15,33 +17,35 @@ declare global {
   }
 }
 
-import NextAuth, { DefaultSession } from 'next-auth';
+hasClaim('test');
 
-declare module 'next-auth' {
-  /**
-   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
-  interface Session {
-    user: {
-      /** The user's identity claims. */
-      claims?: Record<string, unknown>;
-    } & DefaultSession['user'];
-    error?: 'RefreshAccessTokenError';
-  }
-}
+// import NextAuth, { DefaultSession } from 'next-auth';
 
-import { JWT } from 'next-auth/jwt';
+// declare module 'next-auth' {
+//   /**
+//    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+//    */
+//   interface Session {
+//     user: {
+//       /** The user's identity claims. */
+//       claims?: Record<string, unknown>;
+//     } & DefaultSession['user'];
+//     error?: 'RefreshAccessTokenError';
+//   }
+// }
 
-declare module 'next-auth/jwt' {
-  /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
-  interface JWT {
-    /** OpenID Access Token */
-    accessToken?: string;
-    /** OpenID ID Token */
-    idToken?: string;
-    /** OpenID Refresh Token */
-    refreshToken?: string;
-    expiresAt: number;
-    error?: 'RefreshAccessTokenError';
-  }
-}
+// import { JWT } from 'next-auth/jwt';
+
+// declare module 'next-auth/jwt' {
+//   /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
+//   interface JWT {
+//     /** OpenID Access Token */
+//     accessToken?: string;
+//     /** OpenID ID Token */
+//     idToken?: string;
+//     /** OpenID Refresh Token */
+//     refreshToken?: string;
+//     expiresAt: number;
+//     error?: 'RefreshAccessTokenError';
+//   }
+// }
