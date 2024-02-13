@@ -49,6 +49,10 @@ await esbuild.build({
   external: [
     "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
   ],
+  treeShaking: true,
+  splitting: true,
+  minify: true,
+  drop: ['console'],
 });
 
 await esbuild.build({
