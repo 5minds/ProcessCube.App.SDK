@@ -1,5 +1,6 @@
 import * as esbuild from 'esbuild'
 
+const watchMode = process.argv.includes('--watch');
 const productionBuild = process.env.NODE_ENV === 'production';
 const PRODUCTION_CONFIG = {
   treeShaking: true,
@@ -10,8 +11,10 @@ const PRODUCTION_CONFIG = {
 const COMMON_CONFIG = {
   bundle: true,
   platform: 'node',
+  logLevel: 'info',
   ...(productionBuild ? PRODUCTION_CONFIG : {})
 };
+const build = watchMode ? esbuild.context : esbuild.build;
 
 function getMarkCommonAsExternal(pathToCommon) {
   return {
@@ -47,14 +50,14 @@ let commonOutputFile = (await esbuild.build({
 
 const esmoduleBuildPromises = [
   //common
-  esbuild.build({
+  build({
     ...ESMODULE_CONFIG,
     entryPoints: ['src/common/index.ts'],
     outdir: 'build/common',
     packages: 'external',
   }),
   //server
-  esbuild.build({
+  build({
     ...ESMODULE_CONFIG,
     entryPoints: ['src/server/index.ts'],
     outdir: 'build/server',
@@ -64,7 +67,7 @@ const esmoduleBuildPromises = [
     ],
   }),
   //client
-  esbuild.build({
+  build({
     ...ESMODULE_CONFIG,
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
@@ -94,20 +97,20 @@ commonOutputFile = (await esbuild.build({
 
 const commonBuildPromises = [
   //common
-  esbuild.build({
+  build({
     ...COMMONJS_CONFIG,
     entryPoints: ['src/common/index.ts'],
     outdir: 'build/common',
   }),
   //server
-  esbuild.build({
+  build({
     ...COMMONJS_CONFIG,
     entryPoints: ['src/server/index.ts'],
     outdir: 'build/server',
     plugins: [getMarkCommonAsExternal(commonOutputFile)],
   }),
   //client
-  esbuild.build({
+  build({
     ...COMMONJS_CONFIG,
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
@@ -116,3 +119,11 @@ const commonBuildPromises = [
 ];
 
 await Promise.all([...commonBuildPromises, ...esmoduleBuildPromises]);
+
+if (watchMode) {
+  const watchPromises = [];
+  for (const prom of [...commonBuildPromises, ...esmoduleBuildPromises]) {
+    watchPromises.push((await prom).watch())
+  }
+  await Promise.all(watchPromises);
+}

@@ -31,7 +31,7 @@
     "build": "concurrently -n=build:code,build:types \"NODE_ENV=development node build.js\" \"npm run build:types\"",
     "build:types": "tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently -n=build:types:server,build:types:client \"tsc -p tsconfig.server.json --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --emitDeclarationOnly\"",
     "build:prod": "npm run clean && concurrently -n=build:prod:code,build:types \"NODE_ENV=production node build.js\" \"npm run build:types\"",
-    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
+    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild,tsc:server,tsc:common,tsc:client \"node build.js --watch\" \"tsc -p tsconfig.server.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
   },
   "repository": {
     "type": "git",
