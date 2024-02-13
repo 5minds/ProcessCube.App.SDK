@@ -1,5 +1,8 @@
 import * as esbuild from 'esbuild'
 
+/*    ESModules    */
+
+//common
 await esbuild.build({
   entryPoints: ['src/common/index.ts'],
   bundle: true,
@@ -26,7 +29,7 @@ const moduleBuildResult = await esbuild.build({
 let myPlug = {
   name: 'plug',
   setup(build) {
-    build.onResolve({ filter: /^.*common.*$/ }, args => {
+    build.onResolve({ filter: /^\..*\/common.*$/ }, args => {
       return {
         path: moduleBuildResult.outputFiles[0].path,
         namespace: 'file',
@@ -35,11 +38,11 @@ let myPlug = {
   },
 }
 
+//server
 await esbuild.build({
   entryPoints: ['src/server/index.ts'],
   bundle: true,
   outdir: 'build/server',
-  packages: 'external',
   platform: 'node',
   outExtension: {
     '.js': '.mjs',
@@ -49,12 +52,9 @@ await esbuild.build({
   external: [
     "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
   ],
-  treeShaking: true,
-  splitting: true,
-  minify: true,
-  drop: ['console'],
 });
 
+//client
 await esbuild.build({
   entryPoints: ['src/client/index.ts'],
   bundle: true,
@@ -68,6 +68,10 @@ await esbuild.build({
   plugins: [myPlug],
 });
 
+
+/*    CommonJS    */
+
+//common
 const commonBuildResult = await esbuild.build({
   entryPoints: ['src/common/index.ts'],
   bundle: true,
@@ -95,7 +99,7 @@ await esbuild.build({
 myPlug = {
   name: 'plug',
   setup(build) {
-    build.onResolve({ filter: /^.*common.*$/ }, args => {
+    build.onResolve({ filter: /^\..*\/common.*$/ }, args => {
       return {
         path: commonBuildResult.outputFiles[0].path,
         namespace: 'file',
@@ -104,6 +108,7 @@ myPlug = {
   },
 }
 
+//server
 await esbuild.build({
   entryPoints: ['src/server/index.ts'],
   bundle: true,
@@ -114,11 +119,9 @@ await esbuild.build({
     '.js': '.cjs',
   },
   plugins: [myPlug],
-  external: [
-    "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
-  ],
 });
 
+//client
 await esbuild.build({
   entryPoints: ['src/client/index.ts'],
   bundle: true,
