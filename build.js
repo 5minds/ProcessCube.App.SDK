@@ -121,9 +121,6 @@ const commonBuildPromises = [
 await Promise.all([...commonBuildPromises, ...esmoduleBuildPromises]);
 
 if (watchMode) {
-  const watchPromises = [];
-  for (const prom of [...commonBuildPromises, ...esmoduleBuildPromises]) {
-    watchPromises.push((await prom).watch())
-  }
+  const watchPromises = [...commonBuildPromises, ...esmoduleBuildPromises].map(async (prom) => (await prom).watch());
   await Promise.all(watchPromises);
 }
