@@ -9,6 +9,10 @@
     --uic-text-color: var(--user-interaction-component-text-color, theme('colors.dynamicui-gray.50'));
     --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.dynamicui-gray.300'));
     --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, transparent));
+    --uic-formfield-hint-text-color: var(
+      --user-interaction-component-formfield-hint-text-color,
+      var(--formfield-hint-text-color, theme('colors.dynamicui-gray.200'))
+    );
 
     /* HEADER */
     --uic-header-text-color: var(
@@ -91,6 +95,10 @@
     --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, theme('colors.gray.300')));
     --uic-focus-color: var(--user-interaction-component-focus-color, var(--focus-color, theme('colors.sky.700')));
     --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.gray.400'));
+    --uic-formfield-hint-text-color: var(
+      --user-interaction-component-formfield-hint-text-color,
+      var(--formfield-hint-text-color, theme('colors.gray.500'))
+    );
 
     /* HEADER */
     --uic-header-text-color: var(

@@ -29,7 +29,7 @@ export function BooleanFormField(
           {formField.label}
         </label>
         {parsedCustomFormConfig?.hint && (
-          <p className="dark:dynamic-ui-text-dynamicui-gray-200 dynamic-ui-text-gray-500" id={hintId}>
+          <p className="dynamic-ui-text[color:var(--uic-formfield-hint-text-color)]" id={hintId}>
             {parsedCustomFormConfig.hint}
           </p>
         )}
