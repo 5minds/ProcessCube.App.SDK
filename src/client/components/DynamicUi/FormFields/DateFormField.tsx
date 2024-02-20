@@ -15,13 +15,13 @@ export function DateFormField(props: DynamicUiComponentProps<string | null>, ref
   const defaultValue = props.state || formField.defaultValue?.toString();
 
   return (
-    <div className="">
-      <label className="block text-sm font-medium" htmlFor={formField.id}>
+    <div>
+      <label className="dynamic-ui-block dynamic-ui-text-sm dynamic-ui-font-medium" htmlFor={formField.id}>
         {formField.label}
       </label>
-      <div className="mt-1">
+      <div className="dynamic-ui-mt-1">
         <input
-          className="dark:bg-dynamicui-gray-350 dark:focus:shadow-dynamicui-dark dark:invalid:shadow-dynamicui-dark-invalid block w-full rounded-md border-[color:var(--uic-border-color)] shadow-sm invalid:border-red-500 invalid:ring-1 invalid:ring-red-500 focus:border-[color:var(--uic-focus-color)] focus:ring-[color:var(--uic-focus-color)] sm:text-sm dark:border-solid dark:border-transparent dark:placeholder-gray-400 dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f] dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40]"
+          className="dark:dynamic-ui-bg-dynamicui-gray-350 dark:focus:dynamic-ui-shadow-dynamicui-dark dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dynamic-ui-block dynamic-ui-w-full dynamic-ui-rounded-md dynamic-ui-border-[color:var(--uic-border-color)] dynamic-ui-shadow-sm invalid:dynamic-ui-border-red-500 invalid:dynamic-ui-ring-1 invalid:dynamic-ui-ring-red-500 focus:dynamic-ui-border-[color:var(--uic-focus-color)] focus:dynamic-ui-ring-[color:var(--uic-focus-color)] sm:dynamic-ui-text-sm dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:dynamic-ui-placeholder-gray-400 dark:invalid:dynamic-ui-border-[#dc35467f] dark:invalid:dynamic-ui-ring-[#dc35467f] dark:focus:dynamic-ui-border-[#007bff40] dark:focus:dynamic-ui-ring-[#007bff40]"
           type="date"
           defaultValue={defaultValue}
           id={formField.id}
@@ -31,7 +31,7 @@ export function DateFormField(props: DynamicUiComponentProps<string | null>, ref
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p className="dark:text-dynamicui-gray-200 mt-2 text-sm text-gray-500" id={hintId}>
+        <p className="dark:dynamic-ui-text-dynamicui-gray-200 dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-gray-500" id={hintId}>
           {parsedCustomFormConfig?.hint}
         </p>
       )}

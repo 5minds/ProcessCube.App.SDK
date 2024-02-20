@@ -8,7 +8,37 @@
     --uic-background-color: var(--user-interaction-component-background-color, theme('colors.dynamicui-gray.500'));
     --uic-text-color: var(--user-interaction-component-text-color, theme('colors.dynamicui-gray.50'));
     --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.dynamicui-gray.300'));
+    --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, transparent));
 
+    /* HEADER */
+    --uic-header-text-color: var(
+      --user-interaction-component-header-text-color,
+      var(--text-color, theme('colors.dynamicui-gray.150'))
+    );
+
+    --uic-header-dropdown-icon-text-color: var(
+      --user-interaction-component-header-dropdown-icon-text-color,
+      var(--icon-color, theme('colors.dynamicui-gray.150'))
+    );
+    --uic-header-dropdown-icon-text-hover-color: var(
+      --user-interaction-component-header-dropdown-icon-text-hover-color,
+      var(--icon-hover-color, theme('colors.dynamicui-gray.100'))
+    );
+
+    --uic-header-dropdown-menu-background-color: var(
+      --user-interaction-component-header-dropdown-menu-background-color,
+      var(--dropdown-menu-background-color, theme('colors.dynamicui-gray.400'))
+    );
+    --uic-header-dropdown-menu-entry-background-hover-color: var(
+      --user-interaction-component-header-dropdown-menu-entry-background-hover-color,
+      var(--dropdown-menu-entry-background-hover-color, theme('colors.dynamicui-gray.250'))
+    );
+    --uic-header-dropdown-menu-terminate-entry-text-color: var(
+      --user-interaction-component-header-dropdown-menu-terminate-entry-text-color,
+      #d6868d
+    );
+
+    /* FOOTER */
     --uic-footer-background-color: var(
       --user-interaction-component-footer-background-color,
       theme('colors.dynamicui-gray.600')
@@ -67,6 +97,7 @@
       --user-interaction-component-header-text-color,
       var(--text-color, theme('colors.gray.900'))
     );
+
     --uic-header-dropdown-icon-text-color: var(
       --user-interaction-component-header-dropdown-icon-text-color,
       var(--icon-color, theme('colors.gray.400'))
@@ -88,17 +119,9 @@
       --user-interaction-component-header-dropdown-menu-suspend-entry-text-color,
       var(--uic-text-color)
     );
-    --uic-header-dropdown-menu-suspend-entry-icon-color: var(
-      --user-interaction-component-header-dropdown-menu-suspend-entry-icon-color,
-      var(--uic-header-dropdown-icon-text-color)
-    );
     --uic-header-dropdown-menu-terminate-entry-text-color: var(
       --user-interaction-component-header-dropdown-menu-terminate-entry-text-color,
       theme('colors.red.700')
-    );
-    --uic-header-dropdown-menu-terminate-entry-icon-color: var(
-      --user-interaction-component-header-dropdown-menu-terminate-entry-icon-color,
-      theme('colors.red.400')
     );
 
     /* FOOTER */

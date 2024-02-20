@@ -12,11 +12,11 @@ export function BooleanFormField(
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   return (
-    <div className="relative flex items-start">
-      <div className="flex h-5 items-center">
+    <div className="dynamic-ui-relative dynamic-ui-flex dynamic-ui-items-start">
+      <div className="dynamic-ui-flex dynamic-ui-h-5 dynamic-ui-items-center">
         <input
           type="checkbox"
-          className="dark:bg-dynamicui-gray-350 dark:focus:shadow-dynamicui-dark h-4 w-4 rounded border-[color:var(--uic-border-color)] text-sky-600 focus:ring-[color:var(--uic-focus-color)] dark:border-2 dark:border-solid dark:border-transparent dark:text-[#007bff40] dark:placeholder-gray-400   dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] "
+          className="dark:dynamic-ui-bg-dynamicui-gray-350 dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--uic-border-color)] dynamic-ui-text-sky-600 focus:dynamic-ui-ring-[color:var(--uic-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:dynamic-ui-text-[#007bff40] dark:dynamic-ui-placeholder-gray-400 dark:focus:dynamic-ui-border-[#007bff40] dark:focus:dynamic-ui-ring-[#007bff40] "
           defaultChecked={(props.state && props.state !== 'false') || formField.defaultValue === 'true'}
           id={formField.id}
           name={formField.id}
@@ -24,12 +24,12 @@ export function BooleanFormField(
           data-form-field-type="boolean"
         />
       </div>
-      <div className="ml-3 text-sm">
-        <label className="font-medium" htmlFor={formField.id}>
+      <div className="dynamic-ui-ml-3 dynamic-ui-text-sm">
+        <label className="dynamic-ui-font-medium" htmlFor={formField.id}>
           {formField.label}
         </label>
         {parsedCustomFormConfig?.hint && (
-          <p className="dark:text-dynamicui-gray-200 text-gray-500" id={hintId}>
+          <p className="dark:dynamic-ui-text-dynamicui-gray-200 dynamic-ui-text-gray-500" id={hintId}>
             {parsedCustomFormConfig.hint}
           </p>
         )}

@@ -13,7 +13,7 @@ export function StringFormField(
   const inputType = parsedCustomFormConfig?.multiline === 'true' ? 'textarea' : 'input';
   const textInput = React.createElement(inputType, {
     className:
-      'shadow-sm focus:ring-[color:var(--uic-focus-color)] focus:border-[color:var(--uic-focus-color)] block w-full sm:text-sm rounded-md border-[color:var(--uic-border-color)] invalid:border-red-500 invalid:ring-red-500 invalid:ring-1 dark:border-solid dark:border-transparent dark:bg-dynamicui-gray-350 dark:focus:shadow-dynamicui-dark dark:focus:border-[#007bff40] dark:focus:ring-[#007bff40] dark:placeholder-gray-400 dark:invalid:shadow-dynamicui-dark-invalid dark:invalid:border-[#dc35467f] dark:invalid:ring-[#dc35467f]',
+      'dynamic-ui-shadow-sm focus:dynamic-ui-ring-[color:var(--uic-focus-color)] focus:dynamic-ui-border-[color:var(--uic-focus-color)] dynamic-ui-block dynamic-ui-w-full sm:dynamic-ui-text-sm dynamic-ui-rounded-md dynamic-ui-border-[color:var(--uic-border-color)] invalid:dynamic-ui-border-red-500 invalid:dynamic-ui-ring-red-500 invalid:dynamic-ui-ring-1 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:dynamic-ui-bg-dynamicui-gray-350 dark:focus:dynamic-ui-shadow-dynamicui-dark dark:focus:dynamic-ui-border-[#007bff40] dark:focus:dynamic-ui-ring-[#007bff40] dark:dynamic-ui-placeholder-gray-400 dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dark:invalid:dynamic-ui-border-[#dc35467f] dark:invalid:dynamic-ui-ring-[#dc35467f]',
     id: formField.id,
     name: formField.id,
     defaultValue: state || (formField.defaultValue?.toString() ?? ''),
@@ -25,17 +25,17 @@ export function StringFormField(
   });
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="dark:text-dynamicui-gray-200 mt-2 text-sm text-gray-500">
+    <p id={`${formField.id}-hint`} className="dark:dynamic-ui-text-dynamicui-gray-200 dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-gray-500">
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;
 
   return (
     <div>
-      <label className="block text-sm font-medium" htmlFor={formField.id}>
+      <label className="dynamic-ui-block dynamic-ui-text-sm dynamic-ui-font-medium" htmlFor={formField.id}>
         {label}
       </label>
-      <div className="mt-1">{textInput}</div>
+      <div className="dynamic-ui-mt-1">{textInput}</div>
       {hint}
     </div>
   );
