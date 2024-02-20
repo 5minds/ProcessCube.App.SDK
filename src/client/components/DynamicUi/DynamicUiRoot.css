@@ -1,8 +1,0 @@
-.dynamic-ui-root {
-  @apply mx-auto block h-full min-h-[200px] rounded-lg shadow-lg shadow-[color:var(--uic-shadow-color)] sm:w-full sm:max-w-lg;
-}
-
-.dynamic-ui-root.dark {
-  @apply shadow-dynamicui-gray-300;
-  background-color: blue;
-}

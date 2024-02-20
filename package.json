@@ -37,7 +37,7 @@
     "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
     "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
     "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "build:css": "node build-css.cjs && npm run build:types",
+    "build:css": "node build-css.cjs",
     "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types,build:prod:css \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\" \"npm run build:prod:css\"",
     "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --out-extension:.js=.mjs",
     "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify",
@@ -81,9 +81,7 @@
     "@types/react-is": "^18.2.4",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.0",
-    "esbuild-plugin-inline-import": "^1.0.4",
     "esbuild-style-plugin": "^1.6.3",
-    "postcss": "^8.4.35",
     "prettier": "^3.0.0",
     "prettier-plugin-tailwindcss": "^0.5.10",
     "tailwindcss": "^3.4.0",
@@ -105,7 +103,6 @@
     "marked": "^9.1.2",
     "only-server": "^0.0.1",
     "openid-client": "^5.5.0",
-    "react-is": "^18.2.0",
-    "react-shadow": "^20.4.0"
+    "react-is": "^18.2.0"
   }
 }
