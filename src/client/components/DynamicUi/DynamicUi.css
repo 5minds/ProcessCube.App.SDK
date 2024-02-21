@@ -9,9 +9,27 @@
     --uic-text-color: var(--user-interaction-component-text-color, theme('colors.dynamicui-gray.50'));
     --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.dynamicui-gray.300'));
     --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, transparent));
+    --uic-focus-color: var(--user-interaction-component-focus-color, var(--focus-color, #007bff40));
+
     --uic-formfield-hint-text-color: var(
       --user-interaction-component-formfield-hint-text-color,
       var(--formfield-hint-text-color, theme('colors.dynamicui-gray.200'))
+    );
+    --uic-formfield-background-color: var(
+      --user-interaction-component-formfield-background-color,
+      var(--formfield-background-color, theme('colors.dynamicui-gray.350'))
+    );
+    --uic-formfield-placeholder-text-color: var(
+      --user-interaction-component-formfield-placeholder-text-color,
+      var(--formfield-placeholder-text-color, theme('colors.gray.400'))
+    );
+    --uic-formfield-invalid-color: var(
+      --user-interaction-component-formfield-invalid-color,
+      var(--formfield-invalid-color, #dc35467f)
+    );
+    --uic-formfield-checkbox-text-color: var(
+      --user-interaction-component-formfield-checkbox-text-color,
+      var(--formfield-checkbox-text-color, #007bff40)
     );
 
     /* HEADER */
@@ -95,9 +113,26 @@
     --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, theme('colors.gray.300')));
     --uic-focus-color: var(--user-interaction-component-focus-color, var(--focus-color, theme('colors.sky.700')));
     --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.gray.400'));
+
     --uic-formfield-hint-text-color: var(
       --user-interaction-component-formfield-hint-text-color,
       var(--formfield-hint-text-color, theme('colors.gray.500'))
+    );
+    --uic-formfield-background-color: var(
+      --user-interaction-component-formfield-background-color,
+      var(--formfield-background-color, theme('colors.white'))
+    );
+    --uic-formfield-placeholder-text-color: var(
+      --user-interaction-component-formfield-placeholder-text-color,
+      var(--formfield-placeholder-text-color, theme('colors.gray.400'))
+    );
+    --uic-formfield-invalid-color: var(
+      --user-interaction-component-formfield-invalid-color,
+      var(--formfield-invalid-color, theme('colors.red.500'))
+    );
+    --uic-formfield-checkbox-text-color: var(
+      --user-interaction-component-formfield-checkbox-text-color,
+      var(--formfield-checkbox-text-color, theme('colors.sky.600'))
     );
 
     /* HEADER */
