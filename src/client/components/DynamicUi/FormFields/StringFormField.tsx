@@ -25,7 +25,10 @@ export function StringFormField(
   });
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)] dynamic-ui-mt-2 dynamic-ui-text-sm">
+    <p
+      id={`${formField.id}-hint`}
+      className="dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]"
+    >
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;

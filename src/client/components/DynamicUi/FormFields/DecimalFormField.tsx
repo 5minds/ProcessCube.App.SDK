@@ -22,7 +22,7 @@ export function DecimalFormField(props: DynamicUiComponentProps<string | null>, 
       </label>
       <div className="dynamic-ui-mt-1">
         <input
-          className="dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dynamic-ui-block dynamic-ui-w-full dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-shadow-sm invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] sm:dynamic-ui-text-sm dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)]"
+          className="dynamic-ui-block dynamic-ui-w-full dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] dynamic-ui-shadow-sm invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] sm:dynamic-ui-text-sm dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dark:focus:dynamic-ui-shadow-dynamicui-dark"
           type="number"
           step="0.01"
           placeholder={parsedCustomFormConfig?.placeholder || '0.00'}
@@ -34,7 +34,10 @@ export function DecimalFormField(props: DynamicUiComponentProps<string | null>, 
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p className="dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)] dynamic-ui-mt-2 dynamic-ui-text-sm" id={hintId}>
+        <p
+          className="dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]"
+          id={hintId}
+        >
           {parsedCustomFormConfig?.hint}
         </p>
       )}

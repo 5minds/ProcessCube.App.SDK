@@ -45,11 +45,14 @@ export function EnumFormField(
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)]"
+                    className="dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:focus:dynamic-ui-shadow-dynamicui-dark"
                   />
                 </div>
                 <div className="dynamic-ui-ml-3 dynamic-ui-text-sm">
-                  <label htmlFor={option.id} className="dynamic-ui-font-medium dynamic-ui-text-[color:var(--dui-text-color)]">
+                  <label
+                    htmlFor={option.id}
+                    className="dynamic-ui-font-medium dynamic-ui-text-[color:var(--dui-text-color)]"
+                  >
                     {option.name}
                   </label>
                 </div>
@@ -79,11 +82,14 @@ export function EnumFormField(
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)]"
+                    className="dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:focus:dynamic-ui-shadow-dynamicui-dark"
                   />
                 </div>
                 <div className="dynamic-ui-ml-3 dynamic-ui-text-sm">
-                  <label htmlFor={option.id} className="dynamic-ui-font-medium dynamic-ui-text-[color:var(--dui-text-color)]">
+                  <label
+                    htmlFor={option.id}
+                    className="dynamic-ui-font-medium dynamic-ui-text-[color:var(--dui-text-color)]"
+                  >
                     {option.name}
                   </label>
                 </div>
@@ -100,7 +106,7 @@ export function EnumFormField(
         <select
           id={formField.id}
           name={formField.id}
-          className="dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dark:dynamic-ui-bg-dynamicui-dropdown-dark dynamic-ui-mt-1 dynamic-ui-block dynamic-ui-w-full dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-py-2 dynamic-ui-pl-3 dynamic-ui-pr-10 dynamic-ui-text-base invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-[color:var(--dui-focus-color)] sm:dynamic-ui-text-sm dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)]"
+          className="dynamic-ui-mt-1 dynamic-ui-block dynamic-ui-w-full dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-py-2 dynamic-ui-pl-3 dynamic-ui-pr-10 dynamic-ui-text-base dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-[color:var(--dui-focus-color)] sm:dynamic-ui-text-sm dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:dynamic-ui-bg-dynamicui-dropdown-dark dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dark:focus:dynamic-ui-shadow-dynamicui-dark"
           onChange={(event) => (event.target.dataset.value = event.target.value)}
           data-value={defaultSelect}
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
@@ -121,7 +127,10 @@ export function EnumFormField(
   }
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)] dynamic-ui-mt-2 dynamic-ui-text-sm">
+    <p
+      id={`${formField.id}-hint`}
+      className="dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]"
+    >
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;

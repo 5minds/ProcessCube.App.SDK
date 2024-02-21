@@ -36,7 +36,7 @@ export function ParagraphFormField(
         // headings
         '[&_h1]:dynamic-ui-text-2xl [&_h1]:dynamic-ui-font-bold [&_h2]:dynamic-ui-text-xl [&_h2]:dynamic-ui-font-bold [&_h3]:dynamic-ui-text-lg [&_h3]:dynamic-ui-font-bold [&_h4]:dynamic-ui-text-base [&_h4]:dynamic-ui-font-bold [&_h5]:dynamic-ui-text-sm [&_h5]:dynamic-ui-font-bold [&_h6]:dynamic-ui-text-xs [&_h6]:dynamic-ui-font-bold',
         // code blocks
-        '[&_pre]:dark:dynamic-ui-bg-dynamicui-gray-700 [&_code]:dynamic-ui-text-[#e83e8c] [&_pre]:dynamic-ui-my-4 [&_pre]:dynamic-ui-bg-gray-100 [&_pre_code]:dynamic-ui-text-inherit',
+        '[&_code]:dynamic-ui-text-[#e83e8c] [&_pre]:dynamic-ui-my-4 [&_pre]:dynamic-ui-bg-gray-100 [&_pre]:dark:dynamic-ui-bg-dynamicui-gray-700 [&_pre_code]:dynamic-ui-text-inherit',
         // revert margin
         '[&_blockquote]:dynamic-ui-m-[revert] [&_fieldset]:dynamic-ui-m-[revert] [&_h1]:dynamic-ui-m-[revert] [&_h2]:dynamic-ui-m-[revert] [&_h3]:dynamic-ui-m-[revert] [&_h4]:dynamic-ui-m-[revert] [&_h5]:dynamic-ui-m-[revert] [&_h6]:dynamic-ui-m-[revert] [&_menu]:dynamic-ui-m-[revert] [&_ol]:dynamic-ui-m-[revert] [&_ul]:dynamic-ui-m-[revert]',
         // revert padding
@@ -44,7 +44,7 @@ export function ParagraphFormField(
         // list styles
         '[&_ol]:dynamic-ui-list-decimal [&_ol_p]:dynamic-ui-my-2 first-of-type:[&_ol_p]:dynamic-ui-my-4 [&_ul]:dynamic-ui-list-disc [&_ul_p]:dynamic-ui-my-2 first-of-type:[&_ul_p]:dynamic-ui-my-4',
         // checkbox
-        "[&_input[type='checkbox']]:dark:dynamic-ui-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dark:hover:checked:dynamic-ui-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dynamic-ui-h-4 [&_input[type='checkbox']]:dynamic-ui-w-4 [&_input[type='checkbox']]:dynamic-ui-rounded [&_input[type='checkbox']]:dynamic-ui-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dynamic-ui-text-sky-600 [&_input[type='checkbox']]:hover:dynamic-ui-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dark:dynamic-ui-border-2 [&_input[type='checkbox']]:dark:dynamic-ui-border-solid [&_input[type='checkbox']]:dark:dynamic-ui-border-transparent [&_input[type='checkbox']]:dark:dynamic-ui-text-[#007bff40] [&_input[type='checkbox']]:dark:hover:dynamic-ui-border-transparent",
+        "[&_input[type='checkbox']]:dynamic-ui-h-4 [&_input[type='checkbox']]:dynamic-ui-w-4 [&_input[type='checkbox']]:dynamic-ui-rounded [&_input[type='checkbox']]:dynamic-ui-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dynamic-ui-text-sky-600 [&_input[type='checkbox']]:hover:dynamic-ui-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dark:dynamic-ui-border-2 [&_input[type='checkbox']]:dark:dynamic-ui-border-solid [&_input[type='checkbox']]:dark:dynamic-ui-border-transparent [&_input[type='checkbox']]:dark:dynamic-ui-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dark:dynamic-ui-text-[#007bff40] [&_input[type='checkbox']]:dark:hover:dynamic-ui-border-transparent [&_input[type='checkbox']]:dark:hover:checked:dynamic-ui-bg-dynamicui-gray-350",
       )}
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>

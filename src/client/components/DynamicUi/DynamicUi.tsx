@@ -126,10 +126,7 @@ export function DynamicUi(
   const withDarkMode = rootClassNames.split(' ').includes('dark');
 
   return (
-    <div
-      className={withDarkMode ? `dark dynamic-ui-dark ${rootClassNames}` : rootClassNames}
-      data-dynamic-ui
-    >
+    <div className={withDarkMode ? `dark dynamic-ui-dark ${rootClassNames}` : rootClassNames} data-dynamic-ui>
       <form
         ref={formRef}
         className={classNames(
@@ -142,7 +139,10 @@ export function DynamicUi(
         action={onSubmit}
       >
         <header
-          className={classNames('dynamic-ui-px-4 dynamic-ui-pb-3 dynamic-ui-pt-4 sm:dynamic-ui-px-6', props.classNames?.header ? props.classNames.header : '')}
+          className={classNames(
+            'dynamic-ui-px-4 dynamic-ui-pb-3 dynamic-ui-pt-4 sm:dynamic-ui-px-6',
+            props.classNames?.header ? props.classNames.header : '',
+          )}
         >
           <Headline
             title={props.title ?? props.task.flowNodeName ?? 'User Task'}
@@ -256,7 +256,11 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
       </Fragment>
     );
   }
-  return <div className="dynamic-ui-space-y-2 sm:dynamic-ui-flex sm:dynamic-ui-flex-row-reverse sm:-dynamic-ui-space-x-2 sm:dynamic-ui-space-y-0">{buttons}</div>;
+  return (
+    <div className="dynamic-ui-space-y-2 sm:dynamic-ui-flex sm:dynamic-ui-flex-row-reverse sm:-dynamic-ui-space-x-2 sm:dynamic-ui-space-y-0">
+      {buttons}
+    </div>
+  );
 }
 
 function Headline(props: {
@@ -313,7 +317,9 @@ function Headline(props: {
                         type="button"
                         onClick={() => props.onSuspend?.()}
                         className={classNames(
-                          active ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]' : '',
+                          active
+                            ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]'
+                            : '',
                           'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-suspend-entry-text-color)]',
                         )}
                       >
@@ -328,7 +334,9 @@ function Headline(props: {
                           type="button"
                           onClick={() => props.onTerminate?.()}
                           className={classNames(
-                            active ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]' : '',
+                            active
+                              ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]'
+                              : '',
                             'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-terminate-entry-text-color)]',
                           )}
                         >
