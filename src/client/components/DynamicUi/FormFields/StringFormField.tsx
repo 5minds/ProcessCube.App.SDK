@@ -13,7 +13,7 @@ export function StringFormField(
   const inputType = parsedCustomFormConfig?.multiline === 'true' ? 'textarea' : 'input';
   const textInput = React.createElement(inputType, {
     className:
-      'dynamic-ui-shadow-sm focus:dynamic-ui-ring-[color:var(--uic-focus-color)] focus:dynamic-ui-border-[color:var(--uic-focus-color)] dynamic-ui-block dynamic-ui-w-full sm:dynamic-ui-text-sm dynamic-ui-rounded-md dynamic-ui-border-[color:var(--uic-border-color)] invalid:dynamic-ui-border-[color:var(--uic-formfield-invalid-color)] invalid:dynamic-ui-ring-[color:var(--uic-formfield-invalid-color)] invalid:dynamic-ui-ring-1 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--uic-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-placeholder-[color:var(--uic-formfield-placeholder-text-color)] dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid',
+      'dynamic-ui-shadow-sm focus:dynamic-ui-ring-[color:var(--dui-focus-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] dynamic-ui-block dynamic-ui-w-full sm:dynamic-ui-text-sm dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid',
     id: formField.id,
     name: formField.id,
     defaultValue: state || (formField.defaultValue?.toString() ?? ''),
@@ -25,7 +25,7 @@ export function StringFormField(
   });
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="dynamic-ui-text-[color:var(--uic-formfield-hint-text-color)] dynamic-ui-mt-2 dynamic-ui-text-sm">
+    <p id={`${formField.id}-hint`} className="dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)] dynamic-ui-mt-2 dynamic-ui-text-sm">
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;

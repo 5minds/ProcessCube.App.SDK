@@ -16,7 +16,7 @@ export function BooleanFormField(
       <div className="dynamic-ui-flex dynamic-ui-h-5 dynamic-ui-items-center">
         <input
           type="checkbox"
-          className="dynamic-ui-bg-[color:var(--uic-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--uic-border-color)] dynamic-ui-text-[color:var(--uic-formfield-checkbox-text-color)] focus:dynamic-ui-ring-[color:var(--uic-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-placeholder-[color:var(--uic-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--uic-focus-color)]"
+          className="dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)]"
           defaultChecked={(props.state && props.state !== 'false') || formField.defaultValue === 'true'}
           id={formField.id}
           name={formField.id}
@@ -29,7 +29,7 @@ export function BooleanFormField(
           {formField.label}
         </label>
         {parsedCustomFormConfig?.hint && (
-          <p className="dynamic-ui-text-[color:var(--uic-formfield-hint-text-color)]" id={hintId}>
+          <p className="dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]" id={hintId}>
             {parsedCustomFormConfig.hint}
           </p>
         )}

@@ -32,7 +32,7 @@ export function ParagraphFormField(
         // paragraph elements
         '[&_p]:dynamic-ui-my-4 first-of-type:[&_p]:dynamic-ui-mb-4 first-of-type:[&_p]:dynamic-ui-mt-0',
         // links/anchor
-        '[&_a]:dynamic-ui-text-[color:var(--uic-link-color)] [&_a]:dynamic-ui-underline hover:[&_a]:dynamic-ui-text-[color:var(--uic-link-hover-color)]',
+        '[&_a]:dynamic-ui-text-[color:var(--dui-link-color)] [&_a]:dynamic-ui-underline hover:[&_a]:dynamic-ui-text-[color:var(--dui-link-hover-color)]',
         // headings
         '[&_h1]:dynamic-ui-text-2xl [&_h1]:dynamic-ui-font-bold [&_h2]:dynamic-ui-text-xl [&_h2]:dynamic-ui-font-bold [&_h3]:dynamic-ui-text-lg [&_h3]:dynamic-ui-font-bold [&_h4]:dynamic-ui-text-base [&_h4]:dynamic-ui-font-bold [&_h5]:dynamic-ui-text-sm [&_h5]:dynamic-ui-font-bold [&_h6]:dynamic-ui-text-xs [&_h6]:dynamic-ui-font-bold',
         // code blocks
@@ -44,7 +44,7 @@ export function ParagraphFormField(
         // list styles
         '[&_ol]:dynamic-ui-list-decimal [&_ol_p]:dynamic-ui-my-2 first-of-type:[&_ol_p]:dynamic-ui-my-4 [&_ul]:dynamic-ui-list-disc [&_ul_p]:dynamic-ui-my-2 first-of-type:[&_ul_p]:dynamic-ui-my-4',
         // checkbox
-        "[&_input[type='checkbox']]:dark:dynamic-ui-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dark:hover:checked:dynamic-ui-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dynamic-ui-h-4 [&_input[type='checkbox']]:dynamic-ui-w-4 [&_input[type='checkbox']]:dynamic-ui-rounded [&_input[type='checkbox']]:dynamic-ui-border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:dynamic-ui-text-sky-600 [&_input[type='checkbox']]:hover:dynamic-ui-border-[color:var(--uic-border-color)] [&_input[type='checkbox']]:dark:dynamic-ui-border-2 [&_input[type='checkbox']]:dark:dynamic-ui-border-solid [&_input[type='checkbox']]:dark:dynamic-ui-border-transparent [&_input[type='checkbox']]:dark:dynamic-ui-text-[#007bff40] [&_input[type='checkbox']]:dark:hover:dynamic-ui-border-transparent",
+        "[&_input[type='checkbox']]:dark:dynamic-ui-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dark:hover:checked:dynamic-ui-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dynamic-ui-h-4 [&_input[type='checkbox']]:dynamic-ui-w-4 [&_input[type='checkbox']]:dynamic-ui-rounded [&_input[type='checkbox']]:dynamic-ui-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dynamic-ui-text-sky-600 [&_input[type='checkbox']]:hover:dynamic-ui-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dark:dynamic-ui-border-2 [&_input[type='checkbox']]:dark:dynamic-ui-border-solid [&_input[type='checkbox']]:dark:dynamic-ui-border-transparent [&_input[type='checkbox']]:dark:dynamic-ui-text-[#007bff40] [&_input[type='checkbox']]:dark:hover:dynamic-ui-border-transparent",
       )}
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>

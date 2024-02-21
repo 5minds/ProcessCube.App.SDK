@@ -2,6 +2,9 @@
 export default {
   content: ['./src/client/components/**/*.{js,ts,jsx,tsx,mdx}'],
   prefix: 'dynamic-ui-',
+  corePlugins: {
+    preflight: false,
+  },
   theme: {
     extend: {
       boxShadow: {

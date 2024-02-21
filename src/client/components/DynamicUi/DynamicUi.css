@@ -5,93 +5,93 @@
 @layer base {
   .dark,
   .dark * {
-    --uic-background-color: var(--user-interaction-component-background-color, theme('colors.dynamicui-gray.500'));
-    --uic-text-color: var(--user-interaction-component-text-color, theme('colors.dynamicui-gray.50'));
-    --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.dynamicui-gray.300'));
-    --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, transparent));
-    --uic-focus-color: var(--user-interaction-component-focus-color, var(--focus-color, #007bff40));
+    --dui-background-color: var(--dynamic-user-interface-background-color, theme('colors.dynamicui-gray.500'));
+    --dui-text-color: var(--dynamic-user-interface-text-color, theme('colors.dynamicui-gray.50'));
+    --dui-shadow-color: var(--dynamic-user-interface-shadow-color, theme('colors.dynamicui-gray.300'));
+    --dui-border-color: var(--dynamic-user-interface-border-color, var(--border-color, transparent));
+    --dui-focus-color: var(--dynamic-user-interface-focus-color, var(--focus-color, #007bff40));
 
-    --uic-formfield-hint-text-color: var(
-      --user-interaction-component-formfield-hint-text-color,
+    --dui-formfield-hint-text-color: var(
+      --dynamic-user-interface-formfield-hint-text-color,
       var(--formfield-hint-text-color, theme('colors.dynamicui-gray.200'))
     );
-    --uic-formfield-background-color: var(
-      --user-interaction-component-formfield-background-color,
+    --dui-formfield-background-color: var(
+      --dynamic-user-interface-formfield-background-color,
       var(--formfield-background-color, theme('colors.dynamicui-gray.350'))
     );
-    --uic-formfield-placeholder-text-color: var(
-      --user-interaction-component-formfield-placeholder-text-color,
+    --dui-formfield-placeholder-text-color: var(
+      --dynamic-user-interface-formfield-placeholder-text-color,
       var(--formfield-placeholder-text-color, theme('colors.gray.400'))
     );
-    --uic-formfield-invalid-color: var(
-      --user-interaction-component-formfield-invalid-color,
+    --dui-formfield-invalid-color: var(
+      --dynamic-user-interface-formfield-invalid-color,
       var(--formfield-invalid-color, #dc35467f)
     );
-    --uic-formfield-checkbox-text-color: var(
-      --user-interaction-component-formfield-checkbox-text-color,
+    --dui-formfield-checkbox-text-color: var(
+      --dynamic-user-interface-formfield-checkbox-text-color,
       var(--formfield-checkbox-text-color, #007bff40)
     );
 
     /* HEADER */
-    --uic-header-text-color: var(
-      --user-interaction-component-header-text-color,
+    --dui-header-text-color: var(
+      --dynamic-user-interface-header-text-color,
       var(--text-color, theme('colors.dynamicui-gray.150'))
     );
 
-    --uic-header-dropdown-icon-text-color: var(
-      --user-interaction-component-header-dropdown-icon-text-color,
+    --dui-header-dropdown-icon-text-color: var(
+      --dynamic-user-interface-header-dropdown-icon-text-color,
       var(--icon-color, theme('colors.dynamicui-gray.150'))
     );
-    --uic-header-dropdown-icon-text-hover-color: var(
-      --user-interaction-component-header-dropdown-icon-text-hover-color,
+    --dui-header-dropdown-icon-text-hover-color: var(
+      --dynamic-user-interface-header-dropdown-icon-text-hover-color,
       var(--icon-hover-color, theme('colors.dynamicui-gray.100'))
     );
 
-    --uic-header-dropdown-menu-background-color: var(
-      --user-interaction-component-header-dropdown-menu-background-color,
+    --dui-header-dropdown-menu-background-color: var(
+      --dynamic-user-interface-header-dropdown-menu-background-color,
       var(--dropdown-menu-background-color, theme('colors.dynamicui-gray.400'))
     );
-    --uic-header-dropdown-menu-entry-background-hover-color: var(
-      --user-interaction-component-header-dropdown-menu-entry-background-hover-color,
+    --dui-header-dropdown-menu-entry-background-hover-color: var(
+      --dynamic-user-interface-header-dropdown-menu-entry-background-hover-color,
       var(--dropdown-menu-entry-background-hover-color, theme('colors.dynamicui-gray.250'))
     );
-    --uic-header-dropdown-menu-terminate-entry-text-color: var(
-      --user-interaction-component-header-dropdown-menu-terminate-entry-text-color,
+    --dui-header-dropdown-menu-terminate-entry-text-color: var(
+      --dynamic-user-interface-header-dropdown-menu-terminate-entry-text-color,
       #d6868d
     );
 
     /* FOOTER */
-    --uic-footer-background-color: var(
-      --user-interaction-component-footer-background-color,
+    --dui-footer-background-color: var(
+      --dynamic-user-interface-footer-background-color,
       theme('colors.dynamicui-gray.600')
     );
-    --uic-footer-continue-button-background-color: var(
-      --user-interaction-component-footer-continue-button-background-color,
+    --dui-footer-continue-button-background-color: var(
+      --dynamic-user-interface-footer-continue-button-background-color,
       #33609a
     );
-    --uic-footer-continue-button-background-hover-color: var(
-      --user-interaction-component-footer-continue-button-background-hover-color,
+    --dui-footer-continue-button-background-hover-color: var(
+      --dynamic-user-interface-footer-continue-button-background-hover-color,
       #3666a5
     );
-    --uic-footer-continue-button-focus-outline-color: var(
-      --user-interaction-component-footer-continue-button-focus-outline-color,
+    --dui-footer-continue-button-focus-outline-color: var(
+      --dynamic-user-interface-footer-continue-button-focus-outline-color,
       #3666a5
     );
 
-    --uic-footer-decline-button-text-color: var(
-      --user-interaction-component-footer-decline-button-text-color,
+    --dui-footer-decline-button-text-color: var(
+      --dynamic-user-interface-footer-decline-button-text-color,
       theme('colors.dynamicui-gray.50')
     );
-    --uic-footer-decline-button-background-color: var(
-      --user-interaction-component-footer-decline-button-background-color,
+    --dui-footer-decline-button-background-color: var(
+      --dynamic-user-interface-footer-decline-button-background-color,
       theme('colors.dynamicui-gray.350')
     );
-    --uic-footer-decline-button-background-hover-color: var(
-      --user-interaction-component-footer-decline-button-background-hover-color,
+    --dui-footer-decline-button-background-hover-color: var(
+      --dynamic-user-interface-footer-decline-button-background-hover-color,
       theme('colors.dynamicui-gray.300')
     );
-    --uic-footer-decline-button-focus-outline-color: var(
-      --user-interaction-component-footer-decline-button-focus-outline-color,
+    --dui-footer-decline-button-focus-outline-color: var(
+      --dynamic-user-interface-footer-decline-button-focus-outline-color,
       theme('colors.dynamicui-gray.300')
     );
   }
@@ -100,107 +100,107 @@
   ::before,
   ::after {
     box-sizing: border-box;
-    --uic-background-color: var(
-      --user-interaction-component-background-color,
+    --dui-background-color: var(
+      --dynamic-user-interface-background-color,
       var(--background-color, theme('colors.white'))
     );
-    --uic-text-color: var(--user-interaction-component-text-color, var(--text-bright-color, theme('colors.gray.700')));
-    --uic-link-color: var(--user-interaction-component-link-color, var(--link-color, theme('colors.sky.600')));
-    --uic-link-hover-color: var(
-      --user-interaction-component-link-hover-color,
+    --dui-text-color: var(--dynamic-user-interface-text-color, var(--text-bright-color, theme('colors.gray.700')));
+    --dui-link-color: var(--dynamic-user-interface-link-color, var(--link-color, theme('colors.sky.600')));
+    --dui-link-hover-color: var(
+      --dynamic-user-interface-link-hover-color,
       var(--link-hover-color, theme('colors.sky.900'))
     );
-    --uic-border-color: var(--user-interaction-component-border-color, var(--border-color, theme('colors.gray.300')));
-    --uic-focus-color: var(--user-interaction-component-focus-color, var(--focus-color, theme('colors.sky.700')));
-    --uic-shadow-color: var(--user-interaction-component-shadow-color, theme('colors.gray.400'));
+    --dui-border-color: var(--dynamic-user-interface-border-color, var(--border-color, theme('colors.gray.300')));
+    --dui-focus-color: var(--dynamic-user-interface-focus-color, var(--focus-color, theme('colors.sky.700')));
+    --dui-shadow-color: var(--dynamic-user-interface-shadow-color, theme('colors.gray.400'));
 
-    --uic-formfield-hint-text-color: var(
-      --user-interaction-component-formfield-hint-text-color,
+    --dui-formfield-hint-text-color: var(
+      --dynamic-user-interface-formfield-hint-text-color,
       var(--formfield-hint-text-color, theme('colors.gray.500'))
     );
-    --uic-formfield-background-color: var(
-      --user-interaction-component-formfield-background-color,
+    --dui-formfield-background-color: var(
+      --dynamic-user-interface-formfield-background-color,
       var(--formfield-background-color, theme('colors.white'))
     );
-    --uic-formfield-placeholder-text-color: var(
-      --user-interaction-component-formfield-placeholder-text-color,
+    --dui-formfield-placeholder-text-color: var(
+      --dynamic-user-interface-formfield-placeholder-text-color,
       var(--formfield-placeholder-text-color, theme('colors.gray.500'))
     );
-    --uic-formfield-invalid-color: var(
-      --user-interaction-component-formfield-invalid-color,
+    --dui-formfield-invalid-color: var(
+      --dynamic-user-interface-formfield-invalid-color,
       var(--formfield-invalid-color, theme('colors.red.500'))
     );
-    --uic-formfield-checkbox-text-color: var(
-      --user-interaction-component-formfield-checkbox-text-color,
+    --dui-formfield-checkbox-text-color: var(
+      --dynamic-user-interface-formfield-checkbox-text-color,
       var(--formfield-checkbox-text-color, theme('colors.sky.600'))
     );
 
     /* HEADER */
-    --uic-header-text-color: var(
-      --user-interaction-component-header-text-color,
+    --dui-header-text-color: var(
+      --dynamic-user-interface-header-text-color,
       var(--text-color, theme('colors.gray.900'))
     );
 
-    --uic-header-dropdown-icon-text-color: var(
-      --user-interaction-component-header-dropdown-icon-text-color,
+    --dui-header-dropdown-icon-text-color: var(
+      --dynamic-user-interface-header-dropdown-icon-text-color,
       var(--icon-color, theme('colors.gray.400'))
     );
-    --uic-header-dropdown-icon-text-hover-color: var(
-      --user-interaction-component-header-dropdown-icon-text-hover-color,
+    --dui-header-dropdown-icon-text-hover-color: var(
+      --dynamic-user-interface-header-dropdown-icon-text-hover-color,
       var(--icon-hover-color, theme('colors.gray.500'))
     );
 
-    --uic-header-dropdown-menu-background-color: var(
-      --user-interaction-component-header-dropdown-menu-background-color,
+    --dui-header-dropdown-menu-background-color: var(
+      --dynamic-user-interface-header-dropdown-menu-background-color,
       var(--dropdown-menu-background-color, theme('colors.white'))
     );
-    --uic-header-dropdown-menu-entry-background-hover-color: var(
-      --user-interaction-component-header-dropdown-menu-entry-background-hover-color,
+    --dui-header-dropdown-menu-entry-background-hover-color: var(
+      --dynamic-user-interface-header-dropdown-menu-entry-background-hover-color,
       var(--dropdown-menu-entry-background-hover-color, theme('colors.gray.100'))
     );
-    --uic-header-dropdown-menu-suspend-entry-text-color: var(
-      --user-interaction-component-header-dropdown-menu-suspend-entry-text-color,
-      var(--uic-text-color)
+    --dui-header-dropdown-menu-suspend-entry-text-color: var(
+      --dynamic-user-interface-header-dropdown-menu-suspend-entry-text-color,
+      var(--dui-text-color)
     );
-    --uic-header-dropdown-menu-terminate-entry-text-color: var(
-      --user-interaction-component-header-dropdown-menu-terminate-entry-text-color,
+    --dui-header-dropdown-menu-terminate-entry-text-color: var(
+      --dynamic-user-interface-header-dropdown-menu-terminate-entry-text-color,
       theme('colors.red.700')
     );
 
     /* FOOTER */
-    --uic-footer-background-color: var(--user-interaction-component-footer-background-color, theme('colors.gray.50'));
+    --dui-footer-background-color: var(--dynamic-user-interface-footer-background-color, theme('colors.gray.50'));
 
-    --uic-footer-continue-button-text-color: var(
-      --user-interaction-component-footer-continue-button-text-color,
+    --dui-footer-continue-button-text-color: var(
+      --dynamic-user-interface-footer-continue-button-text-color,
       theme('colors.white')
     );
-    --uic-footer-continue-button-background-color: var(
-      --user-interaction-component-footer-continue-button-background-color,
+    --dui-footer-continue-button-background-color: var(
+      --dynamic-user-interface-footer-continue-button-background-color,
       theme('colors.sky.600')
     );
-    --uic-footer-continue-button-background-hover-color: var(
-      --user-interaction-component-footer-continue-button-background-hover-color,
+    --dui-footer-continue-button-background-hover-color: var(
+      --dynamic-user-interface-footer-continue-button-background-hover-color,
       theme('colors.sky.700')
     );
-    --uic-footer-continue-button-focus-outline-color: var(
-      --user-interaction-component-footer-continue-button-focus-outline-color,
+    --dui-footer-continue-button-focus-outline-color: var(
+      --dynamic-user-interface-footer-continue-button-focus-outline-color,
       theme('colors.sky.500')
     );
 
-    --uic-footer-decline-button-text-color: var(
-      --user-interaction-component-footer-decline-button-text-color,
+    --dui-footer-decline-button-text-color: var(
+      --dynamic-user-interface-footer-decline-button-text-color,
       theme('colors.gray.700')
     );
-    --uic-footer-decline-button-background-color: var(
-      --user-interaction-component-footer-decline-button-background-color,
+    --dui-footer-decline-button-background-color: var(
+      --dynamic-user-interface-footer-decline-button-background-color,
       theme('colors.white')
     );
-    --uic-footer-decline-button-background-hover-color: var(
-      --user-interaction-component-footer-decline-button-background-hover-color,
+    --dui-footer-decline-button-background-hover-color: var(
+      --dynamic-user-interface-footer-decline-button-background-hover-color,
       theme('colors.gray.50')
     );
-    --uic-footer-decline-button-focus-outline-color: var(
-      --user-interaction-component-footer-decline-button-focus-outline-color,
+    --dui-footer-decline-button-focus-outline-color: var(
+      --dynamic-user-interface-footer-decline-button-focus-outline-color,
       theme('colors.gray.300')
     );
   }

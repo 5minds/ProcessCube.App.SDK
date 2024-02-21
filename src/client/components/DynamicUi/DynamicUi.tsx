@@ -121,7 +121,7 @@ export function DynamicUi(
   return (
     <div
       className={classNames(
-        'dynamic-ui-mx-auto dynamic-ui-block dynamic-ui-h-full dynamic-ui-min-h-[200px] dynamic-ui-rounded-lg dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--uic-shadow-color)] sm:dynamic-ui-w-full sm:dynamic-ui-max-w-lg',
+        'dynamic-ui-mx-auto dynamic-ui-block dynamic-ui-h-full dynamic-ui-min-h-[200px] dynamic-ui-rounded-lg dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--dui-shadow-color)] sm:dynamic-ui-w-full sm:dynamic-ui-max-w-lg',
         props.classNames?.wrapper ? props.classNames?.wrapper : '',
         props.className ? props.className : '',
       )}
@@ -130,7 +130,7 @@ export function DynamicUi(
       <form
         ref={formRef}
         className={classNames(
-          'dynamic-ui-flex dynamic-ui-max-h-full dynamic-ui-flex-col dynamic-ui-rounded-lg dynamic-ui-bg-[color:var(--uic-background-color)]  dynamic-ui-text-[color:var(--uic-text-color)] dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--uic-shadow-color)]',
+          'dynamic-ui-flex dynamic-ui-max-h-full dynamic-ui-flex-col dynamic-ui-rounded-lg dynamic-ui-bg-[color:var(--dui-background-color)]  dynamic-ui-text-[color:var(--dui-text-color)] dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--dui-shadow-color)]',
           props.classNames?.base ? props.classNames?.base : '',
         )}
         data-user-task-id={props.task.flowNodeId}
@@ -205,7 +205,7 @@ export function DynamicUi(
         </section>
         <footer
           className={classNames(
-            'dynamic-ui-rounded-b-lg dynamic-ui-bg-[color:var(--uic-footer-background-color)] dynamic-ui-px-4 dynamic-ui-py-3 sm:dynamic-ui-px-6',
+            'dynamic-ui-rounded-b-lg dynamic-ui-bg-[color:var(--dui-footer-background-color)] dynamic-ui-px-4 dynamic-ui-py-3 sm:dynamic-ui-px-6',
             props.classNames?.footer ? props.classNames.footer : '',
           )}
         >
@@ -223,7 +223,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
     <Fragment>
       <button
         type="submit"
-        className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--uic-footer-continue-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--uic-footer-continue-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm "
+        className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--dui-footer-continue-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm "
       >
         OK
       </button>
@@ -237,7 +237,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--uic-footer-continue-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--uic-footer-continue-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--uic-footer-continue-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--uic-footer-continue-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm "
+          className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--dui-footer-continue-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm "
           value="true"
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
@@ -245,7 +245,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-[color:var(--uic-border-color)] dynamic-ui-bg-[color:var(--uic-footer-decline-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--uic-footer-decline-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--uic-footer-decline-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--uic-footer-decline-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm"
+          className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-footer-decline-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--dui-footer-decline-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--dui-footer-decline-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-footer-decline-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm"
           value="false"
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
@@ -270,7 +270,7 @@ function Headline(props: {
       <div className="dynamic-ui-flex-1">
         <h3
           id="headline-title"
-          className="dynamic-ui-text-lg dynamic-ui-font-medium dynamic-ui-leading-6 dynamic-ui-text-[color:var(--uic-header-text-color)]"
+          className="dynamic-ui-text-lg dynamic-ui-font-medium dynamic-ui-leading-6 dynamic-ui-text-[color:var(--dui-header-text-color)]"
         >
           {props.title}
         </h3>
@@ -279,7 +279,7 @@ function Headline(props: {
         {showHeaderMenu && (
           <Menu as="div" className="dynamic-ui-relative dynamic-ui-inline-block dynamic-ui-text-left">
             <div>
-              <Menu.Button className="dynamic-ui-flex dynamic-ui-items-center dynamic-ui-rounded-full dynamic-ui-text-[color:var(--uic-header-dropdown-icon-text-color)] hover:dynamic-ui-text-[color:var(--uic-header-dropdown-icon-text-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--uic-focus-color)]  ">
+              <Menu.Button className="dynamic-ui-flex dynamic-ui-items-center dynamic-ui-rounded-full dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-color)] hover:dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-focus-color)]  ">
                 <span className="dynamic-ui-sr-only">Open options</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -302,7 +302,7 @@ function Headline(props: {
               leaveFrom="dynamic-ui-transform dynamic-ui-opacity-100 dynamic-ui-scale-100"
               leaveTo="dynamic-ui-transform dynamic-ui-opacity-0 dynamic-ui-scale-95"
             >
-              <Menu.Items className="dynamic-ui-absolute dynamic-ui-right-0 dynamic-ui-z-10 dynamic-ui-mt-2 dynamic-ui-w-56 dynamic-ui-origin-top-right dynamic-ui-rounded-md dynamic-ui-bg-[color:var(--uic-header-dropdown-menu-background-color)] dynamic-ui-shadow-lg dynamic-ui-ring-1 dynamic-ui-ring-black dynamic-ui-ring-opacity-5 focus:dynamic-ui-outline-none">
+              <Menu.Items className="dynamic-ui-absolute dynamic-ui-right-0 dynamic-ui-z-10 dynamic-ui-mt-2 dynamic-ui-w-56 dynamic-ui-origin-top-right dynamic-ui-rounded-md dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-background-color)] dynamic-ui-shadow-lg dynamic-ui-ring-1 dynamic-ui-ring-black dynamic-ui-ring-opacity-5 focus:dynamic-ui-outline-none">
                 <div className="dynamic-ui-py-1">
                   <Menu.Item>
                     {({ active }) => (
@@ -310,8 +310,8 @@ function Headline(props: {
                         type="button"
                         onClick={() => props.onSuspend?.()}
                         className={classNames(
-                          active ? 'dynamic-ui-bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)]' : '',
-                          'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--uic-header-dropdown-menu-suspend-entry-text-color)]',
+                          active ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]' : '',
+                          'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-suspend-entry-text-color)]',
                         )}
                       >
                         Suspend
@@ -325,8 +325,8 @@ function Headline(props: {
                           type="button"
                           onClick={() => props.onTerminate?.()}
                           className={classNames(
-                            active ? 'dynamic-ui-bg-[color:var(--uic-header-dropdown-menu-entry-background-hover-color)]' : '',
-                            'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--uic-header-dropdown-menu-terminate-entry-text-color)]',
+                            active ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]' : '',
+                            'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-terminate-entry-text-color)]',
                           )}
                         >
                           Terminate
