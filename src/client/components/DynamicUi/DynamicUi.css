@@ -124,7 +124,7 @@
     );
     --uic-formfield-placeholder-text-color: var(
       --user-interaction-component-formfield-placeholder-text-color,
-      var(--formfield-placeholder-text-color, theme('colors.gray.400'))
+      var(--formfield-placeholder-text-color, theme('colors.gray.500'))
     );
     --uic-formfield-invalid-color: var(
       --user-interaction-component-formfield-invalid-color,
