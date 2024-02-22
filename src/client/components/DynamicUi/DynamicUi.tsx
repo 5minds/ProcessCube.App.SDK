@@ -126,7 +126,7 @@ export function DynamicUi(
   const withDarkMode = rootClassNames.split(' ').includes('dark');
 
   return (
-    <div className={withDarkMode ? `dark dynamic-ui-dark ${rootClassNames}` : rootClassNames} data-dynamic-ui>
+    <div className={withDarkMode ? `dynamic-ui-dark ${rootClassNames}` : rootClassNames} data-dynamic-ui>
       <form
         ref={formRef}
         className={classNames(
