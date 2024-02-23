@@ -55,18 +55,32 @@ export type FormState = {
 
 export function DynamicUi(
   props: PropsWithChildren<{
+    /** Instance of the UserTask to render */
     task: DataModels.FlowNodeInstances.UserTaskInstance;
+    /** Callback, that is called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
+    /** Option to disable the header menu in the top right corner */
     showHeaderMenu?: boolean;
+    /** Callback, that is called when the suspend option is clicked */
     onSuspend?: () => void | Promise<void>;
+    /** Option to disable the terminate option in the top right corner menu */
     showTerminateOption?: boolean;
+    /** Callback, that is called when the terminate option is clicked */
     onTerminate?: () => void | Promise<void>;
+    /** Custom class name for the root element */
     className?: string;
+    /** Custom class names for the different parts of the component */
     classNames?: Partial<Record<'wrapper' | 'base' | 'header' | 'body' | 'footer', string>>;
+    /** Custom title for the header of the dialog */
     title?: React.ReactNode;
+    /** Custom components that can be used to render own form field types or override existing ones */
     customFieldComponents?: DynamicUiFormFieldComponentMap;
+    /** Initial state of the form fields */
     state?: FormState;
+    /** Callback, that is called on every form field change */
     onStateChange?: (newValue: string, formFieldId: string, formState: FormState) => void | Promise<void>;
+    /** Option to enable dark mode */
+    darkMode?: boolean;
   }>,
 ) {
   const { userTaskConfig: config } = props.task;
@@ -123,10 +137,17 @@ export function DynamicUi(
     props.classNames?.wrapper ? props.classNames?.wrapper : '',
     props.className ? props.className : '',
   );
-  const withDarkMode = rootClassNames.split(' ').includes('dark');
+  const withDarkMode = props.darkMode || (props.darkMode !== false && rootClassNames.split(' ').includes('dark'));
 
   return (
-    <div className={withDarkMode ? `dynamic-ui-dark ${rootClassNames}` : rootClassNames} data-dynamic-ui>
+    <div
+      className={
+        withDarkMode
+          ? `dynamic-ui-dark ${rootClassNames}`
+          : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'dynamic-ui-dark'))
+      }
+      data-dynamic-ui
+    >
       <form
         ref={formRef}
         className={classNames(
