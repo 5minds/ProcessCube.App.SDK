@@ -44,3 +44,12 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   header: HeaderFormField,
   confirm: ConfirmFormField,
 };
+export { BooleanFormField } from './BooleanFormField';
+export { DateFormField } from './DateFormField';
+export { DecimalFormField } from './DecimalFormField';
+export { EnumFormField } from './EnumFormField';
+export { IntegerFormField } from './IntegerFormField';
+export { StringFormField } from './StringFormField';
+export { ParagraphFormField } from './ParagraphFormField';
+export { HeaderFormField } from './HeaderFormField';
+export { ConfirmFormField } from './ConfirmFormField';
