@@ -29,7 +29,7 @@
     );
     --dui-formfield-checkbox-text-color: var(
       --dynamic-user-interface-formfield-checkbox-text-color,
-      var(--formfield-checkbox-text-color, #007bff40)
+      var(--formfield-checkbox-text-color, #007bff74)
     );
 
     /* HEADER */
