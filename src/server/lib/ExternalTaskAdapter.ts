@@ -3,7 +3,7 @@ import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcu
 import { basename, dirname, join, relative } from 'node:path';
 import { build as esBuild } from 'esbuild';
 import { promises as fsp, existsSync } from 'node:fs';
-import { Issuer, TokenSet } from 'openid-client';
+import { Issuer, TokenSet, custom } from 'openid-client';
 import { jwtDecode } from 'jwt-decode';
 import { watch } from 'chokidar';
 
@@ -28,6 +28,10 @@ export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'w
  * @returns {Promise<void>} A promise that resolves when the external tasks are subscribed
  * */
 export async function subscribeToExternalTasks(customExternalTasksDirPath?: string): Promise<void> {
+  custom.setHttpOptionsDefaults({
+    timeout: 100000,
+  });
+
   if (customExternalTasksDirPath && !existsSync(customExternalTasksDirPath)) {
     throw new Error(
       `Invalid customExternalTasksDirPath. The given path '${customExternalTasksDirPath}' does not exist`,
