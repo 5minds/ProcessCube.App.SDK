@@ -57,16 +57,10 @@ export function DynamicUi(
   props: PropsWithChildren<{
     /** Instance of the UserTask to render */
     task: DataModels.FlowNodeInstances.UserTaskInstance;
+    /** Custom element to insert into the DynamicUI Headline */
+    headerComponent?: JSX.Element;
     /** Callback, that is called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
-    /** Option to disable the header menu in the top right corner */
-    showHeaderMenu?: boolean;
-    /** Callback, that is called when the suspend option is clicked */
-    onSuspend?: () => void | Promise<void>;
-    /** Option to disable the terminate option in the top right corner menu */
-    showTerminateOption?: boolean;
-    /** Callback, that is called when the terminate option is clicked */
-    onTerminate?: () => void | Promise<void>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -110,10 +104,6 @@ export function DynamicUi(
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
     props.onSubmit(userTaskResult, formData);
-  };
-
-  const onSuspend = () => {
-    props.onSuspend?.();
   };
 
   function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
@@ -167,10 +157,7 @@ export function DynamicUi(
         >
           <Headline
             title={props.title ?? props.task.flowNodeName ?? 'User Task'}
-            onSuspend={onSuspend}
-            showHeaderMenu={props.showHeaderMenu}
-            showTerminateOption={props.showTerminateOption}
-            onTerminate={props.onTerminate}
+            headerComponent={props.headerComponent}
           />
         </header>
         <section
@@ -284,15 +271,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
   );
 }
 
-function Headline(props: {
-  title?: React.ReactNode;
-  onSuspend?: () => void;
-  onTerminate?: () => void | Promise<void>;
-  showTerminateOption?: boolean;
-  showHeaderMenu?: boolean;
-}) {
-  const showHeaderMenu = props.showHeaderMenu ?? true;
-
+function Headline(props: { title?: React.ReactNode; headerComponent?: JSX.Element }) {
   return (
     <div className="dynamic-ui-flex dynamic-ui-space-x-3">
       <div className="dynamic-ui-flex-1">
@@ -303,75 +282,7 @@ function Headline(props: {
           {props.title}
         </h3>
       </div>
-      <div className="dynamic-ui-flex dynamic-ui-self-center">
-        {showHeaderMenu && (
-          <Menu as="div" className="dynamic-ui-relative dynamic-ui-inline-block dynamic-ui-text-left">
-            <div>
-              <Menu.Button className="dynamic-ui-flex dynamic-ui-items-center dynamic-ui-rounded-full dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-color)] hover:dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-focus-color)]  ">
-                <span className="dynamic-ui-sr-only">Open options</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  className="dynamic-ui-h-5 dynamic-ui-w-5"
-                >
-                  <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                </svg>
-              </Menu.Button>
-            </div>
-
-            <Transition
-              as={Fragment}
-              enter="dynamic-ui-transition dynamic-ui-ease-out dynamic-ui-duration-100"
-              enterFrom="dynamic-ui-transform dynamic-ui-opacity-0 dynamic-ui-scale-95"
-              enterTo="dynamic-ui-transform dynamic-ui-opacity-100 dynamic-ui-scale-100"
-              leave="dynamic-ui-transition dynamic-ui-ease-in dynamic-ui-duration-75"
-              leaveFrom="dynamic-ui-transform dynamic-ui-opacity-100 dynamic-ui-scale-100"
-              leaveTo="dynamic-ui-transform dynamic-ui-opacity-0 dynamic-ui-scale-95"
-            >
-              <Menu.Items className="dynamic-ui-absolute dynamic-ui-right-0 dynamic-ui-z-10 dynamic-ui-mt-2 dynamic-ui-w-56 dynamic-ui-origin-top-right dynamic-ui-rounded-md dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-background-color)] dynamic-ui-shadow-lg dynamic-ui-ring-1 dynamic-ui-ring-black dynamic-ui-ring-opacity-5 focus:dynamic-ui-outline-none">
-                <div className="dynamic-ui-py-1">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <button
-                        type="button"
-                        onClick={() => props.onSuspend?.()}
-                        className={classNames(
-                          active
-                            ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]'
-                            : '',
-                          'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-suspend-entry-text-color)]',
-                        )}
-                      >
-                        Suspend
-                      </button>
-                    )}
-                  </Menu.Item>
-                  {props.showTerminateOption && (
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          type="button"
-                          onClick={() => props.onTerminate?.()}
-                          className={classNames(
-                            active
-                              ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]'
-                              : '',
-                            'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-terminate-entry-text-color)]',
-                          )}
-                        >
-                          Terminate
-                        </button>
-                      )}
-                    </Menu.Item>
-                  )}
-                </div>
-              </Menu.Items>
-            </Transition>
-          </Menu>
-        )}
-      </div>
+      <div className="dynamic-ui-flex dynamic-ui-self-center">{props.headerComponent}</div>
     </div>
   );
 }
@@ -511,4 +422,68 @@ function transformFormDataToUserTaskResult(
   });
 
   return userTaskResult;
+}
+
+export function HeaderDropDownMenu(props: { children: React.ReactNode }) {
+  return (
+    <Menu as="div" className="dynamic-ui-relative dynamic-ui-inline-block dynamic-ui-text-left">
+      <div>
+        <Menu.Button className="dynamic-ui-flex dynamic-ui-items-center dynamic-ui-rounded-full dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-color)] hover:dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-focus-color)]  ">
+          <span className="dynamic-ui-sr-only">Open options</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+            className="dynamic-ui-h-5 dynamic-ui-w-5"
+          >
+            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
+          </svg>
+        </Menu.Button>
+      </div>
+
+      <Transition
+        as={Fragment}
+        enter="dynamic-ui-transition dynamic-ui-ease-out dynamic-ui-duration-100"
+        enterFrom="dynamic-ui-transform dynamic-ui-opacity-0 dynamic-ui-scale-95"
+        enterTo="dynamic-ui-transform dynamic-ui-opacity-100 dynamic-ui-scale-100"
+        leave="dynamic-ui-transition dynamic-ui-ease-in dynamic-ui-duration-75"
+        leaveFrom="dynamic-ui-transform dynamic-ui-opacity-100 dynamic-ui-scale-100"
+        leaveTo="dynamic-ui-transform dynamic-ui-opacity-0 dynamic-ui-scale-95"
+      >
+        <Menu.Items className="dynamic-ui-absolute dynamic-ui-right-0 dynamic-ui-z-10 dynamic-ui-mt-2 dynamic-ui-w-56 dynamic-ui-origin-top-right dynamic-ui-rounded-md dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-background-color)] dynamic-ui-shadow-lg dynamic-ui-ring-1 dynamic-ui-ring-black dynamic-ui-ring-opacity-5 focus:dynamic-ui-outline-none">
+          <div className="dynamic-ui-py-1">{props.children}</div>
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  );
+}
+
+export function HeaderDropDownItem(props: {
+  title: string | JSX.Element;
+  onClick: () => void;
+  isDanger?: boolean;
+  classNames?: string;
+}): JSX.Element {
+  return (
+    <Menu.Item>
+      {({ active }) => {
+        const dangerClasses = 'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-terminate-entry-text-color)]';
+        const normalClasses = 'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-suspend-entry-text-color)]';
+        return (
+          <button
+            type="button"
+            onClick={() => props.onClick()}
+            className={classNames(
+              active ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]' : '',
+              props.isDanger ? dangerClasses : normalClasses,
+              props.classNames ?? '',
+            )}
+          >
+            {props.title}
+          </button>
+        );
+      }}
+    </Menu.Item>
+  );
 }
