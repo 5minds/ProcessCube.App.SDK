@@ -10,10 +10,6 @@ import {
 import { classNames } from '../../utils/classNames';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
-// TODO: Alert vom alten Portal Aufbau anschauen
-// TODO: überschriebene Styles anpassen
-// TODO: components überschreibbar machen siehe react-select
-
 interface DynamicUiForwardedRefRenderFunction
   extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
   (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
@@ -133,7 +129,7 @@ export function DynamicUi(
     <div
       className={
         withDarkMode
-          ? `dynamic-ui-dark dark ${rootClassNames}`
+          ? `dark dynamic-ui-dark ${rootClassNames}`
           : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'dynamic-ui-dark'))
       }
       data-dynamic-ui
@@ -461,22 +457,23 @@ export function HeaderDropDownMenu(props: { children: React.ReactNode }) {
 
 export function HeaderDropDownItem(props: {
   title: string | JSX.Element;
-  onClick: () => void;
+  onClick: () => void | Promise<void>;
   isDanger?: boolean;
   classNames?: string;
 }): JSX.Element {
   return (
     <Menu.Item>
       {({ active }) => {
-        const dangerClasses = 'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-terminate-entry-text-color)]';
-        const normalClasses = 'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-header-dropdown-menu-suspend-entry-text-color)]';
+        const dangerClass = 'dynamic-ui-text-[color:var(--dui-header-dropdown-menu-danger-entry-text-color)]';
+        const defaultClass = 'dynamic-ui-text-[color:var(--dui-header-dropdown-menu-default-entry-text-color)]';
         return (
           <button
             type="button"
             onClick={() => props.onClick()}
             className={classNames(
               active ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]' : '',
-              props.isDanger ? dangerClasses : normalClasses,
+              'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm',
+              props.isDanger ? dangerClass : defaultClass,
               props.classNames ?? '',
             )}
           >
