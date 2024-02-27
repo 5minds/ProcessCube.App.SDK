@@ -123,7 +123,7 @@ export function DynamicUi(
   }
 
   const rootClassNames: string = classNames(
-    'dynamic-ui-mx-auto dynamic-ui-block dynamic-ui-h-full dynamic-ui-min-h-[200px] dynamic-ui-rounded-lg dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--dui-shadow-color)] sm:dynamic-ui-w-full sm:dynamic-ui-max-w-lg',
+    'dynamic-ui dynamic-ui-mx-auto dynamic-ui-block dynamic-ui-h-full dynamic-ui-min-h-[200px] dynamic-ui-rounded-lg dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--dui-shadow-color)] sm:dynamic-ui-w-full sm:dynamic-ui-max-w-lg',
     props.classNames?.wrapper ? props.classNames?.wrapper : '',
     props.className ? props.className : '',
   );

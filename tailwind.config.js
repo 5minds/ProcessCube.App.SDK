@@ -2,6 +2,7 @@
 export default {
   content: ['./src/client/components/**/*.{js,ts,jsx,tsx,mdx}'],
   prefix: 'dynamic-ui-',
+  important: true,
   corePlugins: {
     preflight: false,
   },
