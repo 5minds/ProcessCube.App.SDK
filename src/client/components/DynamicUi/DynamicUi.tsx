@@ -74,7 +74,7 @@ export function DynamicUi(
     /** Callback, that is called on every form field change */
     onStateChange?: (newValue: string, formFieldId: string, formState: FormState) => void | Promise<void>;
     /** Option to enable dark mode */
-    darkMode?: boolean;
+    darkMode?: true;
   }>,
 ) {
   const { userTaskConfig: config } = props.task;
@@ -127,13 +127,13 @@ export function DynamicUi(
     props.classNames?.wrapper ? props.classNames?.wrapper : '',
     props.className ? props.className : '',
   );
-  const withDarkMode = props.darkMode || (props.darkMode !== false && rootClassNames.split(' ').includes('dark'));
+  const withDarkMode = props.darkMode || rootClassNames.split(' ').includes('dark');
 
   return (
     <div
       className={
         withDarkMode
-          ? `dynamic-ui-dark ${rootClassNames}`
+          ? `dynamic-ui-dark dark ${rootClassNames}`
           : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'dynamic-ui-dark'))
       }
       data-dynamic-ui
