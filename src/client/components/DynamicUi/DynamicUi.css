@@ -56,7 +56,7 @@
       var(--dropdown-menu-entry-background-hover-color, theme('colors.dynamicui-gray.250'))
     );
     --dui-header-dropdown-menu-danger-entry-text-color: var(
-      --dynamic-user-interface-header-dropdown-menu-terminate-entry-text-color,
+      --dynamic-user-interface-header-dropdown-menu-danger-entry-text-color,
       #d6868d
     );
 
@@ -163,7 +163,7 @@
       var(--dui-text-color)
     );
     --dui-header-dropdown-menu-danger-entry-text-color: var(
-      --dynamic-user-interface-header-dropdown-menu-terminate-entry-text-color,
+      --dynamic-user-interface-header-dropdown-menu-danger-entry-text-color,
       theme('colors.red.700')
     );
 
