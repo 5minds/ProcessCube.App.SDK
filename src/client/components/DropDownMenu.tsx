@@ -4,21 +4,23 @@ import { classNames } from '../utils/classNames';
 
 // TODO split this up from DynamicUi.css; dont use dui varialbes here
 
-export function DropDownMenu(props: { children: React.ReactNode }) {
+export function DropDownMenu(props: { children: React.ReactNode; collapsedIcon?: React.ReactNode }) {
   return (
     <Menu as="div" className="app-sdk-relative app-sdk-inline-block app-sdk-text-left">
       <div>
         <Menu.Button className="app-sdk-flex app-sdk-items-center app-sdk-rounded-full app-sdk-text-[color:var(--dui-header-dropdown-icon-text-color)] hover:app-sdk-text-[color:var(--dui-header-dropdown-icon-text-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--dui-focus-color)]  ">
           <span className="app-sdk-sr-only">Open options</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-            className="app-sdk-h-5 app-sdk-w-5"
-          >
-            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
-          </svg>
+          {props.collapsedIcon || (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+              className="app-sdk-h-5 app-sdk-w-5"
+            >
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
+            </svg>
+          )}
         </Menu.Button>
       </div>
 

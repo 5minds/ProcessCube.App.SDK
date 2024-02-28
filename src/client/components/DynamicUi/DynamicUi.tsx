@@ -51,19 +51,19 @@ export type FormState = {
 
 export function DynamicUi(
   props: PropsWithChildren<{
-    /** Instance of the UserTask to render */
+    /** UserTaskInstance with a defined dynamic form  */
     task: DataModels.FlowNodeInstances.UserTaskInstance;
     /** Custom element to insert into the DynamicUI Headline */
     headerComponent?: JSX.Element;
-    /** Callback, that is called when the form is submitted */
+    /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
     classNames?: Partial<Record<'wrapper' | 'base' | 'header' | 'body' | 'footer', string>>;
-    /** Custom title for the header of the dialog */
+    /** Custom title for the headline of the dialog */
     title?: React.ReactNode;
-    /** Custom components that can be used to render own form field types or override existing ones */
+    /** Custom components that will be used to render own form field types or override existing ones */
     customFieldComponents?: DynamicUiFormFieldComponentMap;
     /** Initial state of the form fields */
     state?: FormState;
@@ -81,16 +81,15 @@ export function DynamicUi(
     formFields.map((field) => [field.id, { ref: React.createRef<DynamicUiRefFunctions>() }]),
   );
 
-  const moreThanOneConfirm = formFields.filter((field) => field.type === 'confirm').length > 1;
-  if (moreThanOneConfirm) {
+  const confirmFormFields = formFields.filter((field) => field.type === 'confirm');
+  if (confirmFormFields.length > 1) {
     console.warn(
       `[@5minds/processcube_app_sdk:DynamicUi]\t\tWarning while rendering UserTask "${props.task.flowNodeId}"!\n The UserTask has more than one confirm form field. Please use only one confirm form field per User Task.\n\nThe first confirm form field is used for rendering.`,
     );
   }
 
-  const confirmFormField = formFields.find((field) => field.type === 'confirm');
+  const confirmFormField = confirmFormFields.length === 1 ? confirmFormFields[0] : null;
 
-  // ein und auskommentieren für den style check
   const formFieldComponentMap = {
     ...FormFieldComponentMap,
     ...(props.customFieldComponents ? props.customFieldComponents : {}),
@@ -120,8 +119,8 @@ export function DynamicUi(
 
   const rootClassNames: string = classNames(
     'dynamic-ui app-sdk-mx-auto app-sdk-block app-sdk-h-full app-sdk-min-h-[200px] app-sdk-rounded-lg app-sdk-shadow-lg app-sdk-shadow-[color:var(--dui-shadow-color)] sm:app-sdk-w-full sm:app-sdk-max-w-lg',
-    props.classNames?.wrapper ? props.classNames?.wrapper : '',
-    props.className ? props.className : '',
+    props.classNames?.wrapper ?? '',
+    props.className ?? '',
   );
   const withDarkMode = props.darkMode || rootClassNames.split(' ').includes('dark');
 
@@ -138,7 +137,7 @@ export function DynamicUi(
         ref={formRef}
         className={classNames(
           'app-sdk-flex app-sdk-max-h-full app-sdk-flex-col app-sdk-rounded-lg app-sdk-bg-[color:var(--dui-background-color)]  app-sdk-text-[color:var(--dui-text-color)] app-sdk-shadow-lg app-sdk-shadow-[color:var(--dui-shadow-color)]',
-          props.classNames?.base ? props.classNames?.base : '',
+          props.classNames?.base ?? '',
         )}
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
@@ -159,7 +158,7 @@ export function DynamicUi(
         <section
           className={classNames(
             'app-sdk-overflow-y-auto app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6',
-            props.classNames?.body ? props.classNames.body : '',
+            props.classNames?.body ?? '',
           )}
         >
           <div className="app-sdk-flex app-sdk-flex-col app-sdk-space-y-6 dark:[color-scheme:dark]">
@@ -168,52 +167,53 @@ export function DynamicUi(
                 field.type
               ];
 
-              if (DynamicUiFormFieldComponent) {
-                if (!ReactIs.isValidElementType(DynamicUiFormFieldComponent)) {
-                  console.warn(
-                    `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe given DynamicUiFormFieldComponent is not a valid React Element Type.\n\nFormField:\t${JSON.stringify(
-                      field,
-                      null,
-                      2,
-                    )}\nDynamicUiFormFieldComponent:\t${DynamicUiFormFieldComponent.toString()}\n\nRendering 'null' as fallback`,
-                  );
-                  return null;
-                }
-
-                let ReactElement: FormFieldRenderer;
-                if (isReactClassComponent(DynamicUiFormFieldComponent)) {
-                  assertElementIsReactComponent(DynamicUiFormFieldComponent);
-                  ReactElement = DynamicUiFormFieldComponent;
-                } else {
-                  let formFieldComponentToUse = DynamicUiFormFieldComponent;
-
-                  // has only one parameter => wrap to function with two params because, forwardRef needs 0 or 2.
-                  if (DynamicUiFormFieldComponent.length === 1) {
-                    formFieldComponentToUse = (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) => (
-                      <DynamicUiFormFieldComponent {...props} />
-                    );
-                  }
-
-                  assertElementIsRenderFunction(formFieldComponentToUse);
-                  ReactElement = forwardRef(formFieldComponentToUse);
-                }
-
-                const ref = formFieldRefs.get(field.id)?.ref;
-
-                return (
-                  <Fragment key={field.id}>
-                    <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
-                  </Fragment>
-                );
+              if (!DynamicUiFormFieldComponent) {
+                return null;
               }
-              return null;
+
+              if (!ReactIs.isValidElementType(DynamicUiFormFieldComponent)) {
+                console.warn(
+                  `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe given DynamicUiFormFieldComponent is not a valid React Element Type.\n\nFormField:\t${JSON.stringify(
+                    field,
+                    null,
+                    2,
+                  )}\nDynamicUiFormFieldComponent:\t${DynamicUiFormFieldComponent.toString()}\n\nRendering 'null' as fallback`,
+                );
+                return null;
+              }
+
+              let ReactElement: FormFieldRenderer;
+              if (isReactClassComponent(DynamicUiFormFieldComponent)) {
+                assertElementIsReactComponent(DynamicUiFormFieldComponent);
+                ReactElement = DynamicUiFormFieldComponent;
+              } else {
+                let formFieldComponentToUse = DynamicUiFormFieldComponent;
+
+                // has only one parameter => wrap to function with two params because, forwardRef needs 0 or 2.
+                if (DynamicUiFormFieldComponent.length === 1) {
+                  formFieldComponentToUse = (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) => (
+                    <DynamicUiFormFieldComponent {...props} />
+                  );
+                }
+
+                assertElementIsRenderFunction(formFieldComponentToUse);
+                ReactElement = forwardRef(formFieldComponentToUse);
+              }
+
+              const ref = formFieldRefs.get(field.id)?.ref;
+
+              return (
+                <Fragment key={field.id}>
+                  <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
+                </Fragment>
+              );
             })}
           </div>
         </section>
         <footer
           className={classNames(
             'app-sdk-rounded-b-lg app-sdk-bg-[color:var(--dui-footer-background-color)] app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6',
-            props.classNames?.footer ? props.classNames.footer : '',
+            props.classNames?.footer ?? '',
           )}
         >
           <FormButtons confirmFormField={confirmFormField} />
@@ -223,7 +223,7 @@ export function DynamicUi(
   );
 }
 
-function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.UserTaskFormField }) {
+function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.UserTaskFormField | null }) {
   const { confirmFormField } = props;
 
   let buttons: React.ReactNode = (
