@@ -3,3 +3,4 @@ import 'client-only';
 
 export * from './components/DynamicLink';
 export * from './components/DynamicUi';
+export * from './components/DropDownMenu';

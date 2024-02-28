@@ -13,7 +13,7 @@ export function StringFormField(
   const inputType = parsedCustomFormConfig?.multiline === 'true' ? 'textarea' : 'input';
   const textInput = React.createElement(inputType, {
     className:
-      'dynamic-ui-border dynamic-ui-py-2 dynamic-ui-px-3 dynamic-ui-shadow-sm focus:dynamic-ui-ring-[color:var(--dui-focus-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] dynamic-ui-block dynamic-ui-w-full sm:dynamic-ui-text-sm dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dark:focus:dynamic-ui-shadow-dynamicui-dark dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid',
+      'app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-shadow-sm focus:app-sdk-ring-[color:var(--dui-focus-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] app-sdk-block app-sdk-w-full sm:app-sdk-text-sm app-sdk-rounded-md app-sdk-border-[color:var(--dui-border-color)] invalid:app-sdk-border-[color:var(--dui-formfield-invalid-color)] invalid:app-sdk-ring-[color:var(--dui-formfield-invalid-color)] invalid:app-sdk-ring-1 dark:app-sdk-border-solid dark:app-sdk-border-transparent app-sdk-bg-[color:var(--dui-formfield-background-color)] dark:focus:app-sdk-shadow-dynamicui-dark app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] dark:invalid:app-sdk-shadow-dynamicui-dark-invalid',
     id: formField.id,
     name: formField.id,
     defaultValue: state || (formField.defaultValue?.toString() ?? ''),
@@ -27,7 +27,7 @@ export function StringFormField(
   const hint = parsedCustomFormConfig?.hint ? (
     <p
       id={`${formField.id}-hint`}
-      className="dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]"
+      className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--dui-formfield-hint-text-color)]"
     >
       {parsedCustomFormConfig.hint}
     </p>
@@ -35,10 +35,10 @@ export function StringFormField(
 
   return (
     <div>
-      <label className="dynamic-ui-block dynamic-ui-text-sm dynamic-ui-font-medium" htmlFor={formField.id}>
+      <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {label}
       </label>
-      <div className="dynamic-ui-mt-1">{textInput}</div>
+      <div className="app-sdk-mt-1">{textInput}</div>
       {hint}
     </div>
   );

@@ -12,11 +12,11 @@ export function BooleanFormField(
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   return (
-    <div className="dynamic-ui-relative dynamic-ui-flex dynamic-ui-items-start">
-      <div className="dynamic-ui-flex dynamic-ui-h-5 dynamic-ui-items-center">
+    <div className="app-sdk-relative app-sdk-flex app-sdk-items-start">
+      <div className="app-sdk-flex app-sdk-h-5 app-sdk-items-center">
         <input
           type="checkbox"
-          className="dynamic-ui-border dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:focus:dynamic-ui-shadow-dynamicui-dark"
+          className="app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-text-[color:var(--dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-dynamicui-dark"
           defaultChecked={(props.state && props.state !== 'false') || formField.defaultValue === 'true'}
           id={formField.id}
           name={formField.id}
@@ -24,12 +24,12 @@ export function BooleanFormField(
           data-form-field-type="boolean"
         />
       </div>
-      <div className="dynamic-ui-ml-3 dynamic-ui-text-sm">
-        <label className="dynamic-ui-font-medium" htmlFor={formField.id}>
+      <div className="app-sdk-ml-3 app-sdk-text-sm">
+        <label className="app-sdk-font-medium" htmlFor={formField.id}>
           {formField.label}
         </label>
         {parsedCustomFormConfig?.hint && (
-          <p className="dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]" id={hintId}>
+          <p className="app-sdk-text-[color:var(--dui-formfield-hint-text-color)]" id={hintId}>
             {parsedCustomFormConfig.hint}
           </p>
         )}

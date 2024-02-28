@@ -17,12 +17,12 @@ export function DecimalFormField(props: DynamicUiComponentProps<string | null>, 
 
   return (
     <div>
-      <label className="dynamic-ui-block dynamic-ui-text-sm dynamic-ui-font-medium" htmlFor={formField.id}>
+      <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {formField.label}
       </label>
-      <div className="dynamic-ui-mt-1">
+      <div className="app-sdk-mt-1">
         <input
-          className="dynamic-ui-border dynamic-ui-py-2 dynamic-ui-px-3 dynamic-ui-block dynamic-ui-w-full dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] dynamic-ui-shadow-sm invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] sm:dynamic-ui-text-sm dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dark:focus:dynamic-ui-shadow-dynamicui-dark"
+          className="app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-dynamicui-dark-invalid dark:focus:app-sdk-shadow-dynamicui-dark"
           type="number"
           step="0.01"
           placeholder={parsedCustomFormConfig?.placeholder || '0.00'}
@@ -35,7 +35,7 @@ export function DecimalFormField(props: DynamicUiComponentProps<string | null>, 
       </div>
       {parsedCustomFormConfig?.hint && (
         <p
-          className="dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]"
+          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--dui-formfield-hint-text-color)]"
           id={hintId}
         >
           {parsedCustomFormConfig?.hint}

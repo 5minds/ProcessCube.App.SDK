@@ -27,7 +27,7 @@ export function EnumFormField(
       enumInput = (
         <fieldset
           id={formField.id}
-          className="dynamic-ui-mt-1 dynamic-ui-space-y-2"
+          className="app-sdk-mt-1 app-sdk-space-y-2"
           data-type="checkbox"
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
           data-form-field-type="enum"
@@ -36,8 +36,8 @@ export function EnumFormField(
             const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
 
             return (
-              <div key={option.id} className="dynamic-ui-relative dynamic-ui-flex dynamic-ui-items-start">
-                <div className="dynamic-ui-flex dynamic-ui-h-5 dynamic-ui-items-center">
+              <div key={option.id} className="app-sdk-relative app-sdk-flex app-sdk-items-start">
+                <div className="app-sdk-flex app-sdk-h-5 app-sdk-items-center">
                   <input
                     type="checkbox"
                     defaultChecked={hasValueToBeChecked}
@@ -45,13 +45,13 @@ export function EnumFormField(
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="dynamic-ui-border dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:focus:dynamic-ui-shadow-dynamicui-dark"
+                    className="app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-text-[color:var(--dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-dynamicui-dark"
                   />
                 </div>
-                <div className="dynamic-ui-ml-3 dynamic-ui-text-sm">
+                <div className="app-sdk-ml-3 app-sdk-text-sm">
                   <label
                     htmlFor={option.id}
-                    className="dynamic-ui-font-medium dynamic-ui-text-[color:var(--dui-text-color)]"
+                    className="app-sdk-font-medium app-sdk-text-[color:var(--dui-text-color)]"
                   >
                     {option.name}
                   </label>
@@ -67,28 +67,28 @@ export function EnumFormField(
       enumInput = (
         <fieldset
           id={formField.id}
-          className="dynamic-ui-mt-1 dynamic-ui-space-y-2"
+          className="app-sdk-mt-1 app-sdk-space-y-2"
           data-type="radio"
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
           data-form-field-type="enum"
         >
           {options?.map((option) => {
             return (
-              <div key={option.id} className="dynamic-ui-relative dynamic-ui-flex dynamic-ui-items-start">
-                <div className="dynamic-ui-flex dynamic-ui-h-5 dynamic-ui-items-center">
+              <div key={option.id} className="app-sdk-relative app-sdk-flex app-sdk-items-start">
+                <div className="app-sdk-flex app-sdk-h-5 app-sdk-items-center">
                   <input
                     type="radio"
                     defaultChecked={(state || formField.defaultValue) == option.id}
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="dynamic-ui-border dynamic-ui-h-4 dynamic-ui-w-4 dynamic-ui-rounded dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-text-[color:var(--dui-formfield-checkbox-text-color)] dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-ring-[color:var(--dui-focus-color)] dark:dynamic-ui-border-2 dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:focus:dynamic-ui-shadow-dynamicui-dark"
+                    className="app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-text-[color:var(--dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-dynamicui-dark"
                   />
                 </div>
-                <div className="dynamic-ui-ml-3 dynamic-ui-text-sm">
+                <div className="app-sdk-ml-3 app-sdk-text-sm">
                   <label
                     htmlFor={option.id}
-                    className="dynamic-ui-font-medium dynamic-ui-text-[color:var(--dui-text-color)]"
+                    className="app-sdk-font-medium app-sdk-text-[color:var(--dui-text-color)]"
                   >
                     {option.name}
                   </label>
@@ -106,7 +106,7 @@ export function EnumFormField(
         <select
           id={formField.id}
           name={formField.id}
-          className="dynamic-ui-border dynamic-ui-mt-1 dynamic-ui-block dynamic-ui-w-full dynamic-ui-rounded-md dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-formfield-background-color)] dynamic-ui-py-2 dynamic-ui-pl-3 dynamic-ui-pr-10 dynamic-ui-text-base dynamic-ui-placeholder-[color:var(--dui-formfield-placeholder-text-color)] invalid:dynamic-ui-border-[color:var(--dui-formfield-invalid-color)] invalid:dynamic-ui-ring-1 invalid:dynamic-ui-ring-[color:var(--dui-formfield-invalid-color)] focus:dynamic-ui-border-[color:var(--dui-focus-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-[color:var(--dui-focus-color)] sm:dynamic-ui-text-sm dark:dynamic-ui-border-solid dark:dynamic-ui-border-transparent dark:dynamic-ui-bg-dynamicui-dropdown-dark dark:invalid:dynamic-ui-shadow-dynamicui-dark-invalid dark:focus:dynamic-ui-shadow-dynamicui-dark"
+          className="app-sdk-border app-sdk-mt-1 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-py-2 app-sdk-pl-3 app-sdk-pr-10 app-sdk-text-base app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] invalid:app-sdk-border-[color:var(--dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-outline-none focus:app-sdk-ring-[color:var(--dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:app-sdk-bg-dynamicui-dropdown-dark dark:invalid:app-sdk-shadow-dynamicui-dark-invalid dark:focus:app-sdk-shadow-dynamicui-dark"
           onChange={(event) => (event.target.dataset.value = event.target.value)}
           data-value={defaultSelect}
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
@@ -129,7 +129,7 @@ export function EnumFormField(
   const hint = parsedCustomFormConfig?.hint ? (
     <p
       id={`${formField.id}-hint`}
-      className="dynamic-ui-mt-2 dynamic-ui-text-sm dynamic-ui-text-[color:var(--dui-formfield-hint-text-color)]"
+      className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--dui-formfield-hint-text-color)]"
     >
       {parsedCustomFormConfig.hint}
     </p>
@@ -137,7 +137,7 @@ export function EnumFormField(
 
   return (
     <div>
-      <label className="dynamic-ui-block dynamic-ui-text-sm dynamic-ui-font-medium" htmlFor={formField.id}>
+      <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {label}
       </label>
       {enumInput}

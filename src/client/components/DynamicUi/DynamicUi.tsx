@@ -119,7 +119,7 @@ export function DynamicUi(
   }
 
   const rootClassNames: string = classNames(
-    'dynamic-ui dynamic-ui-mx-auto dynamic-ui-block dynamic-ui-h-full dynamic-ui-min-h-[200px] dynamic-ui-rounded-lg dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--dui-shadow-color)] sm:dynamic-ui-w-full sm:dynamic-ui-max-w-lg',
+    'dynamic-ui app-sdk-mx-auto app-sdk-block app-sdk-h-full app-sdk-min-h-[200px] app-sdk-rounded-lg app-sdk-shadow-lg app-sdk-shadow-[color:var(--dui-shadow-color)] sm:app-sdk-w-full sm:app-sdk-max-w-lg',
     props.classNames?.wrapper ? props.classNames?.wrapper : '',
     props.className ? props.className : '',
   );
@@ -129,15 +129,15 @@ export function DynamicUi(
     <div
       className={
         withDarkMode
-          ? `dark dynamic-ui-dark ${rootClassNames}`
-          : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'dynamic-ui-dark'))
+          ? `dark app-sdk-dark ${rootClassNames}`
+          : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'app-sdk-dark'))
       }
       data-dynamic-ui
     >
       <form
         ref={formRef}
         className={classNames(
-          'dynamic-ui-flex dynamic-ui-max-h-full dynamic-ui-flex-col dynamic-ui-rounded-lg dynamic-ui-bg-[color:var(--dui-background-color)]  dynamic-ui-text-[color:var(--dui-text-color)] dynamic-ui-shadow-lg dynamic-ui-shadow-[color:var(--dui-shadow-color)]',
+          'app-sdk-flex app-sdk-max-h-full app-sdk-flex-col app-sdk-rounded-lg app-sdk-bg-[color:var(--dui-background-color)]  app-sdk-text-[color:var(--dui-text-color)] app-sdk-shadow-lg app-sdk-shadow-[color:var(--dui-shadow-color)]',
           props.classNames?.base ? props.classNames?.base : '',
         )}
         data-user-task-id={props.task.flowNodeId}
@@ -147,7 +147,7 @@ export function DynamicUi(
       >
         <header
           className={classNames(
-            'dynamic-ui-px-4 dynamic-ui-pb-3 dynamic-ui-pt-4 sm:dynamic-ui-px-6',
+            'app-sdk-px-4 app-sdk-pb-3 app-sdk-pt-4 sm:app-sdk-px-6',
             props.classNames?.header ? props.classNames.header : '',
           )}
         >
@@ -158,11 +158,11 @@ export function DynamicUi(
         </header>
         <section
           className={classNames(
-            'dynamic-ui-overflow-y-auto dynamic-ui-px-4 dynamic-ui-py-3 sm:dynamic-ui-px-6',
+            'app-sdk-overflow-y-auto app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6',
             props.classNames?.body ? props.classNames.body : '',
           )}
         >
-          <div className="dynamic-ui-flex dynamic-ui-flex-col dynamic-ui-space-y-6 dark:[color-scheme:dark]">
+          <div className="app-sdk-flex app-sdk-flex-col app-sdk-space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
               const DynamicUiFormFieldComponent = (formFieldComponentMap as GenericFormFieldTypeComponentMap)[
                 field.type
@@ -212,7 +212,7 @@ export function DynamicUi(
         </section>
         <footer
           className={classNames(
-            'dynamic-ui-rounded-b-lg dynamic-ui-bg-[color:var(--dui-footer-background-color)] dynamic-ui-px-4 dynamic-ui-py-3 sm:dynamic-ui-px-6',
+            'app-sdk-rounded-b-lg app-sdk-bg-[color:var(--dui-footer-background-color)] app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6',
             props.classNames?.footer ? props.classNames.footer : '',
           )}
         >
@@ -230,7 +230,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
     <Fragment>
       <button
         type="submit"
-        className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--dui-footer-continue-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm "
+        className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
       >
         OK
       </button>
@@ -244,7 +244,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-transparent dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--dui-footer-continue-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm "
+          className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
           value="true"
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
@@ -252,7 +252,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
         <button
           type="submit"
           name={confirmFormField.id}
-          className="dynamic-ui-inline-flex dynamic-ui-w-full dynamic-ui-justify-center dynamic-ui-rounded-md dynamic-ui-border dynamic-ui-border-[color:var(--dui-border-color)] dynamic-ui-bg-[color:var(--dui-footer-decline-button-background-color)] dynamic-ui-px-3 dynamic-ui-py-2 dynamic-ui-text-base dynamic-ui-font-medium dynamic-ui-leading-4 dynamic-ui-text-[color:var(--dui-footer-decline-button-text-color)] dynamic-ui-shadow-sm hover:dynamic-ui-bg-[color:var(--dui-footer-decline-button-background-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-footer-decline-button-focus-outline-color)] focus:dynamic-ui-ring-offset-2 sm:dynamic-ui-ml-2 sm:dynamic-ui-w-auto sm:dynamic-ui-text-sm"
+          className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-footer-decline-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--dui-footer-decline-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--dui-footer-decline-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--dui-footer-decline-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm"
           value="false"
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
@@ -261,7 +261,7 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
     );
   }
   return (
-    <div className="dynamic-ui-space-y-2 sm:dynamic-ui-flex sm:dynamic-ui-flex-row-reverse sm:-dynamic-ui-space-x-2 sm:dynamic-ui-space-y-0">
+    <div className="app-sdk-space-y-2 sm:app-sdk-flex sm:app-sdk-flex-row-reverse sm:-app-sdk-space-x-2 sm:app-sdk-space-y-0">
       {buttons}
     </div>
   );
@@ -269,16 +269,16 @@ function FormButtons(props: { confirmFormField?: DataModels.FlowNodeInstances.Us
 
 function Headline(props: { title?: React.ReactNode; headerComponent?: JSX.Element }) {
   return (
-    <div className="dynamic-ui-flex dynamic-ui-space-x-3">
-      <div className="dynamic-ui-flex-1">
+    <div className="app-sdk-flex app-sdk-space-x-3">
+      <div className="app-sdk-flex-1">
         <h3
           id="headline-title"
-          className="dynamic-ui-text-lg dynamic-ui-font-medium dynamic-ui-leading-6 dynamic-ui-text-[color:var(--dui-header-text-color)]"
+          className="app-sdk-text-lg app-sdk-font-medium app-sdk-leading-6 app-sdk-text-[color:var(--dui-header-text-color)]"
         >
           {props.title}
         </h3>
       </div>
-      <div className="dynamic-ui-flex dynamic-ui-self-center">{props.headerComponent}</div>
+      <div className="app-sdk-flex app-sdk-self-center">{props.headerComponent}</div>
     </div>
   );
 }
@@ -418,69 +418,4 @@ function transformFormDataToUserTaskResult(
   });
 
   return userTaskResult;
-}
-
-export function HeaderDropDownMenu(props: { children: React.ReactNode }) {
-  return (
-    <Menu as="div" className="dynamic-ui-relative dynamic-ui-inline-block dynamic-ui-text-left">
-      <div>
-        <Menu.Button className="dynamic-ui-flex dynamic-ui-items-center dynamic-ui-rounded-full dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-color)] hover:dynamic-ui-text-[color:var(--dui-header-dropdown-icon-text-hover-color)] focus:dynamic-ui-outline-none focus:dynamic-ui-ring-2 focus:dynamic-ui-ring-[color:var(--dui-focus-color)]  ">
-          <span className="dynamic-ui-sr-only">Open options</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-            className="dynamic-ui-h-5 dynamic-ui-w-5"
-          >
-            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
-          </svg>
-        </Menu.Button>
-      </div>
-
-      <Transition
-        as={Fragment}
-        enter="dynamic-ui-transition dynamic-ui-ease-out dynamic-ui-duration-100"
-        enterFrom="dynamic-ui-transform dynamic-ui-opacity-0 dynamic-ui-scale-95"
-        enterTo="dynamic-ui-transform dynamic-ui-opacity-100 dynamic-ui-scale-100"
-        leave="dynamic-ui-transition dynamic-ui-ease-in dynamic-ui-duration-75"
-        leaveFrom="dynamic-ui-transform dynamic-ui-opacity-100 dynamic-ui-scale-100"
-        leaveTo="dynamic-ui-transform dynamic-ui-opacity-0 dynamic-ui-scale-95"
-      >
-        <Menu.Items className="dynamic-ui-absolute dynamic-ui-right-0 dynamic-ui-z-10 dynamic-ui-mt-2 dynamic-ui-w-56 dynamic-ui-origin-top-right dynamic-ui-rounded-md dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-background-color)] dynamic-ui-shadow-lg dynamic-ui-ring-1 dynamic-ui-ring-black dynamic-ui-ring-opacity-5 focus:dynamic-ui-outline-none">
-          <div className="dynamic-ui-py-1">{props.children}</div>
-        </Menu.Items>
-      </Transition>
-    </Menu>
-  );
-}
-
-export function HeaderDropDownItem(props: {
-  title: string | JSX.Element;
-  onClick: () => void | Promise<void>;
-  isDanger?: boolean;
-  classNames?: string;
-}): JSX.Element {
-  return (
-    <Menu.Item>
-      {({ active }) => {
-        const dangerClass = 'dynamic-ui-text-[color:var(--dui-header-dropdown-menu-danger-entry-text-color)]';
-        const defaultClass = 'dynamic-ui-text-[color:var(--dui-header-dropdown-menu-default-entry-text-color)]';
-        return (
-          <button
-            type="button"
-            onClick={() => props.onClick()}
-            className={classNames(
-              active ? 'dynamic-ui-bg-[color:var(--dui-header-dropdown-menu-entry-background-hover-color)]' : '',
-              'dynamic-ui-block dynamic-ui-w-full dynamic-ui-px-4 dynamic-ui-py-2 dynamic-ui-text-left dynamic-ui-text-sm',
-              props.isDanger ? dangerClass : defaultClass,
-              props.classNames ?? '',
-            )}
-          >
-            {props.title}
-          </button>
-        );
-      }}
-    </Menu.Item>
-  );
 }
