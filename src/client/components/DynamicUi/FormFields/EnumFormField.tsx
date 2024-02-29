@@ -45,7 +45,7 @@ export function EnumFormField(
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-text-[color:var(--dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-dynamicui-dark"
+                    className="app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-text-[color:var(--dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-app-sdk-dark"
                   />
                 </div>
                 <div className="app-sdk-ml-3 app-sdk-text-sm">
@@ -82,7 +82,7 @@ export function EnumFormField(
                     name={formField.id}
                     id={option.id}
                     value={option.id}
-                    className="app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-text-[color:var(--dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-dynamicui-dark"
+                    className="app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-text-[color:var(--dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-app-sdk-dark"
                   />
                 </div>
                 <div className="app-sdk-ml-3 app-sdk-text-sm">
@@ -106,7 +106,7 @@ export function EnumFormField(
         <select
           id={formField.id}
           name={formField.id}
-          className="app-sdk-border app-sdk-mt-1 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-py-2 app-sdk-pl-3 app-sdk-pr-10 app-sdk-text-base app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] invalid:app-sdk-border-[color:var(--dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-outline-none focus:app-sdk-ring-[color:var(--dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:app-sdk-bg-dynamicui-dropdown-dark dark:invalid:app-sdk-shadow-dynamicui-dark-invalid dark:focus:app-sdk-shadow-dynamicui-dark"
+          className="app-sdk-border app-sdk-mt-1 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-py-2 app-sdk-pl-3 app-sdk-pr-10 app-sdk-text-base app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] invalid:app-sdk-border-[color:var(--dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-outline-none focus:app-sdk-ring-[color:var(--dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:app-sdk-bg-app-sdk-dropdown-dark dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
           onChange={(event) => (event.target.dataset.value = event.target.value)}
           data-value={defaultSelect}
           aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}

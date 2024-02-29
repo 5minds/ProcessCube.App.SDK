@@ -5,19 +5,19 @@
 @layer base {
   .dark,
   .dark * {
-    --dui-background-color: var(--dynamic-user-interface-background-color, theme('colors.dynamicui-gray.500'));
-    --dui-text-color: var(--dynamic-user-interface-text-color, theme('colors.dynamicui-gray.50'));
-    --dui-shadow-color: var(--dynamic-user-interface-shadow-color, theme('colors.dynamicui-gray.300'));
+    --dui-background-color: var(--dynamic-user-interface-background-color, theme('colors.app-sdk-gray.500'));
+    --dui-text-color: var(--dynamic-user-interface-text-color, theme('colors.app-sdk-gray.50'));
+    --dui-shadow-color: var(--dynamic-user-interface-shadow-color, theme('colors.app-sdk-gray.300'));
     --dui-border-color: var(--dynamic-user-interface-border-color, var(--border-color, transparent));
     --dui-focus-color: var(--dynamic-user-interface-focus-color, var(--focus-color, #007bff40));
 
     --dui-formfield-hint-text-color: var(
       --dynamic-user-interface-formfield-hint-text-color,
-      var(--formfield-hint-text-color, theme('colors.dynamicui-gray.200'))
+      var(--formfield-hint-text-color, theme('colors.app-sdk-gray.200'))
     );
     --dui-formfield-background-color: var(
       --dynamic-user-interface-formfield-background-color,
-      var(--formfield-background-color, theme('colors.dynamicui-gray.350'))
+      var(--formfield-background-color, theme('colors.app-sdk-gray.350'))
     );
     --dui-formfield-placeholder-text-color: var(
       --dynamic-user-interface-formfield-placeholder-text-color,
@@ -35,25 +35,25 @@
     /* HEADER */
     --dui-header-text-color: var(
       --dynamic-user-interface-header-text-color,
-      var(--text-color, theme('colors.dynamicui-gray.150'))
+      var(--text-color, theme('colors.app-sdk-gray.150'))
     );
 
     --dui-header-dropdown-icon-text-color: var(
       --dynamic-user-interface-header-dropdown-icon-text-color,
-      var(--icon-color, theme('colors.dynamicui-gray.150'))
+      var(--icon-color, theme('colors.app-sdk-gray.150'))
     );
     --dui-header-dropdown-icon-text-hover-color: var(
       --dynamic-user-interface-header-dropdown-icon-text-hover-color,
-      var(--icon-hover-color, theme('colors.dynamicui-gray.100'))
+      var(--icon-hover-color, theme('colors.app-sdk-gray.100'))
     );
 
     --dui-header-dropdown-menu-background-color: var(
       --dynamic-user-interface-header-dropdown-menu-background-color,
-      var(--dropdown-menu-background-color, theme('colors.dynamicui-gray.400'))
+      var(--dropdown-menu-background-color, theme('colors.app-sdk-gray.400'))
     );
     --dui-header-dropdown-menu-entry-background-hover-color: var(
       --dynamic-user-interface-header-dropdown-menu-entry-background-hover-color,
-      var(--dropdown-menu-entry-background-hover-color, theme('colors.dynamicui-gray.250'))
+      var(--dropdown-menu-entry-background-hover-color, theme('colors.app-sdk-gray.250'))
     );
     --dui-header-dropdown-menu-danger-entry-text-color: var(
       --dynamic-user-interface-header-dropdown-menu-danger-entry-text-color,
@@ -63,7 +63,7 @@
     /* FOOTER */
     --dui-footer-background-color: var(
       --dynamic-user-interface-footer-background-color,
-      theme('colors.dynamicui-gray.600')
+      theme('colors.app-sdk-gray.600')
     );
     --dui-footer-continue-button-background-color: var(
       --dynamic-user-interface-footer-continue-button-background-color,
@@ -80,19 +80,19 @@
 
     --dui-footer-decline-button-text-color: var(
       --dynamic-user-interface-footer-decline-button-text-color,
-      theme('colors.dynamicui-gray.50')
+      theme('colors.app-sdk-gray.50')
     );
     --dui-footer-decline-button-background-color: var(
       --dynamic-user-interface-footer-decline-button-background-color,
-      theme('colors.dynamicui-gray.350')
+      theme('colors.app-sdk-gray.350')
     );
     --dui-footer-decline-button-background-hover-color: var(
       --dynamic-user-interface-footer-decline-button-background-hover-color,
-      theme('colors.dynamicui-gray.300')
+      theme('colors.app-sdk-gray.300')
     );
     --dui-footer-decline-button-focus-outline-color: var(
       --dynamic-user-interface-footer-decline-button-focus-outline-color,
-      theme('colors.dynamicui-gray.300')
+      theme('colors.app-sdk-gray.300')
     );
   }
 

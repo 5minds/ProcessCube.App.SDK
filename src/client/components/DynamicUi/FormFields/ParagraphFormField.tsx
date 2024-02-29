@@ -36,7 +36,7 @@ export function ParagraphFormField(
         // headings
         '[&_h1]:app-sdk-text-2xl [&_h1]:app-sdk-font-bold [&_h2]:app-sdk-text-xl [&_h2]:app-sdk-font-bold [&_h3]:app-sdk-text-lg [&_h3]:app-sdk-font-bold [&_h4]:app-sdk-text-base [&_h4]:app-sdk-font-bold [&_h5]:app-sdk-text-sm [&_h5]:app-sdk-font-bold [&_h6]:app-sdk-text-xs [&_h6]:app-sdk-font-bold',
         // code blocks
-        '[&_code]:app-sdk-text-[#e83e8c] [&_pre]:app-sdk-my-4 [&_pre]:app-sdk-bg-gray-100 [&_pre]:dark:app-sdk-bg-dynamicui-gray-700 [&_pre_code]:app-sdk-text-inherit',
+        '[&_code]:app-sdk-text-[#e83e8c] [&_pre]:app-sdk-my-4 [&_pre]:app-sdk-bg-gray-100 [&_pre]:dark:app-sdk-bg-app-sdk-gray-700 [&_pre_code]:app-sdk-text-inherit',
         // revert margin
         '[&_blockquote]:app-sdk-m-[revert] [&_fieldset]:app-sdk-m-[revert] [&_h1]:app-sdk-m-[revert] [&_h2]:app-sdk-m-[revert] [&_h3]:app-sdk-m-[revert] [&_h4]:app-sdk-m-[revert] [&_h5]:app-sdk-m-[revert] [&_h6]:app-sdk-m-[revert] [&_menu]:app-sdk-m-[revert] [&_ol]:app-sdk-m-[revert] [&_ul]:app-sdk-m-[revert]',
         // revert padding
@@ -44,7 +44,7 @@ export function ParagraphFormField(
         // list styles
         '[&_ol]:app-sdk-list-decimal [&_ol_p]:app-sdk-my-2 first-of-type:[&_ol_p]:app-sdk-my-4 [&_ul]:app-sdk-list-disc [&_ul_p]:app-sdk-my-2 first-of-type:[&_ul_p]:app-sdk-my-4',
         // checkbox
-        "[&_input[type='checkbox']]:app-sdk-border [&_input[type='checkbox']]:app-sdk-h-4 [&_input[type='checkbox']]:app-sdk-w-4 [&_input[type='checkbox']]:app-sdk-rounded [&_input[type='checkbox']]:app-sdk-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:app-sdk-text-sky-600 [&_input[type='checkbox']]:hover:app-sdk-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dark:app-sdk-border-2 [&_input[type='checkbox']]:dark:app-sdk-border-solid [&_input[type='checkbox']]:dark:app-sdk-border-transparent [&_input[type='checkbox']]:dark:app-sdk-bg-dynamicui-gray-350 [&_input[type='checkbox']]:dark:app-sdk-text-[#007bff40] [&_input[type='checkbox']]:dark:hover:app-sdk-border-transparent [&_input[type='checkbox']]:dark:hover:checked:app-sdk-bg-dynamicui-gray-350",
+        "[&_input[type='checkbox']]:app-sdk-border [&_input[type='checkbox']]:app-sdk-h-4 [&_input[type='checkbox']]:app-sdk-w-4 [&_input[type='checkbox']]:app-sdk-rounded [&_input[type='checkbox']]:app-sdk-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:app-sdk-text-sky-600 [&_input[type='checkbox']]:hover:app-sdk-border-[color:var(--dui-border-color)] [&_input[type='checkbox']]:dark:app-sdk-border-2 [&_input[type='checkbox']]:dark:app-sdk-border-solid [&_input[type='checkbox']]:dark:app-sdk-border-transparent [&_input[type='checkbox']]:dark:app-sdk-bg-app-sdk-gray-350 [&_input[type='checkbox']]:dark:app-sdk-text-[#007bff40] [&_input[type='checkbox']]:dark:hover:app-sdk-border-transparent [&_input[type='checkbox']]:dark:hover:checked:app-sdk-bg-app-sdk-gray-350",
       )}
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>
