@@ -4,9 +4,9 @@ import { classNames } from '../utils/classNames';
 
 export function DropDownMenu(props: { children: React.ReactNode; collapsedIcon?: React.ReactNode }) {
   return (
-    <Menu as="div" className="app-sdk-relative app-sdk-inline-block app-sdk-text-left">
+    <Menu as="div" className="app-sdk-default-styles app-sdk-relative app-sdk-inline-block app-sdk-text-left">
       <div>
-        <Menu.Button className="app-sdk-flex app-sdk-items-center app-sdk-rounded-full app-sdk-text-[color:var(--asdk-ddm-icon-text-color)] hover:app-sdk-text-[color:var(--asdk-ddm-icon-text-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-ddm-focus-color)]  ">
+        <Menu.Button className="app-sdk-cursor-pointer app-sdk-bg-transparent app-sdk-p-0 app-sdk-text-[100%] app-sdk-flex app-sdk-items-center app-sdk-rounded-full app-sdk-text-[color:var(--asdk-ddm-icon-text-color)] hover:app-sdk-text-[color:var(--asdk-ddm-icon-text-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-ddm-focus-color)]  ">
           <span className="app-sdk-sr-only">Open options</span>
           {props.collapsedIcon || (
             <svg
@@ -55,8 +55,8 @@ export function DropDownMenuItem(props: {
             type="button"
             onClick={() => props.onClick()}
             className={classNames(
-              active ? 'app-sdk-bg-[color:var(--asdk-ddm-entry-background-hover-color)]' : '',
-              'app-sdk-block app-sdk-w-full app-sdk-px-4 app-sdk-py-2 app-sdk-text-left app-sdk-text-sm',
+              active ? 'app-sdk-bg-[color:var(--asdk-ddm-entry-background-hover-color)]' : 'app-sdk-bg-transparent',
+              'app-sdk-cursor-pointer app-sdk-p-0 app-sdk-text-[100%] app-sdk-block app-sdk-w-full app-sdk-px-4 app-sdk-py-2 app-sdk-text-left app-sdk-text-sm',
               props.isDanger ? dangerClass : defaultClass,
               props.classNames ?? '',
             )}

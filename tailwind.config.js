@@ -12,6 +12,7 @@ export default {
         'app-sdk-dark-invalid': '0 0 0 0.2rem rgb(220 53 69 / 25%)',
       },
       colors: {
+        'app-sdk-inherit': 'inherit',
         'app-sdk-gray': {
           50: '#cdcdcd',
           100: '#c3c3c3',

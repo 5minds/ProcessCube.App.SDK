@@ -10,3 +10,30 @@
   --asdk-focus-color: var(--app-sdk-focus-color, theme('colors.sky.700'));
   --asdk-text-color: var(--app-sdk-text-color, theme('colors.gray.700'));
 }
+
+.app-sdk-default-styles * {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+  font-family: theme(
+    'fontFamily.sans',
+    ui-sans-serif,
+    system-ui,
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol',
+    'Noto Color Emoji'
+  );
+  font-feature-settings: theme('fontFamily.sans[1].fontFeatureSettings', normal);
+  font-variation-settings: theme('fontFamily.sans[1].fontVariationSettings', normal);
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: theme('borderColor.DEFAULT', currentColor);
+  --tw-content: '';
+  margin: 0;
+  line-height: inherit;
+}

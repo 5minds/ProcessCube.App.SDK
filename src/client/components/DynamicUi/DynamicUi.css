@@ -72,7 +72,6 @@
   *,
   ::before,
   ::after {
-    box-sizing: border-box;
     --asdk-dui-background-color: var(
       --app-sdk-dynamic-user-interface-background-color,
       theme('colors.white')
