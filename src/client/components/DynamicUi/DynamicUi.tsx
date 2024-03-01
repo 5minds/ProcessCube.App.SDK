@@ -118,7 +118,7 @@ export function DynamicUi(
   }
 
   const rootClassNames: string = classNames(
-    'dynamic-ui app-sdk-mx-auto app-sdk-block app-sdk-h-full app-sdk-min-h-[200px] app-sdk-rounded-lg app-sdk-shadow-lg app-sdk-shadow-[color:var(--dui-shadow-color)] sm:app-sdk-w-full sm:app-sdk-max-w-lg',
+    'dynamic-ui app-sdk-mx-auto app-sdk-block app-sdk-h-full app-sdk-min-h-[200px] app-sdk-rounded-lg app-sdk-shadow-lg app-sdk-shadow-[color:var(--asdk-dui-shadow-color)] sm:app-sdk-w-full sm:app-sdk-max-w-lg',
     props.classNames?.wrapper ?? '',
     props.className ?? '',
   );
@@ -136,7 +136,7 @@ export function DynamicUi(
       <form
         ref={formRef}
         className={classNames(
-          'app-sdk-flex app-sdk-max-h-full app-sdk-flex-col app-sdk-rounded-lg app-sdk-bg-[color:var(--dui-background-color)]  app-sdk-text-[color:var(--dui-text-color)] app-sdk-shadow-lg app-sdk-shadow-[color:var(--dui-shadow-color)]',
+          'app-sdk-flex app-sdk-max-h-full app-sdk-flex-col app-sdk-rounded-lg app-sdk-bg-[color:var(--asdk-dui-background-color)]  app-sdk-text-[color:var(--asdk-dui-text-color)] app-sdk-shadow-lg app-sdk-shadow-[color:var(--asdk-dui-shadow-color)]',
           props.classNames?.base ?? '',
         )}
         data-user-task-id={props.task.flowNodeId}
@@ -212,7 +212,7 @@ export function DynamicUi(
         </section>
         <footer
           className={classNames(
-            'app-sdk-rounded-b-lg app-sdk-bg-[color:var(--dui-footer-background-color)] app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6',
+            'app-sdk-rounded-b-lg app-sdk-bg-[color:var(--asdk-dui-footer-background-color)] app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6',
             props.classNames?.footer ?? '',
           )}
         >
@@ -230,7 +230,7 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
     <Fragment>
       <button
         type="submit"
-        className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
+        className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--asdk-dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
       >
         OK
       </button>
@@ -244,7 +244,7 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
         <button
           type="submit"
           name={confirmFormField.id}
-          className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
+          className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--asdk-dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
           value="true"
         >
           {parsedConfirmFormFieldConfig?.confirmButtonText ?? 'Confirm'}
@@ -252,7 +252,7 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
         <button
           type="submit"
           name={confirmFormField.id}
-          className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-footer-decline-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--dui-footer-decline-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--dui-footer-decline-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--dui-footer-decline-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm"
+          className="app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-footer-decline-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--asdk-dui-footer-decline-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--asdk-dui-footer-decline-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-dui-footer-decline-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm"
           value="false"
         >
           {parsedConfirmFormFieldConfig?.declineButtonText ?? 'Decline'}
@@ -273,7 +273,7 @@ function Headline(props: { title?: React.ReactNode; headerComponent?: JSX.Elemen
       <div className="app-sdk-flex-1">
         <h3
           id="headline-title"
-          className="app-sdk-text-lg app-sdk-font-medium app-sdk-leading-6 app-sdk-text-[color:var(--dui-header-text-color)]"
+          className="app-sdk-text-lg app-sdk-font-medium app-sdk-leading-6 app-sdk-text-[color:var(--asdk-dui-header-text-color)]"
         >
           {props.title}
         </h3>

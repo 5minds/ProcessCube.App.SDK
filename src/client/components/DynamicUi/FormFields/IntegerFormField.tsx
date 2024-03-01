@@ -23,7 +23,7 @@ export function IntegerFormField(
       </label>
       <div className="app-sdk-mt-1">
         <input
-          className="app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--dui-border-color)] app-sdk-bg-[color:var(--dui-formfield-background-color)] app-sdk-placeholder-[color:var(--dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--dui-focus-color)] focus:app-sdk-ring-[color:var(--dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
+          className="app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
           type="number"
           step={1}
           id={formField.id}
@@ -38,7 +38,7 @@ export function IntegerFormField(
         <p
           id={`${formField.id}-hint`}
           data-hint
-          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--dui-formfield-hint-text-color)]"
+          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
         >
           {parsedCustomFormConfig.hint}
         </p>

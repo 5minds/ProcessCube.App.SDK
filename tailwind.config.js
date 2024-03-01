@@ -2,7 +2,6 @@
 export default {
   content: ['./src/client/components/**/*.{js,ts,jsx,tsx,mdx}'],
   prefix: 'app-sdk-',
-  important: true,
   corePlugins: {
     preflight: false,
   },
