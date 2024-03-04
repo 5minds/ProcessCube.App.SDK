@@ -1,4 +1,15 @@
 import * as esbuild from 'esbuild'
+import fs from 'fs'
+
+var packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf-8'))
+const additionalPackages = ['fsevents'];
+const packagesBlacklist = ['chokidar']
+const externalPackages = [
+  ...Object.keys(packageJSON.dependencies),
+  ...Object.keys(packageJSON.peerDependencies),
+  ...additionalPackages,
+].filter(dep => !packagesBlacklist.includes(dep));
+
 
 const watchMode = process.argv.includes('--watch');
 const productionBuild = process.env.NODE_ENV === 'production';
@@ -6,7 +17,6 @@ const PRODUCTION_CONFIG = {
   treeShaking: true,
   splitting: true,
   minify: true,
-  drop: ['console'],
 };
 const COMMON_CONFIG = {
   bundle: true,
@@ -62,9 +72,7 @@ const esmoduleBuildPromises = [
     entryPoints: ['src/server/index.ts'],
     outdir: 'build/server',
     plugins: [getMarkCommonAsExternal(commonOutputFile)],
-    external: [
-      "@opentelemetry", "fsevents", "@5minds/*", "next", "next-auth", "react", "jwt-decode", "openid-client", "esbuild"
-    ],
+    external: externalPackages,
   }),
   //client
   build({
