@@ -4,7 +4,7 @@ export * from './lib';
 export * from './plugin';
 export * from './server-actions';
 
-import { hasClaim } from '../common';
+import '../common';
 
 declare global {
   namespace NodeJS {
@@ -16,5 +16,3 @@ declare global {
     }
   }
 }
-
-hasClaim('test');
