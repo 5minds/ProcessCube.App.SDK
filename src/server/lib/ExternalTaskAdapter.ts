@@ -110,7 +110,7 @@ async function startExternalTaskWorker(
 
   if (module.default === undefined) {
     logger.info(
-      `External task file recognized at ${pathToExternalTask}. Please export a default handler function. For more information see https://processcube.io/docs/app-sdk/samples/external-task-adapter#external-tasks-entwickeln`,
+      `External task file recognized at ${pathToExternalTask}. Please export a default handler function. For more information see https://processcube.io/docs/app-sdk/samples/nextjs/external-task-adapter-with-nextjs#external-tasks-entwickeln`,
     );
     return;
   }
@@ -197,7 +197,7 @@ async function getFreshTokenSet(): Promise<TokenSet | null> {
     !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
   ) {
     const error = new Error(
-      'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/external-task-adapter#authority',
+      'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/nextjs/external-task-adapter-with-nextjs#authority',
     );
 
     logger.error(
