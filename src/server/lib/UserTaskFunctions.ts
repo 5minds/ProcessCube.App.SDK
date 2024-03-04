@@ -1,6 +1,7 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import { Client } from './internal/EngineClient';
 import type { Identity, UserTaskResult } from '@5minds/processcube_engine_sdk';
+
+import { Client } from './internal/EngineClient';
 
 /**
  * If there is no UserTask waiting, this function will wait for the next UserTask to be created.
