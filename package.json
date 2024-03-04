@@ -6,20 +6,20 @@
   "main": "build/common/index.cjs",
   "module": "build/common/index.mjs",
   "browser": "build/client/index.mjs",
-  "types": "build/common/index.d.ts",
+  "types": "common.d.ts",
   "exports": {
     ".": {
-      "types": "./build/common/index.d.ts",
+      "types": "./common.d.ts",
       "require": "./build/common/index.cjs",
       "default": "./build/common/index.mjs"
     },
     "./server": {
-      "types": "./build/server/index.d.ts",
+      "types": "./server.d.ts",
       "require": "./build/server/index.cjs",
       "default": "./build/server/index.mjs"
     },
     "./client": {
-      "types": "./build/client/index.d.ts",
+      "types": "./client.d.ts",
       "require": "./build/client/index.cjs",
       "default": "./build/client/index.mjs"
     }
@@ -40,7 +40,10 @@
   "files": [
     "build/client",
     "build/common",
-    "build/server"
+    "build/server",
+    "client.d.ts",
+    "common.d.ts",
+    "server.d.ts"
   ],
   "keywords": [
     "SDK",
