@@ -3,52 +3,47 @@
   "version": "5.1.0-alpha.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
-  "main": "common/index.cjs",
-  "module": "common/index.mjs",
-  "browser": "client/index.mjs",
-  "types": "common/index.d.ts",
+  "main": "build/common/index.cjs",
+  "module": "build/common/index.mjs",
+  "browser": "build/client/index.mjs",
+  "types": "common.d.ts",
   "exports": {
     ".": {
-      "types": "./common/index.d.ts",
-      "require": "./common/index.cjs",
-      "default": "./common/index.mjs"
+      "types": "./common.d.ts",
+      "require": "./build/common/index.cjs",
+      "default": "./build/common/index.mjs"
     },
     "./server": {
-      "types": "./server/index.d.ts",
-      "require": "./server/index.cjs",
-      "default": "./server/index.mjs"
+      "types": "./server.d.ts",
+      "require": "./build/server/index.cjs",
+      "default": "./build/server/index.mjs"
     },
     "./client": {
-      "types": "./client/index.d.ts",
-      "require": "./client/index.cjs",
-      "default": "./client/index.mjs"
+      "types": "./client.d.ts",
+      "require": "./build/client/index.cjs",
+      "default": "./build/client/index.mjs"
     }
   },
   "scripts": {
-    "clean": "rm -rf server common client",
+    "clean": "rm -rf build",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "concurrently -n=build:esm,build:commonjs,build:types \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\"",
-    "build:esm:server": "NODE_ENV=development esbuild src/server/*.ts --outdir=./server --bundle --platform=node --format=esm --external:@opentelemetry --external:fsevents --external:@5minds/* --external:next --external:next-auth --external:react --external:jwt-decode --external:openid-client --external:esbuild --analyze=verbose --out-extension:.js=.mjs",
-    "build:esm:client/common": "NODE_ENV=development esbuild src/client/*.ts src/common/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
-    "build:esm": "npm run build:esm:server && npm run build:esm:client/common",
-    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
-    "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\"",
-    "build:prod:esm:server": "NODE_ENV=production esbuild src/server/*.ts --outdir=./server --bundle --platform=node --format=esm --external:@opentelemetry --external:fsevents --external:@5minds/* --external:next --external:next-auth --external:react --external:jwt-decode --external:openid-client --external:esbuild --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
-    "build:prod:esm:client/common": "NODE_ENV=production esbuild src/client/*.ts src/common/*.ts --outdir=. --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --drop:console --out-extension:.js=.mjs",
-    "build:prod:esm": "npm run build:prod:esm:server && npm run build:prod:esm:client/common",
-    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify --drop:console",
-    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
+    "build": "concurrently -n=build:code,build:types \"NODE_ENV=development node build.js\" \"npm run build:types\"",
+    "build:types": "tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently -n=build:types:server,build:types:client \"tsc -p tsconfig.server.json --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --emitDeclarationOnly\"",
+    "build:prod": "npm run clean && concurrently -n=build:prod:code,build:types \"NODE_ENV=production node build.js\" \"npm run build:types\"",
+    "watch": "NODE_ENV=development tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently --kill-others -n=esbuild,tsc:server,tsc:common,tsc:client \"node build.js --watch\" \"tsc -p tsconfig.server.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\""
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/5minds/ProcessCube.App.SDK.git"
   },
   "files": [
-    "client",
-    "server",
-    "common"
+    "build/client",
+    "build/common",
+    "build/server",
+    "client.d.ts",
+    "common.d.ts",
+    "server.d.ts"
   ],
   "keywords": [
     "SDK",
@@ -70,14 +65,15 @@
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/node": "^20.11.17",
     "@types/react": "^18.2.22",
     "concurrently": "^8.2.0",
     "prettier": "^3.0.0",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "next": ">=13.4",
-    "next-auth": "^4.23.1",
+    "next": ">=14",
+    "next-auth": "~4.24.6",
     "react": ">=18.0.0"
   },
   "dependencies": {

@@ -1,10 +1,10 @@
-import NextAuth, { DefaultSession } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
 import 'only-server';
 
 export * from './lib';
 export * from './plugin';
 export * from './server-actions';
+
+import '../common';
 
 declare global {
   namespace NodeJS {
@@ -14,32 +14,5 @@ declare global {
       PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET?: string;
       PROCESSCUBE_AUTHORITY_URL?: string;
     }
-  }
-}
-
-declare module 'next-auth' {
-  /**
-   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
-  interface Session {
-    user: {
-      /** The user's identity claims. */
-      claims?: Record<string, unknown>;
-    } & DefaultSession['user'];
-    error?: 'RefreshAccessTokenError';
-  }
-}
-
-declare module 'next-auth/jwt' {
-  /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
-  interface JWT {
-    /** OpenID Access Token */
-    accessToken?: string;
-    /** OpenID ID Token */
-    idToken?: string;
-    /** OpenID Refresh Token */
-    refreshToken?: string;
-    expiresAt: number;
-    error?: 'RefreshAccessTokenError';
   }
 }
