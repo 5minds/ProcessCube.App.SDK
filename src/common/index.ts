@@ -1,5 +1,6 @@
 export * from './components/RemoteUserTask';
 export * from './functions/hasClaim';
+export * from './types';
 
 declare global {
   namespace NodeJS {
