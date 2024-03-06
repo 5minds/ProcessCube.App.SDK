@@ -1,8 +1,9 @@
+import { existsSync, promises as fsp } from 'node:fs';
+import { basename, dirname, join, relative } from 'node:path';
+
 import { watch } from 'chokidar';
 import { build as esBuild } from 'esbuild';
 import { jwtDecode } from 'jwt-decode';
-import { existsSync, promises as fsp } from 'node:fs';
-import { basename, dirname, join, relative } from 'node:path';
 import { Issuer, TokenSet } from 'openid-client';
 
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
