@@ -1,3 +1,6 @@
+import NextAuth, { DefaultSession, User } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
+
 export * from './components/RemoteUserTask';
 export * from './functions/hasClaim';
 export * from './types';
@@ -11,8 +14,6 @@ declare global {
   }
 }
 
-import NextAuth, { DefaultSession, User } from 'next-auth';
-
 declare module 'next-auth' {
   /**
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
@@ -25,8 +26,6 @@ declare module 'next-auth' {
     error?: 'RefreshAccessTokenError';
   }
 }
-
-import { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth/jwt' {
   /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */

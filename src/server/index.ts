@@ -1,10 +1,10 @@
 import 'only-server';
 
+import '../common';
+
 export * from './lib';
 export * from './plugin';
 export * from './server-actions';
-
-import '../common';
 
 declare global {
   namespace NodeJS {

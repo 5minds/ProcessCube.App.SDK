@@ -1,7 +1,7 @@
 import { DataModels } from '@5minds/processcube_engine_client';
 import type { Identity, UserTaskResult } from '@5minds/processcube_engine_sdk';
 
-import { mapUserTask, mapUserTaskList, UserTaskInstance, UserTaskList } from '../../common';
+import { UserTaskInstance, UserTaskList, mapUserTask, mapUserTaskList } from '../../common';
 import { Client } from './internal/EngineClient';
 
 /**
