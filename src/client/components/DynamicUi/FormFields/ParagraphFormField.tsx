@@ -1,10 +1,10 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 import { marked } from 'marked';
+import React from 'react';
+import { useEffect, useState } from 'react';
 
-import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { classNames } from '../../../utils/classNames';
+import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 
 export function ParagraphFormField(
   { formField: { defaultValue, label } }: DynamicUiComponentProps,

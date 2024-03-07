@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
 export function EnumFormField(
   { formField, state }: DynamicUiComponentProps<string | Array<string> | null>,

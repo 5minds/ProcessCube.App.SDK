@@ -3,10 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  @import "../../root.css";
+  @import '../../root.css';
   .dark,
   .dark * {
-    --asdk-dui-background-color: var(--app-sdk-dynamic-user-interface-background-color, theme('colors.app-sdk-gray.500'));
+    --asdk-dui-background-color: var(
+      --app-sdk-dynamic-user-interface-background-color,
+      theme('colors.app-sdk-gray.500')
+    );
     --asdk-dui-shadow-color: var(--app-sdk-dynamic-user-interface-shadow-color, theme('colors.app-sdk-gray.300'));
     --asdk-dui-border-color: var(--app-sdk-dynamic-user-interface-border-color, transparent);
 
@@ -22,10 +25,7 @@
       --app-sdk-dynamic-user-interface-formfield-placeholder-text-color,
       theme('colors.gray.400')
     );
-    --asdk-dui-formfield-invalid-color: var(
-      --app-sdk-dynamic-user-interface-formfield-invalid-color,
-      #dc35467f
-    );
+    --asdk-dui-formfield-invalid-color: var(--app-sdk-dynamic-user-interface-formfield-invalid-color, #dc35467f);
     --asdk-dui-formfield-checkbox-text-color: var(
       --app-sdk-dynamic-user-interface-formfield-checkbox-text-color,
       #007bff74
@@ -72,16 +72,10 @@
   *,
   ::before,
   ::after {
-    --asdk-dui-background-color: var(
-      --app-sdk-dynamic-user-interface-background-color,
-      theme('colors.white')
-    );
+    --asdk-dui-background-color: var(--app-sdk-dynamic-user-interface-background-color, theme('colors.white'));
     --asdk-dui-text-color: var(--app-sdk-dynamic-user-interface-text-color, var(--asdk-text-color));
     --asdk-dui-link-color: var(--app-sdk-dynamic-user-interface-link-color, theme('colors.sky.600'));
-    --asdk-dui-link-hover-color: var(
-      --app-sdk-dynamic-user-interface-link-hover-color,
-      theme('colors.sky.900')
-    );
+    --asdk-dui-link-hover-color: var(--app-sdk-dynamic-user-interface-link-hover-color, theme('colors.sky.900'));
     --asdk-dui-border-color: var(--app-sdk-dynamic-user-interface-border-color, theme('colors.gray.300'));
     --asdk-dui-focus-color: var(--app-sdk-dynamic-user-interface-focus-color, var(--asdk-focus-color));
     --asdk-dui-shadow-color: var(--app-sdk-dynamic-user-interface-shadow-color, theme('colors.gray.400'));
@@ -108,13 +102,13 @@
     );
 
     /* HEADER */
-    --asdk-dui-header-text-color: var(
-      --app-sdk-dynamic-user-interface-header-text-color,
-      theme('colors.gray.900')
-    );
+    --asdk-dui-header-text-color: var(--app-sdk-dynamic-user-interface-header-text-color, theme('colors.gray.900'));
 
     /* FOOTER */
-    --asdk-dui-footer-background-color: var(--app-sdk-dynamic-user-interface-footer-background-color, theme('colors.gray.50'));
+    --asdk-dui-footer-background-color: var(
+      --app-sdk-dynamic-user-interface-footer-background-color,
+      theme('colors.gray.50')
+    );
 
     --asdk-dui-footer-continue-button-text-color: var(
       --app-sdk-dynamic-user-interface-footer-continue-button-text-color,

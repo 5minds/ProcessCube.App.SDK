@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { isNumber } from '../utils/isNumber';
+import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
 export function IntegerFormField(
   { formField, state }: DynamicUiComponentProps<string | null>,
