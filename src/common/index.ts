@@ -1,5 +1,9 @@
+import NextAuth, { DefaultSession, User } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
+
 export * from './components/RemoteUserTask';
 export * from './functions/hasClaim';
+export * from './types';
 
 declare global {
   namespace NodeJS {
@@ -10,8 +14,6 @@ declare global {
   }
 }
 
-import NextAuth, { DefaultSession } from 'next-auth';
-
 declare module 'next-auth' {
   /**
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
@@ -20,12 +22,10 @@ declare module 'next-auth' {
     user: {
       /** The user's identity claims. */
       claims?: Record<string, unknown>;
-    } & DefaultSession['user'];
+    } & DefaultSession['user'] & { [profile_property: string]: any };
     error?: 'RefreshAccessTokenError';
   }
 }
-
-import { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth/jwt' {
   /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
@@ -38,5 +38,6 @@ declare module 'next-auth/jwt' {
     refreshToken?: string;
     expiresAt: number;
     error?: 'RefreshAccessTokenError';
+    user?: User;
   }
 }

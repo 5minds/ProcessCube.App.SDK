@@ -2,7 +2,7 @@ name: Delete NPM tag on Branch Deletion
 on: delete
 
 env:
-  CI_TOOLS_VERSION: '4.1.0-feature-bad477-lnin9b9h'
+  CI_TOOLS_VERSION: '^4.2.0'
   CI_TOOLS_ALPHA_BRANCH: next
   CI_TOOLS_STABLE_BRANCH: main
 
@@ -21,7 +21,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Use Node.js 20
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'

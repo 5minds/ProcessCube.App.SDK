@@ -1,57 +1,54 @@
 {
   "name": "@5minds/processcube_app_sdk",
-  "version": "5.1.0",
+  "version": "5.1.0-alpha.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
-  "main": "common/index.cjs",
-  "module": "common/index.mjs",
-  "browser": "client/index.mjs",
-  "types": "common/index.d.ts",
+  "main": "build/common/index.cjs",
+  "module": "build/common/index.mjs",
+  "browser": "build/client/index.mjs",
+  "types": "common.d.ts",
   "exports": {
     ".": {
-      "types": "./common/index.d.ts",
-      "require": "./common/index.cjs",
-      "default": "./common/index.mjs"
+      "types": "./common.d.ts",
+      "require": "./build/common/index.cjs",
+      "default": "./build/common/index.mjs"
     },
     "./server": {
-      "types": "./server/index.d.ts",
-      "require": "./server/index.cjs",
-      "default": "./server/index.mjs"
+      "types": "./server.d.ts",
+      "require": "./build/server/index.cjs",
+      "default": "./build/server/index.mjs"
     },
     "./client": {
-      "types": "./client/index.d.ts",
-      "require": "./client/index.cjs",
-      "default": "./client/index.mjs"
+      "types": "./client.d.ts",
+      "require": "./build/client/index.cjs",
+      "default": "./build/client/index.mjs"
     },
     "./client/components/*.css": {
-      "import": "./client/components/*.css",
-      "require": "./client/components/*.css",
-      "default": "./client/components/*.css"
+      "import": "./build/client/components/*.css",
+      "require": "./build/client/components/*.css",
+      "default": "./build/client/components/*.css"
     }
   },
   "scripts": {
-    "clean": "rm -rf server common client",
+    "clean": "rm -rf build",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "concurrently -n=build:esm,build:commonjs,build:types,build:css \"npm run build:esm\" \"npm run build:commonjs\" \"npm run build:types\" \"npm run build:types\"",
-    "build:esm": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --format=esm --analyze=verbose --out-extension:.js=.mjs",
-    "build:commonjs": "NODE_ENV=development esbuild src/**/*.ts --outdir=. --packages=external --bundle --platform=node --out-extension:.js=.cjs --analyze=verbose",
-    "build:types": "tsc --emitDeclarationOnly && tsc -p tsconfig.common.json --emitDeclarationOnly && tsc -p tsconfig.client.json --emitDeclarationOnly",
-    "build:css": "node build-css.cjs",
-    "build:prod": "npm run clean && concurrently -n=build:prod:esm,build:prod:commonjs,build:types,build:prod:css \"npm run build:prod:esm\" \"npm run build:prod:commonjs\" \"npm run build:types\" \"npm run build:prod:css\"",
-    "build:prod:esm": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --format=esm --tree-shaking=true --splitting --minify --out-extension:.js=.mjs",
-    "build:prod:commonjs": "NODE_ENV=production esbuild src/**/*.ts --outdir=.  --packages=external --bundle --platform=node --out-extension:.js=.cjs --tree-shaking=true --minify",
-    "build:prod:css": "NODE_ENV=production node build-css.cjs",
-    "watch": "NODE_ENV=development concurrently --kill-others -n=esbuild:esm,esbuild:comonjs,tsc:server,tsc:common,tsc:client,build:css \"esbuild src/**/*.ts --watch --outdir=. --format=esm --bundle --packages=external --out-extension:.js=.mjs\" \"esbuild src/**/*.ts --watch --outdir=. --platform=node --bundle --packages=external --out-extension:.js=.cjs\" \"tsc -p tsconfig.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"npm run build:css -- --watch\""
+    "build": "concurrently -n=build:code,build:types,build:css \"NODE_ENV=development node build.js\" \"npm run build:types\" \"NODE_ENV=development node build-css.cjs\"",
+    "build:types": "tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently -n=build:types:server,build:types:client \"tsc -p tsconfig.server.json --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --emitDeclarationOnly\"",
+    "build:prod": "npm run clean && concurrently -n=build:prod:code,build:types,build:css \"NODE_ENV=production node build.js\" \"npm run build:types\" \"NODE_ENV=production node build-css.cjs\"",
+    "watch": "NODE_ENV=development tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently --kill-others -n=esbuild,tsc:server,tsc:common,tsc:client,build:css \"node build.js --watch\" \"tsc -p tsconfig.server.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"npm run build:css -- --watch\""
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/5minds/ProcessCube.App.SDK.git"
   },
   "files": [
-    "client",
-    "server",
-    "common",
+    "build/client",
+    "build/common",
+    "build/server",
+    "client.d.ts",
+    "common.d.ts",
+    "server.d.ts",
     "!**.EMPTY"
   ],
   "keywords": [
@@ -68,7 +65,7 @@
     "url": "https://github.com/5minds/ProcessCube.App.SDK/issues",
     "email": "product@5minds.de"
   },
-  "homepage": "https://processcube.io/docs/develop-applications/application-sdk",
+  "homepage": "https://processcube.io/docs/app-sdk",
   "engines": {
     "node": ">=18"
   },
@@ -77,6 +74,8 @@
   ],
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/node": "^20.11.17",
     "@types/react": "^18.2.22",
     "@types/react-is": "^18.2.4",
     "autoprefixer": "^10.4.16",
@@ -88,18 +87,19 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "next": ">=13.4",
-    "next-auth": "^4.23.1",
+    "next": ">=14",
+    "next-auth": "~4.24.6",
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "2023-2",
-    "@5minds/processcube_engine_sdk": "2023-2",
+    "@5minds/processcube_engine_client": "2024-1",
+    "@5minds/processcube_engine_sdk": "2024-1",
     "@headlessui/react": "^1.7.17",
+    "chokidar": "^3.5.3",
     "client-only": "^0.0.1",
-    "esbuild": "^0.19.3",
+    "esbuild": "^0.20.0",
     "isomorphic-dompurify": "^1.9.0",
-    "jwt-decode": "^3.1.2",
+    "jwt-decode": "^4.0.0",
     "marked": "^9.1.2",
     "only-server": "^0.0.1",
     "openid-client": "^5.5.0",

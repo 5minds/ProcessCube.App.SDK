@@ -12,7 +12,7 @@ const entryPoints = fs
 
 const BUILD_OPTIONS = {
   entryPoints: entryPoints,
-  outdir: '.',
+  outdir: 'build',
   bundle: true,
   minify: process.env.NODE_ENV !== 'production' ? false : true,
   entryNames: '[dir]/[name]',
