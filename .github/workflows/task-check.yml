@@ -6,6 +6,7 @@ on:
 jobs:
   task-check:
     runs-on: ubuntu-latest
+    if: github.actor != 'renovate'
     steps:
       - uses: kentaro-m/task-completed-checker-action@v0.1.2
         with:
