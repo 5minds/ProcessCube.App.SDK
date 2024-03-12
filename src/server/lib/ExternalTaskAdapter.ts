@@ -8,8 +8,10 @@ import { Issuer, TokenSet } from 'openid-client';
 
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
-
+import { ChildProcess, fork } from 'node:child_process';
+import { IPCMessageType } from '../../common';
 import { EngineURL } from './internal/EngineClient';
+
 
 const DUMMY_IDENTITY: Identity = {
   token: 'ZHVtbXlfdG9rZW4=',
@@ -20,7 +22,7 @@ const EXTERNAL_TASK_FILE_NAMES: ReadonlyArray<string> = ['external_task.ts', 'ex
 
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefined;
-const externalTaskWorkerByPath: Record<string, ExternalTaskWorker<any, any>> = {};
+const externalTaskWorkerProcessByPath: Record<string, ChildProcess> = {};
 
 export type ExternalTaskConfig = Omit<IExternalTaskWorkerConfig, 'identity' | 'workerId'>;
 
@@ -45,12 +47,6 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       }
 
       await startExternalTaskWorker(path, externalTasksDirPath);
-
-      const directory = dirname(path);
-      const relativePath = relative(externalTasksDirPath, directory);
-      const topic = getExternalTaskTopicByPath(relativePath);
-
-      logger.info(`Started external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
     })
     .on('change', async (path) => {
       if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
@@ -58,12 +54,6 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
       }
 
       await restartExternalTaskWorker(path, externalTasksDirPath);
-
-      const directory = dirname(path);
-      const relativePath = relative(externalTasksDirPath, directory);
-      const topic = getExternalTaskTopicByPath(relativePath);
-
-      logger.info(`Restarted external task ${externalTaskWorkerByPath[path].workerId} for topic ${topic}`);
     })
     .on('unlink', async (path) => {
       if (!EXTERNAL_TASK_FILE_NAMES.includes(basename(path))) {
@@ -72,17 +62,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
 
       stopExternalTaskWorker(path);
 
-      const directory = dirname(path);
-      const relativePath = relative(externalTasksDirPath, directory);
-      const topic = getExternalTaskTopicByPath(relativePath);
-
-      logger.info(`Stopped external task ${externalTaskWorkerByPath[path].workerId} for topic '${topic}'`, {
-        reason: `External Task for topic '${topic}' was removed`,
-        workerId: externalTaskWorkerByPath[path].workerId,
-        topic: topic,
-      });
-
-      delete externalTaskWorkerByPath[path];
+      delete externalTaskWorkerProcessByPath[path];
     })
     .on('error', (error) => logger.info(`Watcher error: ${error}`));
 }
@@ -99,6 +79,9 @@ async function startExternalTaskWorker(
   externalTasksDirPath: string,
   customConfig?: IExternalTaskWorkerConfig,
 ): Promise<void> {
+  if (externalTaskWorkerProcessByPath[pathToExternalTask]) {
+    return;
+  }
   const directory = dirname(pathToExternalTask);
   const workerfile = getExternalTaskFile(directory);
 
@@ -108,40 +91,59 @@ async function startExternalTaskWorker(
   }
 
   const transpiledFile = await transpileFile(pathToExternalTask);
-  const module = await createModule(transpiledFile, pathToExternalTask);
-
-  if (module.default === undefined) {
-    logger.info(
-      `External task file recognized at ${pathToExternalTask}. Please export a default handler function. For more information see https://processcube.io/docs/app-sdk/samples/nextjs/external-task-adapter-with-nextjs#external-tasks-entwickeln`,
-    );
-    return;
-  }
-
   const tokenSet = await getFreshTokenSet();
   const identity = getIdentityForExternalTaskWorkers(tokenSet);
-
   const relativePath = relative(externalTasksDirPath, directory);
-
   const topic = getExternalTaskTopicByPath(relativePath);
-  const handler = module.default;
-  const config: IExternalTaskWorkerConfig = {
-    identity: identity,
-    ...customConfig,
-    ...module?.config,
-  };
-  const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-  externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
-    logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
-      err: error,
-      type: errorType,
-      externalTask: externalTask,
-    });
+
+  const processFile = join(__dirname, 'lib/ExternalTaskWorkerProcess.cjs');
+  let externalTaskWorkerProcess = fork(processFile);
+  externalTaskWorkerProcess.on('message', async (message: { action: string }) => {
+    switch (message.action) {
+      case 'createCompleted':
+        await startRefreshingIdentityCycle(tokenSet, externalTaskWorkerProcess);
+        externalTaskWorkerProcess.send({
+          action: 'start',
+          payload: {
+            topic,
+          },
+        } satisfies IPCMessageType);
+        break;
+    }
   });
 
-  externalTaskWorker.start();
-  await startRefreshingIdentityCycle(tokenSet, externalTaskWorker);
+  externalTaskWorkerProcess.send({
+    action: 'create',
+    payload: {
+      EngineURL,
+      topic,
+      identity,
+      moduleString: transpiledFile,
+      fullWorkerFilePath: pathToExternalTask,
+    },
+  } satisfies IPCMessageType);
 
-  externalTaskWorkerByPath[pathToExternalTask] = externalTaskWorker;
+  // return externalTaskWorkerProcess;
+
+  // const handler = module.default;
+  // const config: IExternalTaskWorkerConfig = {
+  //   identity: identity,
+  //   ...customConfig,
+  //   ...module?.config,
+  // };
+  // const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
+  // externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
+  //   logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
+  //     err: error,
+  //     type: errorType,
+  //     externalTask: externalTask,
+  //   });
+  // });
+
+  // externalTaskWorker.start();
+  // await startRefreshingIdentityCycle(tokenSet, externalTaskWorker);
+
+  externalTaskWorkerProcessByPath[pathToExternalTask] = externalTaskWorkerProcess;
 }
 
 /**
@@ -152,9 +154,9 @@ async function startExternalTaskWorker(
  * @returns A promise that resolves when the external task worker has been restarted.
  */
 async function restartExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
-  const workerId = externalTaskWorkerByPath[pathToExternalTask]?.workerId;
+  const workerId = externalTaskWorkerProcessByPath[pathToExternalTask];
   stopExternalTaskWorker(pathToExternalTask);
-  await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath, { workerId });
+  await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath, { });
 }
 
 /**
@@ -164,14 +166,16 @@ async function restartExternalTaskWorker(pathToExternalTask: string, externalTas
  * @param pathToExternalTask - The path to the external task.
  */
 function stopExternalTaskWorker(pathToExternalTask: string): void {
-  const externalTaskWorker = externalTaskWorkerByPath[pathToExternalTask];
+  const externalTaskWorkerProcess = externalTaskWorkerProcessByPath[pathToExternalTask];
 
-  if (!externalTaskWorker) {
+  if (!externalTaskWorkerProcess) {
     return;
   }
 
-  externalTaskWorker.stop();
-  externalTaskWorker.dispose();
+  externalTaskWorkerProcess.kill();
+
+  // externalTaskWorker.stop();
+  // externalTaskWorker.dispose();
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
@@ -243,50 +247,62 @@ function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Identity 
 /**
  * Start refreshing the identity in regular intervals.
  * @param {TokenSet | null} tokenSet The token set to refresh the identity for
- * @param {ExternalTaskWorker<any, any>} externalTaskWorker The external task worker to refresh the identity for
+ * @param {ChildProcess} externalTaskWorkerProcess The external task worker process to refresh the identity for
  * @param {number} retries The number of retries to refresh the identity
  * @returns {Promise<void>} A promise that resolves when the identity is refreshed
  * */
 async function startRefreshingIdentityCycle(
   tokenSet: TokenSet | null,
-  externalTaskWorker: ExternalTaskWorker<any, any>,
+  externalTaskWorkerProcess: ChildProcess,
   retries: number = 5,
 ): Promise<void> {
+  let timeout: NodeJS.Timeout;
+  const disconnectCallback = () => {
+    logger.info('External task worker process IPC channel was disconnected, stopping identity refresh cycle', {
+      pid: externalTaskWorkerProcess.pid,
+    });
+    clearTimeout(timeout);
+  };
+
   try {
     if (!authorityIsConfigured || tokenSet === null) {
       return;
     }
 
-    if (!externalTaskWorker.pollingIsActive) {
-      return;
-    }
+    externalTaskWorkerProcess.once('disconnect', disconnectCallback);
 
     const expiresIn = await getExpiresInForExternalTaskWorkers(tokenSet);
     const delay = expiresIn * DELAY_FACTOR * 1000;
 
-    setTimeout(async () => {
-      if (!externalTaskWorker.pollingIsActive) {
+    timeout = setTimeout(async () => {
+      const newTokenSet = await getFreshTokenSet();
+      const newIdentity = getIdentityForExternalTaskWorkers(newTokenSet);
+
+      if (externalTaskWorkerProcess.killed) {
         return;
       }
 
-      const newTokenSet = await getFreshTokenSet();
-      const newIdentity = getIdentityForExternalTaskWorkers(newTokenSet);
-      externalTaskWorker.identity = newIdentity;
-      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorker);
+      externalTaskWorkerProcess.send({
+        action: 'updateIdentity',
+        payload: {
+          identity: newIdentity,
+        },
+      } satisfies IPCMessageType);
+      externalTaskWorkerProcess.removeListener('disconnect', disconnectCallback);
+      await startRefreshingIdentityCycle(newTokenSet, externalTaskWorkerProcess);
     }, delay);
   } catch (error) {
     if (retries === 0) {
       throw error;
     }
 
-    logger.error(`Could not refresh identity for external task worker ${externalTaskWorker.workerId}`, {
+    logger.error(`Could not refresh identity for external task worker process ${externalTaskWorkerProcess.pid}`, {
       err: error,
-      workerId: externalTaskWorker.workerId,
       retryCount: retries,
     });
 
     const delay = 2 * 1000;
-    setTimeout(async () => await startRefreshingIdentityCycle(tokenSet, externalTaskWorker, retries - 1), delay);
+    timeout = setTimeout(async () => await startRefreshingIdentityCycle(tokenSet, externalTaskWorkerProcess, retries - 1), delay);
   }
 }
 
@@ -320,29 +336,6 @@ async function transpileFile(entryPoint: string): Promise<any> {
   }
 
   return result.outputFiles[0].text;
-}
-
-/**
- * Creates a module from a given source code string and filename.
- * @param src - The source code string of the module.
- * @param filename - The filename of the module.
- * @returns The exported object from the compiled module.
- * @throws If there is an error while compiling or requiring the module.
- */
-async function createModule(src: string, filename: string) {
-  try {
-    var Module = module.constructor as any;
-    var m = new Module();
-    m._compile(src, filename);
-
-    return m.exports;
-  } catch (error) {
-    logger.error(`Could not require module from string`, {
-      err: error,
-    });
-
-    throw error;
-  }
 }
 
 /**
