@@ -303,7 +303,7 @@ async function transpileFile(entryPoint: string): Promise<any> {
     platform: 'node',
     target: 'node18',
     format: 'cjs',
-    external: ['@opentelemetry/api']
+    external: ['@opentelemetry/api'],
   });
 
   if (result.errors.length > 0) {
