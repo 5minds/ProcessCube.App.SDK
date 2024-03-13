@@ -29,6 +29,7 @@ process.once('SIGTERM', () => {
   logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
     reason: `External Task Worker Process received SIGTERM`,
     workerId: externalTaskWorker.workerId,
+    pid
   });
 
   quit();
@@ -38,6 +39,7 @@ process.once('SIGINT', () => {
   logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
     reason: `External Task Worker Process received SIGINT`,
     workerId: externalTaskWorker.workerId,
+    pid
   });
 
   quit();
@@ -47,6 +49,17 @@ process.once('SIGHUP', () => {
   logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
     reason: `External Task Worker Process received SIGHUP`,
     workerId: externalTaskWorker.workerId,
+    pid
+  });
+
+  quit();
+});
+
+process.once('disconnect', () => {
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
+    reason: `External Task Worker Process received disconnect`,
+    workerId: externalTaskWorker.workerId,
+    pid
   });
 
   quit();
@@ -79,7 +92,8 @@ async function create({
     logger.error(`External task ${externalTaskWorker.workerId} for topic ${topic} ran into an error`, {
       error,
       workerId: externalTaskWorker.workerId,
-      topic: topic,
+      topic,
+      pid
     });
   });
 
@@ -108,7 +122,8 @@ function restart({
   logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
     reason: `Code changes in External Task for ${topic}`,
     workerId: externalTaskWorker.workerId,
-    topic: topic,
+    topic,
+    pid
   });
 
   shutdownExternalTaskWorker();
@@ -124,7 +139,7 @@ function restart({
 
 function start({ topic }: { topic: string }) {
   externalTaskWorker.start();
-  logger.info(`Started external task ${externalTaskWorker.workerId} for topic ${topic}; ${pid}`);
+  logger.info(`Started external task ${externalTaskWorker.workerId} for topic ${topic}`, { workerId: externalTaskWorker.workerId, topic, pid });
 }
 
 function updateIdentity({ identity }: { identity: Identity }) {

@@ -123,26 +123,6 @@ async function startExternalTaskWorker(
     },
   } satisfies IPCMessageType);
 
-  // return externalTaskWorkerProcess;
-
-  // const handler = module.default;
-  // const config: IExternalTaskWorkerConfig = {
-  //   identity: identity,
-  //   ...customConfig,
-  //   ...module?.config,
-  // };
-  // const externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
-  // externalTaskWorker.onWorkerError((errorType, error, externalTask): void => {
-  //   logger.error(`Intercepted "${errorType}"-type error: ${error.message}`, {
-  //     err: error,
-  //     type: errorType,
-  //     externalTask: externalTask,
-  //   });
-  // });
-
-  // externalTaskWorker.start();
-  // await startRefreshingIdentityCycle(tokenSet, externalTaskWorker);
-
   externalTaskWorkerProcessByPath[pathToExternalTask] = externalTaskWorkerProcess;
 }
 
@@ -154,9 +134,25 @@ async function startExternalTaskWorker(
  * @returns A promise that resolves when the external task worker has been restarted.
  */
 async function restartExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
-  const workerId = externalTaskWorkerProcessByPath[pathToExternalTask];
+  const directory = dirname(pathToExternalTask);
+  const transpiledFile = await transpileFile(pathToExternalTask);
+  const tokenSet = await getFreshTokenSet();
+  const identity = getIdentityForExternalTaskWorkers(tokenSet);
+  const relativePath = relative(externalTasksDirPath, directory);
+  const topic = getExternalTaskTopicByPath(relativePath);
+  const workerProcess = externalTaskWorkerProcessByPath[pathToExternalTask];
   stopExternalTaskWorker(pathToExternalTask);
   await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath, { });
+  workerProcess.send({
+    action: 'restart',
+    payload: {
+      EngineURL,
+      topic,
+      identity,
+      moduleString: transpiledFile,
+      fullWorkerFilePath: pathToExternalTask,
+    },
+  } satisfies IPCMessageType);
 }
 
 /**
@@ -173,9 +169,6 @@ function stopExternalTaskWorker(pathToExternalTask: string): void {
   }
 
   externalTaskWorkerProcess.kill();
-
-  // externalTaskWorker.stop();
-  // externalTaskWorker.dispose();
 }
 
 async function getExternalTaskFile(directory: string): Promise<string | null> {
