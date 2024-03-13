@@ -7,6 +7,7 @@ import { pid } from 'node:process';
 const logger = new Logger('processcube_app_sdk:external_task_worker_process');
 
 let externalTaskWorker: ExternalTaskWorker<any, any>;
+let workerTopic: string;
 
 process.on('message', async (message: IPCMessageType) => {
   switch (message.action) {
@@ -17,7 +18,7 @@ process.on('message', async (message: IPCMessageType) => {
       restart(message.payload);
       break;
     case 'start':
-      start(message.payload);
+      start();
       break;
     case 'updateIdentity':
       updateIdentity(message.payload);
@@ -26,9 +27,10 @@ process.on('message', async (message: IPCMessageType) => {
 });
 
 process.once('SIGTERM', () => {
-  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
-    reason: `External Task Worker Process received SIGTERM`,
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId} for topic ${workerTopic}`, {
+    reason: 'External Task Worker Process received SIGTERM',
     workerId: externalTaskWorker.workerId,
+    topic: workerTopic,
     pid
   });
 
@@ -36,9 +38,10 @@ process.once('SIGTERM', () => {
 });
 
 process.once('SIGINT', () => {
-  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
-    reason: `External Task Worker Process received SIGINT`,
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId} for topic ${workerTopic}`, {
+    reason: 'External Task Worker Process received SIGINT',
     workerId: externalTaskWorker.workerId,
+    topic: workerTopic,
     pid
   });
 
@@ -46,9 +49,10 @@ process.once('SIGINT', () => {
 });
 
 process.once('SIGHUP', () => {
-  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
-    reason: `External Task Worker Process received SIGHUP`,
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId} for topic ${workerTopic}`, {
+    reason: 'External Task Worker Process received SIGHUP',
     workerId: externalTaskWorker.workerId,
+    topic: workerTopic,
     pid
   });
 
@@ -56,9 +60,10 @@ process.once('SIGHUP', () => {
 });
 
 process.once('disconnect', () => {
-  logger.info(`Stopping external task worker ${externalTaskWorker.workerId}`, {
-    reason: `External Task Worker Process received disconnect`,
+  logger.info(`Stopping external task worker ${externalTaskWorker.workerId} for topic ${workerTopic}`, {
+    reason: 'External Task Worker Process received disconnect',
     workerId: externalTaskWorker.workerId,
+    topic: workerTopic,
     pid
   });
 
@@ -70,17 +75,19 @@ async function create({
   topic,
   identity,
   moduleString,
-  fullWorkerFilePath,
+  pathToExternalTask,
   workerId,
 }: {
   EngineURL: string;
   topic: string;
   identity: Identity;
   moduleString: string;
-  fullWorkerFilePath: string;
+  pathToExternalTask: string;
   workerId?: string;
 }) {
-  const module = await requireFromString(moduleString, fullWorkerFilePath);
+  workerTopic = topic;
+  const module = await requireFromString(moduleString, pathToExternalTask);
+  console.log(module)
   const config: IExternalTaskWorkerConfig = {
     identity,
     ...module?.config,
@@ -89,7 +96,7 @@ async function create({
   const handler = module.default;
   externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
   externalTaskWorker.onWorkerError((error) => {
-    logger.error(`External task ${externalTaskWorker.workerId} for topic ${topic} ran into an error`, {
+    logger.error(`External task worker ${externalTaskWorker.workerId} for topic ${topic} ran into an error`, {
       error,
       workerId: externalTaskWorker.workerId,
       topic,
@@ -101,7 +108,7 @@ async function create({
 
   process.send({
     action: 'createCompleted',
-  });
+  } satisfies IPCMessageType);
 }
 
 function restart({
@@ -109,19 +116,19 @@ function restart({
   topic,
   identity,
   moduleString,
-  fullWorkerFilePath,
+  pathToExternalTask,
 }: {
   EngineURL: string;
   topic: string;
   identity: Identity;
   moduleString: string;
-  fullWorkerFilePath: string;
+  pathToExternalTask: string;
 }) {
   const workerId = externalTaskWorker.workerId;
 
-  logger.info(`Restarting external task ${externalTaskWorker.workerId} for topic ${topic}`, {
+  logger.info(`Restarting external task worker ${workerId} for topic ${topic}`, {
     reason: `Code changes in External Task for ${topic}`,
-    workerId: externalTaskWorker.workerId,
+    workerId,
     topic,
     pid
   });
@@ -132,14 +139,18 @@ function restart({
     topic,
     identity,
     moduleString,
-    fullWorkerFilePath,
+    pathToExternalTask,
     workerId,
   });
 }
 
-function start({ topic }: { topic: string }) {
+function start() {
   externalTaskWorker.start();
-  logger.info(`Started external task ${externalTaskWorker.workerId} for topic ${topic}`, { workerId: externalTaskWorker.workerId, topic, pid });
+  logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${workerTopic}`, {
+    workerId: externalTaskWorker.workerId,
+    topic: workerTopic,
+    pid
+  });
 }
 
 function updateIdentity({ identity }: { identity: Identity }) {
