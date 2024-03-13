@@ -1,3 +1,4 @@
+import { ChildProcess, fork } from 'node:child_process';
 import { existsSync, promises as fsp } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
 
@@ -8,10 +9,9 @@ import { Issuer, TokenSet } from 'openid-client';
 
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
-import { ChildProcess, fork } from 'node:child_process';
+
 import { IPCMessageType } from '../../common';
 import { EngineURL } from './internal/EngineClient';
-
 
 const DUMMY_IDENTITY: Identity = {
   token: 'ZHVtbXlfdG9rZW4=',
@@ -74,10 +74,7 @@ export async function subscribeToExternalTasks(customExternalTasksDirPath?: stri
  * @param externalTasksDirPath The path to the directory containing external tasks.
  * @returns A Promise that resolves when the external task worker has started.
  */
-async function startExternalTaskWorker(
-  pathToExternalTask: string,
-  externalTasksDirPath: string,
-): Promise<void> {
+async function startExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
   if (externalTaskWorkerProcessByPath[pathToExternalTask]) {
     return;
   }
@@ -137,8 +134,6 @@ async function restartExternalTaskWorker(pathToExternalTask: string, externalTas
   const relativePath = relative(externalTasksDirPath, directory);
   const topic = getExternalTaskTopicByPath(relativePath);
   const workerProcess = externalTaskWorkerProcessByPath[pathToExternalTask];
-  stopExternalTaskWorker(pathToExternalTask);
-  await startExternalTaskWorker(pathToExternalTask, externalTasksDirPath);
   workerProcess.send({
     action: 'restart',
     payload: {
@@ -286,10 +281,13 @@ async function startRefreshingIdentityCycle(
       }
       retries--;
 
-      logger.error(`Could not refresh identity for external task worker process ${externalTaskWorkerProcess.pid} with topic ${topic}`, {
-        err: error,
-        retryCount: retries,
-      });
+      logger.error(
+        `Could not refresh identity for external task worker process ${externalTaskWorkerProcess.pid} with topic ${topic}`,
+        {
+          err: error,
+          retryCount: retries,
+        },
+      );
 
       const delay = 2 * 1000;
       timeout = setTimeout(refresh, delay);
@@ -312,7 +310,7 @@ async function transpileFile(entryPoint: string): Promise<any> {
     platform: 'node',
     target: 'node18',
     format: 'cjs',
-    external: ['@opentelemetry/api']
+    external: ['@opentelemetry/api'],
   });
 
   if (result.errors.length > 0) {
