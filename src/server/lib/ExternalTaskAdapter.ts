@@ -124,7 +124,7 @@ async function startExternalTaskWorker(pathToExternalTask: string, externalTasks
  *
  * @param pathToExternalTask - The path to the external task.
  * @param externalTasksDirPath - The path to the directory containing external tasks.
- * @returns A promise that resolves when the external task worker has been restarted.
+ * @returns A promise that resolves when the external task worker restart has been started.
  */
 async function restartExternalTaskWorker(pathToExternalTask: string, externalTasksDirPath: string): Promise<void> {
   const directory = dirname(pathToExternalTask);

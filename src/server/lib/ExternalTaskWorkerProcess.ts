@@ -163,12 +163,6 @@ function shutdownExternalTaskWorker(reason: string) {
   externalTaskWorker?.dispose();
 }
 
-/**
- * Require a module from a string.
- * @param {string} src The source code of the module
- * @param {string} filename The filename of the module
- * @returns The module exports of the module
- * */
 function requireFromString(src: string, filename: string) {
   try {
     var Module = module.constructor as any;
@@ -185,11 +179,6 @@ function requireFromString(src: string, filename: string) {
   }
 }
 
-/**
- * Used for those situations where you *know* that a value cannot possibly be `null`.
- *
- * But you want/need to check at runtime to fail early and produce a clear error message.
- */
 function assertNotNull<T = any>(value: T, nameForErrorMessage: string, context?: any): asserts value is NonNullable<T> {
   if (value == null) {
     const suffix = context == null ? '' : `\n\nContext:\n\n${JSON.stringify(context, null, 2)}`;
