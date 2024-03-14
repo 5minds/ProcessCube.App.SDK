@@ -1,9 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+@import '../../root.css';
 @layer base {
-  @import '../../root.css';
   .dark,
   .dark * {
     --asdk-dui-background-color: var(

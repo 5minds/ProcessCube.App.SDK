@@ -23,7 +23,7 @@ const BUILD_OPTIONS = {
     postCssPlugin({
       extract: true,
       postcss: {
-        plugins: [require('tailwindcss'), require('autoprefixer')],
+        plugins: [require('postcss-import'),require('tailwindcss'), require('autoprefixer')],
       },
     }),
   ],

@@ -1,9 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+@import '../root.css';
 @layer base {
-  @import '../root.css';
   .dark,
   .dark * {
     --asdk-ddm-icon-text-color: var(--app-sdk-drop-down-menu-icon-text-color, theme('colors.app-sdk-gray.150'));
