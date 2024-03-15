@@ -6,7 +6,7 @@ on:
 jobs:
   task-check:
     runs-on: ubuntu-latest
-    if: github.actor != 'renovate'
+    if: github.actor != 'renovate[bot]'
     steps:
       - uses: chromaui/task-completed-checker-action@main
         with:
