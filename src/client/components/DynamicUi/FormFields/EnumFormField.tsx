@@ -62,7 +62,6 @@ export function EnumFormField(
         </fieldset>
       );
       break;
-    // state wiederherstellung testen
     case 'radio':
       enumInput = (
         <fieldset
