@@ -3,7 +3,7 @@ import { pid } from 'node:process';
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 
-import { CreateRestartPayload, type IPCMessageType } from '../../common';
+import { type IPCMessageType, StartPayload } from '../../common';
 
 const logger = new Logger('processcube_app_sdk:external_task_worker_process');
 const EngineURL = process.env.PROCESSCUBE_ENGINE_URL!;
@@ -47,7 +47,7 @@ async function create({
   moduleString,
   workerPath,
   workerId,
-}: CreateRestartPayload & {
+}: StartPayload & {
   workerId?: string;
 }) {
   workerTopic = topic;
@@ -84,7 +84,6 @@ async function create({
     quit(undefined, 3);
   });
 
-  assertNotNull(externalTaskWorker, 'externalTaskWorker');
   externalTaskWorker.start();
   logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
     workerId: externalTaskWorker.workerId,
@@ -93,7 +92,7 @@ async function create({
   });
 }
 
-function restart({ topic, identity, moduleString, workerPath }: CreateRestartPayload) {
+function restart({ topic, identity, moduleString, workerPath }: StartPayload) {
   const workerId = externalTaskWorker?.workerId;
 
   logger.info(`Restarting external task worker ${workerId ?? ''} for topic ${topic}`, {

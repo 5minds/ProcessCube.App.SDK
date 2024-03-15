@@ -1,6 +1,6 @@
 import { Identity } from '@5minds/processcube_engine_sdk';
 
-export type CreateRestartPayload = {
+export type StartPayload = {
   identity: Identity;
   moduleString: string;
   topic: string;
@@ -10,7 +10,7 @@ export type CreateRestartPayload = {
 export type IPCMessageType =
   | {
       action: 'create' | 'restart';
-      payload: CreateRestartPayload;
+      payload: StartPayload;
     }
   | {
       action: 'updateIdentity';
