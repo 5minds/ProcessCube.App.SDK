@@ -1,5 +1,5 @@
 @import '../../root.css';
-@layer base {
+@layer components {
   .dark,
   .dark * {
     --asdk-dui-background-color: var(
