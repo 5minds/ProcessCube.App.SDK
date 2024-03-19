@@ -42,9 +42,9 @@ export function DropdownMenu(props: { children: React.ReactNode; collapsedIcon?:
 
 export function DropdownMenuItem(props: {
   title: string | JSX.Element;
-  onClick: () => void | Promise<void>;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   isDanger?: boolean;
-  classNames?: string;
+  className?: string;
 }): JSX.Element {
   return (
     <Menu.Item>
@@ -54,12 +54,12 @@ export function DropdownMenuItem(props: {
         return (
           <button
             type="button"
-            onClick={() => props.onClick()}
+            onClick={props.onClick}
             className={classNames(
               active ? 'app-sdk-bg-[color:var(--asdk-ddm-entry-background-hover-color)]' : 'app-sdk-bg-transparent',
               'app-sdk-cursor-pointer app-sdk-p-0 app-sdk-text-[100%] app-sdk-block app-sdk-w-full app-sdk-px-4 app-sdk-py-2 app-sdk-text-left app-sdk-text-sm',
               props.isDanger ? dangerClass : defaultClass,
-              props.classNames ?? '',
+              props.className ?? '',
             )}
           >
             {props.title}

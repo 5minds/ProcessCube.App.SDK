@@ -2,10 +2,7 @@
 @layer components {
   .dark,
   .dark * {
-    --asdk-dui-background-color: var(
-      --app-sdk-dynamic-ui-background-color,
-      theme('colors.app-sdk-gray.500')
-    );
+    --asdk-dui-background-color: var(--app-sdk-dynamic-ui-background-color, theme('colors.app-sdk-gray.500'));
     --asdk-dui-shadow-color: var(--app-sdk-dynamic-ui-shadow-color, theme('colors.app-sdk-gray.300'));
     --asdk-dui-border-color: var(--app-sdk-dynamic-ui-border-color, transparent);
 
@@ -22,16 +19,10 @@
       theme('colors.gray.400')
     );
     --asdk-dui-formfield-invalid-color: var(--app-sdk-dynamic-ui-formfield-invalid-color, #dc35467f);
-    --asdk-dui-formfield-checkbox-text-color: var(
-      --app-sdk-dynamic-ui-formfield-checkbox-text-color,
-      #007bff74
-    );
+    --asdk-dui-formfield-checkbox-text-color: var(--app-sdk-dynamic-ui-formfield-checkbox-text-color, #007bff74);
 
     /* HEADER */
-    --asdk-dui-header-text-color: var(
-      --app-sdk-dynamic-ui-header-text-color,
-      theme('colors.app-sdk-gray.150')
-    );
+    --asdk-dui-header-text-color: var(--app-sdk-dynamic-ui-header-text-color, theme('colors.app-sdk-gray.150'));
 
     /* FOOTER */
     --asdk-dui-footer-background-color: var(
@@ -76,22 +67,13 @@
     --asdk-dui-focus-color: var(--app-sdk-dynamic-ui-focus-color, var(--asdk-focus-color));
     --asdk-dui-shadow-color: var(--app-sdk-dynamic-ui-shadow-color, theme('colors.gray.400'));
 
-    --asdk-dui-formfield-hint-text-color: var(
-      --app-sdk-dynamic-ui-formfield-hint-text-color,
-      theme('colors.gray.500')
-    );
-    --asdk-dui-formfield-background-color: var(
-      --app-sdk-dynamic-ui-formfield-background-color,
-      theme('colors.white')
-    );
+    --asdk-dui-formfield-hint-text-color: var(--app-sdk-dynamic-ui-formfield-hint-text-color, theme('colors.gray.500'));
+    --asdk-dui-formfield-background-color: var(--app-sdk-dynamic-ui-formfield-background-color, theme('colors.white'));
     --asdk-dui-formfield-placeholder-text-color: var(
       --app-sdk-dynamic-ui-formfield-placeholder-text-color,
       theme('colors.gray.500')
     );
-    --asdk-dui-formfield-invalid-color: var(
-      --app-sdk-dynamic-ui-formfield-invalid-color,
-      theme('colors.red.500')
-    );
+    --asdk-dui-formfield-invalid-color: var(--app-sdk-dynamic-ui-formfield-invalid-color, theme('colors.red.500'));
     --asdk-dui-formfield-checkbox-text-color: var(
       --app-sdk-dynamic-ui-formfield-checkbox-text-color,
       theme('colors.sky.600')
@@ -101,10 +83,7 @@
     --asdk-dui-header-text-color: var(--app-sdk-dynamic-ui-header-text-color, theme('colors.gray.900'));
 
     /* FOOTER */
-    --asdk-dui-footer-background-color: var(
-      --app-sdk-dynamic-ui-footer-background-color,
-      theme('colors.gray.50')
-    );
+    --asdk-dui-footer-background-color: var(--app-sdk-dynamic-ui-footer-background-color, theme('colors.gray.50'));
 
     --asdk-dui-footer-continue-button-text-color: var(
       --app-sdk-dynamic-ui-footer-continue-button-text-color,
