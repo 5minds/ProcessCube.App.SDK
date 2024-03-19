@@ -42,7 +42,7 @@ export function DropdownMenu(props: { children: React.ReactNode; collapsedIcon?:
 
 export function DropdownMenuItem(props: {
   title: string | JSX.Element;
-  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
   isDanger?: boolean;
   className?: string;
 }): JSX.Element {
