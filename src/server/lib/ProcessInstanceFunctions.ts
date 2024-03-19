@@ -1,5 +1,5 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import { EventMessage, Subscription } from '@5minds/processcube_engine_sdk';
+import type { EventMessage, Subscription } from '@5minds/processcube_engine_sdk';
 
 import { Client } from './internal/EngineClient';
 
