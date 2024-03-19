@@ -3,7 +3,7 @@ import React, { Fragment } from 'react';
 
 import { classNames } from '../utils/classNames';
 
-export function DropDownMenu(props: { children: React.ReactNode; collapsedIcon?: React.ReactNode }) {
+export function DropdownMenu(props: { children: React.ReactNode; collapsedIcon?: React.ReactNode }) {
   return (
     <Menu as="div" className="app-sdk-default-styles app-sdk-relative app-sdk-inline-block app-sdk-text-left">
       <div>
@@ -40,7 +40,7 @@ export function DropDownMenu(props: { children: React.ReactNode; collapsedIcon?:
   );
 }
 
-export function DropDownMenuItem(props: {
+export function DropdownMenuItem(props: {
   title: string | JSX.Element;
   onClick: () => void | Promise<void>;
   isDanger?: boolean;

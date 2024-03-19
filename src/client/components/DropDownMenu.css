@@ -2,31 +2,31 @@
 @layer components {
   .dark,
   .dark * {
-    --asdk-ddm-icon-text-color: var(--app-sdk-drop-down-menu-icon-text-color, theme('colors.app-sdk-gray.150'));
+    --asdk-ddm-icon-text-color: var(--app-sdk-dropdown-menu-icon-text-color, theme('colors.app-sdk-gray.150'));
     --asdk-ddm-icon-text-hover-color: var(
-      --app-sdk-drop-down-menu-icon-text-hover-color,
+      --app-sdk-dropdown-menu-icon-text-hover-color,
       theme('colors.app-sdk-gray.100')
     );
-    --asdk-ddm-background-color: var(--app-sdk-drop-down-menu-background-color, theme('colors.app-sdk-gray.400'));
+    --asdk-ddm-background-color: var(--app-sdk-dropdown-menu-background-color, theme('colors.app-sdk-gray.400'));
     --asdk-ddm-entry-background-hover-color: var(
-      --app-sdk-drop-down-menu-entry-background-hover-color,
+      --app-sdk-dropdown-menu-entry-background-hover-color,
       theme('colors.app-sdk-gray.250')
     );
-    --asdk-ddm-danger-entry-text-color: var(--app-sdk-drop-down-menu-danger-entry-text-color, #d6868d);
+    --asdk-ddm-danger-entry-text-color: var(--app-sdk-dropdown-menu-danger-entry-text-color, #d6868d);
   }
 
   *,
   ::before,
   ::after {
-    --asdk-ddm-icon-text-color: var(--app-sdk-drop-down-menu-icon-text-color, theme('colors.gray.900'));
-    --asdk-ddm-icon-text-hover-color: var(--app-sdk-drop-down-menu-icon-text-hover-color, theme('colors.gray.500'));
-    --asdk-ddm-focus-color: var(--app-sdk-drop-down-menu-focus-color, var(--asdk-focus-color));
-    --asdk-ddm-background-color: var(--app-sdk-drop-down-menu-background-color, theme('colors.white'));
+    --asdk-ddm-icon-text-color: var(--app-sdk-dropdown-menu-icon-text-color, theme('colors.gray.900'));
+    --asdk-ddm-icon-text-hover-color: var(--app-sdk-dropdown-menu-icon-text-hover-color, theme('colors.gray.500'));
+    --asdk-ddm-focus-color: var(--app-sdk-dropdown-menu-focus-color, var(--asdk-focus-color));
+    --asdk-ddm-background-color: var(--app-sdk-dropdown-menu-background-color, theme('colors.white'));
     --asdk-ddm-entry-background-hover-color: var(
-      --app-sdk-drop-down-menu-entry-background-hover-color,
+      --app-sdk-dropdown-menu-entry-background-hover-color,
       theme('colors.gray.100')
     );
-    --asdk-ddm-default-entry-text-color: var(--app-sdk-drop-down-menu-default-entry-text-color, var(--asdk-text-color));
-    --asdk-ddm-danger-entry-text-color: var(--app-sdk-drop-down-menu-danger-entry-text-color, theme('colors.red.700'));
+    --asdk-ddm-default-entry-text-color: var(--app-sdk-dropdown-menu-default-entry-text-color, var(--asdk-text-color));
+    --asdk-ddm-danger-entry-text-color: var(--app-sdk-dropdown-menu-danger-entry-text-color, theme('colors.red.700'));
   }
 }
