@@ -1,8 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./common",
-
+    "outDir": "./build/common",
+    "composite": true,
+    "rootDir": "./src/common",
+    "tsBuildInfoFile": "./build/common.tsbuildinfo"
   },
   "include": ["./src/common"],
 }

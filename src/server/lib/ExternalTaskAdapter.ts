@@ -1,11 +1,13 @@
-import { Identity, Logger } from '@5minds/processcube_engine_sdk';
-import { IExternalTaskWorkerConfig, ExternalTaskWorker } from '@5minds/processcube_engine_client';
+import { existsSync, promises as fsp } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
-import { build as esBuild } from 'esbuild';
-import { promises as fsp, existsSync } from 'node:fs';
-import { Issuer, TokenSet, custom } from 'openid-client';
-import { jwtDecode } from 'jwt-decode';
+
 import { watch } from 'chokidar';
+import { build as esBuild } from 'esbuild';
+import { jwtDecode } from 'jwt-decode';
+import { Issuer, TokenSet, custom } from 'openid-client';
+
+import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
+import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 
 import { EngineURL } from './internal/EngineClient';
 
@@ -114,7 +116,7 @@ async function startExternalTaskWorker(
 
   if (module.default === undefined) {
     logger.info(
-      `External task file recognized at ${pathToExternalTask}. Please export a default handler function. For more information see https://processcube.io/docs/app-sdk/samples/external-task-adapter#external-tasks-entwickeln`,
+      `External task file recognized at ${pathToExternalTask}. Please export a default handler function. For more information see https://processcube.io/docs/app-sdk/samples/nextjs/external-task-adapter-with-nextjs#external-tasks-entwickeln`,
     );
     return;
   }
@@ -201,7 +203,7 @@ async function getFreshTokenSet(): Promise<TokenSet | null> {
     !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
   ) {
     const error = new Error(
-      'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/external-task-adapter#authority',
+      'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/nextjs/external-task-adapter-with-nextjs#authority',
     );
 
     logger.error(
@@ -305,6 +307,7 @@ async function transpileFile(entryPoint: string): Promise<any> {
     platform: 'node',
     target: 'node18',
     format: 'cjs',
+    external: ['@opentelemetry/api']
   });
 
   if (result.errors.length > 0) {

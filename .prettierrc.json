@@ -1,5 +1,9 @@
 {
   "singleQuote": true,
   "printWidth": 120,
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "importOrder": ["^node:(.*)$", "<THIRD_PARTY_MODULES>" , "^@5minds/(.*)$", "^[./]"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }
