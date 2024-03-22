@@ -1,6 +1,6 @@
-import { cookies, headers } from 'next/headers';
-import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
 import { getToken } from 'next-auth/jwt';
+import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
+import { cookies, headers } from 'next/headers';
 
 import type { DataModels } from '@5minds/processcube_engine_client';
 
