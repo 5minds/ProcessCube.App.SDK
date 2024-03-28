@@ -374,8 +374,14 @@ function transformFormDataToUserTaskResult(
 
     if (userTaskResult[key]) {
       const type = formFields.find((field) => field.id === key)?.type;
-      if (type === 'boolean' || type === 'confirm') {
-        userTaskResult[key] = Boolean(userTaskResult[key]);
+     if (type === 'boolean') {
+        userTaskResult[key] = userTaskResult[key] === 'on';
+
+        continue;
+      }
+
+      if (type === 'confirm') {
+        userTaskResult[key] = JSON.parse(userTaskResult[key]);
 
         continue;
       }
