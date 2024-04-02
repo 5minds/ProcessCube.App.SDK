@@ -19,9 +19,6 @@ const REACT_IS_STABLE = semverPrerelease(React.version) == null;
 const REACT_IS_CANARY_AND_GREATER_THAN_STABLE =
   !REACT_IS_STABLE && semverGt(React.version, '18.2.0') && React.version.includes('canary');
 
-console.log('REACT_IS_STABLE', REACT_IS_STABLE);
-console.log('REACT_IS_CANARY_AND_GREATER_THAN_STABLE', REACT_IS_CANARY_AND_GREATER_THAN_STABLE);
-console.log('REACT_VERSION_IS_SUPPORTED', REACT_VERSION_IS_SUPPORTED);
 interface DynamicUiForwardedRefRenderFunction
   extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
   (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
@@ -106,7 +103,6 @@ export function DynamicUi(
     );
   }
 
-  console.log('React.version', React.version);
   const confirmFormField = confirmFormFields.length === 1 ? confirmFormFields[0] : null;
 
   const formFieldComponentMap = {
@@ -143,8 +139,6 @@ export function DynamicUi(
   );
   const withDarkMode = props.darkMode || rootClassNames.split(' ').includes('dark');
 
-  console.log('loggggs', formRef);
-  // console.log('formRef rrrr', formRef);
   const submitAndActionAttributes = {
     ...(REACT_IS_CANARY_AND_GREATER_THAN_STABLE && {
       action: onSubmit,
@@ -153,7 +147,6 @@ export function DynamicUi(
       REACT_IS_STABLE && {
         onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
           // provide submitter information for confirm fields
-          console.log('e', e);
           const formData = new FormData(formRef.current!);
           const submitter = (e.nativeEvent as any).submitter as HTMLButtonElement;
           if (!formData.has(submitter.name)) {
