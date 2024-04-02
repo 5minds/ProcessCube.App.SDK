@@ -1,6 +1,8 @@
-import { Menu, Transition } from '@headlessui/react';
 import React, { Fragment, PropsWithChildren, forwardRef, useRef } from 'react';
 import * as ReactIs from 'react-is';
+import semverGt from 'semver/functions/gt';
+import semverPrerelease from 'semver/functions/prerelease';
+import semverSatisfies from 'semver/functions/satisfies';
 
 import { DataModels } from '@5minds/processcube_engine_sdk';
 
@@ -12,6 +14,14 @@ import {
 } from './FormFields';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
+const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=18.0.0 <19', { includePrerelease: true });
+const REACT_IS_STABLE = semverPrerelease(React.version) == null;
+const REACT_IS_CANARY_AND_GREATER_THAN_STABLE =
+  !REACT_IS_STABLE && semverGt(React.version, '18.2.0') && React.version.includes('canary');
+
+console.log('REACT_IS_STABLE', REACT_IS_STABLE);
+console.log('REACT_IS_CANARY_AND_GREATER_THAN_STABLE', REACT_IS_CANARY_AND_GREATER_THAN_STABLE);
+console.log('REACT_VERSION_IS_SUPPORTED', REACT_VERSION_IS_SUPPORTED);
 interface DynamicUiForwardedRefRenderFunction
   extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
   (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
@@ -75,6 +85,12 @@ export function DynamicUi(
     darkMode?: true;
   }>,
 ) {
+  if (!REACT_VERSION_IS_SUPPORTED) {
+    console.warn(
+      `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe React version is not supported!\nVersion: ${React.version}`,
+    );
+  }
+
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
   const timeoutRef = useRef<number>();
@@ -90,6 +106,7 @@ export function DynamicUi(
     );
   }
 
+  console.log('React.version', React.version);
   const confirmFormField = confirmFormFields.length === 1 ? confirmFormFields[0] : null;
 
   const formFieldComponentMap = {
@@ -126,6 +143,21 @@ export function DynamicUi(
   );
   const withDarkMode = props.darkMode || rootClassNames.split(' ').includes('dark');
 
+  console.log('loggggs', formRef);
+  // console.log('formRef rrrr', formRef);
+  const submitAndActionAttributes = {
+    ...(REACT_IS_CANARY_AND_GREATER_THAN_STABLE && {
+      action: onSubmit,
+    }),
+    ...(!REACT_IS_CANARY_AND_GREATER_THAN_STABLE &&
+      REACT_IS_STABLE && {
+        action: '#',
+        onSubmit: (e: any) => {
+          e.preventDefault();
+          onSubmit(new FormData(e.target));
+        },
+      }),
+  };
   return (
     <div
       className={
@@ -134,6 +166,7 @@ export function DynamicUi(
           : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'app-sdk-dark'))
       }
       data-dynamic-ui
+      data-blablabl
     >
       <form
         ref={formRef}
@@ -144,7 +177,7 @@ export function DynamicUi(
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
         onChange={onFormDataChange}
-        action={onSubmit}
+        {...submitAndActionAttributes}
       >
         <header
           className={classNames(
@@ -374,7 +407,7 @@ function transformFormDataToUserTaskResult(
 
     if (userTaskResult[key]) {
       const type = formFields.find((field) => field.id === key)?.type;
-     if (type === 'boolean') {
+      if (type === 'boolean') {
         userTaskResult[key] = userTaskResult[key] === 'on';
 
         continue;
