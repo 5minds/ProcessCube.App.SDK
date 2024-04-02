@@ -151,11 +151,15 @@ export function DynamicUi(
     }),
     ...(!REACT_IS_CANARY_AND_GREATER_THAN_STABLE &&
       REACT_IS_STABLE && {
-        action: '#',
         onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+          // provide submitter information for confirm fields
           console.log('e', e);
-          // e.preventDefault();
-          onSubmit(new FormData(formRef.current!));
+          const formData = new FormData(formRef.current!);
+          const submitter = (e.nativeEvent as any).submitter as HTMLButtonElement;
+          if (!formData.has(submitter.name)) {
+            formData.append(submitter.name, submitter.value);
+          }
+          onSubmit(formData);
         },
         method: 'dialog',
       }),
