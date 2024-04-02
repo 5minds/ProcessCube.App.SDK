@@ -154,7 +154,7 @@ export function DynamicUi(
         action: '#',
         onSubmit: (e: any) => {
           // e.preventDefault();
-          onSubmit(new FormData(e.target));
+          onSubmit(new FormData(formRef.current!));
         },
       }),
   };
