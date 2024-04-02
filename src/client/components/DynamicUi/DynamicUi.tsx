@@ -140,6 +140,8 @@ export function DynamicUi(
   const withDarkMode = props.darkMode || rootClassNames.split(' ').includes('dark');
 
   const submitAndActionAttributes = {
+    // React supports functions as a form "action" in the current canary (used by Nextjs) release (next stable).
+    // In order for the Dynamic UI to work with the current stable version of React, we need to use a workaround here.
     ...(REACT_IS_CANARY_AND_GREATER_THAN_STABLE && {
       action: onSubmit,
     }),
