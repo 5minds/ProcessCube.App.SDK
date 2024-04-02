@@ -1,5 +1,5 @@
 @import '../root.css';
-@layer components {
+@layer base {
   .dark,
   .dark * {
     --asdk-ddm-icon-text-color: var(--app-sdk-dropdown-menu-icon-text-color, theme('colors.app-sdk-gray.150'));
