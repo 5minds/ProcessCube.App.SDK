@@ -152,10 +152,12 @@ export function DynamicUi(
     ...(!REACT_IS_CANARY_AND_GREATER_THAN_STABLE &&
       REACT_IS_STABLE && {
         action: '#',
-        onSubmit: (e: any) => {
+        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+          console.log('e', e);
           // e.preventDefault();
           onSubmit(new FormData(formRef.current!));
         },
+        method: 'dialog',
       }),
   };
   return (
