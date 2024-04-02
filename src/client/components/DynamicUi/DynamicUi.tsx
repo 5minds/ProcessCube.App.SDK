@@ -153,7 +153,7 @@ export function DynamicUi(
       REACT_IS_STABLE && {
         action: '#',
         onSubmit: (e: any) => {
-          e.preventDefault();
+          // e.preventDefault();
           onSubmit(new FormData(e.target));
         },
       }),
