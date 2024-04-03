@@ -3,12 +3,12 @@ import { pid } from 'node:process';
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
 
-import { type IPCMessageType, StartPayload } from '../../common';
+import type { IPCMessageType, StartPayload } from '../../common';
 
 const logger = new Logger('processcube_app_sdk:external_task_worker_process');
-const EngineURL = process.env.PROCESSCUBE_ENGINE_URL!;
+const EngineURL = process.env.PROCESSCUBE_ENGINE_URL ?? null;
 
-let externalTaskWorker: ExternalTaskWorker<any, any> | null = null;
+let externalTaskWorker: ExternalTaskWorker<unknown, any> | null = null;
 let workerTopic: string;
 
 process.on('message', async (message: IPCMessageType) => {
@@ -53,7 +53,7 @@ async function create({
   workerTopic = topic;
   const module = await requireFromString(moduleString, workerPath);
   if (module === null) {
-    quit(undefined, 1);
+    process.exit(1);
   }
   if (!('default' in module)) {
     logger.error(
@@ -64,7 +64,7 @@ async function create({
         pid,
       },
     );
-    quit(undefined, 2);
+    process.exit(2);
   }
   const config: IExternalTaskWorkerConfig = {
     identity,
@@ -72,7 +72,8 @@ async function create({
     workerId,
   };
   const handler = module.default;
-  externalTaskWorker = new ExternalTaskWorker<any, any>(EngineURL, topic, handler, config);
+  assertNotNull(EngineURL, 'EngineURL');
+  externalTaskWorker = new ExternalTaskWorker<unknown, any>(EngineURL, topic, handler, config);
   externalTaskWorker.onWorkerError((error) => {
     assertNotNull(externalTaskWorker, 'externalTaskWorker');
     logger.error(`External task worker ${externalTaskWorker.workerId} for topic ${topic} ran into an error`, {
@@ -81,7 +82,9 @@ async function create({
       topic,
       pid,
     });
-    quit(undefined, 3);
+    externalTaskWorker.stop();
+    externalTaskWorker.dispose();
+    process.exit(3);
   });
 
   externalTaskWorker.start();
@@ -118,20 +121,19 @@ function updateIdentity({ identity }: { identity: Identity }) {
   }
 }
 
-function quit(reason?: string, code = 0) {
+function quit(reason: string) {
   shutdownExternalTaskWorker(reason);
-  process.exit(code);
+  process.exit();
 }
 
-function shutdownExternalTaskWorker(reason?: string) {
-  if (reason) {
-    logger.info(`Stopping external task worker ${externalTaskWorker?.workerId ?? ''} for topic ${workerTopic}`, {
-      reason,
-      workerId: externalTaskWorker?.workerId,
-      topic: workerTopic,
-      pid,
-    });
-  }
+function shutdownExternalTaskWorker(reason: string) {
+  logger.info(`Stopping external task worker ${externalTaskWorker?.workerId ?? ''} for topic ${workerTopic}`, {
+    reason,
+    workerId: externalTaskWorker?.workerId,
+    topic: workerTopic,
+    pid,
+  });
+
   externalTaskWorker?.stop();
   externalTaskWorker?.dispose();
 }
