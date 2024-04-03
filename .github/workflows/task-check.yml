@@ -6,8 +6,8 @@ on:
 jobs:
   task-check:
     runs-on: ubuntu-latest
-    if: github.actor != 'renovate'
+    if: github.actor != 'renovate[bot]'
     steps:
-      - uses: kentaro-m/task-completed-checker-action@v0.1.2
+      - uses: chromaui/task-completed-checker-action@main
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'

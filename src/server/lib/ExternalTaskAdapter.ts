@@ -5,7 +5,7 @@ import { basename, dirname, join, relative } from 'node:path';
 import { watch } from 'chokidar';
 import { build as esBuild } from 'esbuild';
 import { jwtDecode } from 'jwt-decode';
-import { Issuer, TokenSet } from 'openid-client';
+import { Issuer, TokenSet, custom } from 'openid-client';
 
 import { IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
@@ -34,8 +34,11 @@ let freshIdentity: Identity;
  * */
 export async function subscribeToExternalTasks(customEtwRootDirectory?: string): Promise<void> {
   if (customEtwRootDirectory && !existsSync(customEtwRootDirectory)) {
-    throw new Error(`Invalid customEtwRootDirectory. The given path '${customEtwRootDirectory}' does not exist`);
+    throw new Error(`Invalid customExternalTasksDirPath. The given path '${customEtwRootDirectory}' does not exist`);
   }
+  custom.setHttpOptionsDefaults({
+    timeout: 100000,
+  });
 
   const tokenSet = await getFreshTokenSet();
   freshIdentity = await getIdentityForExternalTaskWorkers(tokenSet);
