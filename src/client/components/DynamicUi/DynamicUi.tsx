@@ -57,7 +57,7 @@ export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
 export type FormState = {
   [formFieldId: string]: JSONValue;
 };
-export const FORMDATA_FNI_ID = '$_DYNAMICUI_FNI_ID';
+export const FORMDATA_FNI_ID = '$_DYNAMICUI_FNI_ID' as string;
 
 export function DynamicUi(
   props: PropsWithChildren<{
