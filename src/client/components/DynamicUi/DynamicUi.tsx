@@ -65,7 +65,11 @@ export function DynamicUi(
     /** Custom element to insert into the DynamicUI Headline */
     headerComponent?: JSX.Element;
     /** Callback, that will be called when the form is submitted */
-    onSubmit: (result: UserTaskResult, rawFormData: FormData) => Promise<void>;
+    onSubmit: (
+      result: UserTaskResult,
+      rawFormData: FormData,
+      task: DataModels.FlowNodeInstances.UserTaskInstance,
+    ) => Promise<void>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -113,7 +117,7 @@ export function DynamicUi(
   const onSubmit = (formData: FormData) => {
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
-    props.onSubmit(userTaskResult, formData);
+    props.onSubmit(userTaskResult, formData, props.task);
   };
 
   function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
