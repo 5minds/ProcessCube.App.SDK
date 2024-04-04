@@ -57,7 +57,6 @@ export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
 export type FormState = {
   [formFieldId: string]: JSONValue;
 };
-export const FORMDATA_FNI_ID = '$_DYNAMICUI_FNI_ID';
 
 export function DynamicUi(
   props: PropsWithChildren<{
@@ -245,7 +244,6 @@ export function DynamicUi(
                 </Fragment>
               );
             })}
-            <input type="hidden" name={FORMDATA_FNI_ID} value={props.task.flowNodeInstanceId} />
           </div>
         </section>
         <footer
@@ -460,8 +458,6 @@ function transformFormDataToUserTaskResult(
       }
     }
   });
-
-  delete userTaskResult[FORMDATA_FNI_ID];
 
   return userTaskResult;
 }
