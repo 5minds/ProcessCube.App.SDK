@@ -6,6 +6,7 @@ import semverSatisfies from 'semver/functions/satisfies';
 
 import { DataModels } from '@5minds/processcube_engine_sdk';
 
+import { UserTaskInstance, mapUserTask } from '../../../common/types';
 import { classNames } from '../../utils/classNames';
 import {
   type DynamicUiFormFieldComponentMap,
@@ -61,15 +62,11 @@ export type FormState = {
 export function DynamicUi(
   props: PropsWithChildren<{
     /** UserTaskInstance with a defined dynamic form  */
-    task: DataModels.FlowNodeInstances.UserTaskInstance;
+    task: DataModels.FlowNodeInstances.UserTaskInstance | UserTaskInstance;
     /** Custom element to insert into the DynamicUI Headline */
     headerComponent?: JSX.Element;
     /** Callback, that will be called when the form is submitted */
-    onSubmit: (
-      result: UserTaskResult,
-      rawFormData: FormData,
-      task: DataModels.FlowNodeInstances.UserTaskInstance,
-    ) => Promise<void>;
+    onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -117,7 +114,7 @@ export function DynamicUi(
   const onSubmit = (formData: FormData) => {
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
-    props.onSubmit(userTaskResult, formData, props.task);
+    props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
   };
 
   function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
