@@ -22,6 +22,7 @@ type BpmnViewerComponentProps = {
     flowNodeInstancesTriggeredByThisProcessInstance: DataModels.FlowNodeInstances.FlowNodeInstance[];
     retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
     gotoProcessAction: (processInstanceId: string) => void;
+    gotoManualOrUserTaskAction: (processInstanceId: string, flowNodeId: string) => void;
     options?: BpmnViewerComponentOptions;
 };
 
@@ -86,7 +87,7 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
         }
 
 
-        this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, props.flowNodeInstancesTriggeredByThisProcessInstance, props.retryAction, props.gotoProcessAction);
+        this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, props.flowNodeInstancesTriggeredByThisProcessInstance, props.retryAction, props.gotoProcessAction, props.gotoManualOrUserTaskAction);
     }
 
     private displayDiagram(diagramXML: string) {
@@ -98,7 +99,7 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
             y: viewbox.outer.height / 2,
             };
             canvas.zoom('fit-viewport', center);
-            this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, this.props.flowNodeInstancesTriggeredByThisProcessInstance, this.props.retryAction, this.props.gotoProcessAction);
+            this.bpmnViewerOverlayCreator.createOverlaysFlowNodeInstances(this.props.processInstanceState, this.props.flowNodeInstances, this.props.flowNodeInstancesTriggeredByThisProcessInstance, this.props.retryAction, this.props.gotoProcessAction, this.props.gotoManualOrUserTaskAction);
         });
     }
 

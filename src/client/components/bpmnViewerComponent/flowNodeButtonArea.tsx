@@ -1,12 +1,14 @@
 import { FlowNode } from "./bpmnViewerOverlayCreator";
 import ExecutionCount from "./executionCount";
 import GotoButton from "./gotoButton";
+import PlayButton from "./playButton";
 import RetryButton from "./retryButton";
 
 type FlowNodeButtonAreaProps = {
     flowNode: FlowNode;
     onRetryClick: () => void;
     onGotoClick: () => void;
+    onPlayClick: () => void;
 };
 
 export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
@@ -23,6 +25,8 @@ export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
 
     const showGotoButton = flowNode.IsCallActivity || ((flowNode.IsEventReceiver || flowNode.IsEventSender) && flowNode.LinkedProcessInstanceId);
 
+    const showPlayButton = (flowNode.IsUserTask || flowNode.IsManualTask) && flowNode.State === 'suspended';
+
     return (
         <div className="flownode-overlay" style={style}>
             <div className="bpmn-element-overlay__below">
@@ -34,6 +38,10 @@ export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
 
                 {showGotoButton &&
                     <GotoButton onClick={props.onGotoClick}></GotoButton>
+                }
+
+                {showPlayButton &&
+                    <PlayButton onClick={props.onPlayClick}></PlayButton>
                 }
             </div>
         </div>

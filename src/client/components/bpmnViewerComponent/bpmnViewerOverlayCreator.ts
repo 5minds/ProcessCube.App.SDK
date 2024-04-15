@@ -121,6 +121,20 @@ export class FlowNode {
 
     }
 
+    get IsUserTask(): boolean {
+        return (
+            this.type === "bpmn:UserTask"
+        );
+
+    }
+
+    get IsManualTask(): boolean {
+        return (
+            this.type === "bpmn:ManualTask"
+        );
+
+    }
+
     get ExecutionCount(): number {
         return this.flowNodeInstances.length;
     }
@@ -165,7 +179,8 @@ export default class BpmnViewerOverlayCreator {
                                            flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstance[],
                                            flowNodeInstancesTriggeredByThisProcessInstance: DataModels.FlowNodeInstances.FlowNodeInstance[], 
                                            retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: string) => void,
-                                           gotoProcessAction: (processInstanceId: string) => void): void {
+                                           gotoProcessAction: (processInstanceId: string) => void,
+                                           gotoManualOrUserTaskAction: (processInstanceId: string, flowNodeId: string) =>  void):void {
         const executedFlowNodes: FlowNode[] = this.getExecutedFlowNodes(flowNodeInstances, processInstanceState, flowNodeInstancesTriggeredByThisProcessInstance);
 
         this.overlayIds = [];
@@ -174,7 +189,7 @@ export default class BpmnViewerOverlayCreator {
             const flowNodeShape = this.elementRegistry.get(executedFlowNode.Id);
 
             const root = this.getOrCreateOverlayRoot(executedFlowNode);
-            root?.render(React.createElement(FlowNodeOverlay, { flowNode: executedFlowNode, width: flowNodeShape.width, height: flowNodeShape.height, retryAction: retryAction, gotoProcessAction: gotoProcessAction }));
+            root?.render(React.createElement(FlowNodeOverlay, { flowNode: executedFlowNode, width: flowNodeShape.width, height: flowNodeShape.height, retryAction: retryAction, gotoProcessAction: gotoProcessAction, gotoManualOrUserTaskAction: gotoManualOrUserTaskAction }));
 
             this.setSequenceFlowsColor(flowNodeShape, executedFlowNodes);
         }
