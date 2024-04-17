@@ -1,5 +1,6 @@
 import { DataModels } from '@5minds/processcube_engine_client';
 import { Client } from './internal/EngineClient';
+import { getIdentity } from './getIdentity';
 
 /**
  * @param query.query The query of {@link Client.processInstances.query}
@@ -22,14 +23,20 @@ export async function getActiveProcessInstances(query?: {
 }
 
 export async function getProcessInstanceById(processInstanceId: string): Promise<DataModels.ProcessInstances.ProcessInstance> {
+  const identity = await tryGetIdentity();
 
-  const result = await Client.processInstances.query({ processInstanceId: processInstanceId});
+  const result = await Client.processInstances.query(
+    { processInstanceId: processInstanceId },
+    { identity:  identity }
+  );
 
   return result.processInstances[0];
 }
 
 export async function getFlowNodeInstancesByProcessInstanceId(processInstanceId: string): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const result = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId}, { sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' }});
+  const identity = await tryGetIdentity();
+
+  const result = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId}, { sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' }, identity: identity});
 
   return result.flowNodeInstances;
 }
@@ -37,10 +44,13 @@ export async function getFlowNodeInstancesByProcessInstanceId(processInstanceId:
 export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
   flowNodeInstanceIds: string[],
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+    const identity = await tryGetIdentity();
+
     const queryResult = await Client.flowNodeInstances.query(
       {
         triggeredByFlowNodeInstance: flowNodeInstanceIds,
-      }
+      },
+      { identity: identity }
     );
 
     if (queryResult.totalCount > 0) {
@@ -51,8 +61,19 @@ export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
 }
 
 export async function retryProcessInstance(processInstanceId: string, flowNodeInstanceId?: string, newStartToken?: any) {
+  const identity = await tryGetIdentity();
+  
   await Client.processInstances.retryProcessInstance(processInstanceId, { 
       flowNodeInstanceId: flowNodeInstanceId, 
-      newStartToken: newStartToken
+      newStartToken: newStartToken,
+      identity: identity
   });
+}
+
+async function tryGetIdentity(): Promise<DataModels.Iam.Identity | undefined> {
+  try {
+    return await getIdentity();
+  } catch {
+    return undefined;
+  }
 }
