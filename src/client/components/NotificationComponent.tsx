@@ -48,7 +48,7 @@ export const NotificationComponent = ({
     // console.log(result);
   });
 
-  const socketRef = useRef<SocketIOClient.Socket>();
+  const socketRef = useRef<any>();
 
   const socketInitializer = async () => {
     if (!userId || userId === '') {
