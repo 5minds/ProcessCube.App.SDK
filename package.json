@@ -82,8 +82,9 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "2023-2",
-    "@5minds/processcube_engine_sdk": "2023-2",
+    "@5minds/processcube_engine_client": "2024-1",
+    "@5minds/processcube_engine_sdk": "2024-1",
+    "chokidar": "^3.5.3",
     "@chakra-ui/pro-theme": "^0.0.66",
     "@chakra-ui/react": "^2.6.1",
     "client-only": "^0.0.1",
