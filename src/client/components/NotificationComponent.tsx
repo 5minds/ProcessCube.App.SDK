@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiBell, FiX } from 'react-icons/fi';
 import {
   IconButton,
@@ -48,6 +48,8 @@ export const NotificationComponent = ({
     // console.log(result);
   });
 
+  const socketRef = useRef<SocketIOClient.Socket>();
+
   const socketInitializer = async () => {
     if (!userId || userId === '') {
       const userId = await getUserId();
@@ -59,33 +61,37 @@ export const NotificationComponent = ({
 
     await fetch('/api/socket');
 
-    socket = io('', {
-      path: '/api/socket/io' || '',
-      transports: ['websocket', 'polling'],
-      query: { userId },
-    });
+    if (socketRef.current === undefined) {
+      socketRef.current = io('', {
+        path: '/api/socket/io' || '',
+        transports: ['websocket', 'polling'],
+        query: { userId },
+      });
+    }
 
-    socket.on('connect', () => {
+    socketRef.current.on('connect', () => {
       console.log('Connected', socket.id);
     });
 
-    socket.on('waitingTasks', (usertasks: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
+    socketRef.current.on('waitingTasks', (usertasks: Array<DataModels.FlowNodeInstances.UserTaskInstance>) => {
       if (!socketInitialized) {
+        console.log(usertasks.length);
         console.log('waitingTasks', usertasks);
         setNewTasks(usertasks);
         setSocketInitialized(true);
       }
     });
 
-    socket.on('newUserTaskWaiting', (usertask: DataModels.FlowNodeInstances.UserTaskInstance) => {
-      setNewTasks([...newTasks, usertask]);
-    });
+    // socket.on('newUserTaskWaiting', (usertask: DataModels.FlowNodeInstances.UserTaskInstance) => {
+    //   console.log('newTasks', newTasks);
+    //   setNewTasks([...newTasks, usertask]);
+    // });
 
-    socket.on('removeTask', (taskId: string) => {
+    socketRef.current.on('removeTask', (taskId: string) => {
       setNewTasks(newTasks.filter((task) => task.flowNodeInstanceId !== taskId));
     });
 
-    socket.on('error', (error: any) => {
+    socketRef.current.on('error', (error: any) => {
       console.error('Socket error:', error);
     });
   };
