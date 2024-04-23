@@ -59,7 +59,7 @@
     "url": "https://github.com/5minds/ProcessCube.App.SDK/issues",
     "email": "product@5minds.de"
   },
-  "homepage": "https://processcube.io/docs/develop-applications/application-sdk",
+  "homepage": "https://processcube.io/docs/app-sdk",
   "engines": {
     "node": ">=18"
   },
