@@ -113,7 +113,7 @@ const commonBuildPromises = [
   //server
   build({
     ...COMMONJS_CONFIG,
-    entryPoints: ['src/server/index.ts'],
+    entryPoints: ['src/server/index.ts', 'src/server/lib/ExternalTaskWorkerProcess.ts'],
     outdir: 'build/server',
     plugins: [getMarkCommonAsExternal(commonOutputFile)],
   }),

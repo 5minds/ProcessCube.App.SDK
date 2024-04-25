@@ -1,5 +1,9 @@
 import type { NextConfig } from 'next';
-import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } from 'next/dist/shared/lib/constants';
+import {
+  PHASE_DEVELOPMENT_SERVER,
+  PHASE_PRODUCTION_BUILD,
+  PHASE_PRODUCTION_SERVER,
+} from 'next/dist/shared/lib/constants';
 
 import { subscribeToExternalTasks } from '../lib/ExternalTaskAdapter';
 
@@ -15,14 +19,16 @@ interface NextConfigFn {
 }
 
 let isSubscribedToExternalTasks = false;
+let isProductionBuild = false;
 
 export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = {}): NextConfigFn {
   const { applicationSdk: applicationSdkConfig, ...nextConfig } = config;
 
   return async (phase, context) => {
+    isProductionBuild = isProductionBuild || phase === PHASE_PRODUCTION_BUILD;
     const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
     const shouldSubscribeToExternalTasks =
-      applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks;
+      applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks && !isProductionBuild;
 
     if (shouldSubscribeToExternalTasks) {
       isSubscribedToExternalTasks = true;
