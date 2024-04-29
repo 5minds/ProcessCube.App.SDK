@@ -11,7 +11,7 @@ env:
   # NOTE: Um den Releasezyklus von Alpha nach Beta zu ändern, einfach die nachfolgend deklarierten Env Variablen switchen.
   CI_TOOLS_ALPHA_BRANCH: next
   CI_TOOLS_ALPHA_NPM_TAG: next
-  CI_TOOLS_STABLE_BRANCH: main
+  CI_TOOLS_STABLE_BRANCH: 5.x.x
   # CI_TOOLS_BETA_BRANCH: next
   # CI_TOOLS_BETA_NPM_TAG: next
   BOX_RELEASE_TAG: 2023-2
