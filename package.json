@@ -100,7 +100,7 @@
     "chokidar": "^3.5.3",
     "client-only": "^0.0.1",
     "esbuild": "^0.20.0",
-    "isomorphic-dompurify": "^1.9.0",
+    "isomorphic-dompurify": "^2.0.0",
     "jwt-decode": "^4.0.0",
     "marked": "^9.1.2",
     "only-server": "^0.0.1",
