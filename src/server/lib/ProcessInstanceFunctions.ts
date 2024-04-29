@@ -1,5 +1,5 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import type { EventMessage, Subscription } from '@5minds/processcube_engine_sdk';
+import type { EventMessage, Identity, Subscription } from '@5minds/processcube_engine_sdk';
 
 import { Client } from './internal/EngineClient';
 
@@ -29,11 +29,15 @@ export async function getActiveProcessInstances(query?: {
  *
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance to wait for
+ * @param identity The Identity of the User
  * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The ProcessInstance.
  */
-export async function waitForProcessEnd(filterBy: {
-  processInstanceId?: string;
-}): Promise<DataModels.ProcessInstances.ProcessInstance> {
+export async function waitForProcessEnd(
+  filterBy: {
+    processInstanceId?: string;
+  },
+  identity?: Identity,
+): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const { processInstanceId } = filterBy;
 
   return new Promise<DataModels.ProcessInstances.ProcessInstance>(async (resolve, reject) => {
@@ -47,9 +51,12 @@ export async function waitForProcessEnd(filterBy: {
         return;
       }
 
-      const processInstance = await Client.processInstances.query({ processInstanceId: event.processInstanceId });
+      const processInstance = await Client.processInstances.query(
+        { processInstanceId: event.processInstanceId },
+        { identity },
+      );
       for (const sub of subscriptions) {
-        Client.notification.removeSubscription(sub);
+        Client.notification.removeSubscription(sub, identity);
       }
 
       if (processInstance.totalCount === 0) {
@@ -59,23 +66,26 @@ export async function waitForProcessEnd(filterBy: {
       return resolve(processInstance.processInstances[0]);
     };
 
-    subscriptions.push(await Client.notification.onProcessEnded(handleSubscription));
-    subscriptions.push(await Client.notification.onProcessError(handleSubscription));
-    subscriptions.push(await Client.notification.onProcessTerminated(handleSubscription));
+    subscriptions.push(await Client.notification.onProcessEnded(handleSubscription, { identity }));
+    subscriptions.push(await Client.notification.onProcessError(handleSubscription, { identity }));
+    subscriptions.push(await Client.notification.onProcessTerminated(handleSubscription, { identity }));
 
     if (processInstanceId) {
-      const finishedProcessInstance = await Client.processInstances.query({
-        processInstanceId,
-        state: [
-          DataModels.ProcessInstances.ProcessInstanceState.finished,
-          DataModels.ProcessInstances.ProcessInstanceState.terminated,
-          DataModels.ProcessInstances.ProcessInstanceState.error,
-        ],
-      });
+      const finishedProcessInstance = await Client.processInstances.query(
+        {
+          processInstanceId,
+          state: [
+            DataModels.ProcessInstances.ProcessInstanceState.finished,
+            DataModels.ProcessInstances.ProcessInstanceState.terminated,
+            DataModels.ProcessInstances.ProcessInstanceState.error,
+          ],
+        },
+        { identity },
+      );
 
       if (finishedProcessInstance.totalCount > 0) {
         for (const sub of subscriptions) {
-          Client.notification.removeSubscription(sub);
+          Client.notification.removeSubscription(sub, identity);
         }
         resolve(finishedProcessInstance.processInstances[0]);
       }
