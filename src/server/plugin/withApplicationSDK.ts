@@ -18,6 +18,7 @@ interface NextConfigFn {
   (phase: string, context?: any): Promise<NextConfig> | NextConfig;
 }
 
+let isSubscribedToExternalTasks = false;
 let isProductionBuild = false;
 
 export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = {}): NextConfigFn {
@@ -26,9 +27,11 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
   return async (phase, context) => {
     isProductionBuild = isProductionBuild || phase === PHASE_PRODUCTION_BUILD;
     const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
-    const shouldSubscribeToExternalTasks = applicationSdkConfig?.useExternalTasks && isStartingServer && !isProductionBuild;
+    const shouldSubscribeToExternalTasks =
+      applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks && !isProductionBuild;
 
     if (shouldSubscribeToExternalTasks) {
+      isSubscribedToExternalTasks = true;
       await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
     }
 
