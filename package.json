@@ -1,6 +1,6 @@
 {
   "name": "@5minds/processcube_app_sdk",
-  "version": "6.0.0-alpha.1",
+  "version": "6.0.0",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
   "main": "build/common/index.cjs",
