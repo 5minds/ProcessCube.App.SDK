@@ -14,13 +14,10 @@ export function ParagraphFormField(
   useEffect(() => {
     const html = marked.parse(defaultValue?.toString() ?? label?.toString() ?? '', {
       renderer: new MarkdownRenderer(),
-      hooks: {
-        postprocess: (html) => DOMPurify.sanitize(html, { ADD_ATTR: ['target'] }),
-        preprocess: marked.Hooks.prototype.preprocess,
-      },
+      hooks: new MarkedHooks(),
     });
 
-    setGeneratedHtml(html);
+    setGeneratedHtml(html as Awaited<string>);
   }, [defaultValue, label]);
 
   return (
@@ -66,5 +63,11 @@ class MarkdownRenderer extends marked.Renderer {
     }
 
     return result;
+  }
+}
+
+class MarkedHooks extends marked.Hooks {
+  postprocess(html: string): string {
+    return DOMPurify.sanitize(html, { ADD_ATTR: ['target'] })
   }
 }
