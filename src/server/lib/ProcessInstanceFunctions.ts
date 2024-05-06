@@ -1,6 +1,8 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import { Client } from './internal/EngineClient';
+import type { EventMessage, Identity, Subscription } from '@5minds/processcube_engine_sdk';
+
 import { getIdentity } from './getIdentity';
+import { Client } from './internal/EngineClient';
 
 /**
  * @param query.query The query of {@link Client.processInstances.query}
@@ -22,21 +24,28 @@ export async function getActiveProcessInstances(query?: {
   return result;
 }
 
-export async function getProcessInstanceById(processInstanceId: string): Promise<DataModels.ProcessInstances.ProcessInstance> {
+export async function getProcessInstanceById(
+  processInstanceId: string,
+): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const identity = await tryGetIdentity();
 
-  const result = await Client.processInstances.query(
-    { processInstanceId: processInstanceId },
-    { identity:  identity }
-  );
+  const result = await Client.processInstances.query({ processInstanceId: processInstanceId }, { identity: identity });
 
   return result.processInstances[0];
 }
 
-export async function getFlowNodeInstancesByProcessInstanceId(processInstanceId: string): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+export async function getFlowNodeInstancesByProcessInstanceId(
+  processInstanceId: string,
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
   const identity = await tryGetIdentity();
 
-  const result = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId}, { sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' }, identity: identity});
+  const result = await Client.flowNodeInstances.query(
+    { processInstanceId: processInstanceId },
+    {
+      sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
+      identity: identity,
+    },
+  );
 
   return result.flowNodeInstances;
 }
@@ -44,29 +53,33 @@ export async function getFlowNodeInstancesByProcessInstanceId(processInstanceId:
 export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
   flowNodeInstanceIds: string[],
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-    const identity = await tryGetIdentity();
+  const identity = await tryGetIdentity();
 
-    const queryResult = await Client.flowNodeInstances.query(
-      {
-        triggeredByFlowNodeInstance: flowNodeInstanceIds,
-      },
-      { identity: identity }
-    );
+  const queryResult = await Client.flowNodeInstances.query(
+    {
+      triggeredByFlowNodeInstance: flowNodeInstanceIds,
+    },
+    { identity: identity },
+  );
 
-    if (queryResult.totalCount > 0) {
-      return queryResult.flowNodeInstances;
-    }
+  if (queryResult.totalCount > 0) {
+    return queryResult.flowNodeInstances;
+  }
 
-    return [];
+  return [];
 }
 
-export async function retryProcessInstance(processInstanceId: string, flowNodeInstanceId?: string, newStartToken?: any) {
+export async function retryProcessInstance(
+  processInstanceId: string,
+  flowNodeInstanceId?: string,
+  newStartToken?: any,
+) {
   const identity = await tryGetIdentity();
-  
-  await Client.processInstances.retryProcessInstance(processInstanceId, { 
-      flowNodeInstanceId: flowNodeInstanceId, 
-      newStartToken: newStartToken,
-      identity: identity
+
+  await Client.processInstances.retryProcessInstance(processInstanceId, {
+    flowNodeInstanceId: flowNodeInstanceId,
+    newStartToken: newStartToken,
+    identity: identity,
   });
 }
 
@@ -76,4 +89,73 @@ async function tryGetIdentity(): Promise<DataModels.Iam.Identity | undefined> {
   } catch {
     return undefined;
   }
+}
+/**
+ * This function will wait until a ProcessInstance is finished, terminated or errored.
+ * If the processInstance is already finished, it will instantly be returned.
+ *
+ * @param filterBy Additional filter options
+ * @param filterBy.processInstanceId The ID of the ProcessInstance to wait for
+ * @param identity The Identity of the User
+ * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The ProcessInstance.
+ */
+export async function waitForProcessEnd(
+  filterBy: {
+    processInstanceId?: string;
+  },
+  identity?: Identity,
+): Promise<DataModels.ProcessInstances.ProcessInstance> {
+  const { processInstanceId } = filterBy;
+
+  return new Promise<DataModels.ProcessInstances.ProcessInstance>(async (resolve, reject) => {
+    const subscriptions: Array<Subscription> = [];
+
+    const handleSubscription = async (event: EventMessage) => {
+      const processInstanceIdGivenButNotMatching =
+        processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
+
+      if (processInstanceIdGivenButNotMatching) {
+        return;
+      }
+
+      const processInstance = await Client.processInstances.query(
+        { processInstanceId: event.processInstanceId },
+        { identity },
+      );
+      for (const sub of subscriptions) {
+        Client.notification.removeSubscription(sub, identity);
+      }
+
+      if (processInstance.totalCount === 0) {
+        return reject(new Error(`Process with instance ID "${event.processInstanceId}" does not exist.`));
+      }
+
+      return resolve(processInstance.processInstances[0]);
+    };
+
+    subscriptions.push(await Client.notification.onProcessEnded(handleSubscription, { identity }));
+    subscriptions.push(await Client.notification.onProcessError(handleSubscription, { identity }));
+    subscriptions.push(await Client.notification.onProcessTerminated(handleSubscription, { identity }));
+
+    if (processInstanceId) {
+      const finishedProcessInstance = await Client.processInstances.query(
+        {
+          processInstanceId,
+          state: [
+            DataModels.ProcessInstances.ProcessInstanceState.finished,
+            DataModels.ProcessInstances.ProcessInstanceState.terminated,
+            DataModels.ProcessInstances.ProcessInstanceState.error,
+          ],
+        },
+        { identity },
+      );
+
+      if (finishedProcessInstance.totalCount > 0) {
+        for (const sub of subscriptions) {
+          Client.notification.removeSubscription(sub, identity);
+        }
+        resolve(finishedProcessInstance.processInstances[0]);
+      }
+    }
+  });
 }

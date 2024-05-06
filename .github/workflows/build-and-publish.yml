@@ -14,7 +14,7 @@ env:
   CI_TOOLS_STABLE_BRANCH: main
   # CI_TOOLS_BETA_BRANCH: next
   # CI_TOOLS_BETA_NPM_TAG: next
-  BOX_RELEASE_TAG: 2024-1
+  BOX_RELEASE_TAG: 2024-2
 
 jobs:
   build_and_publish:

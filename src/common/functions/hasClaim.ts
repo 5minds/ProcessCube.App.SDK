@@ -1,7 +1,7 @@
-import { Session, getServerSession, CallbacksOptions, Account, TokenSet } from 'next-auth';
-import { getSession } from 'next-auth/react';
-import type { JWT } from 'next-auth/jwt';
 import { jwtDecode } from 'jwt-decode';
+import { Account, CallbacksOptions, Session, TokenSet, getServerSession } from 'next-auth';
+import type { JWT } from 'next-auth/jwt';
+import { getSession } from 'next-auth/react';
 
 import { Logger } from '@5minds/processcube_engine_sdk';
 
