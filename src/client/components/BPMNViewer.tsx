@@ -30,8 +30,8 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
   const viewerRef = useRef<BpmnViewer>(
     new BpmnViewer({
       bpmnRenderer: {
-        defaultFillColor: 'var(--bpmn-viewer-fill-color)',
-        defaultStrokeColor: 'var(--bpmn-viewer-stroke-color)',
+        defaultFillColor: 'var(--asdk-bv-fill-color)',
+        defaultStrokeColor: 'var(--asdk-bv-stroke-color)',
       },
       additionalModules: [ZoomScrollModule, MoveCanvasModule, SelectionModule],
     }),
