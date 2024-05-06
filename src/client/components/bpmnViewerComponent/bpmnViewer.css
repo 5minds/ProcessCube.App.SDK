@@ -71,7 +71,7 @@
   border-radius: 50%;
 }
 
-.connection-done .djs-visual>* {
+.connection-done .djs-visual > * {
   stroke: rgb(17, 202, 0) !important;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .token-area {
-  width: 40%
+  width: 40%;
 }
 
 .documentation-area {
@@ -155,4 +155,3 @@
   width: 100%;
   overflow-y: auto;
 }
-
