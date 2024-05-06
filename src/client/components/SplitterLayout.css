@@ -1,0 +1,101 @@
+@import '../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-sl-background-color: var(--app-sdk-splitter-layout-background-color, theme('colors.app-sdk-gray.700'));
+    --asdk-sl-splitter-color: var(--app-sdk-splitter-layout-splitter-color, theme('colors.app-sdk-gray.300'));
+    --asdk-sl-splitter-hover-color: var(
+      --app-sdk-splitter-layout-splitter-hover-color,
+      theme('colors.app-sdk-gray.100')
+    );
+    --asdk-sl-splitter-changing-color: var(
+      --app-sdk-splitter-layout-splitter-changing-color,
+      theme('colors.app-sdk-gray.200')
+    );
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-sl-background-color: var(--app-sdk-splitter-layout-background-color, theme(colors.white));
+    --asdk-sl-splitter-color: var(--app-sdk-splitter-layout-splitter-color, theme('colors.app-sdk-gray.700'));
+    --asdk-sl-splitter-hover-color: var(
+      --app-sdk-splitter-layout-splitter-hover-color,
+      theme('colors.app-sdk-gray.200')
+    );
+    --asdk-sl-splitter-changing-color: var(
+      --app-sdk-splitter-layout-splitter-changing-color,
+      theme('colors.app-sdk-gray.400')
+    );
+  }
+
+  .splitter-layout {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .splitter-layout .layout-pane {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+    background-color: var(--asdk-sl-background-color);
+  }
+
+  .splitter-layout .layout-pane.layout-pane-primary {
+    flex: 1 1 auto;
+  }
+
+  .splitter-layout > .layout-splitter {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    width: 2px;
+    height: 100%;
+    background-color: var(--asdk-sl-splitter-color);
+  }
+
+  .splitter-layout .layout-splitter:hover {
+    background-color: var(--asdk-sl-splitter-hover-color);
+  }
+
+  .layout-splitter__inner {
+    position: absolute;
+    width: 4px;
+    height: 100%;
+    margin: 0 -1px;
+    cursor: col-resize;
+  }
+
+  .splitter-layout.layout-changing {
+    cursor: col-resize;
+  }
+
+  .splitter-layout.layout-changing > .layout-splitter {
+    background-color: var(--asdk-sl-splitter-changing-color);
+  }
+
+  .splitter-layout.splitter-layout-vertical {
+    flex-direction: column;
+  }
+
+  .splitter-layout.splitter-layout-vertical.layout-changing {
+    cursor: row-resize;
+  }
+
+  .splitter-layout.splitter-layout-vertical > .layout-splitter {
+    width: 100%;
+    height: 2px;
+  }
+
+  .splitter-layout.splitter-layout-vertical > .layout-splitter > .layout-splitter__inner {
+    position: absolute;
+    height: 4px;
+    width: 100%;
+    margin: -1px 0;
+    cursor: row-resize;
+  }
+}
