@@ -76,16 +76,17 @@
     "@tailwindcss/forms": "^0.5.7",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^20.11.17",
-    "@types/react-is": "^18.2.4",
     "@types/react": "^18.2.22",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-is": "^18.2.4",
     "@types/semver": "^7.5.8",
     "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.0",
     "esbuild-style-plugin": "^1.6.3",
     "postcss-import": "^16.0.1",
-    "prettier-plugin-tailwindcss": "^0.5.10",
     "prettier": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.5.10",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2"
   },
@@ -97,11 +98,10 @@
   "dependencies": {
     "@5minds/processcube_engine_client": "2024-1",
     "@5minds/processcube_engine_sdk": "2024-1",
+    "@headlessui/react": "^1.7.17",
     "@monaco-editor/react": "^4.6.0",
     "@nextui-org/react": "^2.2.9",
-    "@types/react-dom": "18.2.18",
     "bpmn-js": "^16.4.0",
-    "@headlessui/react": "^1.7.17",
     "chokidar": "^3.5.3",
     "client-only": "^0.0.1",
     "esbuild": "^0.20.0",
@@ -110,10 +110,10 @@
     "marked": "^12.0.0",
     "only-server": "^0.0.1",
     "openid-client": "^5.5.0",
+    "react-is": "^18.2.0",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
-    "uuid": "^9.0.1",
-    "react-is": "^18.2.0",
-    "semver": "^7.6.0"
+    "semver": "^7.6.0",
+    "uuid": "^9.0.1"
   }
 }
