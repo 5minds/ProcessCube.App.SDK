@@ -69,7 +69,6 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     this.handleTouchMove = this.handleTouchMove.bind(this);
     this.handleSplitterMouseDown = this.handleSplitterMouseDown.bind(this);
     this.handleSplitterDoubleClick = this.handleSplitterDoubleClick.bind(this);
-    console.log('constructor props.secondaryInitialSize', props.secondaryInitialSize);
     this.state = {
       lastMouseDown: 0,
       secondaryPaneSize: props.secondaryInitialSize || 0,
@@ -282,10 +281,7 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
   }
 
   private handleSplitterDoubleClick(): void {
-    console.log('this.props.secondaryDefaultSize', this.props.secondaryDefaultSize);
-    console.log('this.props.secondaryMinSize', this.props.secondaryMinSize);
     const secondaryPaneSize = this.props.secondaryDefaultSize || this.props.secondaryMinSize;
-    console.log('secondaryPaneSize', secondaryPaneSize);
 
     if (this.state.secondaryPaneSize === secondaryPaneSize) {
       this.setSecondaryPaneSize(Math.floor(secondaryPaneSize * 1.5));
