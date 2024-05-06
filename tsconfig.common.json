@@ -6,5 +6,5 @@
     "rootDir": "./src/common",
     "tsBuildInfoFile": "./build/common.tsbuildinfo"
   },
-  "include": ["./src/common"],
+  "include": ["./src/common"]
 }

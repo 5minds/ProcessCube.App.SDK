@@ -5,7 +5,6 @@ title: ''
 labels: bug
 
 assignees: alexanderkasten
-
 ---
 
 ## Setup
@@ -16,12 +15,6 @@ assignees: alexanderkasten
 
 ## Was wurde getan?
 
-
-
 ## Welches Verhalten wurde erwartet?
 
-
-
 ## Was ist stattdessen passiert?
-
-

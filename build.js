@@ -1,15 +1,14 @@
-import * as esbuild from 'esbuild'
-import fs from 'fs'
+import * as esbuild from 'esbuild';
+import fs from 'fs';
 
-var packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf-8'))
+var packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
 const additionalPackages = ['fsevents'];
-const packagesBlacklist = ['chokidar']
+const packagesBlacklist = ['chokidar'];
 const externalPackages = [
   ...Object.keys(packageJSON.dependencies),
   ...Object.keys(packageJSON.peerDependencies),
   ...additionalPackages,
-].filter(dep => !packagesBlacklist.includes(dep));
-
+].filter((dep) => !packagesBlacklist.includes(dep));
 
 const watchMode = process.argv.includes('--watch');
 const productionBuild = process.env.NODE_ENV === 'production';
@@ -22,7 +21,7 @@ const COMMON_CONFIG = {
   bundle: true,
   platform: 'node',
   logLevel: 'info',
-  ...(productionBuild ? PRODUCTION_CONFIG : {})
+  ...(productionBuild ? PRODUCTION_CONFIG : {}),
 };
 const build = watchMode ? esbuild.context : esbuild.build;
 
@@ -30,14 +29,15 @@ function getMarkCommonAsExternal(pathToCommon) {
   return {
     name: 'markCommonAsExternal',
     setup(build) {
-      build.onResolve({ filter: /^\..*\/common.*$/ }, args => {
+      build.onResolve({ filter: /^\..*\/common.*$/ }, (args) => {
         return {
           path: pathToCommon,
           namespace: 'file',
           external: true,
-      }})
+        };
+      });
     },
-  }
+  };
 }
 
 /*    ESModules    */
@@ -50,13 +50,15 @@ const ESMODULE_CONFIG = {
   },
 };
 
-let commonOutputFile = (await esbuild.build({
-  ...ESMODULE_CONFIG,
-  entryPoints: ['src/common/index.ts'],
-  outdir: 'build/common',
-  packages: 'external',
-  write: false,
-})).outputFiles[0].path;
+let commonOutputFile = (
+  await esbuild.build({
+    ...ESMODULE_CONFIG,
+    entryPoints: ['src/common/index.ts'],
+    outdir: 'build/common',
+    packages: 'external',
+    write: false,
+  })
+).outputFiles[0].path;
 
 const esmoduleBuildPromises = [
   //common
@@ -81,7 +83,7 @@ const esmoduleBuildPromises = [
     outdir: 'build/client',
     plugins: [getMarkCommonAsExternal(commonOutputFile)],
     packages: 'external',
-  })
+  }),
 ];
 
 /*    CommonJS    */
@@ -96,12 +98,14 @@ const COMMONJS_CONFIG = {
 };
 
 //common output file
-commonOutputFile = (await esbuild.build({
-  ...COMMONJS_CONFIG,
-  entryPoints: ['src/common/index.ts'],
-  outdir: 'build/common',
-  write: false,
-})).outputFiles[0].path;
+commonOutputFile = (
+  await esbuild.build({
+    ...COMMONJS_CONFIG,
+    entryPoints: ['src/common/index.ts'],
+    outdir: 'build/common',
+    write: false,
+  })
+).outputFiles[0].path;
 
 const commonBuildPromises = [
   //common
@@ -123,7 +127,7 @@ const commonBuildPromises = [
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
     plugins: [getMarkCommonAsExternal(commonOutputFile)],
-  })
+  }),
 ];
 
 await Promise.all([...commonBuildPromises, ...esmoduleBuildPromises]);
