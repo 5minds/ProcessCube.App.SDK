@@ -36,4 +36,3 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GIT_BRANCH: ${{ github.event.ref }}
         run: ci_tools delete-npm-tag --except-on-primary-branches
-

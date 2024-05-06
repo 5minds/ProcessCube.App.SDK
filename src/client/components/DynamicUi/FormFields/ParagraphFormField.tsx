@@ -68,6 +68,6 @@ class MarkdownRenderer extends marked.Renderer {
 
 class MarkedHooks extends marked.Hooks {
   postprocess(html: string): string {
-    return DOMPurify.sanitize(html, { ADD_ATTR: ['target'] })
+    return DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
   }
 }
