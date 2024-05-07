@@ -3,7 +3,7 @@
   .dark,
   .dark * {
     --asdk-bv-fill-color: var(--app-sdk-bpmn-viewer-fill-color, theme('colors.app-sdk-gray.700'));
-    --asdk-bv-stroke-color: var(--app-sdk-bpmn-viewer-fill-color, theme('colors.app-sdk-gray.50'));
+    --asdk-bv-stroke-color: var(--app-sdk-bpmn-viewer-stroke-color, theme('colors.app-sdk-gray.50'));
     --asdk-bv-element-hover-color: var(--app-sdk-bpmn-viewer-element-hover-color, theme('colors.sky.300'));
     --asdk-bv-element-selected-color: var(--app-sdk-bpmn-viewer-element-selected-color, theme('colors.orange.500'));
   }
@@ -12,7 +12,7 @@
   ::before,
   ::after {
     --asdk-bv-fill-color: var(--app-sdk-bpmn-viewer-fill-color, theme(colors.white));
-    --asdk-bv-stroke-color: var(--app-sdk-bpmn-viewer-fill-color, theme('colors.app-sdk-gray.700'));
+    --asdk-bv-stroke-color: var(--app-sdk-bpmn-viewer-stroke-color, theme('colors.app-sdk-gray.700'));
     --asdk-bv-element-hover-color: var(--app-sdk-bpmn-viewer-element-hover-color, theme('colors.sky.700'));
     --asdk-bv-element-selected-color: var(--app-sdk-bpmn-viewer-element-selected-color, theme('colors.orange.500'));
   }
