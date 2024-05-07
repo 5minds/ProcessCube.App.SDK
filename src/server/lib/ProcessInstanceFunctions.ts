@@ -1,6 +1,7 @@
 import { DataModels } from '@5minds/processcube_engine_client';
 import type { EventMessage, Identity, Subscription } from '@5minds/processcube_engine_sdk';
 
+import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
 
 /**
@@ -30,6 +31,7 @@ export async function getActiveProcessInstances(query?: {
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance to wait for
  * @param identity The Identity of the User
+ * @param useImpliedIdentity Defines wheter the implied identity of the current User should be used
  * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The ProcessInstance.
  */
 export async function waitForProcessEnd(
@@ -37,8 +39,10 @@ export async function waitForProcessEnd(
     processInstanceId?: string;
   },
   identity?: Identity,
+  useImpliedIdentity?: boolean,
 ): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const { processInstanceId } = filterBy;
+  const impliedIdentity = useImpliedIdentity ? await getIdentity() : undefined;
 
   return new Promise<DataModels.ProcessInstances.ProcessInstance>(async (resolve, reject) => {
     const subscriptions: Array<Subscription> = [];
@@ -53,10 +57,10 @@ export async function waitForProcessEnd(
 
       const processInstance = await Client.processInstances.query(
         { processInstanceId: event.processInstanceId },
-        { identity },
+        { identity: identity || impliedIdentity },
       );
       for (const sub of subscriptions) {
-        Client.notification.removeSubscription(sub, identity);
+        Client.notification.removeSubscription(sub, identity || impliedIdentity);
       }
 
       if (processInstance.totalCount === 0) {
@@ -66,9 +70,15 @@ export async function waitForProcessEnd(
       return resolve(processInstance.processInstances[0]);
     };
 
-    subscriptions.push(await Client.notification.onProcessEnded(handleSubscription, { identity }));
-    subscriptions.push(await Client.notification.onProcessError(handleSubscription, { identity }));
-    subscriptions.push(await Client.notification.onProcessTerminated(handleSubscription, { identity }));
+    subscriptions.push(
+      await Client.notification.onProcessEnded(handleSubscription, { identity: identity || impliedIdentity }),
+    );
+    subscriptions.push(
+      await Client.notification.onProcessError(handleSubscription, { identity: identity || impliedIdentity }),
+    );
+    subscriptions.push(
+      await Client.notification.onProcessTerminated(handleSubscription, { identity: identity || impliedIdentity }),
+    );
 
     if (processInstanceId) {
       const finishedProcessInstance = await Client.processInstances.query(
@@ -80,12 +90,12 @@ export async function waitForProcessEnd(
             DataModels.ProcessInstances.ProcessInstanceState.error,
           ],
         },
-        { identity },
+        { identity: identity || impliedIdentity },
       );
 
       if (finishedProcessInstance.totalCount > 0) {
         for (const sub of subscriptions) {
-          Client.notification.removeSubscription(sub, identity);
+          Client.notification.removeSubscription(sub, identity || impliedIdentity);
         }
         resolve(finishedProcessInstance.processInstances[0]);
       }
