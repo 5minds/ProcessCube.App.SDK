@@ -2,6 +2,7 @@ import { DataModels } from '@5minds/processcube_engine_client';
 import type { Identity, UserTaskResult } from '@5minds/processcube_engine_sdk';
 
 import { UserTaskInstance, UserTaskList, mapUserTask, mapUserTaskList } from '../../common';
+import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
 
 /**
@@ -112,9 +113,8 @@ export async function finishUserTaskAndGetNext(
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     ...filterBy,
   };
-
   const userTasks = await Client.userTasks.query(queryOptions, {
-    identity: identity,
+    identity: identity || (await getIdentity()),
   });
 
   return mapUserTask(userTasks.userTasks[0]);
