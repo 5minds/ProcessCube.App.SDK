@@ -29,7 +29,7 @@
     );
   }
 
-  .splitter-layout {
+  .app-sdk-splitter-layout {
     position: relative;
     display: flex;
     flex-direction: row;
@@ -38,18 +38,18 @@
     overflow: hidden;
   }
 
-  .splitter-layout .layout-pane {
+  .app-sdk-splitter-layout .app-sdk-layout-pane {
     position: relative;
     flex: 0 0 auto;
     overflow: hidden;
     background-color: var(--asdk-sl-background-color);
   }
 
-  .splitter-layout .layout-pane.layout-pane-primary {
+  .app-sdk-splitter-layout .app-sdk-layout-pane.app-sdk-layout-pane-primary {
     flex: 1 1 auto;
   }
 
-  .splitter-layout > .layout-splitter {
+  .app-sdk-splitter-layout > .app-sdk-layout-splitter {
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
@@ -58,11 +58,11 @@
     background-color: var(--asdk-sl-splitter-color);
   }
 
-  .splitter-layout .layout-splitter:hover {
+  .app-sdk-splitter-layout .app-sdk-layout-splitter:hover {
     background-color: var(--asdk-sl-splitter-hover-color);
   }
 
-  .layout-splitter__inner {
+  .app-sdk-layout-splitter__inner {
     position: absolute;
     width: 4px;
     height: 100%;
@@ -70,28 +70,30 @@
     cursor: col-resize;
   }
 
-  .splitter-layout.layout-changing {
+  .app-sdk-splitter-layout.layout-changing {
     cursor: col-resize;
   }
 
-  .splitter-layout.layout-changing > .layout-splitter {
+  .app-sdk-splitter-layout.layout-changing > .app-sdk-layout-splitter {
     background-color: var(--asdk-sl-splitter-changing-color);
   }
 
-  .splitter-layout.splitter-layout-vertical {
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical {
     flex-direction: column;
   }
 
-  .splitter-layout.splitter-layout-vertical.layout-changing {
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical.layout-changing {
     cursor: row-resize;
   }
 
-  .splitter-layout.splitter-layout-vertical > .layout-splitter {
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical > .app-sdk-layout-splitter {
     width: 100%;
     height: 2px;
   }
 
-  .splitter-layout.splitter-layout-vertical > .layout-splitter > .layout-splitter__inner {
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical
+    > .app-sdk-layout-splitter
+    > .app-sdk-layout-splitter__inner {
     position: absolute;
     height: 4px;
     width: 100%;

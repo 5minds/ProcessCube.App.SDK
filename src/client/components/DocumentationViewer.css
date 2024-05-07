@@ -1,19 +1,6 @@
 @import '../root.css';
 @layer base {
-  .markdown-container {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-    scroll-padding-top: 1rem;
-
-    & .markdown {
-      margin: 0 10rem;
-
-      & > * {
-        all: revert;
-      }
-    }
+  .app-sdk-markdown > * {
+    all: revert;
   }
 }

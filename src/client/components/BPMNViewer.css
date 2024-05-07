@@ -17,9 +17,7 @@
     --asdk-bv-element-selected-color: var(--app-sdk-bpmn-viewer-element-selected-color, theme('colors.orange.500'));
   }
 
-  .bpmn-viewer {
-    height: 100%;
-
+  .app-sdk-bpmn-viewer {
     svg .djs-element .djs-hit-stroke,
     .djs-element .djs-hit-click-stroke,
     .djs-element .djs-hit-all {
@@ -55,7 +53,7 @@
   }
 
   .djs-cursor-grab {
-    .bpmn-viewer {
+    .app-sdk-bpmn-viewer {
       svg .djs-element .djs-hit-stroke,
       .djs-element .djs-hit-click-stroke,
       .djs-element .djs-hit-all {

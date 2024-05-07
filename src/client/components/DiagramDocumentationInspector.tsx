@@ -15,7 +15,7 @@ const BPMNViewer = dynamic<BPMNViewerNextJSProps>(() => import('./BPMNViewer').t
 
 const DEFAULT_SPLITTER_SIZE = 30;
 
-function DiagramDocumentationInspectorFunction(props: { xml: string }) {
+export function DiagramDocumentationInspector(props: { xml: string }) {
   const bpmnViewerRef = useRef<BPMNViewerFunctions>(null);
   const splitterRef = useRef<SplitterLayout>(null);
   const [selectedElements, setSelectedElement] = useState<Array<ElementLike>>([]);
@@ -31,15 +31,11 @@ function DiagramDocumentationInspectorFunction(props: { xml: string }) {
     // Not using the useSearchParams hook, because the component should be able to run in non-Next.js environments
     const searchParams = new URLSearchParams(window.location.search);
     const elementIds = searchParams.getAll('selected');
-    if (elementIds) {
-      setPreselectedElementIds(elementIds);
-    }
+    setPreselectedElementIds(elementIds);
 
-    const splitterSize = searchParams.get('splitterSize');
-    if (splitterSize) {
-      setSplitterSize(parseFloat(splitterSize));
-      splitterRef.current?.setSecondaryPaneSize(parseFloat(splitterSize));
-    }
+    const splitterSize = parseFloat(searchParams.get('splitterSize') ?? `${DEFAULT_SPLITTER_SIZE}`);
+    setSplitterSize(splitterSize);
+    splitterRef.current?.setSecondaryPaneSize(splitterSize);
   }, []);
 
   useEffect(() => {
@@ -65,7 +61,7 @@ function DiagramDocumentationInspectorFunction(props: { xml: string }) {
 
     // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
     window.history.replaceState(null, '', `?${searchParams.toString()}${headingElement ? window.location.hash : ''}`);
-    window.location.hash = window.location.hash;
+    window.location.hash && (window.location.hash = window.location.hash); // Seems stupid, but is needed to trigger a hashchange event
   }, [selectedElements, splitterSize]);
 
   useEffect(() => {
@@ -78,7 +74,7 @@ function DiagramDocumentationInspectorFunction(props: { xml: string }) {
 
       overlays?.add(element.id, {
         position: position,
-        html: '<div title="This element has documentation" class="documentation-overlay-icon"><svg xmlns="http://www.w3.org/2000/svg" height=17 viewBox="0 0 448 512"><!--!Font Awesome Pro 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2024 Fonticons, Inc.--><path d="M64 0C28.7 0 0 28.7 0 64L0 448l0 0c0 35.3 28.7 64 64 64H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H416V413.3c18.6-6.6 32-24.4 32-45.3V48c0-26.5-21.5-48-48-48H64zM384 416v64H64c-17.7 0-32-14.3-32-32s14.3-32 32-32H384zM64 384c-11.7 0-22.6 3.1-32 8.6L32 64c0-17.7 14.3-32 32-32H96V384H64zm64 0V32H400c8.8 0 16 7.2 16 16V368c0 8.8-7.2 16-16 16H128zm48-240c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16z"/></svg></div>',
+        html: '<div title="This element has documentation" class="app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-p-[2px] app-sdk-rounded-s"><svg xmlns="http://www.w3.org/2000/svg" height=17 viewBox="0 0 448 512"><!--!Font Awesome Pro 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2024 Fonticons, Inc.--><path d="M64 0C28.7 0 0 28.7 0 64L0 448l0 0c0 35.3 28.7 64 64 64H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H416V413.3c18.6-6.6 32-24.4 32-45.3V48c0-26.5-21.5-48-48-48H64zM384 416v64H64c-17.7 0-32-14.3-32-32s14.3-32 32-32H384zM64 384c-11.7 0-22.6 3.1-32 8.6L32 64c0-17.7 14.3-32 32-32H96V384H64zm64 0V32H400c8.8 0 16 7.2 16 16V368c0 8.8-7.2 16-16 16H128zm48-240c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16z"/></svg></div>',
       });
     });
   }, [bpmnRendered]);
@@ -95,10 +91,10 @@ function DiagramDocumentationInspectorFunction(props: { xml: string }) {
         viewerRef={bpmnViewerRef}
         xml={props.xml}
         preselectedElementIds={preselectedElementIds}
-        onSelectionChange={(elements) => setSelectedElement([...elements])}
+        onSelectionChanged={(elements) => setSelectedElement([...elements])}
         onImportDone={() => setBpmnRendered(true)}
       />
-      <div className="documentation-area">
+      <div className="app-sdk-flex app-sdk-justify-center app-sdk-h-full app-sdk-mask-image app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-text-[color:var(--asdk-ddi-text-color)] [mask-image: linear-gradient(#000, #000, transparent 0, #000 1.5rem, #000 calc(100% - 1.5rem), transparent)]">
         <DocumentationText elements={selectedElements} />
       </div>
     </SplitterLayout>
@@ -107,7 +103,7 @@ function DiagramDocumentationInspectorFunction(props: { xml: string }) {
 
 function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
   if (elements.length === 0) {
-    return <p className="documentation-area__info">Please select an element</p>;
+    return <p className="app-sdk-m-0 app-sdk-p-6">Please select an element</p>;
   }
 
   if (elements.length === 1) {
@@ -116,7 +112,7 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
       return <DocumentationViewer documentation={text} />;
     }
 
-    return <p className="documentation-area__info">No documentation available</p>;
+    return <p className="app-sdk-m-0 app-sdk-p-6">No documentation available</p>;
   }
 
   return (
@@ -187,5 +183,3 @@ const filterElementsWithDocumentation = (element: ElementLike) => {
   const documentation = businessObject?.documentation?.[0]?.text;
   return documentation != null && documentation.trim() !== '';
 };
-
-export const DiagramDocumentationInspector = DiagramDocumentationInspectorFunction;

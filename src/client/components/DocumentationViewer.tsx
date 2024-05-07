@@ -5,18 +5,16 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 
-function DocumentationViewerFunction(props: { documentation: string }) {
+export function DocumentationViewer(props: { documentation: string }) {
   return (
-    <div className="markdown-container">
+    <div className="app-sdk-absolute app-sdk-w-full app-sdk-h-full app-sdk-overflow-y-auto app-sdk-scroll-p-4 app-sdk-scroll-smooth">
       <Markdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSlug, [rehypeAutolinkHeadings, { behavior: 'wrap' }]]}
-        className="markdown"
+        className="app-sdk-markdown lg:app-sdk-mx-40 md:app-sdk-mx-20 app-sdk-mx-10"
       >
         {props.documentation ?? ''}
       </Markdown>
     </div>
   );
 }
-
-export const DocumentationViewer = DocumentationViewerFunction;

@@ -16,10 +16,9 @@ type SplitterLayoutProps = React.PropsWithChildren<{
   secondaryMinSize: number;
   secondaryDefaultSize: number | null;
   secondaryInitialSize: number | null;
-  onSecondaryPaneSizeChange: ((current: number) => void) | null;
-  onDragStart: ((prev: number, current: number) => void) | null;
+  onSizeChanged: ((secondarySize: number) => void) | null;
+  onDragStart: ((prev: number) => void) | null;
   onDragEnd: ((prev: number, current: number) => void) | null;
-  initMediator?: ((instance: SplitterLayout) => void) | null;
 }>;
 
 type SplitterLayoutState = {
@@ -53,9 +52,8 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     secondaryMinSize: 0,
     onDragStart: null,
     onDragEnd: null,
-    onSecondaryPaneSizeChange: null,
+    onSizeChanged: null,
     children: [],
-    initMediator: null,
   };
 
   private container: any;
@@ -74,10 +72,6 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
       secondaryPaneSize: props.secondaryInitialSize || 0,
       resizing: false,
     };
-
-    if (props.initMediator != null) {
-      props.initMediator(this);
-    }
   }
 
   componentDidMount(): void {
@@ -114,14 +108,14 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
   }
 
   componentDidUpdate(_prevProps: SplitterLayoutProps, prevState: SplitterLayoutState): void {
-    if (prevState.secondaryPaneSize !== this.state.secondaryPaneSize && this.props.onSecondaryPaneSizeChange) {
-      this.props.onSecondaryPaneSizeChange(this.state.secondaryPaneSize);
+    if (prevState.secondaryPaneSize !== this.state.secondaryPaneSize && this.props.onSizeChanged) {
+      this.props.onSizeChanged(this.state.secondaryPaneSize);
     }
 
     if (prevState.resizing !== this.state.resizing) {
       if (this.state.resizing) {
         if (this.props.onDragStart) {
-          this.props.onDragStart(prevState.secondaryPaneSize, this.state.secondaryPaneSize);
+          this.props.onDragStart(prevState.secondaryPaneSize);
         }
       } else if (this.props.onDragEnd) {
         this.props.onDragEnd(prevState.secondaryPaneSize, this.state.secondaryPaneSize);
@@ -211,10 +205,18 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     return secondaryPaneSize;
   }
 
+  /**
+   * Set the size of the secondary pane.
+   */
   setSecondaryPaneSize(secondaryPaneSize: number): void {
     this.setState({ secondaryPaneSize });
   }
 
+  /**
+   * Maximize the secondary pane.
+   *
+   * Only works if `percentage` is set to `true`.
+   */
   maximizeSecondaryPane(): void {
     if (this.props.percentage) {
       this.setSecondaryPaneSize(100 - this.props.primaryMinSize);
@@ -223,13 +225,23 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     }
   }
 
-  secondaryPaneIsMinimizedToDefault(): boolean {
+  /**
+   * Check if the layout is in the default state, i.e. the secondary pane is at its default size.
+   */
+  isReset(): boolean {
     const secondaryPaneSize = this.props.secondaryDefaultSize || this.props.secondaryMinSize;
 
     return this.state.secondaryPaneSize === secondaryPaneSize;
   }
 
-  minimizeSecondaryPaneToDefault(): void {
+  /**
+   * Reset the layout to the default state, i.e. set the secondary pane to its default size.
+   *
+   * If `secondaryDefaultSize` is not set, the secondary pane will be set to its `secondaryMinSize`.
+   *
+   * If `secondaryMinSize` is not set, the secondary pane will be set to 0.
+   */
+  reset(): void {
     const secondaryPaneSize = this.props.secondaryDefaultSize || this.props.secondaryMinSize;
 
     this.setSecondaryPaneSize(secondaryPaneSize);
@@ -295,12 +307,12 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
   }
 
   render(): JSX.Element {
-    let containerClasses = 'splitter-layout';
+    let containerClasses = 'app-sdk-splitter-layout';
     if (this.props.customClassName) {
       containerClasses += ` ${this.props.customClassName}`;
     }
     if (this.props.vertical) {
-      containerClasses += ' splitter-layout-vertical';
+      containerClasses += ' app-sdk-splitter-layout-vertical';
     }
     if (this.state.resizing) {
       containerClasses += ' layout-changing';
@@ -335,9 +347,9 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
       >
         {wrappedChildren[0]}
         {wrappedChildren.length > 1 && (
-          <div role="separator" className="layout-splitter">
+          <div role="separator" className="app-sdk-layout-splitter">
             <div
-              className="layout-splitter__inner"
+              className="app-sdk-layout-splitter__inner"
               ref={(c) => {
                 this.splitter = c;
               }}
@@ -363,7 +375,7 @@ function SplitterPane(
 ): JSX.Element {
   const size = props.size || 0;
   const unit = props.percentage ? '%' : 'px';
-  let classes = 'layout-pane';
+  let classes = 'app-sdk-layout-pane';
   const style: React.CSSProperties = {};
   if (!props.primary) {
     if (props.vertical) {
@@ -372,7 +384,7 @@ function SplitterPane(
       style.width = `${size}${unit}`;
     }
   } else {
-    classes += ' layout-pane-primary';
+    classes += ' app-sdk-layout-pane-primary';
   }
   return (
     <div className={classes} style={style}>

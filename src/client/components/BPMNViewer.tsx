@@ -16,7 +16,7 @@ export type BPMNViewerProps = {
   xml: string;
   className?: string;
   preselectedElementIds?: string[];
-  onSelectionChange?: (elements: Array<ElementLike>) => void;
+  onSelectionChanged?: (elements: Array<ElementLike>) => void;
   onImportDone?: () => void;
 };
 
@@ -63,7 +63,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
     const canvas = viewer.get<Canvas>('canvas');
 
     const onSelectionChange = (event: { newSelection: ElementLike[] }) => {
-      props.onSelectionChange?.(event.newSelection);
+      props.onSelectionChanged?.(event.newSelection);
     };
 
     viewer
@@ -102,7 +102,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
     };
   }, [props.xml]);
 
-  return <div ref={containerRef} className={clsx('bpmn-viewer', props.className)} />;
+  return <div ref={containerRef} className={clsx('app-sdk-bpmn-viewer', 'app-sdk-h-full', props.className)} />;
 }
 
 export const BPMNViewer = forwardRef(BPMNViewerFunction);
