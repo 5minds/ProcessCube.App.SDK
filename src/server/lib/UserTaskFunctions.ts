@@ -266,21 +266,6 @@ export async function getReservedUserTasksByIdentity(
 /**
  *
  * @param identity The identity of the user
- * @param flowNodeInstanceId The instance id of the flowNode that should be reserved
- * @param actualOwnerId The user id of the process instance owner
- * @returns {Promise<void>}
- */
-export async function reserveUserTask(
-  identity: DataModels.Iam.Identity,
-  flowNodeInstanceId: string,
-  actualOwnerId?: string,
-): Promise<void> {
-  await Client.userTasks.reserveUserTaskInstance(identity, flowNodeInstanceId, actualOwnerId || identity.userId);
-}
-
-/**
- *
- * @param identity The identity of the user
  * @param options Additional options for the query e.g. {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<UserTaskList>}
  */
