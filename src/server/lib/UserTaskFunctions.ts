@@ -114,7 +114,7 @@ export async function finishUserTaskAndGetNext(
     ...filterBy,
   };
   const userTasks = await Client.userTasks.query(queryOptions, {
-    identity: identity || (await getIdentity()),
+    identity: identity,
   });
 
   return mapUserTask(userTasks.userTasks[0]);
@@ -240,24 +240,25 @@ export async function getWaitingUserTasksByCorrelationId(
  * @returns {Promise<UserTaskList>}
  */
 export async function getReservedUserTasksByIdentity(
-  identity: DataModels.Iam.Identity,
+  identity?: DataModels.Iam.Identity,
   options?: {
     offset?: number;
     limit?: number;
     sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
   },
 ): Promise<UserTaskList> {
+  const resolvedIdentity = identity || (await getIdentity());
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
     {
-      identity: identity,
+      identity: resolvedIdentity,
       ...options,
     },
   );
 
-  const reservedUserTasks = result.userTasks.filter((userTask) => userTask.actualOwnerId === identity.userId);
+  const reservedUserTasks = result.userTasks.filter((userTask) => userTask.actualOwnerId === resolvedIdentity.userId);
   result.userTasks = reservedUserTasks;
 
   return mapUserTaskList(result);
