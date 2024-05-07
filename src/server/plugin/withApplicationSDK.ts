@@ -35,20 +35,17 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
       await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
     }
 
-    // const enhancedNextConfig = {
-    //   ...nextConfig,
-    //   experimental: {
-    //     ...nextConfig.experimental,
-    //     serverComponentsExternalPackages: [
-    //       ...(nextConfig.experimental?.serverComponentsExternalPackages || []),
-    //       'esbuild',
-    //     ],
-    //   },
-    // };
+    const enhancedNextConfig = {
+      ...nextConfig,
+      experimental: {
+        ...nextConfig.experimental,
+        serverComponentsExternalPackages: [
+          ...(nextConfig.experimental?.serverComponentsExternalPackages || []),
+          'esbuild',
+        ],
+      },
+    };
 
-    // console.log(enhancedNextConfig);
-
-    console.log(nextConfig);
-    return nextConfig;
+    return enhancedNextConfig;
   };
 }
