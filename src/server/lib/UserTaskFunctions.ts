@@ -271,24 +271,27 @@ export async function getReservedUserTasksByIdentity(
  * @returns {Promise<UserTaskList>}
  */
 export async function getAssignedUserTasksByIdentity(
-  identity: DataModels.Iam.Identity,
+  identity?: DataModels.Iam.Identity,
   options?: {
     offset?: number;
     limit?: number;
     sortSettings?: DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings;
   },
 ): Promise<UserTaskList> {
+  const resolvedIdentity = identity || (await getIdentity());
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
     {
-      identity: identity,
+      identity: resolvedIdentity,
       ...options,
     },
   );
 
-  const assignedUserTasks = result.userTasks.filter((userTask) => userTask.assignedUserIds?.includes(identity.userId));
+  const assignedUserTasks = result.userTasks.filter((userTask) =>
+    userTask.assignedUserIds?.includes(resolvedIdentity.userId),
+  );
   result.userTasks = assignedUserTasks;
 
   return mapUserTaskList(result);
