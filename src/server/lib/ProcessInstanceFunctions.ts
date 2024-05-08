@@ -30,19 +30,18 @@ export async function getActiveProcessInstances(query?: {
  *
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance to wait for
- * @param identity The Identity of the User
- * @param useImpliedIdentity Defines wheter the implied identity of the current User should be used
+ * @param identity The Identity of the User or true if the implied identity schould be used
  * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The ProcessInstance.
  */
 export async function waitForProcessEnd(
   filterBy: {
     processInstanceId?: string;
   },
-  identity?: Identity,
-  useImpliedIdentity?: boolean,
+  identity?: Identity | boolean,
 ): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const { processInstanceId } = filterBy;
-  const impliedIdentity = useImpliedIdentity ? await getIdentity() : undefined;
+  const resolvedIdentity =
+    typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
 
   return new Promise<DataModels.ProcessInstances.ProcessInstance>(async (resolve, reject) => {
     const subscriptions: Array<Subscription> = [];
@@ -57,10 +56,10 @@ export async function waitForProcessEnd(
 
       const processInstance = await Client.processInstances.query(
         { processInstanceId: event.processInstanceId },
-        { identity: identity || impliedIdentity },
+        { identity: resolvedIdentity },
       );
       for (const sub of subscriptions) {
-        Client.notification.removeSubscription(sub, identity || impliedIdentity);
+        Client.notification.removeSubscription(sub, resolvedIdentity);
       }
 
       if (processInstance.totalCount === 0) {
@@ -70,14 +69,10 @@ export async function waitForProcessEnd(
       return resolve(processInstance.processInstances[0]);
     };
 
+    subscriptions.push(await Client.notification.onProcessEnded(handleSubscription, { identity: resolvedIdentity }));
+    subscriptions.push(await Client.notification.onProcessError(handleSubscription, { identity: resolvedIdentity }));
     subscriptions.push(
-      await Client.notification.onProcessEnded(handleSubscription, { identity: identity || impliedIdentity }),
-    );
-    subscriptions.push(
-      await Client.notification.onProcessError(handleSubscription, { identity: identity || impliedIdentity }),
-    );
-    subscriptions.push(
-      await Client.notification.onProcessTerminated(handleSubscription, { identity: identity || impliedIdentity }),
+      await Client.notification.onProcessTerminated(handleSubscription, { identity: resolvedIdentity }),
     );
 
     if (processInstanceId) {
@@ -90,12 +85,12 @@ export async function waitForProcessEnd(
             DataModels.ProcessInstances.ProcessInstanceState.error,
           ],
         },
-        { identity: identity || impliedIdentity },
+        { identity: resolvedIdentity },
       );
 
       if (finishedProcessInstance.totalCount > 0) {
         for (const sub of subscriptions) {
-          Client.notification.removeSubscription(sub, identity || impliedIdentity);
+          Client.notification.removeSubscription(sub, resolvedIdentity);
         }
         resolve(finishedProcessInstance.processInstances[0]);
       }

@@ -13,8 +13,7 @@ import { Client } from './internal/EngineClient';
  * @param filterBy.correlationId The ID of the correlation which contains the UserTask
  * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
  * @param filterBy.flowNodeId The UserTask FlowNode ID (BPMN)
- * @param identity The Identity of the User
- * @param useImpliedIdentity Defines wheter the implied identity of the current User should be used
+ * @param identity The Identity of the User or true if the implied identity schould be used
  * @returns {Promise<UserTaskInstance>} The created UserTask.
  */
 export async function waitForUserTask(
@@ -23,11 +22,11 @@ export async function waitForUserTask(
     processInstanceId?: string;
     flowNodeId?: string;
   } = {},
-  identity?: Identity,
-  useImpliedIdentity?: boolean,
+  identity?: Identity | boolean,
 ): Promise<UserTaskInstance> {
   const { correlationId, processInstanceId, flowNodeId } = filterBy;
-  const impliedIdentity = useImpliedIdentity ? await getIdentity() : undefined;
+  const resolvedIdentity =
+    typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
 
   return new Promise<UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(
@@ -48,9 +47,9 @@ export async function waitForUserTask(
         }
 
         const userTask = await getWaitingUserTaskByFlowNodeInstanceId(event.flowNodeInstanceId as string, {
-          identity: identity || impliedIdentity,
+          identity: resolvedIdentity,
         });
-        Client.notification.removeSubscription(sub, identity || impliedIdentity);
+        Client.notification.removeSubscription(sub, resolvedIdentity);
 
         if (userTask === null) {
           return reject(new Error(`UserTask with instance ID "${event.flowNodeInstanceId}" does not exist.`));
@@ -59,7 +58,7 @@ export async function waitForUserTask(
         return resolve(userTask);
       },
       {
-        identity: identity || impliedIdentity,
+        identity: resolvedIdentity,
       },
     );
 
@@ -71,12 +70,12 @@ export async function waitForUserTask(
         state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
       },
       {
-        identity: identity || impliedIdentity,
+        identity: resolvedIdentity,
       },
     );
 
     if (userTasks.userTasks.length > 0) {
-      Client.notification.removeSubscription(sub, identity || impliedIdentity);
+      Client.notification.removeSubscription(sub, resolvedIdentity);
       resolve(userTasks.userTasks[0]);
     }
   });
@@ -99,20 +98,19 @@ export type FilterBy = {
  * @param flowNodeInstanceId The ID of the flowNodeInstance to finish
  * @param FilterBy Additional filter options for the next UserTask
  * @param result The result of the UserTask
- * @param identity The Identity of the User
- * @param useImpliedIdentity Defines wheter the implied identity of the current User should be used
+ * @param identity The Identity of the User or true if the implied identity schould be used
  * @returns {Promise<UserTaskInstance>} The next UserTask based on the given filter options.
  */
 export async function finishUserTaskAndGetNext(
   flowNodeInstanceId: string,
   filterBy: FilterBy = {},
   result: UserTaskResult = {},
-  identity?: Identity,
-  useImpliedIdentity?: boolean,
+  identity?: Identity | boolean,
 ): Promise<UserTaskInstance | null> {
-  const impliedIdentity = useImpliedIdentity ? await getIdentity() : undefined;
+  const resolvedIdentity =
+    typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
 
-  await Client.userTasks.finishUserTask(flowNodeInstanceId, result, identity);
+  await Client.userTasks.finishUserTask(flowNodeInstanceId, result, resolvedIdentity);
 
   const queryOptions: {
     state: DataModels.FlowNodeInstances.FlowNodeInstanceState;
@@ -121,7 +119,7 @@ export async function finishUserTaskAndGetNext(
     ...filterBy,
   };
   const userTasks = await Client.userTasks.query(queryOptions, {
-    identity: identity || impliedIdentity,
+    identity: resolvedIdentity,
   });
 
   return mapUserTask(userTasks.userTasks[0]);
