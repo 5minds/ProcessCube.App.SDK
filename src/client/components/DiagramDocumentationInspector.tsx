@@ -89,7 +89,7 @@ export function DiagramDocumentationInspector(props: { xml: string }) {
         onSelectionChanged={(elements) => setSelectedElement([...elements])}
         onImportDone={() => setBpmnRendered(true)}
       />
-      <div className="app-sdk-flex app-sdk-justify-center app-sdk-h-full app-sdk-mask-image app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-text-[color:var(--asdk-ddi-text-color)] [mask-image: linear-gradient(#000, #000, transparent 0, #000 1.5rem, #000 calc(100% - 1.5rem), transparent)]">
+      <div className="app-sdk-flex app-sdk-justify-center app-sdk-h-full app-sdk-mask-image app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-text-[color:var(--asdk-ddi-text-color)]">
         <DocumentationText elements={selectedElements} />
       </div>
     </SplitterLayout>
