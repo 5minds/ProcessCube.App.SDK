@@ -35,4 +35,13 @@ export default {
   },
   plugins: [require('@tailwindcss/forms')({ strategy: 'class' })],
   darkMode: 'class',
+  safelist: [
+    'asdk-pii-flow-node-instance-state--finished',
+    'asdk-pii-flow-node-instance-state--running',
+    'asdk-pii-flow-node-instance-state--error',
+    'asdk-pii-flow-node-instance-state--terminated',
+    'asdk-pii-flow-node-instance-state--canceled',
+    'asdk-pii-play-button',
+    // { pattern: /asdk-pii-flow-node-instance-state--[a-zA-Z]+/ },
+  ],
 };

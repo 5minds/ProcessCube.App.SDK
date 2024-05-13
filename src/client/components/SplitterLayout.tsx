@@ -80,7 +80,6 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     document.addEventListener('mousemove', this.handleMouseMove);
     document.addEventListener('touchend', this.handleMouseUp);
     document.addEventListener('touchmove', this.handleTouchMove);
-    document.addEventListener('dblclick', this.handleSplitterDoubleClick);
 
     let secondaryPaneSize;
     if (this.props.secondaryInitialSize) {
@@ -129,7 +128,6 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     document.removeEventListener('mousemove', this.handleMouseMove);
     document.removeEventListener('touchend', this.handleMouseUp);
     document.removeEventListener('touchmove', this.handleTouchMove);
-    document.removeEventListener('dblclick', this.handleSplitterDoubleClick);
   }
 
   private clearSelection(): void {
@@ -355,6 +353,7 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
               }}
               onMouseDown={this.handleSplitterMouseDown}
               onTouchStart={this.handleSplitterMouseDown}
+              onDoubleClick={this.handleSplitterDoubleClick}
             ></div>
           </div>
         )}
