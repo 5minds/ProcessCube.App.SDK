@@ -28,7 +28,15 @@ export function DiagramDocumentationInspector(props: { xml: string }) {
     const elementIds = searchParams.getAll('selected');
     setPreselectedElementIds(elementIds);
 
-    const splitterSize = parseFloat(searchParams.get('splitterSize') ?? `${DEFAULT_SPLITTER_SIZE}`);
+    if (!searchParams.has('splitterSize')) {
+      return;
+    }
+
+    const splitterSize = parseFloat(searchParams.get('splitterSize')!);
+    if (isNaN(splitterSize) || splitterSize === DEFAULT_SPLITTER_SIZE) {
+      return;
+    }
+
     setSplitterSize(splitterSize);
     splitterRef.current?.setSecondaryPaneSize(splitterSize);
   }, []);
@@ -79,6 +87,7 @@ export function DiagramDocumentationInspector(props: { xml: string }) {
       ref={splitterRef}
       vertical
       percentage
+      secondaryInitialSize={DEFAULT_SPLITTER_SIZE}
       secondaryDefaultSize={DEFAULT_SPLITTER_SIZE}
       onDragEnd={(_prev: number, current: number) => setSplitterSize(Math.round(current))}
     >
