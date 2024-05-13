@@ -10,13 +10,11 @@
       --app-sdk-diagram-documentation-inspector-background-color,
       theme('colors.app-sdk-gray.700')
     );
-    --asdk-ddi-text-color: var(--app-sdk-diagram-documentation-inspector-text-color, theme('colors.app-sdk-gray.50'));
   }
 
   *,
   ::before,
   ::after {
     --asdk-ddi-background-color: var(--app-sdk-diagram-documentation-inspector-background-color, theme(colors.white));
-    --asdk-ddi-text-color: var(--app-sdk-diagram-documentation-inspector-text-color, theme('colors.app-sdk-gray.700'));
   }
 }
