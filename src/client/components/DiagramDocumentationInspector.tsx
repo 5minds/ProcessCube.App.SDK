@@ -1,17 +1,12 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
-import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import React from 'react';
 
-import { BPMNViewerFunctions, BPMNViewerNextJSProps } from './BPMNViewer';
+import { BPMNViewer, BPMNViewerFunctions } from './BPMNViewer';
 import { DocumentationViewer } from './DocumentationViewer';
 import { SplitterLayout } from './SplitterLayout';
-
-const BPMNViewer = dynamic<BPMNViewerNextJSProps>(() => import('./BPMNViewer').then((mod) => mod.BPMNViewerNextJS), {
-  ssr: false,
-});
 
 const DEFAULT_SPLITTER_SIZE = 30;
 
@@ -88,7 +83,7 @@ export function DiagramDocumentationInspector(props: { xml: string }) {
       onDragEnd={(_prev: number, current: number) => setSplitterSize(Math.round(current))}
     >
       <BPMNViewer
-        viewerRef={bpmnViewerRef}
+        ref={bpmnViewerRef}
         xml={props.xml}
         preselectedElementIds={preselectedElementIds}
         onSelectionChanged={(elements) => setSelectedElement([...elements])}
