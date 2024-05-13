@@ -93,7 +93,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
         viewer.get<Selection>('selection').select(preselectedElements ?? []);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
 
     return () => {
