@@ -1,4 +1,3 @@
-import 'bpmn-js/dist/assets/diagram-js.css';
 import BpmnViewer from 'bpmn-js/lib/Viewer';
 import clsx from 'clsx';
 import type Canvas from 'diagram-js/lib/core/Canvas';
