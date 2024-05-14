@@ -14,7 +14,7 @@ const DEFAULT_SPLITTER_SIZE = 30;
 export function DiagramDocumentationInspector(props: { xml: string }) {
   const bpmnViewerRef = useRef<BPMNViewerFunctions>(null);
   const splitterRef = useRef<SplitterLayout>(null);
-  const [selectedElements, setSelectedElement] = useState<Array<ElementLike>>([]);
+  const [selectedElements, setSelectedElements] = useState<Array<ElementLike>>([]);
   const [bpmnRendered, setBpmnRendered] = useState(false);
   const [preselectedElementIds, setPreselectedElementIds] = useState<string[]>([]);
   const [splitterSize, setSplitterSize] = useState(DEFAULT_SPLITTER_SIZE);
@@ -96,7 +96,7 @@ export function DiagramDocumentationInspector(props: { xml: string }) {
         ref={bpmnViewerRef}
         xml={props.xml}
         preselectedElementIds={preselectedElementIds}
-        onSelectionChanged={(elements) => setSelectedElement([...elements])}
+        onSelectionChanged={(elements) => setSelectedElements([...elements])}
         onImportDone={() => setBpmnRendered(true)}
       />
       <div className="app-sdk-flex app-sdk-justify-center app-sdk-h-full app-sdk-scroll-shadow app-sdk-bg-[color:var(--asdk-ddi-background-color)]">
