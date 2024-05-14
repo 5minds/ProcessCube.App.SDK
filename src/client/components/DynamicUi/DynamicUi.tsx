@@ -67,6 +67,8 @@ export function DynamicUi(
     headerComponent?: JSX.Element;
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
+    /** Callback, that will be called based on the validation strategy */
+    onValidate: (formData: FormData) => Promise<Object>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -112,12 +114,16 @@ export function DynamicUi(
   };
 
   const onSubmit = (formData: FormData) => {
+    const res = props.onValidate(formData);
+    console.log(res);
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
 
     props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
   };
 
-  function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
+  async function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
+    const res = await props.onValidate(new FormData(formRef.current!));
+    console.log(res);
     const target = event.target as HTMLInputElement;
     if (timeoutRef.current != null) {
       window.clearTimeout(timeoutRef.current);
