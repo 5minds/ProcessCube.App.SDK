@@ -1,6 +1,7 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
+import dynamic from 'next/dynamic';
 import { PropsWithChildren, useCallback, useEffect, useRef } from 'react';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
@@ -76,6 +77,7 @@ export function ProcessInstanceInspector({ processInstance, flowNodeInstances }:
           createRoot(htmlContainer).render(
             <BottomButtonContainer width={element.width}>
               {showExecutionCount && <BottomButton>{matchingInstances.length}</BottomButton>}
+              {showPlayButton && <PlayButton onClick={() => console.log(matchingInstances[0])} />}
             </BottomButtonContainer>,
           );
         }
@@ -127,3 +129,7 @@ function PlayButton({ onClick }: { onClick: React.MouseEventHandler<HTMLDivEleme
     </BottomButton>
   );
 }
+
+export const ProcessInstanceInspectorNextJS = dynamic(() => Promise.resolve(ProcessInstanceInspector), {
+  ssr: false,
+});
