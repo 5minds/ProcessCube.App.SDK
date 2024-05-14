@@ -1,25 +1,24 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
-import { PropsWithChildren, forwardRef, useCallback } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useRef } from 'react';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { FlowNodeInstance, FlowNodeInstanceState, ProcessInstance } from '@5minds/processcube_engine_sdk';
 
-import { BPMNViewerFunctions } from './BPMNViewer';
-import { DiagramDocumentationInspector as DDI } from './DiagramDocumentationInspector';
+import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from './DiagramDocumentationInspector';
 
 type ProcessInstanceInspectorProps = {
-  processInstance: ProcessInstance;
+  processInstance: ProcessInstance & { xml: string };
   flowNodeInstances: FlowNodeInstance[];
 };
-
-const DiagramDocumentationInspector = forwardRef(DDI);
 
 const byNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
 export function ProcessInstanceInspector({ processInstance, flowNodeInstances }: ProcessInstanceInspectorProps) {
+  const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
+
   const sequenceFlowFinished = useCallback(
     (element: ElementLike) => {
       const businessObject = getBusinessObject(element);
@@ -33,55 +32,58 @@ export function ProcessInstanceInspector({ processInstance, flowNodeInstances }:
     [flowNodeInstances],
   );
 
-  const bpmnViewerCallback = useCallback((bpmnViewer: BPMNViewerFunctions | null) => {
-    if (bpmnViewer == null) {
+  useEffect(() => {
+    const bpmnViewer = diagramDocumentationInspectorRef.current?.bpmnViewerRef;
+    const overlays = bpmnViewer?.getOverlays();
+    const elementRegistry = bpmnViewer?.getElementRegistry();
+
+    if (!bpmnViewer || !overlays || !elementRegistry) {
       return;
     }
 
-    const overlays = bpmnViewer.getOverlays();
-    const elementRegistry = bpmnViewer.getElementRegistry();
-    const flowNodeIds = new Set(flowNodeInstances.map((fni) => fni.flowNodeId));
-    elementRegistry.forEach((element) => {
-      if (element.type === 'bpmn:SequenceFlow' && sequenceFlowFinished(element)) {
-        bpmnViewer.addMarker(element.id, 'connection-done');
-        return;
-      }
+    bpmnViewer.onImportDone(() => {
+      const flowNodeIds = new Set(flowNodeInstances.map((fni) => fni.flowNodeId));
+      elementRegistry.forEach((element: ElementLike) => {
+        if (element.type === 'bpmn:SequenceFlow' && sequenceFlowFinished(element)) {
+          bpmnViewer.addMarker(element.id, 'connection-done');
+          return;
+        }
 
-      if (!flowNodeIds.has(element.id)) {
-        return;
-      }
+        if (!flowNodeIds.has(element.id)) {
+          return;
+        }
 
-      const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(byNewest)!;
-      bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${matchingInstances[0].state}`);
+        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(byNewest)!;
+        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${matchingInstances[0].state}`);
 
-      const showExecutionCount = matchingInstances.length > 1;
-      const showPlayButton =
-        (element.type === 'bpmn:ManualTask' || element.type === 'bpmn:UserTask' || element.type === 'bpmn:Task') &&
-        matchingInstances[0].state === FlowNodeInstanceState.suspended;
+        const showExecutionCount = matchingInstances.length > 1;
+        const showPlayButton =
+          (element.type === 'bpmn:ManualTask' || element.type === 'bpmn:UserTask' || element.type === 'bpmn:Task') &&
+          matchingInstances[0].state === FlowNodeInstanceState.suspended;
 
-      if (showExecutionCount || showPlayButton) {
-        const overlayId = overlays.add(element.id, {
-          position: {
-            bottom: -7,
-            left: 0,
-          },
-          html: '<div></div>',
-        } as OverlayAttrs);
+        if (showExecutionCount || showPlayButton) {
+          const overlayId = overlays.add(element.id, {
+            position: {
+              bottom: -7,
+              left: 0,
+            },
+            html: '<div></div>',
+          } as OverlayAttrs);
 
-        const overlay = overlays.get(overlayId) as Overlay & { htmlContainer: HTMLElement };
-        const htmlContainer = overlay.htmlContainer as HTMLElement;
+          const overlay = overlays.get(overlayId) as Overlay & { htmlContainer: HTMLElement };
+          const htmlContainer = overlay.htmlContainer as HTMLElement;
 
-        createRoot(htmlContainer).render(
-          <BottomButtonContainer width={element.width}>
-            {showExecutionCount && <BottomButton>{matchingInstances.length}</BottomButton>}
-            {showPlayButton && <PlayButton onClick={() => console.log(matchingInstances[0].flowNodeInstanceId)} />}
-          </BottomButtonContainer>,
-        );
-      }
+          createRoot(htmlContainer).render(
+            <BottomButtonContainer width={element.width}>
+              {showExecutionCount && <BottomButton>{matchingInstances.length}</BottomButton>}
+            </BottomButtonContainer>,
+          );
+        }
+      });
     });
-  }, []);
+  }, [diagramDocumentationInspectorRef.current, flowNodeInstances]);
 
-  return <DiagramDocumentationInspector xml={processInstance.xml!} ref={bpmnViewerCallback} />;
+  return <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />;
 }
 
 function BottomButtonContainer({ width, children }: PropsWithChildren<{ width: number }>) {

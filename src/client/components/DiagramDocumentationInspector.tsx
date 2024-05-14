@@ -1,9 +1,11 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
+import type ElementRegistry from 'diagram-js/lib/core/ElementRegistry';
 import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
+import type Overlays from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
-import React from 'react';
-import { Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { ForwardedRef, forwardRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 
 import { BPMNViewer, BPMNViewerFunctions } from './BPMNViewer';
@@ -12,7 +14,21 @@ import { SplitterLayout } from './SplitterLayout';
 
 const DEFAULT_SPLITTER_SIZE = 30;
 
-export function DiagramDocumentationInspector(props: { xml: string }, ref: Ref<BPMNViewerFunctions | null>) {
+export type DiagramDocumentationInspectorRef = {
+  bpmnViewerRef: {
+    getElementRegistry(): ElementRegistry | undefined;
+    getOverlays(): Overlays | undefined;
+    addMarker(elementId: string, className: string): void;
+    onImportDone(callback: () => void): void;
+  };
+};
+
+type DiagramDocumentationInspectorProps = {
+  xml: string;
+};
+
+function DiagramDocumentationInspectorFunction(props: DiagramDocumentationInspectorProps, ref: any) {
+  const [onImportDoneCallbacks, setOnImportDoneCallbacks] = useState<(() => void)[]>([]);
   const bpmnViewerRef = useRef<BPMNViewerFunctions>(null);
   const splitterRef = useRef<SplitterLayout>(null);
   const [selectedElements, setSelectedElements] = useState<Array<ElementLike>>([]);
@@ -71,6 +87,8 @@ export function DiagramDocumentationInspector(props: { xml: string }, ref: Ref<B
   }, [selectedElements, splitterSize]);
 
   useEffect(() => {
+    onImportDoneCallbacks.forEach((callback) => callback());
+
     const overlays = bpmnViewerRef.current?.getOverlays();
     const registry = bpmnViewerRef.current?.getElementRegistry();
     const documentatedElements = registry?.filter(filterElementsWithDocumentation);
@@ -82,23 +100,26 @@ export function DiagramDocumentationInspector(props: { xml: string }, ref: Ref<B
 
   useImperativeHandle(
     ref,
-    () => {
-      if (!bpmnViewerRef.current) {
-        return null;
-      }
-
-      return {
-        getOverlays() {
-          return bpmnViewerRef.current!.getOverlays();
-        },
+    () => ({
+      bpmnViewerRef: {
         getElementRegistry() {
-          return bpmnViewerRef.current!.getElementRegistry();
+          return bpmnViewerRef.current?.getElementRegistry();
+        },
+        getOverlays() {
+          return bpmnViewerRef.current?.getOverlays();
         },
         addMarker(elementId: string, className: string) {
           bpmnViewerRef.current?.addMarker(elementId, className);
         },
-      };
-    },
+        onImportDone(callback: () => void) {
+          if (bpmnRendered) {
+            callback();
+          } else {
+            setOnImportDoneCallbacks((prev) => [...prev, callback]);
+          }
+        },
+      },
+    }),
     [bpmnViewerRef.current],
   );
 
@@ -238,6 +259,24 @@ function filterElementsWithDocumentation(element: ElementLike) {
   return documentation != null && documentation.trim() !== '';
 }
 
-export const DiagramDocumentationInspectorNextJS = dynamic(() => Promise.resolve(DiagramDocumentationInspector), {
-  ssr: false,
-});
+export const DiagramDocumentationInspector = forwardRef(DiagramDocumentationInspectorFunction);
+
+export type DiagramDocumentationInspectorNextJSProps = DiagramDocumentationInspectorProps & {
+  viewerRef?: ForwardedRef<DiagramDocumentationInspectorRef>;
+};
+
+/**
+ *
+ * Nextjs has problems to pass a ref to a function component that was loaded via dynamic() import().
+ * This wrapper enables passing refs.
+ */
+function ForwardedDiagramDocumentationInspector(props: DiagramDocumentationInspectorNextJSProps) {
+  return <DiagramDocumentationInspector {...props} ref={props.viewerRef} />;
+}
+
+export const DiagramDocumentationInspectorNextJS = dynamic(
+  () => Promise.resolve(ForwardedDiagramDocumentationInspector),
+  {
+    ssr: false,
+  },
+);
