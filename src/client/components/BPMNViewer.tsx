@@ -8,6 +8,7 @@ import type Selection from 'diagram-js/lib/features/selection/Selection';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
+import dynamic from 'next/dynamic';
 import { ForwardedRef, Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import React from 'react';
 
@@ -115,6 +116,10 @@ export type BPMNViewerNextJSProps = BPMNViewerProps & {
  * Nextjs has problems to pass a ref to a function component that was loaded via dynamic() import().
  * This wrapper enables passing refs.
  */
-export function BPMNViewerNextJS(props: BPMNViewerNextJSProps) {
+function ForwardedBPMNViewer(props: BPMNViewerNextJSProps) {
   return <BPMNViewer {...props} ref={props.viewerRef} />;
 }
+
+export const BPMNViewerNextJS = dynamic(() => Promise.resolve(ForwardedBPMNViewer), {
+  ssr: false,
+});

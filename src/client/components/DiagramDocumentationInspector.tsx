@@ -1,6 +1,7 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
+import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import React from 'react';
 
@@ -187,3 +188,7 @@ const filterElementsWithDocumentation = (element: ElementLike) => {
   const documentation = businessObject?.documentation?.[0]?.text;
   return documentation != null && documentation.trim() !== '';
 };
+
+export const DiagramDocumentationInspectorNextJS = dynamic(() => Promise.resolve(DiagramDocumentationInspector), {
+  ssr: false,
+});
