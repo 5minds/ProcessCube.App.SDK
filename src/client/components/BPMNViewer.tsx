@@ -81,7 +81,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
         viewer.on('selection.changed', onSelectionChange);
 
         const { preselectedElementIds } = props;
-        if (!preselectedElementIds) {
+        if (!preselectedElementIds || preselectedElementIds.length === 0) {
           return;
         }
 
@@ -100,7 +100,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
       viewer.off('selection.changed', onSelectionChange);
       viewer.detach();
     };
-  }, [props.xml]);
+  }, [props.xml, props.preselectedElementIds]);
 
   return <div ref={containerRef} className={clsx('app-sdk-bpmn-viewer', 'app-sdk-h-full', props.className)} />;
 }
