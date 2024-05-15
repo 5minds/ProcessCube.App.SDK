@@ -68,7 +68,9 @@ export function DynamicUi(
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
     /** Callback, that will be called based on the validation strategy */
-    onValidate: (formData: FormData) => Promise<Object>;
+    onValidate: (formData: FormData) => Promise<Error>;
+    /** Decides which strategy is used to validate the FormData. Default is onSubmit */
+    validationStrategy?: 'onsubmit' | 'onfocusleave' | 'onchange';
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -114,16 +116,18 @@ export function DynamicUi(
   };
 
   const onSubmit = (formData: FormData) => {
-    const res = props.onValidate(formData);
-    console.log(res);
+    if (props.validationStrategy === 'onsubmit' || props.validationStrategy == undefined) {
+      const res = props.onValidate(formData);
+    }
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
-
     props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
   };
 
   async function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
-    const res = await props.onValidate(new FormData(formRef.current!));
-    console.log(res);
+    if (props.validationStrategy === 'onchange') {
+      const res = await props.onValidate(new FormData(formRef.current!));
+    }
+
     const target = event.target as HTMLInputElement;
     if (timeoutRef.current != null) {
       window.clearTimeout(timeoutRef.current);
