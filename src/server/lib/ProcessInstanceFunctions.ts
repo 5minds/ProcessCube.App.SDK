@@ -51,13 +51,13 @@ export async function getFlowNodeInstancesByProcessInstanceId(
 export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
   flowNodeInstanceIds: string[],
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const identity = await getIdentity();
+  // const identity = await getIdentity();
 
   const queryResult = await Client.flowNodeInstances.query(
     {
       triggeredByFlowNodeInstance: flowNodeInstanceIds,
     },
-    { identity: identity },
+    // { identity: identity },
   );
 
   return queryResult.flowNodeInstances;
