@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, forwardRef, useRef } from 'react';
+import React, { Fragment, PropsWithChildren, forwardRef, useRef, useState } from 'react';
 import * as ReactIs from 'react-is';
 import semverGt from 'semver/functions/gt';
 import semverPrerelease from 'semver/functions/prerelease';
@@ -59,6 +59,11 @@ export type FormState = {
   [formFieldId: string]: JSONValue;
 };
 
+export type ValidationError = {
+  names: Array<string>;
+  message: string;
+};
+
 export function DynamicUi(
   props: PropsWithChildren<{
     /** UserTaskInstance with a defined dynamic form  */
@@ -68,7 +73,7 @@ export function DynamicUi(
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
     /** Callback, that will be called based on the validation strategy */
-    onValidate: (formData: FormData) => Promise<Error>;
+    onValidate: (formData: FormData) => Promise<ValidationError | void>;
     /** Decides which strategy is used to validate the FormData. Default is onSubmit */
     validationStrategy?: 'onsubmit' | 'onfocusleave' | 'onchange';
     /** Custom class name for the root element */
@@ -115,17 +120,99 @@ export function DynamicUi(
     ...(props.customFieldComponents ? props.customFieldComponents : {}),
   };
 
-  const onSubmit = (formData: FormData) => {
+  const onSubmit = async (formData: FormData) => {
     if (props.validationStrategy === 'onsubmit' || props.validationStrategy == undefined) {
-      const res = props.onValidate(formData);
+      const res = await props.onValidate(formData);
+      if (res != undefined) {
+        showInvalidHint(res.message);
+        showErrorInFormField(res.names);
+      } else {
+        hideInvalidHint();
+        hideErrorsInFormField();
+        const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
+        props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
+      }
+    } else {
+      const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
+      props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
     }
-    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
-    props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
   };
+
+  function disableSubmitButton() {
+    if (confirmFormField != null) {
+      const submitButtons = document.getElementsByName(confirmFormField.id);
+      submitButtons.forEach((button) => {
+        if ((button as HTMLButtonElement).type == 'submit') {
+          (button as HTMLButtonElement).disabled = true;
+          button.classList.remove('app-sdk-opacity-100');
+          button.classList.add('app-sdk-opacity-60');
+        }
+      });
+    }
+  }
+
+  function enableSubmitButton() {
+    if (confirmFormField != null) {
+      const submitButtons = document.getElementsByName(confirmFormField.id);
+      submitButtons.forEach((button) => {
+        if ((button as HTMLButtonElement).type == 'submit') {
+          (button as HTMLButtonElement).disabled = false;
+          button.classList.remove('app-sdk-opacity-60');
+          button.classList.add('app-sdk-opacity-100');
+        }
+      });
+    }
+  }
+
+  function showInvalidHint(message: string) {
+    const invalidHint = document.getElementById(props.task.flowNodeInstanceId);
+    if (invalidHint) {
+      invalidHint.innerText = message;
+    }
+    invalidHint?.classList.remove('app-sdk-hidden');
+    invalidHint?.classList.add('app-sdk-block');
+  }
+
+  function hideInvalidHint() {
+    const invalidHint = document.getElementById(props.task.flowNodeInstanceId);
+    invalidHint?.classList.remove('app-sdk-block');
+    invalidHint?.classList.add('app-sdk-hidden');
+  }
+
+  function showErrorInFormField(names: Array<string>) {
+    hideErrorsInFormField();
+    names.map((name) => {
+      const form = document.getElementsByName(name);
+      form[0].classList.add('app-sdk-bg-red-500/20');
+    });
+  }
+
+  function hideErrorsInFormField() {
+    formFields.map((field) => {
+      try {
+        const form = document.getElementsByName(field.id);
+        form[0].classList.remove('app-sdk-bg-red-500/20');
+      } catch (e) {}
+    });
+  }
 
   async function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
     if (props.validationStrategy === 'onchange') {
       const res = await props.onValidate(new FormData(formRef.current!));
+
+      if (res != undefined) {
+        showInvalidHint(res.message);
+        showErrorInFormField(res.names);
+        disableSubmitButton();
+      } else {
+        hideInvalidHint();
+        hideErrorsInFormField();
+        enableSubmitButton();
+      }
+    } else {
+      hideInvalidHint();
+      hideErrorsInFormField();
+      enableSubmitButton();
     }
 
     const target = event.target as HTMLInputElement;
@@ -263,6 +350,12 @@ export function DynamicUi(
             props.classNames?.footer ?? '',
           )}
         >
+          <h1
+            id={props.task.flowNodeInstanceId}
+            className="app-sdk-w-fit app-sdk-mx-auto app-sdk-text-red-600 app-sdk-hidden"
+          >
+            Validation Error
+          </h1>
           <FormButtons confirmFormField={confirmFormField} />
         </footer>
       </form>
