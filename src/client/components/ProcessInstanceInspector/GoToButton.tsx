@@ -2,7 +2,7 @@ import React from 'react';
 
 import { BottomButton } from './BottomButton';
 
-export function OpenButton({ onClick }: { onClick: () => void }) {
+export function GoToButton({ onClick }: { onClick: () => void }) {
   return (
     <BottomButton
       className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"

@@ -8,26 +8,32 @@ import { createRoot } from 'react-dom/client';
 
 import { FlowNodeInstance, FlowNodeInstanceState, ProcessInstance } from '@5minds/processcube_engine_sdk';
 
+import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
+import { BottomButton } from './BottomButton';
 import { BottomButtonContainer } from './BottomButtonContainer';
-import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from './DiagramDocumentationInspector';
+import { GoToButton } from './GoToButton';
+import { PlayButton } from './PlayButton';
 
 type ProcessInstanceInspectorProps = {
   processInstance: ProcessInstance & { xml: string };
   flowNodeInstances: FlowNodeInstance[];
   triggeredFlowNodeInstances: FlowNodeInstance[];
   handlePlay: (flowNodeInstanceId: string, flowNodeType: string) => void;
+  handleGoTo: (instances: FlowNodeInstance[]) => void;
 };
 
 const byNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
 const RECEIVER_TYPES = ['bpmn:StartEvent', 'bpmn:IntermediateCatchEvent', 'bpmn:BoundaryEvent', 'bpmn:ReceiveTask'];
 const SENDER_TYPES = ['bpmn:EndEvent', 'bpmn:IntermediateThrowEvent', 'bpmn:SendTask'];
+const PLAYABLE_TYPES = ['bpmn:ManualTask', 'bpmn:UserTask', 'bpmn:Task'];
 
 export function ProcessInstanceInspector({
   processInstance,
   flowNodeInstances,
   triggeredFlowNodeInstances,
   handlePlay,
+  handleGoTo,
 }: ProcessInstanceInspectorProps) {
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
@@ -70,8 +76,7 @@ export function ProcessInstanceInspector({
 
         const showExecutionCount = matchingInstances.length > 1;
         const showPlayButton =
-          (element.type === 'bpmn:ManualTask' || element.type === 'bpmn:UserTask' || element.type === 'bpmn:Task') &&
-          matchingInstances[0].state === FlowNodeInstanceState.suspended;
+          PLAYABLE_TYPES.includes(element.type) && matchingInstances[0].state === FlowNodeInstanceState.suspended;
 
         let showGoToButton = false;
         let instancesToGoTo: FlowNodeInstance[] = [];
@@ -103,16 +108,15 @@ export function ProcessInstanceInspector({
           const htmlContainer = overlay.htmlContainer as HTMLElement;
 
           createRoot(htmlContainer).render(
-            <BottomButtonContainer
-              width={element.width}
-              flowNodeInstances={matchingInstances}
-              showExecutionCount={showExecutionCount}
-              showPlayButton={showPlayButton}
-              showGoToButton={showGoToButton}
-              instancesToGoTo={instancesToGoTo}
-              handlePlay={handlePlay}
-              handleGoTo={(flowNodeInstances) => console.log('Go to:', flowNodeInstances)}
-            />,
+            <BottomButtonContainer width={element.width}>
+              {showExecutionCount && <BottomButton>{flowNodeInstances.length}</BottomButton>}
+              {showGoToButton && <GoToButton onClick={() => handleGoTo(instancesToGoTo)} />}
+              {showPlayButton && (
+                <PlayButton
+                  onClick={() => handlePlay(flowNodeInstances[0].flowNodeInstanceId, flowNodeInstances[0].flowNodeType)}
+                />
+              )}
+            </BottomButtonContainer>,
           );
         }
       });
