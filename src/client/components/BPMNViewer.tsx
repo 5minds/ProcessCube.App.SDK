@@ -93,7 +93,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
         viewer.get<Selection>('selection').select(preselectedElements ?? []);
       })
       .catch((err) => {
-        console.error(err);
+        console.error(`[@5minds/processcube_app_sdk:BPMNViewer]\t\tError while importing BPMN XML: "${err.message}`);
       });
 
     return () => {
