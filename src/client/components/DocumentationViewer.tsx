@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm';
 
 export function DocumentationViewer(props: { documentation: string }) {
   return (
-    <div className="app-sdk-absolute app-sdk-w-full app-sdk-h-full app-sdk-overflow-y-auto app-sdk-scroll-p-4 app-sdk-scroll-smooth">
+    <div className="app-sdk-absolute app-sdk-w-full app-sdk-h-full app-sdk-overflow-y-auto app-sdk-scroll-p-4 app-sdk-scroll-smooth app-sdk-scroll-shadow">
       <Markdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSlug, [rehypeAutolinkHeadings, { behavior: 'wrap' }]]}
