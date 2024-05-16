@@ -2,7 +2,7 @@
 
 import Editor from '@monaco-editor/react';
 import { Divider } from '@nextui-org/react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

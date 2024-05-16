@@ -1,3 +1,5 @@
+import React from 'react';
+
 type PlayButtonProps = {
   onClick: (e: any) => void;
 };
