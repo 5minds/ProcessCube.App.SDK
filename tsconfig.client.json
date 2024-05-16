@@ -8,7 +8,7 @@
   "include": ["./src/client"],
   "references": [
     {
-      "path": "./tsconfig.common.json",
+      "path": "./tsconfig.common.json"
     }
   ]
 }

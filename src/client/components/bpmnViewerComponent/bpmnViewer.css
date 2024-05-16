@@ -1,0 +1,157 @@
+.flow-node-running-state-overlay {
+  background-color: rgb(84, 200, 255, 0.5);
+  /* color elements as green */
+  opacity: 0.4;
+  pointer-events: none;
+  /* no pointer events, allows clicking through onto the element */
+  border-radius: 10px;
+}
+
+.flow-node-suspended-state-overlay {
+  background-color: rgb(33, 133, 208, 0.5);
+  /* color elements as green */
+  opacity: 0.4;
+  pointer-events: none;
+  /* no pointer events, allows clicking through onto the element */
+  border-radius: 10px;
+}
+
+.flow-node-finished-state-overlay {
+  background-color: rgb(24, 185, 24, 0.5);
+  /* color elements as green */
+  opacity: 0.4;
+  pointer-events: none;
+  /* no pointer events, allows clicking through onto the element */
+  border-radius: 10px;
+}
+
+.flow-node-terminated-state-overlay {
+  background-color: rgb(230, 110, 0, 0.5);
+  /* color elements as green */
+  opacity: 0.4;
+  pointer-events: none;
+  /* no pointer events, allows clicking through onto the element */
+  border-radius: 10px;
+}
+
+.flow-node-error-state-overlay {
+  background-color: rgb(255, 1, 1, 0.5);
+  /* color elements as green */
+  opacity: 0.4;
+  pointer-events: none;
+  /* no pointer events, allows clicking through onto the element */
+  border-radius: 10px;
+}
+
+.flow-node-canceled-state-overlay {
+  background-color: rgb(100, 100, 125, 0.5);
+  /* color elements as green */
+  opacity: 0.4;
+  pointer-events: none;
+  /* no pointer events, allows clicking through onto the element */
+  border-radius: 10px;
+}
+
+.flow-node-unknown-state-overlay {
+  background-color: rgb(233, 179, 255, 0.5);
+  /* color elements as green */
+  opacity: 0.4;
+  pointer-events: none;
+  /* no pointer events, allows clicking through onto the element */
+  border-radius: 10px;
+}
+
+.bpmn-element-overlay-backdrop--gateway {
+  position: absolute;
+  border-radius: 0;
+  transform: rotate(45deg) translate(10px, 0px);
+}
+
+.bpmn-element-overlay-backdrop--rounded {
+  border-radius: 50%;
+}
+
+.connection-done .djs-visual > * {
+  stroke: rgb(17, 202, 0) !important;
+}
+
+.bpmn-element-overlay-backdrop {
+  border-radius: 10px;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  flex-direction: column;
+}
+
+.flownode-overlay {
+  pointer-events: all;
+
+  display: flex;
+  justify-content: center;
+  z-index: 99999;
+  margin-top: 7px;
+}
+
+.bpmn-element-overlay__below {
+  display: flex;
+
+  border-radius: 0.125rem;
+}
+
+.bpmn-element-overlay__below-item {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  padding: 0.25rem 0;
+  margin: 0 0.075rem;
+  min-width: 32px;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.bpmn-element-overlay__below-item--execution-count {
+  color: #fff;
+  background-color: #777;
+  font-weight: bold;
+}
+
+.bpmn-element-overlay__below-item--action {
+  background-color: #607d8b;
+  color: #fff;
+  cursor: pointer;
+  line-height: 16px;
+
+  &:hover .action-icon-hovered,
+  .action-icon {
+    display: unset;
+  }
+
+  &:hover .action-icon,
+  .action-icon-hovered {
+    display: none;
+  }
+}
+
+.monaco-editor {
+  border: 1px solid black;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.token-area {
+  width: 40%;
+}
+
+.documentation-area {
+  margin-left: 20px;
+  flex: 1 1 100%;
+}
+
+#markdown-container {
+  max-height: 450px;
+  width: 100%;
+  overflow-y: auto;
+}
