@@ -112,8 +112,8 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
   }
 
   if (elements.length === 1) {
-    const text: string = getBusinessObject(elements[0])?.documentation?.[0]?.text;
-    if (text != null && text.trim() !== '') {
+    if (filterElementsWithDocumentation(elements[0])) {
+      const text = getBusinessObject(elements[0])?.documentation?.[0]?.text;
       return <DocumentationViewer documentation={text} />;
     }
 
@@ -123,6 +123,7 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
   return (
     <DocumentationViewer
       documentation={elements
+        .filter(filterElementsWithDocumentation)
         .map((element) => getBusinessObject(element)?.documentation?.[0]?.text)
         .join('\n\n<hr />\n\n')}
     />
