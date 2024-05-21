@@ -30,7 +30,7 @@ export async function getActiveProcessInstances(query?: {
  *
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance to wait for
- * @param identity The Identity of the User or true if the implied identity schould be used
+ * @param identity The Identity of the User or true if the implied identity should be used
  * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The ProcessInstance.
  */
 export async function waitForProcessEnd(

@@ -13,7 +13,7 @@ import { Client } from './internal/EngineClient';
  * @param filterBy.correlationId The ID of the correlation which contains the UserTask
  * @param filterBy.processInstanceId The ID of the ProcessInstance the UserTask belongs to
  * @param filterBy.flowNodeId The UserTask FlowNode ID (BPMN)
- * @param identity The Identity of the User or true if the implied identity schould be used
+ * @param identity The Identity of the User or true if the implied identity should be used
  * @returns {Promise<UserTaskInstance>} The created UserTask.
  */
 export async function waitForUserTask(
@@ -98,7 +98,7 @@ export type FilterBy = {
  * @param flowNodeInstanceId The ID of the flowNodeInstance to finish
  * @param FilterBy Additional filter options for the next UserTask
  * @param result The result of the UserTask
- * @param identity The Identity of the User or true if the implied identity schould be used
+ * @param identity The Identity of the User or true if the implied identity should be used
  * @returns {Promise<UserTaskInstance>} The next UserTask based on the given filter options.
  */
 export async function finishUserTaskAndGetNext(
