@@ -66,6 +66,7 @@ export function DiagramDocumentationInspector(props: { xml: string }) {
     // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
     window.history.replaceState(null, '', `?${searchParams.toString()}${headingElement ? window.location.hash : ''}`);
     window.location.hash && (window.location.hash = window.location.hash); // Seems stupid, but is needed to trigger a hashchange event
+    headingElement?.scrollIntoView();
   }, [selectedElements, splitterSize]);
 
   useEffect(() => {
