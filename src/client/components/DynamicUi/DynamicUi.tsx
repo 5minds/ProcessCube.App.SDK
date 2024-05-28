@@ -53,6 +53,7 @@ export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
 export type DynamicUiComponentProps<TState = any> = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
   state?: TState;
+  onValidate?: (id: string, type: string, value: any) => Promise<string | void>;
 };
 export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
 export type FormState = {
@@ -64,6 +65,13 @@ export type ValidationError = {
   message: string;
 };
 
+export type ClientValidationFn = (
+  id: string,
+  type: 'string' | 'number' | 'decimal-number' | 'boolean' | 'enum' | 'date' | string,
+  value: any,
+) => Promise<string | void>;
+export type ServerValidationFn = (formData: FormData) => Promise<string | void>;
+
 export function DynamicUi(
   props: PropsWithChildren<{
     /** UserTaskInstance with a defined dynamic form  */
@@ -73,9 +81,7 @@ export function DynamicUi(
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
     /** Callback, that will be called based on the validation strategy */
-    onValidate: (formData: FormData) => Promise<ValidationError | void>;
-    /** Decides which strategy is used to validate the FormData. Default is onSubmit */
-    validationStrategy?: 'onsubmit' | 'onfocusleave' | 'onchange';
+    onValidate: Array<ClientValidationFn | ServerValidationFn>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -121,100 +127,17 @@ export function DynamicUi(
   };
 
   const onSubmit = async (formData: FormData) => {
-    if (props.validationStrategy === 'onsubmit' || props.validationStrategy == undefined) {
-      const res = await props.onValidate(formData);
-      if (res != undefined) {
-        showInvalidHint(res.message);
-        showErrorInFormField(res.names);
-      } else {
-        hideInvalidHint();
-        hideErrorsInFormField();
-        const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
-        props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
-      }
-    } else {
-      const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
-      props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
+    const validationFn = props.onValidate[1] as ServerValidationFn;
+    const res = await validationFn(formData);
+    if (res) {
+      console.log(res);
+      setGlobalError(res);
     }
+    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
+    props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
   };
 
-  function disableSubmitButton() {
-    if (confirmFormField != null) {
-      const submitButtons = document.getElementsByName(confirmFormField.id);
-      submitButtons.forEach((button) => {
-        if ((button as HTMLButtonElement).type == 'submit') {
-          (button as HTMLButtonElement).disabled = true;
-          button.classList.remove('app-sdk-opacity-100');
-          button.classList.add('app-sdk-opacity-60');
-        }
-      });
-    }
-  }
-
-  function enableSubmitButton() {
-    if (confirmFormField != null) {
-      const submitButtons = document.getElementsByName(confirmFormField.id);
-      submitButtons.forEach((button) => {
-        if ((button as HTMLButtonElement).type == 'submit') {
-          (button as HTMLButtonElement).disabled = false;
-          button.classList.remove('app-sdk-opacity-60');
-          button.classList.add('app-sdk-opacity-100');
-        }
-      });
-    }
-  }
-
-  function showInvalidHint(message: string) {
-    const invalidHint = document.getElementById(props.task.flowNodeInstanceId);
-    if (invalidHint) {
-      invalidHint.innerText = message;
-    }
-    invalidHint?.classList.remove('app-sdk-hidden');
-    invalidHint?.classList.add('app-sdk-block');
-  }
-
-  function hideInvalidHint() {
-    const invalidHint = document.getElementById(props.task.flowNodeInstanceId);
-    invalidHint?.classList.remove('app-sdk-block');
-    invalidHint?.classList.add('app-sdk-hidden');
-  }
-
-  function showErrorInFormField(names: Array<string>) {
-    hideErrorsInFormField();
-    names.map((name) => {
-      const form = document.getElementsByName(name);
-      form[0].classList.add('app-sdk-bg-red-500/20');
-    });
-  }
-
-  function hideErrorsInFormField() {
-    formFields.map((field) => {
-      try {
-        const form = document.getElementsByName(field.id);
-        form[0].classList.remove('app-sdk-bg-red-500/20');
-      } catch (e) {}
-    });
-  }
-
   async function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
-    if (props.validationStrategy === 'onchange') {
-      const res = await props.onValidate(new FormData(formRef.current!));
-
-      if (res != undefined) {
-        showInvalidHint(res.message);
-        showErrorInFormField(res.names);
-        disableSubmitButton();
-      } else {
-        hideInvalidHint();
-        hideErrorsInFormField();
-        enableSubmitButton();
-      }
-    } else {
-      hideInvalidHint();
-      hideErrorsInFormField();
-      enableSubmitButton();
-    }
-
     const target = event.target as HTMLInputElement;
     if (timeoutRef.current != null) {
       window.clearTimeout(timeoutRef.current);
@@ -228,6 +151,14 @@ export function DynamicUi(
       const formState = transformFormDataToFormState(formData, formFieldRefs);
       props.onStateChange?.(target.value, target.name, formState);
     }, 100);
+  }
+
+  function setGlobalError(errorMessage: string) {
+    const errorEle = document.getElementById(props.task.flowNodeInstanceId);
+    if (errorEle) {
+      errorEle.style.display = 'block';
+      errorEle.innerText = errorMessage;
+    }
   }
 
   const rootClassNames: string = classNames(
@@ -265,7 +196,6 @@ export function DynamicUi(
           : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'app-sdk-dark'))
       }
       data-dynamic-ui
-      data-blablabl
     >
       <form
         ref={formRef}
@@ -337,8 +267,13 @@ export function DynamicUi(
               const ref = formFieldRefs.get(field.id)?.ref;
 
               return (
-                <Fragment key={field.id}>
-                  <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
+                <Fragment>
+                  <ReactElement
+                    ref={ref}
+                    formField={field}
+                    state={props.state?.[field.id]}
+                    onValidate={props.onValidate[0] as ClientValidationFn}
+                  />
                 </Fragment>
               );
             })}
@@ -352,10 +287,8 @@ export function DynamicUi(
         >
           <h1
             id={props.task.flowNodeInstanceId}
-            className="app-sdk-w-fit app-sdk-mx-auto app-sdk-text-red-600 app-sdk-hidden"
-          >
-            Validation Error
-          </h1>
+            className="app-sdk-w-fit app-sdk-mx-auto app-sdk-text-red-600 app-sdk-hidden app-sdk-mb-2"
+          ></h1>
           <FormButtons confirmFormField={confirmFormField} />
         </footer>
       </form>

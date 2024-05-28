@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { isNumber } from '../utils/isNumber';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function DecimalFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
-  const { formField } = props;
+export function DecimalFormField(
+  { formField, state, onValidate }: DynamicUiComponentProps<string | Array<string> | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
@@ -15,6 +17,28 @@ export function DecimalFormField(props: DynamicUiComponentProps<string | null>, 
     );
   }
 
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  function onFocusLeave(e: any) {
+    if (onValidate) {
+      onValidate(formField.id, 'decimal-number', e.target.value).then((res) => {
+        if (res != undefined) {
+          setErrorMessage(res);
+          setIsValid(false);
+        } else {
+          setErrorMessage('');
+          setIsValid(true);
+        }
+      });
+    }
+  }
+
+  function resetErrors() {
+    setErrorMessage('');
+    setIsValid(true);
+  }
+
   return (
     <div>
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
@@ -22,17 +46,20 @@ export function DecimalFormField(props: DynamicUiComponentProps<string | null>, 
       </label>
       <div className="app-sdk-mt-1">
         <input
-          className="app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
+          className={`${!isValid ? 'app-sdk-bg-red-600/20' : ''} app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark`}
           type="number"
           step="0.01"
           placeholder={parsedCustomFormConfig?.placeholder || '0.00'}
-          defaultValue={props.state || formField.defaultValue?.toString()}
+          onBlur={onFocusLeave}
+          onChange={resetErrors}
+          defaultValue={state || formField.defaultValue?.toString()}
           id={formField.id}
           name={formField.id}
           aria-describedby={hintId}
           data-form-field-type="decimal"
         />
       </div>
+      {!isValid && <h1 className="app-sdk-text-red-600">{errorMessage}</h1>}
       {parsedCustomFormConfig?.hint && (
         <p
           className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
