@@ -270,7 +270,7 @@ export function DynamicUi(
               const ref = formFieldRefs.get(field.id)?.ref;
 
               return (
-                <Fragment>
+                <Fragment key={field.id}>
                   <ReactElement
                     ref={ref}
                     formField={field}
