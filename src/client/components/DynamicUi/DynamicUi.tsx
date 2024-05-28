@@ -81,7 +81,7 @@ export function DynamicUi(
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
     /** Callback, that will be called based on the validation strategy */
-    onValidate: Array<ClientValidationFn | ServerValidationFn>;
+    onValidate?: Array<ClientValidationFn | ServerValidationFn | undefined>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -127,12 +127,15 @@ export function DynamicUi(
   };
 
   const onSubmit = async (formData: FormData) => {
-    const validationFn = props.onValidate[1] as ServerValidationFn;
-    const res = await validationFn(formData);
-    if (res) {
-      console.log(res);
-      setGlobalError(res);
+    if (props.onValidate && props.onValidate[1]) {
+      const validationFn = props.onValidate[1] as ServerValidationFn;
+      const res = await validationFn(formData);
+      if (res) {
+        console.log(res);
+        setGlobalError(res);
+      }
     }
+
     const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
     props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
   };
@@ -272,7 +275,7 @@ export function DynamicUi(
                     ref={ref}
                     formField={field}
                     state={props.state?.[field.id]}
-                    onValidate={props.onValidate[0] as ClientValidationFn}
+                    onValidate={props.onValidate && (props.onValidate[0] as ClientValidationFn)}
                   />
                 </Fragment>
               );
