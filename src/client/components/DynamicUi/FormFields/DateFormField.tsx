@@ -20,16 +20,10 @@ export function DateFormField(
   const [errorMessage, setErrorMessage] = useState('');
 
   function onFocusLeave(e: any) {
-    console.log(e);
     if (onValidate) {
       onValidate(formField.id, formField.type, e.target.valueAsDate).then((res) => {
-        if (res) {
-          setErrorMessage(res);
-          setIsValid(false);
-        } else {
-          setErrorMessage('');
-          setIsValid(true);
-        }
+        setErrorMessage(res.join('\n'));
+        setIsValid(false);
       });
     }
   }
@@ -57,7 +51,6 @@ export function DateFormField(
           data-form-field-type="date"
         />
       </div>
-      {!isValid && <h1 className="app-sdk-text-red-600">{errorMessage}</h1>}
       {parsedCustomFormConfig?.hint && (
         <p
           className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
@@ -66,6 +59,7 @@ export function DateFormField(
           {parsedCustomFormConfig?.hint}
         </p>
       )}
+      {!isValid && <pre className="app-sdk-text-red-600">{errorMessage}</pre>}
     </div>
   );
 }

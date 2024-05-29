@@ -28,13 +28,8 @@ export function EnumFormField(
             return { name: ele.name, value: e.target.checked };
           })[0],
       ).then((res) => {
-        if (res) {
-          setErrorMessage(res);
-          setIsValid(false);
-        } else {
-          setErrorMessage('');
-          setIsValid(true);
-        }
+        setErrorMessage(res.join('\n'));
+        setIsValid(false);
       });
     }
   }
@@ -178,8 +173,8 @@ export function EnumFormField(
         {label}
       </label>
       {enumInput}
-      {!isValid && <h1 className="app-sdk-text-red-600">{errorMessage}</h1>}
       {hint}
+      {!isValid && <pre className="app-sdk-text-red-600">{errorMessage}</pre>}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { classNames } from '../../../utils/classNames';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
@@ -15,13 +15,8 @@ export function StringFormField(
   function onFocusLeave(e: any) {
     if (onValidate) {
       onValidate(formField.id, formField.type, e.target.value).then((res) => {
-        if (res) {
-          setErrorMessage(res);
-          setIsValid(false);
-        } else {
-          setErrorMessage('');
-          setIsValid(true);
-        }
+        setErrorMessage(res.join('\n'));
+        setIsValid(false);
       });
     }
   }
@@ -66,12 +61,12 @@ export function StringFormField(
         {label}
       </label>
       <div className="app-sdk-mt-1">{textInput}</div>
-      {!isValid && (
-        <span className="app-sdk-block app-sdk-text-sm app-sdk-font-medium app-sdk-text-red-600 app-sdk-mt-1">
-          {errorMessage}
-        </span>
-      )}
       {hint}
+      {!isValid && (
+        <pre className="app-sdk-block app-sdk-text-sm app-sdk-font-medium app-sdk-text-red-600 app-sdk-mt-1">
+          {errorMessage}
+        </pre>
+      )}
     </div>
   );
 }

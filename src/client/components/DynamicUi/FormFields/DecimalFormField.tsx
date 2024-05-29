@@ -22,14 +22,9 @@ export function DecimalFormField(
 
   function onFocusLeave(e: any) {
     if (onValidate) {
-      onValidate(formField.id, 'decimal-number', e.target.value).then((res) => {
-        if (res != undefined) {
-          setErrorMessage(res);
-          setIsValid(false);
-        } else {
-          setErrorMessage('');
-          setIsValid(true);
-        }
+      onValidate(formField.id, formField.type, e.target.value).then((res) => {
+        setErrorMessage(res.join('\n'));
+        setIsValid(false);
       });
     }
   }
@@ -59,7 +54,6 @@ export function DecimalFormField(
           data-form-field-type="decimal"
         />
       </div>
-      {!isValid && <h1 className="app-sdk-text-red-600">{errorMessage}</h1>}
       {parsedCustomFormConfig?.hint && (
         <p
           className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
@@ -68,6 +62,7 @@ export function DecimalFormField(
           {parsedCustomFormConfig?.hint}
         </p>
       )}
+      {!isValid && <pre className="app-sdk-text-red-600">{errorMessage}</pre>}
     </div>
   );
 }

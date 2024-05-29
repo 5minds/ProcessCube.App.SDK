@@ -13,6 +13,7 @@ import {
   FormFieldComponentMap,
   type GenericFormFieldTypeComponentMap,
 } from './FormFields';
+import { combineChangeValidationFns, combineSubmitValidationFns } from './utils/combineValidationFns';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
 const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=18.0.0 <19', { includePrerelease: true });
@@ -53,7 +54,7 @@ export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
 export type DynamicUiComponentProps<TState = any> = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
   state?: TState;
-  onValidate?: (id: string, type: string, value: any) => Promise<string | void>;
+  onValidate?: (id: string, type: string, value: any) => Promise<string[]>;
 };
 export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
 export type FormState = {
@@ -80,8 +81,10 @@ export function DynamicUi(
     headerComponent?: JSX.Element;
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
-    /** Callback, that will be called based on the validation strategy */
-    onValidate?: Array<ClientValidationFn | ServerValidationFn | undefined>;
+    /** Callback, that will be called when the form is submitted */
+    onSubmitValidation?: Array<ServerValidationFn>;
+    /** Callback, that will be called after the focus on a formfield changes */
+    onChangeValidation?: Array<ClientValidationFn>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -127,12 +130,15 @@ export function DynamicUi(
   };
 
   const onSubmit = async (formData: FormData) => {
-    if (props.onValidate && props.onValidate[1]) {
-      const validationFn = props.onValidate[1] as ServerValidationFn;
-      const res = await validationFn(formData);
-      if (res) {
-        console.log(res);
-        setGlobalError(res);
+    if (props.onSubmitValidation) {
+      const validationFns = Array.isArray(props.onSubmitValidation)
+        ? props.onSubmitValidation
+        : [props.onSubmitValidation];
+      const combinedValidationFn = combineSubmitValidationFns(...validationFns);
+      const validationErrors = await combinedValidationFn(formData);
+      if (validationErrors.length > 0) {
+        console.log(validationErrors);
+        setGlobalError(validationErrors);
       }
     }
 
@@ -141,6 +147,7 @@ export function DynamicUi(
   };
 
   async function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
+    setGlobalError(['']);
     const target = event.target as HTMLInputElement;
     if (timeoutRef.current != null) {
       window.clearTimeout(timeoutRef.current);
@@ -156,11 +163,11 @@ export function DynamicUi(
     }, 100);
   }
 
-  function setGlobalError(errorMessage: string) {
+  function setGlobalError(errorMessage: string[]) {
     const errorEle = document.getElementById(props.task.flowNodeInstanceId);
     if (errorEle) {
       errorEle.style.display = 'block';
-      errorEle.innerText = errorMessage;
+      errorEle.innerText = errorMessage.join('\n');
     }
   }
 
@@ -269,13 +276,23 @@ export function DynamicUi(
 
               const ref = formFieldRefs.get(field.id)?.ref;
 
+              let combinedValidationFn: ((id: string, type: string, value: any) => Promise<string[]>) | undefined =
+                undefined;
+
+              if (props.onChangeValidation) {
+                const validationFns = Array.isArray(props.onChangeValidation)
+                  ? props.onChangeValidation
+                  : [props.onChangeValidation];
+                combinedValidationFn = combineChangeValidationFns(...validationFns);
+              }
+
               return (
                 <Fragment key={field.id}>
                   <ReactElement
                     ref={ref}
                     formField={field}
                     state={props.state?.[field.id]}
-                    onValidate={props.onValidate && (props.onValidate[0] as ClientValidationFn)}
+                    onValidate={combinedValidationFn}
                   />
                 </Fragment>
               );

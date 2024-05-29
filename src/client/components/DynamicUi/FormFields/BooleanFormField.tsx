@@ -14,16 +14,10 @@ export function BooleanFormField(
   const [errorMessage, setErrorMessage] = useState('');
 
   function onFocusLeave(e: any) {
-    console.log(e);
     if (onValidate) {
-      onValidate(formField.id, 'boolean', e.target.checked).then((res) => {
-        if (res != undefined) {
-          setErrorMessage(res);
-          setIsValid(false);
-        } else {
-          setErrorMessage('');
-          setIsValid(true);
-        }
+      onValidate(formField.id, formField.type, e.target.checked).then((res) => {
+        setErrorMessage(res.join('\n'));
+        setIsValid(false);
       });
     }
   }
@@ -52,12 +46,12 @@ export function BooleanFormField(
         <label className="app-sdk-font-medium" htmlFor={formField.id}>
           {formField.label}
         </label>
-        {!isValid && <h1 className="app-sdk-text-red-600">{errorMessage}</h1>}
         {parsedCustomFormConfig?.hint && (
           <p className="app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]" id={hintId}>
             {parsedCustomFormConfig.hint}
           </p>
         )}
+        {!isValid && <pre className="app-sdk-text-red-600">{errorMessage}</pre>}
       </div>
     </div>
   );
