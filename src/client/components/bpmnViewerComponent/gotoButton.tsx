@@ -1,4 +1,4 @@
-import { FlowNode } from './bpmnViewerOverlayCreator';
+import React from 'react';
 
 type GotoButtonProps = {
   onClick: (e: any) => void;

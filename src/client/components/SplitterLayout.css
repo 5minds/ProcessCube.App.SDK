@@ -1,0 +1,103 @@
+@import '../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-sl-background-color: var(--app-sdk-splitter-layout-background-color, theme('colors.app-sdk-gray.700'));
+    --asdk-sl-splitter-color: var(--app-sdk-splitter-layout-splitter-color, theme('colors.app-sdk-gray.300'));
+    --asdk-sl-splitter-hover-color: var(
+      --app-sdk-splitter-layout-splitter-hover-color,
+      theme('colors.app-sdk-gray.100')
+    );
+    --asdk-sl-splitter-changing-color: var(
+      --app-sdk-splitter-layout-splitter-changing-color,
+      theme('colors.app-sdk-gray.200')
+    );
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-sl-background-color: var(--app-sdk-splitter-layout-background-color, theme(colors.white));
+    --asdk-sl-splitter-color: var(--app-sdk-splitter-layout-splitter-color, theme('colors.app-sdk-gray.700'));
+    --asdk-sl-splitter-hover-color: var(
+      --app-sdk-splitter-layout-splitter-hover-color,
+      theme('colors.app-sdk-gray.200')
+    );
+    --asdk-sl-splitter-changing-color: var(
+      --app-sdk-splitter-layout-splitter-changing-color,
+      theme('colors.app-sdk-gray.400')
+    );
+  }
+
+  .app-sdk-splitter-layout {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .app-sdk-splitter-layout .app-sdk-layout-pane {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+    background-color: var(--asdk-sl-background-color);
+  }
+
+  .app-sdk-splitter-layout .app-sdk-layout-pane.app-sdk-layout-pane-primary {
+    flex: 1 1 auto;
+  }
+
+  .app-sdk-splitter-layout > .app-sdk-layout-splitter {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    width: 2px;
+    height: 100%;
+    background-color: var(--asdk-sl-splitter-color);
+  }
+
+  .app-sdk-splitter-layout .app-sdk-layout-splitter:hover {
+    background-color: var(--asdk-sl-splitter-hover-color);
+  }
+
+  .app-sdk-layout-splitter__inner {
+    position: absolute;
+    width: 4px;
+    height: 100%;
+    margin: 0 -1px;
+    cursor: col-resize;
+  }
+
+  .app-sdk-splitter-layout.layout-changing {
+    cursor: col-resize;
+  }
+
+  .app-sdk-splitter-layout.layout-changing > .app-sdk-layout-splitter {
+    background-color: var(--asdk-sl-splitter-changing-color);
+  }
+
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical {
+    flex-direction: column;
+  }
+
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical.layout-changing {
+    cursor: row-resize;
+  }
+
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical > .app-sdk-layout-splitter {
+    width: 100%;
+    height: 2px;
+  }
+
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical
+    > .app-sdk-layout-splitter
+    > .app-sdk-layout-splitter__inner {
+    position: absolute;
+    height: 4px;
+    width: 100%;
+    margin: -1px 0;
+    cursor: row-resize;
+  }
+}

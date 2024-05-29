@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { FlowNode } from './bpmnViewerOverlayCreator';
 
 type FlowNodeColorAreaProps = {

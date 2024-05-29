@@ -1,0 +1,65 @@
+@import 'bpmn-js/dist/assets/diagram-js.css';
+@import '../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-bv-background-color: var(--app-sdk-bpmn-viewer-background-color, theme('colors.app-sdk-gray.700'));
+    --asdk-bv-foreground-color: var(--app-sdk-bpmn-viewer-foreground-color, theme('colors.app-sdk-gray.50'));
+    --asdk-bv-element-hover-color: var(--app-sdk-bpmn-viewer-element-hover-color, theme('colors.sky.300'));
+    --asdk-bv-element-selected-color: var(--app-sdk-bpmn-viewer-element-selected-color, theme('colors.orange.500'));
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-bv-background-color: var(--app-sdk-bpmn-viewer-background-color, theme(colors.white));
+    --asdk-bv-foreground-color: var(--app-sdk-bpmn-viewer-foreground-color, theme('colors.app-sdk-gray.700'));
+    --asdk-bv-element-hover-color: var(--app-sdk-bpmn-viewer-element-hover-color, theme('colors.sky.700'));
+    --asdk-bv-element-selected-color: var(--app-sdk-bpmn-viewer-element-selected-color, theme('colors.orange.500'));
+  }
+
+  .app-sdk-bpmn-viewer {
+    svg .djs-element .djs-hit-stroke,
+    .djs-element .djs-hit-click-stroke,
+    .djs-element .djs-hit-all {
+      cursor: default;
+    }
+
+    svg .djs-element.selected .djs-outline,
+    svg .djs-selection-outline {
+      display: block;
+      stroke: var(--asdk-bv-element-selected-color);
+      stroke-width: 2px;
+    }
+
+    svg .djs-element.hover .djs-outline {
+      stroke: var(--asdk-bv-element-hover-color);
+      stroke-width: 2px;
+      visibility: visible;
+    }
+
+    .djs-overlays {
+      .djs-overlay {
+        pointer-events: none;
+
+        svg {
+          fill: var(--asdk-bv-foreground-color);
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke: var(--asdk-bv-background-color);
+          stroke-width: 1px;
+        }
+      }
+    }
+  }
+
+  .djs-cursor-grab {
+    .app-sdk-bpmn-viewer {
+      svg .djs-element .djs-hit-stroke,
+      .djs-element .djs-hit-click-stroke,
+      .djs-element .djs-hit-all {
+        cursor: grab;
+      }
+    }
+  }
+}

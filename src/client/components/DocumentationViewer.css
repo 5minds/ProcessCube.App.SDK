@@ -1,0 +1,18 @@
+@import '../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-dv-text-color: var(--app-sdk-documentation-viewer-text-color, theme('colors.app-sdk-gray.50'));
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-dv-text-color: var(--app-sdk-documentation-viewer-text-color, theme('colors.app-sdk-gray.700'));
+  }
+
+  .app-sdk-markdown * {
+    all: revert;
+    color: var(--asdk-dv-text-color);
+  }
+}

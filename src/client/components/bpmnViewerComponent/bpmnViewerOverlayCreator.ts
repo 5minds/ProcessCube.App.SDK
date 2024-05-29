@@ -201,7 +201,7 @@ export default class BpmnViewerOverlayCreator {
       this.setSequenceFlowsColor(flowNodeShape, executedFlowNodes);
     }
 
-    const flowNodeIdsToDelete = [];
+    const flowNodeIdsToDelete: string[] = [];
 
     for (const flowNodeId in this.overlayRoots) {
       const executedFlowNode = executedFlowNodes.find((f) => f.Id === flowNodeId);

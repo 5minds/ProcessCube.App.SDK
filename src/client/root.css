@@ -43,3 +43,10 @@
     line-height: inherit;
   }
 }
+
+@layer utilities {
+  .app-sdk-scroll-shadow {
+    mask-image: linear-gradient(to bottom, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent);
+  }
+}
