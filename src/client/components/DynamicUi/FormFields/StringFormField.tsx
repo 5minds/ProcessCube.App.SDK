@@ -13,7 +13,6 @@ export function StringFormField(
   const [errorMessage, setErrorMessage] = useState('');
 
   function onFocusLeave(e: any) {
-    console.log('here');
     if (onValidate) {
       onValidate(formField.id, formField.type, e.target.value).then((res) => {
         setErrorMessage(res.join('\n'));

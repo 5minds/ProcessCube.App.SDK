@@ -32,7 +32,7 @@ export function BooleanFormField(
       <div className="app-sdk-flex app-sdk-h-5 app-sdk-items-center">
         <input
           type="checkbox"
-          className={`${!isValid ? 'app-sdk-bg-red-600/20' : 'app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)]'} app-sdk-form-checkbox app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-text-[color:var(--asdk-dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-app-sdk-dark`}
+          className="app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-form-checkbox app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-text-[color:var(--asdk-dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-app-sdk-dark"
           defaultChecked={(state && state !== 'false') || formField.defaultValue === 'true'}
           onBlur={onFocusLeave}
           onChange={resetErrors}
