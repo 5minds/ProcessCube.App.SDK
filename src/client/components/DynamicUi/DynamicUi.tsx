@@ -137,7 +137,6 @@ export function DynamicUi(
       const combinedValidationFn = combineSubmitValidationFns(...validationFns);
       const validationErrors = await combinedValidationFn(formData);
       if (validationErrors.length > 0) {
-        console.log(validationErrors);
         setGlobalError(validationErrors);
       }
     }
