@@ -13,7 +13,7 @@ import {
   FormFieldComponentMap,
   type GenericFormFieldTypeComponentMap,
 } from './FormFields';
-import { combineChangeValidationFns, combineSubmitValidationFns } from './utils/combineValidationFns';
+import { combineChangeValidationFns, combineSubmitValidationFns, type CombinedChangeValidationFn } from './utils/combineValidationFns';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
 const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=18.0.0 <19', { includePrerelease: true });
@@ -54,23 +54,21 @@ export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
 export type DynamicUiComponentProps<TState = any> = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
   state?: TState;
-  onValidate?: (id: string, type: string, value: any) => Promise<string[]>;
+  onValidate?: (id: string, type: FormFieldTypes, value: any) => Promise<Array<string>>;
 };
 export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
 export type FormState = {
   [formFieldId: string]: JSONValue;
 };
 
-export type ValidationError = {
-  names: Array<string>;
-  message: string;
-};
+export type FormFieldTypes = 'string' | 'number' | 'decimal-number' | 'boolean' | 'enum' | 'date' | string;
 
 export type ClientValidationFn = (
   id: string,
-  type: 'string' | 'number' | 'decimal-number' | 'boolean' | 'enum' | 'date' | string,
+  type: FormFieldTypes,
   value: any,
 ) => Promise<string | void>;
+
 export type ServerValidationFn = (formData: FormData) => Promise<string | void>;
 
 export function DynamicUi(
@@ -84,7 +82,7 @@ export function DynamicUi(
     /** Callback, that will be called when the form is submitted */
     onSubmitValidation?: Array<ServerValidationFn>;
     /** Callback, that will be called after the focus on a formfield changes */
-    onChangeValidation?: Array<ClientValidationFn>;
+    onFocusChangeValidation?: Array<ClientValidationFn>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -131,10 +129,8 @@ export function DynamicUi(
 
   const onSubmit = async (formData: FormData) => {
     if (props.onSubmitValidation) {
-      const validationFns = Array.isArray(props.onSubmitValidation)
-        ? props.onSubmitValidation
-        : [props.onSubmitValidation];
-      const combinedValidationFn = combineSubmitValidationFns(...validationFns);
+      const validationFns = [props.onSubmitValidation].flat();
+      const combinedValidationFn = combineSubmitValidationFns(validationFns);
       const validationErrors = await combinedValidationFn(formData);
       if (validationErrors.length > 0) {
         setGlobalError(validationErrors);
@@ -162,11 +158,11 @@ export function DynamicUi(
     }, 100);
   }
 
-  function setGlobalError(errorMessage: string[]) {
-    const errorEle = document.getElementById(props.task.flowNodeInstanceId);
-    if (errorEle) {
-      errorEle.style.display = 'block';
-      errorEle.innerText = errorMessage.join('\n');
+  function setGlobalError(errorMessage: Array<string>) {
+    const errorElement = document.getElementById(props.task.flowNodeInstanceId);
+    if (errorElement) {
+      errorElement.style.display = 'block';
+      errorElement.innerText = errorMessage.join('\n');
     }
   }
 
@@ -275,14 +271,12 @@ export function DynamicUi(
 
               const ref = formFieldRefs.get(field.id)?.ref;
 
-              let combinedValidationFn: ((id: string, type: string, value: any) => Promise<string[]>) | undefined =
+              let combinedValidationFn: CombinedChangeValidationFn =
                 undefined;
 
-              if (props.onChangeValidation) {
-                const validationFns = Array.isArray(props.onChangeValidation)
-                  ? props.onChangeValidation
-                  : [props.onChangeValidation];
-                combinedValidationFn = combineChangeValidationFns(...validationFns);
+              if (props.onFocusChangeValidation) {
+                const validationFns = [props.onFocusChangeValidation].flat();
+                combinedValidationFn = combineChangeValidationFns(validationFns);
               }
 
               return (
@@ -307,7 +301,7 @@ export function DynamicUi(
           <h1
             id={props.task.flowNodeInstanceId}
             className="app-sdk-w-fit app-sdk-mx-auto app-sdk-text-red-600 app-sdk-hidden app-sdk-mb-2"
-          ></h1>
+            />
           <FormButtons confirmFormField={confirmFormField} />
         </footer>
       </form>
