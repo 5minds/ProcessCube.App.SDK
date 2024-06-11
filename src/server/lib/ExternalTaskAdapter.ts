@@ -93,7 +93,6 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
   const workerProcess = fork(etwProcessPath, {
     env: {
        ...process.env,
-      NODE_ENV: process.env.NODE_ENV,
     },
   });
   etwProcesses[workerDirectory] = workerProcess;
