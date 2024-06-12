@@ -35,6 +35,15 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
       await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
     }
 
-    return nextConfig;
+    return {
+      ...nextConfig,
+      experimental: {
+        ...nextConfig.experimental,
+        serverComponentsExternalPackages: [
+          ...(nextConfig.experimental?.serverComponentsExternalPackages || []),
+          'esbuild',
+        ],
+      },
+    };
   };
 }
