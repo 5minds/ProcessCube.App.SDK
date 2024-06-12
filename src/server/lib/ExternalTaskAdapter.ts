@@ -91,7 +91,10 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
 
   const etwProcessPath = join(__dirname, 'lib/ExternalTaskWorkerProcess.cjs');
   const workerProcess = fork(etwProcessPath, {
-    env: { NODE_ENV: process.env.NODE_ENV, PROCESSCUBE_ENGINE_URL: EngineURL },
+    env: {
+       ...process.env,
+      PROCESSCUBE_ENGINE_URL: EngineURL
+    },
   });
   etwProcesses[workerDirectory] = workerProcess;
   workerProcess.once('disconnect', () => {
