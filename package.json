@@ -24,9 +24,9 @@
       "default": "./build/client/index.mjs"
     },
     "./client/components/*.css": {
-      "import": "./build/client/components/*.css",
-      "require": "./build/client/components/*.css",
-      "default": "./build/client/components/*.css"
+      "import": "./build/client/components/**/*.css",
+      "require": "./build/client/components/**/*.css",
+      "default": "./build/client/components/**/*.css"
     }
   },
   "scripts": {
