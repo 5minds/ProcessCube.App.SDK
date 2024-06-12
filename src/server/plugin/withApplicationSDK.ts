@@ -35,7 +35,7 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
       await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
     }
 
-    const enhancedNextConfig = {
+    return {
       ...nextConfig,
       experimental: {
         ...nextConfig.experimental,
@@ -45,7 +45,5 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
         ],
       },
     };
-
-    return enhancedNextConfig;
   };
 }
