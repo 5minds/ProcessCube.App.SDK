@@ -77,12 +77,12 @@ export async function retryProcessInstance(
   flowNodeInstanceId?: string,
   newStartToken?: any,
 ) {
-  const identity = await getIdentity();
+  // const identity = await getIdentity();
 
   await Client.processInstances.retryProcessInstance(processInstanceId, {
     flowNodeInstanceId: flowNodeInstanceId,
     newStartToken: newStartToken,
-    identity: identity,
+    // identity: identity,
   });
 }
 
@@ -110,13 +110,6 @@ export async function getActiveProcessInstances(query?: {
   return result;
 }
 
-async function tryGetIdentity(): Promise<DataModels.Iam.Identity | undefined> {
-  try {
-    return await getIdentity();
-  } catch {
-    return undefined;
-  }
-}
 /**
  * This function will wait until a ProcessInstance is finished, terminated or errored.
  * If the ProcessInstance is already finished, it will instantly be returned.
