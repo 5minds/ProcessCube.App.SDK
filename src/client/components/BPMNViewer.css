@@ -53,13 +53,10 @@
     }
   }
 
-  .djs-cursor-grab {
-    .app-sdk-bpmn-viewer {
-      svg .djs-element .djs-hit-stroke,
-      .djs-element .djs-hit-click-stroke,
-      .djs-element .djs-hit-all {
-        cursor: grab;
-      }
+  .djs-cursor-grab .app-sdk-bpmn-viewer .djs-element {
+    .djs-hit,
+    .djs-hit-all {
+      cursor: grab;
     }
   }
 }

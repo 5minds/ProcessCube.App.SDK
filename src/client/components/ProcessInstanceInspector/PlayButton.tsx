@@ -9,7 +9,7 @@ export function PlayButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
     >
       <svg
-        className="!app-sdk-fill-none !app-sdk-stroke-white !app-sdk-stroke-[1.5px]"
+        className="!app-sdk-fill-none !app-sdk-stroke-white !app-sdk-stroke-[2px]"
         width="14px"
         height="14px"
         viewBox="0 0 24 24"

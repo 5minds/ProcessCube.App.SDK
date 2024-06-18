@@ -173,7 +173,9 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
 const DocumentationOverlayIcon = ({ showBackground }: { showBackground?: boolean }) => (
   <div title="This element has documentation">
     <svg
-      className={`${showBackground ? 'app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-p-[2px] app-sdk-rounded' : ''}`}
+      className={`${
+        showBackground ? 'app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-p-[2px] app-sdk-rounded' : ''
+      }`}
       xmlns="http://www.w3.org/2000/svg"
       height="16"
       viewBox="0 0 448 512"

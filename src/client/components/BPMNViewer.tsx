@@ -39,23 +39,19 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
     }),
   );
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        getOverlays() {
-          return viewerRef.current.get<Overlays>('overlays');
-        },
-        getElementRegistry() {
-          return viewerRef.current.get<ElementRegistry>('elementRegistry');
-        },
-        addMarker(elementId: string, className: string) {
-          canvas?.addMarker(elementId, className);
-        },
-      };
-    },
-    [canvas],
-  );
+  useImperativeHandle(ref, () => {
+    return {
+      getOverlays() {
+        return viewerRef.current.get<Overlays>('overlays');
+      },
+      getElementRegistry() {
+        return viewerRef.current.get<ElementRegistry>('elementRegistry');
+      },
+      addMarker(elementId: string, className: string) {
+        canvas?.addMarker(elementId, className);
+      },
+    };
+  }, [canvas]);
 
   useEffect(() => {
     if (!containerRef.current) {

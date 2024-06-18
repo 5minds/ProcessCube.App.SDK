@@ -84,7 +84,7 @@
     }
   }
 
-  .connection-done .djs-visual > * {
+  .asdk-pii-sequence-flow-finished .djs-visual > * {
     stroke: var(--asdk-pii-state-finished-color, theme(colors.green.400)) !important;
   }
 }
