@@ -278,8 +278,11 @@ export async function reserveUserTask(
   await Client.userTasks.reserveUserTaskInstance(identity, flowNodeInstanceId, actualOwnerId || identity.userId);
 }
 
-export async function releaseReservedUserTask(identity: DataModels.Iam.Identity, flowNodeInstanceId: string): Promise<void> {
-    await Client.userTasks.cancelUserTaskInstanceReservation(identity, flowNodeInstanceId);
+export async function cancelReservedUserTask(
+  identity: DataModels.Iam.Identity,
+  flowNodeInstanceId: string,
+): Promise<void> {
+  await Client.userTasks.cancelUserTaskInstanceReservation(identity, flowNodeInstanceId);
 }
 /**
  *
