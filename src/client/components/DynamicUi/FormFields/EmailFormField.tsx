@@ -8,7 +8,7 @@ export function EmailFormField(props: DynamicUiComponentProps<string | null>, re
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  const defaultValue = props.state || formField.defaultValue?.toString();
+  const defaultValue = props.state || (formField.defaultValue?.toString() ?? '');
 
   return (
     <div>
