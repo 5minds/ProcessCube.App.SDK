@@ -16,7 +16,7 @@ export function ButtonFormField(props: DynamicUiComponentProps<string | null>, r
     case 'submit':
       buttonInput = (
         <input
-          className="app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
+          className="app-sdk-cursor-pointer disabled:app-sdk-cursor-default app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--asdk-dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
           type="submit"
           value={defaultValue}
           id={formField.id}
@@ -29,7 +29,7 @@ export function ButtonFormField(props: DynamicUiComponentProps<string | null>, r
     case 'reset':
       buttonInput = (
         <input
-          className="app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
+          className="app-sdk-cursor-pointer disabled:app-sdk-cursor-default app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--asdk-dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
           type="reset"
           value={defaultValue}
           id={formField.id}
@@ -42,7 +42,7 @@ export function ButtonFormField(props: DynamicUiComponentProps<string | null>, r
     default:
       buttonInput = (
         <input
-          className="app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
+          className="app-sdk-cursor-pointer disabled:app-sdk-cursor-default app-sdk-inline-flex app-sdk-w-full app-sdk-justify-center app-sdk-rounded-md app-sdk-border app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-color)] app-sdk-px-3 app-sdk-py-2 app-sdk-text-base app-sdk-font-medium app-sdk-leading-4 app-sdk-text-[color:var(--asdk-dui-footer-continue-button-text-color)] app-sdk-shadow-sm hover:app-sdk-bg-[color:var(--asdk-dui-footer-continue-button-background-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-dui-footer-continue-button-focus-outline-color)] focus:app-sdk-ring-offset-2 sm:app-sdk-ml-2 sm:app-sdk-w-auto sm:app-sdk-text-sm "
           type="button"
           value={defaultValue}
           id={formField.id}
