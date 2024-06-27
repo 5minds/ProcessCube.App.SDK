@@ -5,6 +5,7 @@ import { BooleanFormField } from './BooleanFormField';
 import { ConfirmFormField } from './ConfirmFormField';
 import { DateFormField } from './DateFormField';
 import { DecimalFormField } from './DecimalFormField';
+import { EmailFormField } from './EmailFormField';
 import { EnumFormField } from './EnumFormField';
 import { HeaderFormField } from './HeaderFormField';
 import { IntegerFormField } from './IntegerFormField';
@@ -35,6 +36,7 @@ export type DynamicUiFormFieldComponentMap = CommonFormFieldTypeComponentMap | G
 export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   boolean: BooleanFormField,
   date: DateFormField,
+  email: EmailFormField,
   enum: EnumFormField,
   // longs are full numbers
   long: IntegerFormField,
@@ -48,6 +50,7 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
 export { BooleanFormField } from './BooleanFormField';
 export { DateFormField } from './DateFormField';
 export { DecimalFormField } from './DecimalFormField';
+export { EmailFormField } from './EmailFormField';
 export { EnumFormField } from './EnumFormField';
 export { IntegerFormField } from './IntegerFormField';
 export { StringFormField } from './StringFormField';
