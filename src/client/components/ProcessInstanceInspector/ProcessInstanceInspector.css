@@ -1,3 +1,4 @@
+@import './CommandPalette.css';
 @import '../DiagramDocumentationInspector.css';
 @import '../../root.css';
 @layer base {

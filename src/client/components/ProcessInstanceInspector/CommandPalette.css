@@ -1,0 +1,13 @@
+@import '../../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-cmdp-focus-color: var(--app-sdk-command-palette-focus-color, theme('colors.orange.500'));
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-cmdp-focus-color: var(--app-sdk-command-palette-focus-color, theme('colors.orange.500'));
+  }
+}

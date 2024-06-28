@@ -1,12 +1,13 @@
 import React from 'react';
 
 import { BottomButton } from './BottomButton';
+import { handlePlay } from './actions';
 
-export function PlayButton({ onClick }: { onClick: () => void }) {
+export function PlayButton({ flowNodeInstanceId, flowNodeType }: { flowNodeInstanceId: string; flowNodeType: string }) {
   return (
     <BottomButton
       className="asdk-pii-play-button app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"
-      onClick={onClick}
+      onClick={() => handlePlay(flowNodeInstanceId, flowNodeType)}
     >
       <svg
         className="!app-sdk-fill-none !app-sdk-stroke-white !app-sdk-stroke-[2px]"

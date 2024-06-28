@@ -2,7 +2,7 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -16,11 +16,13 @@ import {
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { BottomButton } from './BottomButton';
 import { BottomButtonContainer } from './BottomButtonContainer';
+import { CommandPalette } from './CommandPalette';
 import { GoToButton } from './GoToButton';
 import { PlayButton } from './PlayButton';
 import { RetryButton } from './RetryButton';
+import { getFlowNodeInstances, getProcessInstance, getTriggeredFlowNodeInstances } from './actions';
 
-const byNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
+const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
 enum FlowNodeType {
   boundaryEvent = 'bpmn:BoundaryEvent',
@@ -45,24 +47,30 @@ const RECEIVER_TYPES = [
   FlowNodeType.receiveTask,
 ];
 
-type ProcessInstanceInspectorProps = {
-  processInstance: ProcessInstance & { xml: string };
-  flowNodeInstances: FlowNodeInstance[];
-  triggeredFlowNodeInstances: FlowNodeInstance[];
-  handlePlay: (flowNodeInstanceId: string, flowNodeType: string) => void;
-  handleGoTo: (flowNodeInstance: FlowNodeInstance) => void;
-  handleRetry: (flowNodeInstanceId?: string) => void;
-};
-
-export function ProcessInstanceInspector({
-  processInstance,
-  flowNodeInstances,
-  triggeredFlowNodeInstances,
-  handlePlay,
-  handleGoTo,
-  handleRetry,
-}: ProcessInstanceInspectorProps) {
+export function ProcessInstanceInspector({ processInstanceId }: { processInstanceId: string }) {
+  const [processInstance, setProcessInstance] = useState<ProcessInstance>();
+  const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
+  const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
+  const [targetInstances, setTargetInstances] = useState<FlowNodeInstance[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
+
+  useEffect(() => {
+    init();
+  }, [processInstanceId]);
+
+  const init = useCallback(async () => {
+    const processInstancePromise = getProcessInstance(processInstanceId);
+    const flowNodeInstancesPromise = getFlowNodeInstances(processInstanceId);
+    const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
+
+    const triggeredFlowNodeInstances = await getTriggeredFlowNodeInstances(
+      flowNodeInstances.map((fni) => fni.flowNodeInstanceId),
+    );
+
+    setProcessInstance(processInstance);
+    setFlowNodeInstances(flowNodeInstances);
+    setTriggeredFlowNodeInstances(triggeredFlowNodeInstances);
+  }, [processInstanceId]);
 
   const sequenceFlowFinished = useCallback(
     (element: ElementLike) => {
@@ -78,6 +86,10 @@ export function ProcessInstanceInspector({
   );
 
   useEffect(() => {
+    if (!processInstance?.xml) {
+      return;
+    }
+
     const bpmnViewer = diagramDocumentationInspectorRef.current?.bpmnViewerRef;
     const overlays = bpmnViewer?.getOverlays();
     const elementRegistry = bpmnViewer?.getElementRegistry();
@@ -99,67 +111,104 @@ export function ProcessInstanceInspector({
           return;
         }
 
-        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(byNewest)!;
-        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${matchingInstances[0].state}`);
+        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(sortByNewest)!;
+        const newestInstance = matchingInstances[0];
+
+        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${newestInstance.state}`);
 
         const showExecutionCount = matchingInstances.length > 1;
         const showPlayButton =
-          PLAYABLE_TYPES.includes(element.type) && matchingInstances[0].state === FlowNodeInstanceState.suspended;
+          PLAYABLE_TYPES.includes(element.type) && newestInstance.state === FlowNodeInstanceState.suspended;
+
+        const showRetryButton =
+          processInstance?.state === ProcessInstanceState.error ||
+          processInstance?.state === ProcessInstanceState.terminated;
 
         let showGoToButton = false;
         let targetInstances: FlowNodeInstance[] = [];
         if (RECEIVER_TYPES.includes(element.type)) {
-          const triggeredByFlowNodeInstance = matchingInstances[0].triggeredByFlowNodeInstance;
+          const triggeredByFlowNodeInstance = newestInstance.triggeredByFlowNodeInstance;
           showGoToButton = triggeredByFlowNodeInstance !== undefined;
           targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
         } else if (SENDER_TYPES.includes(element.type)) {
           const matchingTriggeredInstances = triggeredFlowNodeInstances
-            .filter(
-              (fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === matchingInstances[0].flowNodeInstanceId,
-            )
-            .sort(byNewest);
+            .filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === newestInstance.flowNodeInstanceId)
+            .sort(sortByNewest);
 
           showGoToButton = matchingTriggeredInstances.length > 0;
           targetInstances = matchingTriggeredInstances;
         }
 
-        const showRetryButton =
-          processInstance.state === ProcessInstanceState.error ||
-          processInstance.state === ProcessInstanceState.terminated;
-
-        if (!showExecutionCount && !showPlayButton && !showGoToButton && !showRetryButton) {
+        if (!showExecutionCount && !showPlayButton && !showRetryButton && !showGoToButton) {
           return;
         }
 
+        const isTooNarrowForTwoButtons = element.width < 52;
         const overlayId = overlays.add(element.id, {
           position: {
             bottom: -7,
-            left: element.width < 52 ? -element.width / 2 : 0,
+            left: isTooNarrowForTwoButtons ? -element.width / 2 : 0,
           },
           html: '<div></div>',
         } as OverlayAttrs);
 
         const overlay = overlays.get(overlayId) as Overlay & { htmlContainer: HTMLElement };
-        const htmlContainer = overlay.htmlContainer as HTMLElement;
-        const root = createRoot(htmlContainer);
+        const root = createRoot(overlay.htmlContainer);
 
         root.render(
-          <BottomButtonContainer width={element.width < 52 ? element.width * 2 : element.width}>
+          <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
             {showExecutionCount && <BottomButton>{matchingInstances.length}</BottomButton>}
-            {showGoToButton && <GoToButton onClick={() => handleGoTo(targetInstances[0])} />}
-            {showPlayButton && (
-              <PlayButton
-                onClick={() => handlePlay(matchingInstances[0].flowNodeInstanceId, matchingInstances[0].flowNodeType)}
+            {showGoToButton && (
+              <GoToButton
+                onClick={() => {
+                  if (targetInstances.length > 1) {
+                    setTargetInstances(targetInstances);
+                    return;
+                  }
+
+                  window.location.href = `${targetInstances[0].processInstanceId}?selected=${targetInstances[0].flowNodeId}`;
+                }}
               />
             )}
-            {showRetryButton && <RetryButton onClick={() => handleRetry(matchingInstances[0].flowNodeInstanceId)} />}
+            {showPlayButton && (
+              <PlayButton flowNodeInstanceId={newestInstance.flowNodeInstanceId} flowNodeType={element.type} />
+            )}
+            {showRetryButton && (
+              <RetryButton
+                processInstanceId={newestInstance.processInstanceId}
+                flowNodeInstanceId={newestInstance.flowNodeInstanceId}
+              />
+            )}
           </BottomButtonContainer>,
         );
       });
     });
-  }, [diagramDocumentationInspectorRef.current, flowNodeInstances]);
+  }, [diagramDocumentationInspectorRef.current, processInstance, flowNodeInstances, triggeredFlowNodeInstances]);
 
-  return <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />;
+  if (!processInstance?.xml) {
+    return (
+      <div className="app-sdk-absolute app-sdk-w-screen app-sdk-h-screen app-sdk-flex">
+        <div className="app-sdk-m-auto">Fetching diagram...</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <CommandPalette
+        isOpen={targetInstances.length > 0}
+        placeholder="Select target to go to:"
+        entries={targetInstances.map((fni) => ({
+          id: fni.flowNodeInstanceId,
+          name: `${fni.startedAt?.toLocaleString()} - ${fni.flowNodeId}`,
+          ...fni,
+        }))}
+        onConfirm={(entry) => (window.location.href = `${entry.processInstanceId}?selected=${entry.flowNodeId}`)}
+        onClose={() => setTargetInstances([])}
+      />
+      <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
+    </>
+  );
 }
 
 export const ProcessInstanceInspectorNextJS = dynamic(() => Promise.resolve(ProcessInstanceInspector), {
