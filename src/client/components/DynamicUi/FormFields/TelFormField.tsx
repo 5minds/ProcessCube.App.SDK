@@ -7,6 +7,12 @@ import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 export function TelFormField({ formField, state }: DynamicUiComponentProps<string>, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
+  if (!isValidTel(formField.defaultValue)) {
+    console.warn(
+      `[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for telefon field "${formField.id}"`,
+    );
+  }
+
   const hintId = `${formField.id}-hint`;
 
   return (
@@ -22,7 +28,7 @@ export function TelFormField({ formField, state }: DynamicUiComponentProps<strin
           id={formField.id}
           name={formField.id}
           type="tel"
-          value={state || ''}
+          defaultValue={state || (formField.defaultValue?.toString() ?? '')}
           placeholder={parsedCustomFormConfig?.placeholder || 'Enter phone number...'}
           aria-describedby={parsedCustomFormConfig?.hint ? hintId : undefined}
           data-form-field-type="tel"
@@ -38,4 +44,8 @@ export function TelFormField({ formField, state }: DynamicUiComponentProps<strin
       )}
     </div>
   );
+}
+
+function isValidTel(value: any) {
+  return /^[0-9+]*$/.test(value);
 }
