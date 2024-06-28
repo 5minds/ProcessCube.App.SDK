@@ -1,18 +1,25 @@
+import { Range } from 'postcss/lib/node';
+
 import { DataModels } from '@5minds/processcube_engine_sdk';
 
 import { DynamicUiFormFieldComponent } from '../DynamicUi';
 import { BooleanFormField } from './BooleanFormField';
+import { ColorFormField } from './ColorFormField';
 import { ConfirmFormField } from './ConfirmFormField';
 import { DateFormField } from './DateFormField';
 import { DecimalFormField } from './DecimalFormField';
 import { EmailFormField } from './EmailFormField';
 import { EnumFormField } from './EnumFormField';
+import { FileFormField } from './FileFormField';
 import { HeaderFormField } from './HeaderFormField';
 import { IntegerFormField } from './IntegerFormField';
 import { LocalDatetimeFormField } from './LocalDatetimeFormField';
 import { MonthFormField } from './MonthFormField';
 import { ParagraphFormField } from './ParagraphFormField';
+import { PasswordFormField } from './PasswordFormField';
+import { RangeFormField } from './RangeFormField';
 import { StringFormField } from './StringFormField';
+import { TelFormField } from './TelFormField';
 import { TimeFormField } from './TimeFormField';
 import { WeekFormField } from './WeekFormField';
 
@@ -39,9 +46,11 @@ export type DynamicUiFormFieldComponentMap = CommonFormFieldTypeComponentMap | G
 
 export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   boolean: BooleanFormField,
+  color: ColorFormField,
   date: DateFormField,
   email: EmailFormField,
   enum: EnumFormField,
+  file: FileFormField,
   // longs are full numbers
   long: IntegerFormField,
   datetime: LocalDatetimeFormField,
@@ -50,22 +59,30 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   number: DecimalFormField,
   string: StringFormField,
   paragraph: ParagraphFormField,
+  password: PasswordFormField,
+  range: RangeFormField,
   header: HeaderFormField,
   confirm: ConfirmFormField,
+  tel: TelFormField,
   time: TimeFormField,
   week: WeekFormField,
 };
 export { BooleanFormField } from './BooleanFormField';
+export { ColorFormField } from './ColorFormField';
 export { DateFormField } from './DateFormField';
 export { DecimalFormField } from './DecimalFormField';
 export { EmailFormField } from './EmailFormField';
 export { EnumFormField } from './EnumFormField';
+export { FileFormField } from './FileFormField';
 export { IntegerFormField } from './IntegerFormField';
 export { LocalDatetimeFormField } from './LocalDatetimeFormField';
 export { MonthFormField } from './MonthFormField';
 export { StringFormField } from './StringFormField';
 export { ParagraphFormField } from './ParagraphFormField';
+export { PasswordFormField } from './PasswordFormField';
+export { RangeFormField } from './RangeFormField';
 export { HeaderFormField } from './HeaderFormField';
 export { ConfirmFormField } from './ConfirmFormField';
+export { TelFormField } from './TelFormField';
 export { TimeFormField } from './TimeFormField';
 export { WeekFormField } from './WeekFormField';
