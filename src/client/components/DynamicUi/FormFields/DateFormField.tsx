@@ -7,13 +7,15 @@ export function DateFormField(props: DynamicUiComponentProps<string | null>, ref
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
-
+  console.log('parsedCustomFormConfig', parsedCustomFormConfig);
   if (!isValidDate(formField.defaultValue)) {
     console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for date field "${formField.id}"`);
   }
 
   const defaultValue = props.state || formField.defaultValue?.toString();
+  console.log('defaultValue', defaultValue);
   const inputType = parsedCustomFormConfig?.inputType || 'date';
+  console.log('inputType', inputType);
 
   return (
     <div>
