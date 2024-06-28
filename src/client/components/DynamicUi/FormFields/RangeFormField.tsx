@@ -19,7 +19,7 @@ export function RangeFormField(
   const rangeInput = (
     <input
       className={classNames(
-        'app-sdk-form-input app-sdk-block app-sdk-w-full app-sdk-appearance-none app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)]',
+        'app-sdk-form-input app-sdk-block app-sdk-w-full app-sdk-appearance-auto app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)]',
       )}
       id={formField.id}
       name={formField.id}
