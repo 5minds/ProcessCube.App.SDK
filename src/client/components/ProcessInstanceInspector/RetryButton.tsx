@@ -8,11 +8,14 @@ type RetryButtonProps = {
 };
 
 export function RetryButton({ processInstanceId, flowNodeInstanceId }: RetryButtonProps) {
-  const serverActions = import('../../../server/actions');
   return (
     <BottomButton
       className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"
-      onClick={() => serverActions.then(({ handleRetry }) => handleRetry(processInstanceId, flowNodeInstanceId))}
+      onClick={() =>
+        import('../../../server/actions').then(({ retryProcess }) =>
+          retryProcess(processInstanceId, flowNodeInstanceId),
+        )
+      }
     >
       <svg
         className="!app-sdk-fill-white !app-sdk-stroke-white"

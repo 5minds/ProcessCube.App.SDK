@@ -13,7 +13,6 @@ import {
   ProcessInstanceState,
 } from '@5minds/processcube_engine_sdk';
 
-// import { getFlowNodeInstances, getProcessInstance, getTriggeredFlowNodeInstances } from '../../../server';
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { BottomButton } from './BottomButton';
 import { BottomButtonContainer } from './BottomButtonContainer';
@@ -48,18 +47,14 @@ const RECEIVER_TYPES = [
 ];
 
 export function ProcessInstanceInspector({ processInstanceId }: { processInstanceId: string }) {
-  const serverActions = import('../../../server/actions');
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [targetInstances, setTargetInstances] = useState<FlowNodeInstance[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
-  useEffect(() => {
-    init();
-  }, [processInstanceId]);
-
   const init = useCallback(async () => {
+    const serverActions = import('../../../server/actions');
     const processInstancePromise = serverActions.then((actions) => actions.getProcessInstance(processInstanceId));
     const flowNodeInstancesPromise = serverActions.then((actions) => actions.getFlowNodeInstances(processInstanceId));
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
@@ -85,6 +80,10 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
     },
     [flowNodeInstances],
   );
+
+  useEffect(() => {
+    init();
+  }, [processInstanceId]);
 
   useEffect(() => {
     if (!processInstance?.xml) {
