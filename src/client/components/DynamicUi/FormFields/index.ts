@@ -10,7 +10,7 @@ import { EnumFormField } from './EnumFormField';
 import { HeaderFormField } from './HeaderFormField';
 import { IntegerFormField } from './IntegerFormField';
 import { LocalDatetimeFormField } from './LocalDatetimeFormField';
-// import { MonthFormField } from './MonthFormField';
+import { MonthFormField } from './MonthFormField';
 import { ParagraphFormField } from './ParagraphFormField';
 import { StringFormField } from './StringFormField';
 import { TimeFormField } from './TimeFormField';
@@ -45,7 +45,7 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   // longs are full numbers
   long: IntegerFormField,
   datetime: LocalDatetimeFormField,
-  // month: MonthFormField,
+  month: MonthFormField,
   // numbers can be decimals
   number: DecimalFormField,
   string: StringFormField,
@@ -62,7 +62,7 @@ export { EmailFormField } from './EmailFormField';
 export { EnumFormField } from './EnumFormField';
 export { IntegerFormField } from './IntegerFormField';
 export { LocalDatetimeFormField } from './LocalDatetimeFormField';
-// export { MonthFormField } from './MonthFormField';
+export { MonthFormField } from './MonthFormField';
 export { StringFormField } from './StringFormField';
 export { ParagraphFormField } from './ParagraphFormField';
 export { HeaderFormField } from './HeaderFormField';
