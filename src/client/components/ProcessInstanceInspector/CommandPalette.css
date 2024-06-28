@@ -2,12 +2,18 @@
 @layer base {
   .dark,
   .dark * {
+    --asdk-cmdp-background-color: var(--app-sdk-command-palette-background-color, theme('colors.app-sdk-gray.700'));
+    --asdk-cmdp-input-color: var(--app-sdk-command-palette-input-color, theme('colors.app-sdk-gray.600'));
     --asdk-cmdp-focus-color: var(--app-sdk-command-palette-focus-color, theme('colors.orange.500'));
+    --asdk-cmdp-text-color: var(--app-sdk-command-palette-text-color, theme('colors.white'));
   }
 
   *,
   ::before,
   ::after {
+    --asdk-cmdp-background-color: var(--app-sdk-command-palette-background-color, theme('colors.white'));
+    --asdk-cmdp-input-color: var(--app-sdk-command-palette-input-color, theme('colors.gray.100'));
     --asdk-cmdp-focus-color: var(--app-sdk-command-palette-focus-color, theme('colors.orange.500'));
+    --asdk-cmdp-text-color: var(--app-sdk-command-palette-text-color, theme('colors.gray.800'));
   }
 }
