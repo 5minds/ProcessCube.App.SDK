@@ -12,6 +12,7 @@ import { EmailFormField } from './EmailFormField';
 import { EnumFormField } from './EnumFormField';
 import { FileFormField } from './FileFormField';
 import { HeaderFormField } from './HeaderFormField';
+import { HiddenFormField } from './HiddenFormField';
 import { IntegerFormField } from './IntegerFormField';
 import { LocalDatetimeFormField } from './LocalDatetimeFormField';
 import { MonthFormField } from './MonthFormField';
@@ -21,6 +22,7 @@ import { RangeFormField } from './RangeFormField';
 import { StringFormField } from './StringFormField';
 import { TelFormField } from './TelFormField';
 import { TimeFormField } from './TimeFormField';
+import { UrlFormField } from './UrlFormField';
 import { WeekFormField } from './WeekFormField';
 
 enum MissingFormFieldType {
@@ -51,6 +53,7 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   email: EmailFormField,
   enum: EnumFormField,
   file: FileFormField,
+  hidden: HiddenFormField,
   // longs are full numbers
   long: IntegerFormField,
   datetime: LocalDatetimeFormField,
@@ -65,6 +68,7 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   confirm: ConfirmFormField,
   tel: TelFormField,
   time: TimeFormField,
+  url: UrlFormField,
   week: WeekFormField,
 };
 export { BooleanFormField } from './BooleanFormField';
@@ -73,6 +77,7 @@ export { DateFormField } from './DateFormField';
 export { DecimalFormField } from './DecimalFormField';
 export { EmailFormField } from './EmailFormField';
 export { EnumFormField } from './EnumFormField';
+export { HiddenFormField } from './HiddenFormField';
 export { FileFormField } from './FileFormField';
 export { IntegerFormField } from './IntegerFormField';
 export { LocalDatetimeFormField } from './LocalDatetimeFormField';
@@ -85,4 +90,5 @@ export { HeaderFormField } from './HeaderFormField';
 export { ConfirmFormField } from './ConfirmFormField';
 export { TelFormField } from './TelFormField';
 export { TimeFormField } from './TimeFormField';
+export { UrlFormField } from './UrlFormField';
 export { WeekFormField } from './WeekFormField';
