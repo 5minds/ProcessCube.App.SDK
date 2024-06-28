@@ -8,7 +8,7 @@ import {
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
   retryProcessInstance,
-} from '../../../server';
+} from '.';
 
 export const handlePlay = async (flowNodeInstanceId: string, flowNodeType: string) => {
   if (flowNodeType === 'bpmn:UserTask') {

@@ -1,13 +1,18 @@
 import React from 'react';
 
 import { BottomButton } from './BottomButton';
-import { handlePlay } from './actions';
 
-export function PlayButton({ flowNodeInstanceId, flowNodeType }: { flowNodeInstanceId: string; flowNodeType: string }) {
+type PlayButtonProps = {
+  flowNodeInstanceId: string;
+  flowNodeType: string;
+};
+
+export function PlayButton({ flowNodeInstanceId, flowNodeType }: PlayButtonProps) {
+  const serverActions = import('../../../server/actions');
   return (
     <BottomButton
-      className="asdk-pii-play-button app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"
-      onClick={() => handlePlay(flowNodeInstanceId, flowNodeType)}
+      className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800 asdk-pii-play-button"
+      onClick={() => serverActions.then(({ handlePlay }) => handlePlay(flowNodeInstanceId, flowNodeType))}
     >
       <svg
         className="!app-sdk-fill-none !app-sdk-stroke-white !app-sdk-stroke-[2px]"

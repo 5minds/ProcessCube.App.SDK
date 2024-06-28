@@ -1,19 +1,18 @@
 import React from 'react';
 
 import { BottomButton } from './BottomButton';
-import { handleRetry } from './actions';
 
-export function RetryButton({
-  processInstanceId,
-  flowNodeInstanceId,
-}: {
+type RetryButtonProps = {
   processInstanceId: string;
   flowNodeInstanceId?: string;
-}) {
+};
+
+export function RetryButton({ processInstanceId, flowNodeInstanceId }: RetryButtonProps) {
+  const serverActions = import('../../../server/actions');
   return (
     <BottomButton
       className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"
-      onClick={() => handleRetry(processInstanceId, flowNodeInstanceId)}
+      onClick={() => serverActions.then(({ handleRetry }) => handleRetry(processInstanceId, flowNodeInstanceId))}
     >
       <svg
         className="!app-sdk-fill-white !app-sdk-stroke-white"

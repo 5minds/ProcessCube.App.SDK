@@ -83,6 +83,7 @@ const esmoduleBuildPromises = [
     outdir: 'build/client',
     plugins: [getMarkCommonAsExternal(commonOutputFile)],
     packages: 'external',
+    splitting: true,
   }),
 ];
 

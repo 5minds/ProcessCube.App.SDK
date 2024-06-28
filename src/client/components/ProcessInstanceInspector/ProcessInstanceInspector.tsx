@@ -13,6 +13,7 @@ import {
   ProcessInstanceState,
 } from '@5minds/processcube_engine_sdk';
 
+// import { getFlowNodeInstances, getProcessInstance, getTriggeredFlowNodeInstances } from '../../../server';
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { BottomButton } from './BottomButton';
 import { BottomButtonContainer } from './BottomButtonContainer';
@@ -20,7 +21,6 @@ import { CommandPalette } from './CommandPalette';
 import { GoToButton } from './GoToButton';
 import { PlayButton } from './PlayButton';
 import { RetryButton } from './RetryButton';
-import { getFlowNodeInstances, getProcessInstance, getTriggeredFlowNodeInstances } from './actions';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
@@ -48,6 +48,7 @@ const RECEIVER_TYPES = [
 ];
 
 export function ProcessInstanceInspector({ processInstanceId }: { processInstanceId: string }) {
+  const serverActions = import('../../../server/actions');
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
@@ -59,12 +60,12 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
   }, [processInstanceId]);
 
   const init = useCallback(async () => {
-    const processInstancePromise = getProcessInstance(processInstanceId);
-    const flowNodeInstancesPromise = getFlowNodeInstances(processInstanceId);
+    const processInstancePromise = serverActions.then((actions) => actions.getProcessInstance(processInstanceId));
+    const flowNodeInstancesPromise = serverActions.then((actions) => actions.getFlowNodeInstances(processInstanceId));
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
 
-    const triggeredFlowNodeInstances = await getTriggeredFlowNodeInstances(
-      flowNodeInstances.map((fni) => fni.flowNodeInstanceId),
+    const triggeredFlowNodeInstances = await serverActions.then((actions) =>
+      actions.getTriggeredFlowNodeInstances(flowNodeInstances.map((fni) => fni.flowNodeInstanceId)),
     );
 
     setProcessInstance(processInstance);
