@@ -10,6 +10,7 @@ type PlayButtonProps = {
 export function PlayButton({ flowNodeInstanceId, flowNodeType }: PlayButtonProps) {
   return (
     <BottomButton
+      title="Run Task"
       className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800 asdk-pii-play-button"
       onClick={() =>
         import('../../../server/actions').then(({ finishTask }) => finishTask(flowNodeInstanceId, flowNodeType))
