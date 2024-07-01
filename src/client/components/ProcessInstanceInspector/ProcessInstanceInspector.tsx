@@ -16,7 +16,7 @@ import {
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { BottomButton } from './BottomButton';
 import { BottomButtonContainer } from './BottomButtonContainer';
-import { CommandPalette } from './CommandPalette';
+import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { GoToButton } from './GoToButton';
 import { PlayButton } from './PlayButton';
 import { RetryButton } from './RetryButton';
@@ -46,11 +46,19 @@ const RECEIVER_TYPES = [
   FlowNodeType.receiveTask,
 ];
 
+const EMPTY_COMMAND_PALETTE_PROPS: CommandPaletteProps<FlowNodeInstance & CommandPaletteEntry> = {
+  isOpen: false,
+  placeholder: '',
+  entries: [],
+  onConfirm: () => {},
+  onClose: () => {},
+};
+
 export function ProcessInstanceInspector({ processInstanceId }: { processInstanceId: string }) {
+  const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
-  const [targetInstances, setTargetInstances] = useState<FlowNodeInstance[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
   const init = useCallback(async () => {
@@ -112,13 +120,13 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
         }
 
         const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(sortByNewest)!;
-        const newestInstance = matchingInstances[0];
+        const shownInstance = matchingInstances[0];
 
-        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${newestInstance.state}`);
+        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
 
         const showExecutionCount = matchingInstances.length > 1;
         const showPlayButton =
-          PLAYABLE_TYPES.includes(element.type) && newestInstance.state === FlowNodeInstanceState.suspended;
+          PLAYABLE_TYPES.includes(element.type) && shownInstance.state === FlowNodeInstanceState.suspended;
 
         const showRetryButton =
           processInstance?.state === ProcessInstanceState.error ||
@@ -127,12 +135,12 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
         let showGoToButton = false;
         let targetInstances: FlowNodeInstance[] = [];
         if (RECEIVER_TYPES.includes(element.type)) {
-          const triggeredByFlowNodeInstance = newestInstance.triggeredByFlowNodeInstance;
+          const triggeredByFlowNodeInstance = shownInstance.triggeredByFlowNodeInstance;
           showGoToButton = triggeredByFlowNodeInstance !== undefined;
           targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
         } else if (SENDER_TYPES.includes(element.type)) {
           const matchingTriggeredInstances = triggeredFlowNodeInstances
-            .filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === newestInstance.flowNodeInstanceId)
+            .filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId)
             .sort(sortByNewest);
 
           showGoToButton = matchingTriggeredInstances.length > 0;
@@ -157,12 +165,29 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
 
         root.render(
           <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
-            {showExecutionCount && <BottomButton>{matchingInstances.length}</BottomButton>}
+            {showExecutionCount && (
+              <BottomButton className="app-sdk-select-none" title="Execution Count">
+                {matchingInstances.length}
+              </BottomButton>
+            )}
             {showGoToButton && (
               <GoToButton
                 onClick={() => {
                   if (targetInstances.length > 1) {
-                    setTargetInstances(targetInstances);
+                    setCommandPaletteProps({
+                      isOpen: true,
+                      placeholder: 'Select target to go to:',
+                      entries: targetInstances.map((fni) => ({
+                        id: fni.flowNodeInstanceId,
+                        name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}`,
+                        ...fni,
+                      })),
+                      onConfirm: (entry) => {
+                        // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
+                        window.location.href = `${entry.processInstanceId}?selected=${entry.flowNodeId}`;
+                      },
+                      onClose: () => setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS),
+                    });
                     return;
                   }
 
@@ -171,12 +196,12 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
               />
             )}
             {showPlayButton && (
-              <PlayButton flowNodeInstanceId={newestInstance.flowNodeInstanceId} flowNodeType={element.type} />
+              <PlayButton flowNodeInstanceId={shownInstance.flowNodeInstanceId} flowNodeType={element.type} />
             )}
             {showRetryButton && (
               <RetryButton
-                processInstanceId={newestInstance.processInstanceId}
-                flowNodeInstanceId={newestInstance.flowNodeInstanceId}
+                processInstanceId={shownInstance.processInstanceId}
+                flowNodeInstanceId={shownInstance.flowNodeInstanceId}
               />
             )}
           </BottomButtonContainer>,
@@ -195,17 +220,7 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
 
   return (
     <>
-      <CommandPalette
-        isOpen={targetInstances.length > 0}
-        placeholder="Select target to go to:"
-        entries={targetInstances.map((fni) => ({
-          id: fni.flowNodeInstanceId,
-          name: `${fni.startedAt?.toLocaleString()} - ${fni.flowNodeId}`,
-          ...fni,
-        }))}
-        onConfirm={(entry) => (window.location.href = `${entry.processInstanceId}?selected=${entry.flowNodeId}`)}
-        onClose={() => setTargetInstances([])}
-      />
+      <CommandPalette {...commandPaletteProps} />
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
   );

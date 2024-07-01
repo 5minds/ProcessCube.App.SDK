@@ -12,12 +12,12 @@ import React, { useState } from 'react';
 
 import { classNames } from '../../utils/classNames';
 
-type Entry = {
+export type CommandPaletteEntry = {
   id: string;
   name: string;
 };
 
-type CommandPaletteProps<T extends Entry> = {
+export type CommandPaletteProps<T extends CommandPaletteEntry> = {
   isOpen: boolean;
   placeholder: string;
   entries: T[];
@@ -25,7 +25,7 @@ type CommandPaletteProps<T extends Entry> = {
   onClose: () => void;
 };
 
-export function CommandPalette<T extends Entry>(props: CommandPaletteProps<T>) {
+export function CommandPalette<T extends CommandPaletteEntry>(props: CommandPaletteProps<T>) {
   const [query, setQuery] = useState('');
 
   const filteredEntries =
