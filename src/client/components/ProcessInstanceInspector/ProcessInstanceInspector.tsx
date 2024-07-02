@@ -169,14 +169,17 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       const overlay = overlays.get(overlayId) as Overlay & { htmlContainer: HTMLElement };
       const root = createRoot(overlay.htmlContainer);
 
+      const isFirstShown = instances.indexOf(shownInstance) === 0;
+      const shownInstanceIndex = instances.length - instances.indexOf(shownInstance);
+
       root.render(
         <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
           {showExecutionCount && (
             <BottomButton
               className="app-sdk-select-none app-sdk-pointer-events-auto"
-              title={`Flow Node was executed ${instances.length} times`}
+              title={`Flow Node was executed ${instances.length} times.${isFirstShown ? '' : ` You are viewing instance #${shownInstanceIndex}.`}`}
             >
-              {instances.length}
+              {`${isFirstShown ? '' : `${shownInstanceIndex}/`}${instances.length}`}
             </BottomButton>
           )}
           {showExecutionCount && (
@@ -184,7 +187,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               onClick={() => {
                 const entries = instances.map((fni) => ({
                   id: fni.flowNodeInstanceId,
-                  name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}${fni.flowNodeInstanceId === shownInstance.flowNodeInstanceId ? ' (selected)' : ''}`,
+                  name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.state}` : ''}${fni.flowNodeInstanceId === shownInstance.flowNodeInstanceId ? ' (selected)' : ''}`,
                   ...fni,
                 }));
 
