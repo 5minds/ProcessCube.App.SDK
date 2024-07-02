@@ -51,6 +51,10 @@
         }
       }
     }
+
+    a.bjs-powered-by {
+      z-index: 1 !important;
+    }
   }
 
   .djs-cursor-grab .app-sdk-bpmn-viewer .djs-element {
