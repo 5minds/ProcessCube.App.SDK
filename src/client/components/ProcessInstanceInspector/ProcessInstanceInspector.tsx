@@ -23,6 +23,7 @@ import { GoToButton } from './GoToButton';
 import { ListButton } from './ListButton';
 import { PlayButton } from './PlayButton';
 import { RetryButton } from './RetryButton';
+import { RetryProcessButton } from './RetryProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
@@ -73,8 +74,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
-  const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
   const [shownInstancesMap, setShownInstancesMap] = useState<Map<string, string>>(new Map());
+  const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
@@ -113,11 +114,20 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     [flowNodeInstances],
   );
 
-  const renderButtons = useCallback(
-    (element: ElementLike, instances: FlowNodeInstance[], bpmnViewer: BPMNViewerFunctions, overlays: Overlays) => {
-      const flowNodeIds = new Set(instances.map((fni) => fni.flowNodeId));
-      const shownInstance = instances.find((fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
+  const renderFlowNodeButtons = useCallback(
+    (element: ElementLike, instances: FlowNodeInstance[]) => {
+      const bpmnViewer = diagramDocumentationInspectorRef.current?.bpmnViewerRef;
+      const overlays = bpmnViewer?.getOverlays();
+      if (!bpmnViewer || !overlays) {
+        return;
+      }
 
+      const existingButtons = overlays.get({ element: element.id, type: SDK_OVERLAY_BUTTONS_TYPE });
+      if (Array.isArray(existingButtons) && existingButtons.length > 0) {
+        return;
+      }
+
+      const shownInstance = instances.find((fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
       if (!shownInstance) {
         return;
       }
@@ -152,11 +162,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         return;
       }
 
-      const existingButtons = overlays.get({ element: element.id, type: SDK_OVERLAY_BUTTONS_TYPE });
-      if (Array.isArray(existingButtons) && existingButtons.length > 0) {
-        return;
-      }
-
       const isTooNarrowForTwoButtons = element.width < 52;
       const overlayId = overlays.add(element.id, SDK_OVERLAY_BUTTONS_TYPE, {
         position: {
@@ -171,6 +176,18 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
       const isFirstShown = instances.indexOf(shownInstance) === 0;
       const shownInstanceIndex = instances.length - instances.indexOf(shownInstance);
+
+      const refresh = async () => {
+        // TODO replace timeout
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        shownInstancesMap.forEach((flowNodeInstanceId) => {
+          const fni = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
+          fni && bpmnViewer.removeMarker(fni.flowNodeId, `asdk-pii-flow-node-instance-state--${fni.state}`);
+        });
+
+        overlays.clear();
+        await init();
+      };
 
       root.render(
         <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
@@ -246,36 +263,26 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
             <PlayButton
               flowNodeInstanceId={shownInstance.flowNodeInstanceId}
               flowNodeType={element.type}
-              refresh={async () => {
-                // TODO replace timeout
-                await new Promise((resolve) => setTimeout(resolve, 500));
-                flowNodeIds.forEach((elementId) => {
-                  const flowNodeInstanceId = shownInstancesMap.get(elementId);
-                  const flowNodeInstance = flowNodeInstances.find(
-                    (fni) => fni.flowNodeInstanceId === flowNodeInstanceId,
-                  );
-                  if (!flowNodeInstance) {
-                    return;
-                  }
-
-                  bpmnViewer.removeMarker(elementId, `asdk-pii-flow-node-instance-state--${flowNodeInstance.state}`);
-                });
-
-                overlays.clear();
-                init();
-              }}
+              refresh={refresh}
             />
           )}
           {showRetryButton && (
             <RetryButton
               processInstanceId={shownInstance.processInstanceId}
               flowNodeInstanceId={shownInstance.flowNodeInstanceId}
+              refresh={refresh}
             />
           )}
         </BottomButtonContainer>,
       );
     },
-    [processInstance, flowNodeInstances, triggeredFlowNodeInstances, shownInstancesMap],
+    [
+      diagramDocumentationInspectorRef.current,
+      processInstance,
+      flowNodeInstances,
+      triggeredFlowNodeInstances,
+      shownInstancesMap,
+    ],
   );
 
   useEffect(() => {
@@ -288,10 +295,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     }
 
     const bpmnViewer = diagramDocumentationInspectorRef.current?.bpmnViewerRef;
-    const overlays = bpmnViewer?.getOverlays();
     const elementRegistry = bpmnViewer?.getElementRegistry();
-
-    if (!bpmnViewer || !overlays || !elementRegistry) {
+    if (!bpmnViewer || !elementRegistry) {
       return;
     }
 
@@ -321,7 +326,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
         }
 
-        renderButtons(element, matchingInstances, bpmnViewer, overlays);
+        renderFlowNodeButtons(element, matchingInstances);
       });
     });
   }, [
@@ -343,6 +348,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   return (
     <>
       <CommandPalette {...commandPaletteProps} />
+      {[ProcessInstanceState.error, ProcessInstanceState.terminated].includes(processInstance.state) && (
+        <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
+      )}
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
   );

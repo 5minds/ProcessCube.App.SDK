@@ -5,16 +5,17 @@ import { BottomButton } from './BottomButton';
 type RetryButtonProps = {
   processInstanceId: string;
   flowNodeInstanceId?: string;
+  refresh: () => void;
 };
 
-export function RetryButton({ processInstanceId, flowNodeInstanceId }: RetryButtonProps) {
+export function RetryButton({ processInstanceId, flowNodeInstanceId, refresh }: RetryButtonProps) {
   return (
     <BottomButton
       title="Retry Process Here"
       className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"
       onClick={() =>
         import('../../../server/actions').then(({ retryProcess }) =>
-          retryProcess(processInstanceId, flowNodeInstanceId),
+          retryProcess(processInstanceId, flowNodeInstanceId).then(refresh),
         )
       }
     >
