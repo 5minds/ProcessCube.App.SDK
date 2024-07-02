@@ -1,5 +1,6 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
+import Overlays from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -13,11 +14,13 @@ import {
   ProcessInstanceState,
 } from '@5minds/processcube_engine_sdk';
 
+import { BPMNViewerFunctions } from '../BPMNViewer';
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { BottomButton } from './BottomButton';
 import { BottomButtonContainer } from './BottomButtonContainer';
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { GoToButton } from './GoToButton';
+import { ListButton } from './ListButton';
 import { PlayButton } from './PlayButton';
 import { RetryButton } from './RetryButton';
 
@@ -54,27 +57,48 @@ const EMPTY_COMMAND_PALETTE_PROPS: CommandPaletteProps<FlowNodeInstance & Comman
   onClose: () => {},
 };
 
-export function ProcessInstanceInspector({ processInstanceId }: { processInstanceId: string }) {
+const SDK_OVERLAY_BUTTONS_TYPE = 'asdk-buttons';
+
+type ProcessInstanceInspectorProps = {
+  processInstanceId: string;
+  showExecutionCount?: boolean;
+  showListButton?: boolean;
+  showPlayButton?: boolean;
+  showRetryButton?: boolean;
+  showGoToButton?: boolean;
+};
+
+export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
+  const [shownInstancesMap, setShownInstancesMap] = useState<Map<string, string>>(new Map());
 
   const init = useCallback(async () => {
-    const serverActions = import('../../../server/actions');
-    const processInstancePromise = serverActions.then((actions) => actions.getProcessInstance(processInstanceId));
-    const flowNodeInstancesPromise = serverActions.then((actions) => actions.getFlowNodeInstances(processInstanceId));
+    const serverActions = await import('../../../server/actions');
+    const processInstancePromise = serverActions.getProcessInstance(props.processInstanceId);
+    const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(props.processInstanceId);
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
 
-    const triggeredFlowNodeInstances = await serverActions.then((actions) =>
-      actions.getTriggeredFlowNodeInstances(flowNodeInstances.map((fni) => fni.flowNodeInstanceId)),
+    const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
+      flowNodeInstances.map((fni) => fni.flowNodeInstanceId),
     );
 
     setProcessInstance(processInstance);
     setFlowNodeInstances(flowNodeInstances);
     setTriggeredFlowNodeInstances(triggeredFlowNodeInstances);
-  }, [processInstanceId]);
+
+    const shownInstancesMap = new Map<string, string>();
+    flowNodeInstances.sort(sortByNewest).forEach((fni) => {
+      if (!shownInstancesMap.has(fni.flowNodeId)) {
+        shownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId);
+      }
+    });
+
+    setShownInstancesMap(shownInstancesMap);
+  }, [props.processInstanceId]);
 
   const sequenceFlowFinished = useCallback(
     (element: ElementLike) => {
@@ -89,9 +113,171 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
     [flowNodeInstances],
   );
 
+  const renderButtons = useCallback(
+    (element: ElementLike, instances: FlowNodeInstance[], bpmnViewer: BPMNViewerFunctions, overlays: Overlays) => {
+      const flowNodeIds = new Set(instances.map((fni) => fni.flowNodeId));
+      const shownInstance = instances.find((fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
+
+      if (!shownInstance) {
+        return;
+      }
+
+      const showExecutionCount = props.showExecutionCount && instances.length > 1;
+      const showPlayButton =
+        props.showPlayButton &&
+        PLAYABLE_TYPES.includes(element.type) &&
+        shownInstance.state === FlowNodeInstanceState.suspended;
+
+      const showRetryButton =
+        props.showRetryButton &&
+        (processInstance?.state === ProcessInstanceState.error ||
+          processInstance?.state === ProcessInstanceState.terminated);
+
+      let showGoToButton = false;
+      let targetInstances: FlowNodeInstance[] = [];
+      if (props.showGoToButton && RECEIVER_TYPES.includes(element.type)) {
+        const triggeredByFlowNodeInstance = shownInstance.triggeredByFlowNodeInstance;
+        showGoToButton = triggeredByFlowNodeInstance !== undefined;
+        targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
+      } else if (props.showGoToButton && SENDER_TYPES.includes(element.type)) {
+        const matchingTriggeredInstances = triggeredFlowNodeInstances
+          .filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId)
+          .sort(sortByNewest);
+
+        showGoToButton = matchingTriggeredInstances.length > 0;
+        targetInstances = matchingTriggeredInstances;
+      }
+
+      if (!showExecutionCount && !showPlayButton && !showRetryButton && !showGoToButton) {
+        return;
+      }
+
+      const existingButtons = overlays.get({ element: element.id, type: SDK_OVERLAY_BUTTONS_TYPE });
+      if (Array.isArray(existingButtons) && existingButtons.length > 0) {
+        return;
+      }
+
+      const isTooNarrowForTwoButtons = element.width < 52;
+      const overlayId = overlays.add(element.id, SDK_OVERLAY_BUTTONS_TYPE, {
+        position: {
+          bottom: -7,
+          left: isTooNarrowForTwoButtons ? -element.width / 2 : 0,
+        },
+        html: '<div></div>',
+      } as OverlayAttrs);
+
+      const overlay = overlays.get(overlayId) as Overlay & { htmlContainer: HTMLElement };
+      const root = createRoot(overlay.htmlContainer);
+
+      root.render(
+        <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
+          {showExecutionCount && (
+            <BottomButton
+              className="app-sdk-select-none app-sdk-pointer-events-auto"
+              title={`Flow Node was executed ${instances.length} times`}
+            >
+              {instances.length}
+            </BottomButton>
+          )}
+          {showExecutionCount && (
+            <ListButton
+              onClick={() => {
+                const entries = instances.map((fni) => ({
+                  id: fni.flowNodeInstanceId,
+                  name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}${fni.flowNodeInstanceId === shownInstance.flowNodeInstanceId ? ' (selected)' : ''}`,
+                  ...fni,
+                }));
+
+                const onConfirm = async (entry: FlowNodeInstance & CommandPaletteEntry): Promise<void> => {
+                  bpmnViewer.removeMarker(
+                    shownInstance.flowNodeId,
+                    `asdk-pii-flow-node-instance-state--${shownInstance.state}`,
+                  );
+                  overlays.remove({
+                    element: element.id,
+                    type: SDK_OVERLAY_BUTTONS_TYPE,
+                  });
+
+                  setShownInstancesMap((prev) => new Map(prev).set(entry.flowNodeId, entry.flowNodeInstanceId));
+                  setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS);
+                };
+
+                setCommandPaletteProps({
+                  isOpen: true,
+                  placeholder: 'Select instance to display:',
+                  entries: entries,
+                  onConfirm: onConfirm,
+                  onClose: () => setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS),
+                });
+              }}
+            />
+          )}
+          {showGoToButton && (
+            <GoToButton
+              onClick={() => {
+                if (targetInstances.length > 1) {
+                  const entries = targetInstances.map((fni) => ({
+                    id: fni.flowNodeInstanceId,
+                    name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}`,
+                    ...fni,
+                  }));
+
+                  setCommandPaletteProps({
+                    isOpen: true,
+                    placeholder: 'Select target to go to:',
+                    entries: entries,
+                    onConfirm: (entry) => {
+                      // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
+                      window.location.href = `${entry.processInstanceId}?selected=${entry.flowNodeId}`;
+                    },
+                    onClose: () => setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS),
+                  });
+                  return;
+                }
+
+                window.location.href = `${targetInstances[0].processInstanceId}?selected=${targetInstances[0].flowNodeId}`;
+              }}
+            />
+          )}
+          {showPlayButton && (
+            <PlayButton
+              flowNodeInstanceId={shownInstance.flowNodeInstanceId}
+              flowNodeType={element.type}
+              refresh={async () => {
+                // TODO replace timeout
+                await new Promise((resolve) => setTimeout(resolve, 500));
+                flowNodeIds.forEach((elementId) => {
+                  const flowNodeInstanceId = shownInstancesMap.get(elementId);
+                  const flowNodeInstance = flowNodeInstances.find(
+                    (fni) => fni.flowNodeInstanceId === flowNodeInstanceId,
+                  );
+                  if (!flowNodeInstance) {
+                    return;
+                  }
+
+                  bpmnViewer.removeMarker(elementId, `asdk-pii-flow-node-instance-state--${flowNodeInstance.state}`);
+                });
+
+                overlays.clear();
+                init();
+              }}
+            />
+          )}
+          {showRetryButton && (
+            <RetryButton
+              processInstanceId={shownInstance.processInstanceId}
+              flowNodeInstanceId={shownInstance.flowNodeInstanceId}
+            />
+          )}
+        </BottomButtonContainer>,
+      );
+    },
+    [processInstance, flowNodeInstances, triggeredFlowNodeInstances, shownInstancesMap],
+  );
+
   useEffect(() => {
     init();
-  }, [processInstanceId]);
+  }, [props.processInstanceId]);
 
   useEffect(() => {
     if (!processInstance?.xml) {
@@ -119,96 +305,29 @@ export function ProcessInstanceInspector({ processInstanceId }: { processInstanc
           return;
         }
 
-        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(sortByNewest)!;
-        const shownInstance = matchingInstances[0];
+        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(sortByNewest);
+        const shownInstance = matchingInstances.find(
+          (fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId),
+        );
 
-        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
-
-        const showExecutionCount = matchingInstances.length > 1;
-        const showPlayButton =
-          PLAYABLE_TYPES.includes(element.type) && shownInstance.state === FlowNodeInstanceState.suspended;
-
-        const showRetryButton =
-          processInstance?.state === ProcessInstanceState.error ||
-          processInstance?.state === ProcessInstanceState.terminated;
-
-        let showGoToButton = false;
-        let targetInstances: FlowNodeInstance[] = [];
-        if (RECEIVER_TYPES.includes(element.type)) {
-          const triggeredByFlowNodeInstance = shownInstance.triggeredByFlowNodeInstance;
-          showGoToButton = triggeredByFlowNodeInstance !== undefined;
-          targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
-        } else if (SENDER_TYPES.includes(element.type)) {
-          const matchingTriggeredInstances = triggeredFlowNodeInstances
-            .filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId)
-            .sort(sortByNewest);
-
-          showGoToButton = matchingTriggeredInstances.length > 0;
-          targetInstances = matchingTriggeredInstances;
-        }
-
-        if (!showExecutionCount && !showPlayButton && !showRetryButton && !showGoToButton) {
+        if (!shownInstance) {
           return;
         }
 
-        const isTooNarrowForTwoButtons = element.width < 52;
-        const overlayId = overlays.add(element.id, {
-          position: {
-            bottom: -7,
-            left: isTooNarrowForTwoButtons ? -element.width / 2 : 0,
-          },
-          html: '<div></div>',
-        } as OverlayAttrs);
+        if (!bpmnViewer.hasMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`)) {
+          bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
+        }
 
-        const overlay = overlays.get(overlayId) as Overlay & { htmlContainer: HTMLElement };
-        const root = createRoot(overlay.htmlContainer);
-
-        root.render(
-          <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
-            {showExecutionCount && (
-              <BottomButton className="app-sdk-select-none" title="Execution Count">
-                {matchingInstances.length}
-              </BottomButton>
-            )}
-            {showGoToButton && (
-              <GoToButton
-                onClick={() => {
-                  if (targetInstances.length > 1) {
-                    setCommandPaletteProps({
-                      isOpen: true,
-                      placeholder: 'Select target to go to:',
-                      entries: targetInstances.map((fni) => ({
-                        id: fni.flowNodeInstanceId,
-                        name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}`,
-                        ...fni,
-                      })),
-                      onConfirm: (entry) => {
-                        // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
-                        window.location.href = `${entry.processInstanceId}?selected=${entry.flowNodeId}`;
-                      },
-                      onClose: () => setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS),
-                    });
-                    return;
-                  }
-
-                  window.location.href = `${targetInstances[0].processInstanceId}?selected=${targetInstances[0].flowNodeId}`;
-                }}
-              />
-            )}
-            {showPlayButton && (
-              <PlayButton flowNodeInstanceId={shownInstance.flowNodeInstanceId} flowNodeType={element.type} />
-            )}
-            {showRetryButton && (
-              <RetryButton
-                processInstanceId={shownInstance.processInstanceId}
-                flowNodeInstanceId={shownInstance.flowNodeInstanceId}
-              />
-            )}
-          </BottomButtonContainer>,
-        );
+        renderButtons(element, matchingInstances, bpmnViewer, overlays);
       });
     });
-  }, [diagramDocumentationInspectorRef.current, processInstance, flowNodeInstances, triggeredFlowNodeInstances]);
+  }, [
+    diagramDocumentationInspectorRef.current,
+    processInstance,
+    flowNodeInstances,
+    triggeredFlowNodeInstances,
+    shownInstancesMap,
+  ]);
 
   if (!processInstance?.xml) {
     return (

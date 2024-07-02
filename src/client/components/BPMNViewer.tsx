@@ -21,9 +21,11 @@ export type BPMNViewerProps = {
 };
 
 export type BPMNViewerFunctions = {
-  getOverlays(): Overlays;
-  getElementRegistry(): ElementRegistry;
+  getOverlays(): Overlays | undefined;
+  getElementRegistry(): ElementRegistry | undefined;
   addMarker(elementId: string, className: string): void;
+  removeMarker(elementId: string, className: string): void;
+  hasMarker(elementId: string, className: string): boolean | undefined;
 };
 
 function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions>) {
@@ -49,6 +51,12 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
       },
       addMarker(elementId: string, className: string) {
         canvas?.addMarker(elementId, className);
+      },
+      removeMarker(elementId: string, className: string) {
+        canvas?.removeMarker(elementId, className);
+      },
+      hasMarker(elementId: string, className: string) {
+        return canvas?.hasMarker(elementId, className);
       },
     };
   }, [canvas]);

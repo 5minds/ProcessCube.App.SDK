@@ -19,6 +19,8 @@ export type DiagramDocumentationInspectorRef = {
     getElementRegistry(): ElementRegistry | undefined;
     getOverlays(): Overlays | undefined;
     addMarker(elementId: string, className: string): void;
+    removeMarker(elementId: string, className: string): void;
+    hasMarker(elementId: string, className: string): boolean | undefined;
     onImportDone(callback: () => void): void;
   };
 };
@@ -87,6 +89,10 @@ function DiagramDocumentationInspectorFunction(props: DiagramDocumentationInspec
   }, [selectedElements, splitterSize]);
 
   useEffect(() => {
+    if (!bpmnRendered) {
+      return;
+    }
+
     onImportDoneCallbacks.forEach((callback) => callback());
 
     const overlays = bpmnViewerRef.current?.getOverlays();
@@ -110,6 +116,12 @@ function DiagramDocumentationInspectorFunction(props: DiagramDocumentationInspec
         },
         addMarker(elementId: string, className: string) {
           bpmnViewerRef.current?.addMarker(elementId, className);
+        },
+        removeMarker(elementId: string, className: string) {
+          bpmnViewerRef.current?.removeMarker(elementId, className);
+        },
+        hasMarker(elementId: string, className: string) {
+          return bpmnViewerRef.current?.hasMarker(elementId, className);
         },
         onImportDone(callback: () => void) {
           if (bpmnRendered) {

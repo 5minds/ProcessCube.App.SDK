@@ -5,15 +5,18 @@ import { BottomButton } from './BottomButton';
 type PlayButtonProps = {
   flowNodeInstanceId: string;
   flowNodeType: 'bpmn:UserTask' | 'bpmn:ManualTask' | 'bpmn:Task';
+  refresh: () => void;
 };
 
-export function PlayButton({ flowNodeInstanceId, flowNodeType }: PlayButtonProps) {
+export function PlayButton({ flowNodeInstanceId, flowNodeType, refresh }: PlayButtonProps) {
   return (
     <BottomButton
       title="Run Task"
       className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800 asdk-pii-play-button"
       onClick={() =>
-        import('../../../server/actions').then(({ finishTask }) => finishTask(flowNodeInstanceId, flowNodeType))
+        import('../../../server/actions').then(({ finishTask }) =>
+          finishTask(flowNodeInstanceId, flowNodeType).then(refresh),
+        )
       }
     >
       <svg
