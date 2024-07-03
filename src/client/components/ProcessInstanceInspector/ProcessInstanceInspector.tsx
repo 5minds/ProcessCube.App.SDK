@@ -122,14 +122,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     [flowNodeInstances],
   );
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const bpmnViewer = diagramDocumentationInspectorRef.current?.bpmnViewerRef;
     const overlays = bpmnViewer?.getOverlays();
     if (!bpmnViewer || !overlays) {
       return;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
     shownInstancesMap.forEach((flowNodeInstanceId) => {
       const fni = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
       fni && bpmnViewer.removeMarker(fni.flowNodeId, `asdk-pii-flow-node-instance-state--${fni.state}`);
@@ -137,7 +136,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
     overlays.clear();
     await init();
-  };
+  }, [diagramDocumentationInspectorRef.current, shownInstancesMap, flowNodeInstances, init]);
 
   const renderFlowNodeButtons = useCallback(
     (element: ElementLike, instances: FlowNodeInstance[]) => {
@@ -274,14 +273,15 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
             <PlayButton
               flowNodeInstanceId={shownInstance.flowNodeInstanceId}
               flowNodeType={element.type}
-              refresh={refresh}
+              // TODO use subscriptions to update data
+              refresh={() => setTimeout(refresh, 500)}
             />
           )}
           {showRetryButton && (
             <RetryButton
               processInstanceId={shownInstance.processInstanceId}
               flowNodeInstanceId={shownInstance.flowNodeInstanceId}
-              refresh={refresh}
+              refresh={() => setTimeout(refresh, 500)}
             />
           )}
         </BottomButtonContainer>,
