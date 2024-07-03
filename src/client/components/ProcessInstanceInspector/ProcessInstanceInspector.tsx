@@ -22,6 +22,8 @@ import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './Comm
 import { GoToButton } from './GoToButton';
 import { ListButton } from './ListButton';
 import { PlayButton } from './PlayButton';
+import { ProcessButtonsContainer } from './ProcessButtonsContainer';
+import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
 
@@ -41,6 +43,7 @@ enum FlowNodeType {
   userTask = 'bpmn:UserTask',
 }
 
+const RETRYABLE_STATES = [ProcessInstanceState.error, ProcessInstanceState.terminated];
 const PLAYABLE_TYPES = [FlowNodeType.manualTask, FlowNodeType.userTask, FlowNodeType.task];
 const SENDER_TYPES = [FlowNodeType.endEvent, FlowNodeType.intermediateThrowEvent, FlowNodeType.sendTask];
 const RECEIVER_TYPES = [
@@ -63,12 +66,17 @@ const SDK_OVERLAY_BUTTONS_TYPE = 'asdk-buttons';
 type ProcessInstanceInspectorProps = {
   processInstanceId: string;
   showExecutionCount?: boolean;
+  showGoToButton?: boolean;
   showListButton?: boolean;
   showPlayButton?: boolean;
   showRetryButton?: boolean;
-  showGoToButton?: boolean;
+  showRefreshButton?: boolean;
 };
 
+/**
+ * Displays a BPMN diagram with additional information about the process instance.
+ * The diagram is interactive and allows the user to inspect the flow node instances and navigate to related flow nodes.
+ */
 export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
@@ -114,6 +122,23 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     [flowNodeInstances],
   );
 
+  const refresh = async () => {
+    const bpmnViewer = diagramDocumentationInspectorRef.current?.bpmnViewerRef;
+    const overlays = bpmnViewer?.getOverlays();
+    if (!bpmnViewer || !overlays) {
+      return;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    shownInstancesMap.forEach((flowNodeInstanceId) => {
+      const fni = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
+      fni && bpmnViewer.removeMarker(fni.flowNodeId, `asdk-pii-flow-node-instance-state--${fni.state}`);
+    });
+
+    overlays.clear();
+    await init();
+  };
+
   const renderFlowNodeButtons = useCallback(
     (element: ElementLike, instances: FlowNodeInstance[]) => {
       const bpmnViewer = diagramDocumentationInspectorRef.current?.bpmnViewerRef;
@@ -139,9 +164,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         shownInstance.state === FlowNodeInstanceState.suspended;
 
       const showRetryButton =
-        props.showRetryButton &&
-        (processInstance?.state === ProcessInstanceState.error ||
-          processInstance?.state === ProcessInstanceState.terminated);
+        props.showRetryButton && processInstance && RETRYABLE_STATES.includes(processInstance.state);
 
       let showGoToButton = false;
       let targetInstances: FlowNodeInstance[] = [];
@@ -176,18 +199,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
       const isFirstShown = instances.indexOf(shownInstance) === 0;
       const shownInstanceIndex = instances.length - instances.indexOf(shownInstance);
-
-      const refresh = async () => {
-        // TODO replace timeout
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        shownInstancesMap.forEach((flowNodeInstanceId) => {
-          const fni = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
-          fni && bpmnViewer.removeMarker(fni.flowNodeId, `asdk-pii-flow-node-instance-state--${fni.state}`);
-        });
-
-        overlays.clear();
-        await init();
-      };
 
       root.render(
         <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
@@ -348,8 +359,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   return (
     <>
       <CommandPalette {...commandPaletteProps} />
-      {[ProcessInstanceState.error, ProcessInstanceState.terminated].includes(processInstance.state) && (
-        <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
+      {(props.showRefreshButton || props.showRetryButton) && (
+        <ProcessButtonsContainer>
+          {props.showRetryButton && RETRYABLE_STATES.includes(processInstance.state) && (
+            <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
+          )}
+          {props.showRefreshButton && <RefreshProcessButton onClick={refresh} />}
+        </ProcessButtonsContainer>
       )}
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
