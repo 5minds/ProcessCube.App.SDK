@@ -21,9 +21,9 @@ type FlowNodeOverlayProps = {
   flowNode: FlowNode;
   width: number;
   height: number;
-  retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
-  gotoProcessAction: (processInstanceId: string) => void;
-  gotoManualOrUserTaskAction: (processInstanceId: string, flowNodeId: string) => void;
+  retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void | undefined;
+  gotoProcessAction: (processInstanceId: string) => void | undefined;
+  gotoManualOrUserTaskAction: (processInstanceId: string, flowNodeId: string) => void | undefined;
 };
 
 export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
