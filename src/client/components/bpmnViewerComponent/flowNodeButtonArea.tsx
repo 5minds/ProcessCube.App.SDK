@@ -8,9 +8,9 @@ import RetryButton from './retryButton';
 
 type FlowNodeButtonAreaProps = {
   flowNode: FlowNode;
-  onRetryClick: () => void | undefined;
-  onGotoClick: () => void  | undefined;
-  onPlayClick: () => void  | undefined;
+  onRetryClick?: () => void;
+  onGotoClick?: () => void;
+  onPlayClick?: () => void;
 };
 
 export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
@@ -44,13 +44,13 @@ export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
   return (
     <div className="flownode-overlay" style={style}>
       <div className="bpmn-element-overlay__below">
-        {showRetryButton && <RetryButton onClick={props.onRetryClick} flowNode={props.flowNode}></RetryButton>}
+        {showRetryButton && <RetryButton onClick={props.onRetryClick!} flowNode={props.flowNode}></RetryButton>}
 
         <ExecutionCount count={props.flowNode.ExecutionCount}></ExecutionCount>
 
-        {showGotoButton && <GotoButton onClick={props.onGotoClick}></GotoButton>}
+        {showGotoButton && <GotoButton onClick={props.onGotoClick!}></GotoButton>}
 
-        {showPlayButton && <PlayButton onClick={props.onPlayClick}></PlayButton>}
+        {showPlayButton && <PlayButton onClick={props.onPlayClick!}></PlayButton>}
       </div>
     </div>
   );
