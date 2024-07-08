@@ -157,6 +157,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       }
 
       const showExecutionCount = props.showExecutionCount && instances.length > 1;
+      const showListButton = props.showListButton && instances.length > 1;
       const showPlayButton =
         props.showPlayButton &&
         PLAYABLE_TYPES.includes(element.type) &&
@@ -209,7 +210,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               {`${isFirstShown ? '' : `${shownInstanceIndex}/`}${instances.length}`}
             </BottomButton>
           )}
-          {showExecutionCount && (
+          {showListButton && (
             <ListButton
               onClick={() => {
                 const entries = instances.map((fni) => ({
