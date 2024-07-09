@@ -1,6 +1,5 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
-import Overlays from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -14,7 +13,6 @@ import {
   ProcessInstanceState,
 } from '@5minds/processcube_engine_sdk';
 
-import { BPMNViewerFunctions } from '../BPMNViewer';
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { BottomButton } from './BottomButton';
 import { BottomButtonContainer } from './BottomButtonContainer';
@@ -83,6 +81,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [shownInstancesMap, setShownInstancesMap] = useState<Map<string, string>>(new Map());
+  const [selectedInstanceIds, setSelectedInstanceIds] = useState<string[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
   const init = useCallback(async () => {
@@ -148,7 +147,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
       const existingButtons = overlays.get({ element: element.id, type: SDK_OVERLAY_BUTTONS_TYPE });
       if (Array.isArray(existingButtons) && existingButtons.length > 0) {
-        return;
+        overlays.remove({
+          element: element.id,
+          type: SDK_OVERLAY_BUTTONS_TYPE,
+        });
       }
 
       const shownInstance = instances.find((fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
@@ -220,6 +222,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
                 }));
 
                 const onConfirm = async (entry: FlowNodeInstance & CommandPaletteEntry): Promise<void> => {
+                  const newShownInstance = instances.find((fni) => fni.flowNodeInstanceId === entry.flowNodeInstanceId);
+                  if (!newShownInstance) {
+                    return;
+                  }
+
                   bpmnViewer.removeMarker(
                     shownInstance.flowNodeId,
                     `asdk-pii-flow-node-instance-state--${shownInstance.state}`,
@@ -229,7 +236,21 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
                     type: SDK_OVERLAY_BUTTONS_TYPE,
                   });
 
-                  setShownInstancesMap((prev) => new Map(prev).set(entry.flowNodeId, entry.flowNodeInstanceId));
+                  const searchParams = new URLSearchParams(window.location.search);
+                  const selectedInstanceIds = searchParams.getAll('instance');
+
+                  if (selectedInstanceIds.includes(shownInstance.flowNodeInstanceId)) {
+                    searchParams.delete('instance', shownInstance.flowNodeInstanceId);
+                  }
+
+                  if (instances.indexOf(newShownInstance) !== 0) {
+                    searchParams.append('instance', newShownInstance.flowNodeInstanceId);
+                  }
+
+                  // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
+                  window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+
+                  setShownInstancesMap((prev) => new Map(prev).set(element.id, entry.flowNodeInstanceId));
                   setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS);
                 };
 
@@ -246,27 +267,35 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           {showGoToButton && (
             <GoToButton
               onClick={() => {
-                if (targetInstances.length > 1) {
-                  const entries = targetInstances.map((fni) => ({
-                    id: fni.flowNodeInstanceId,
-                    name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}`,
-                    ...fni,
-                  }));
+                if (targetInstances.length === 1) {
+                  const searchParams = new URLSearchParams();
+                  searchParams.append('selected', targetInstances[0].flowNodeId);
+                  searchParams.append('instance', targetInstances[0].flowNodeInstanceId);
 
-                  setCommandPaletteProps({
-                    isOpen: true,
-                    placeholder: 'Select target to go to:',
-                    entries: entries,
-                    onConfirm: (entry) => {
-                      // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
-                      window.location.href = `${entry.processInstanceId}?selected=${entry.flowNodeId}`;
-                    },
-                    onClose: () => setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS),
-                  });
+                  window.location.href = `${targetInstances[0].processInstanceId}?${searchParams.toString()}`;
                   return;
                 }
 
-                window.location.href = `${targetInstances[0].processInstanceId}?selected=${targetInstances[0].flowNodeId}`;
+                const entries = targetInstances.map((fni) => ({
+                  id: fni.flowNodeInstanceId,
+                  name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}`,
+                  ...fni,
+                }));
+
+                setCommandPaletteProps({
+                  isOpen: true,
+                  placeholder: 'Select target to go to:',
+                  entries: entries,
+                  onConfirm: (entry) => {
+                    const searchParams = new URLSearchParams();
+                    searchParams.append('selected', entry.flowNodeId);
+                    searchParams.append('instance', entry.flowNodeInstanceId);
+
+                    // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
+                    window.location.href = `${entry.processInstanceId}?${searchParams.toString()}`;
+                  },
+                  onClose: () => setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS),
+                });
               }}
             />
           )}
@@ -296,6 +325,44 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       shownInstancesMap,
     ],
   );
+
+  useEffect(() => {
+    if (!window) {
+      return;
+    }
+
+    // Not using the useSearchParams hook, because the component should be able to run in non-Next.js environments
+    const searchParams = new URLSearchParams(window.location.search);
+    const instanceIds = searchParams.getAll('instance');
+
+    setSelectedInstanceIds(instanceIds);
+  }, []);
+
+  useEffect(() => {
+    if (selectedInstanceIds.length === 0 || flowNodeInstances.length === 0) {
+      return;
+    }
+
+    const selectedFlowNodeInstances = flowNodeInstances.filter((fni) =>
+      selectedInstanceIds.includes(fni.flowNodeInstanceId),
+    );
+
+    if (selectedFlowNodeInstances.length !== selectedInstanceIds.length) {
+      selectedInstanceIds.forEach((instanceId) => {
+        if (!flowNodeInstances.some((fni) => fni.flowNodeInstanceId === instanceId)) {
+          const searchParams = new URLSearchParams(window.location.search);
+          searchParams.delete('instance', instanceId);
+
+          // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
+          window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+        }
+      });
+    }
+
+    selectedFlowNodeInstances.forEach((fni) =>
+      setShownInstancesMap((prev) => new Map(prev).set(fni.flowNodeId, fni.flowNodeInstanceId)),
+    );
+  }, [selectedInstanceIds, flowNodeInstances]);
 
   useEffect(() => {
     init();
@@ -334,9 +401,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           return;
         }
 
-        if (!bpmnViewer.hasMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`)) {
-          bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
-        }
+        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--finished`);
+        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--suspended`);
+        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--running`);
+        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--terminated`);
+        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
 
         renderFlowNodeButtons(element, matchingInstances);
       });
