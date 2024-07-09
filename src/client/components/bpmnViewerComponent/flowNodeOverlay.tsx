@@ -84,7 +84,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                 <Button
                   color="primary"
                   onPress={() => {
-                    props.retryAction!(
+                    props.retryAction?.(
                       props.flowNode.ProcessInstanceId,
                       props.flowNode.CurrentFlowNodeInstanceId,
                       JSON.parse(newToken),
