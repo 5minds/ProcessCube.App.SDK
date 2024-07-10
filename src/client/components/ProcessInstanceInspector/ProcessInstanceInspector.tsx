@@ -407,6 +407,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--suspended`);
         bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--running`);
         bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--terminated`);
+
+        bpmnViewer.addMarker(element.id, 'asdk-pii-flow-node-instance-state');
         bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
 
         renderFlowNodeButtons(element, matchingInstances);
@@ -436,7 +438,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           {props.showRetryButton && RETRYABLE_STATES.includes(processInstance.state) && (
             <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
           )}
-          {props.showTerminateButton && (
+          {props.showTerminateButton && !RETRYABLE_STATES.includes(processInstance.state) && (
             <TerminateProcessButton
               processInstanceId={props.processInstanceId}
               refresh={() => window.location.reload()}

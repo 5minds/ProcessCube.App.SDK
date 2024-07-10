@@ -40,10 +40,7 @@
     }
   }
 
-  .asdk-pii-flow-node-instance-state--finished,
-  .asdk-pii-flow-node-instance-state--running,
-  .asdk-pii-flow-node-instance-state--suspended,
-  .asdk-pii-flow-node-instance-state--terminated {
+  .asdk-pii-flow-node-instance-state {
     .djs-hit {
       fill-opacity: 0.2;
       filter: blur(10px);
