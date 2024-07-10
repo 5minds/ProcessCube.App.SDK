@@ -24,6 +24,7 @@ import { ProcessButtonsContainer } from './ProcessButtonsContainer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
+import { TerminateProcessButton } from './TerminateProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
@@ -69,6 +70,7 @@ type ProcessInstanceInspectorProps = {
   showPlayButton?: boolean;
   showRetryButton?: boolean;
   showRefreshButton?: boolean;
+  showTerminateButton?: boolean;
 };
 
 /**
@@ -433,6 +435,12 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         <ProcessButtonsContainer>
           {props.showRetryButton && RETRYABLE_STATES.includes(processInstance.state) && (
             <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
+          )}
+          {props.showTerminateButton && (
+            <TerminateProcessButton
+              processInstanceId={props.processInstanceId}
+              refresh={() => window.location.reload()}
+            />
           )}
           {props.showRefreshButton && <RefreshProcessButton onClick={refresh} />}
         </ProcessButtonsContainer>
