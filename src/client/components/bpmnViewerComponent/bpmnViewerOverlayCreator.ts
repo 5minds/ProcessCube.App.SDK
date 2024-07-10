@@ -171,9 +171,9 @@ export default class BpmnViewerOverlayCreator {
     processInstanceState: string,
     flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstance[],
     flowNodeInstancesTriggeredByThisProcessInstance: DataModels.FlowNodeInstances.FlowNodeInstance[],
-    retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: string) => void,
-    gotoProcessAction: (processInstanceId: string) => void,
-    gotoManualOrUserTaskAction: (processInstanceId: string, flowNodeId: string) => void,
+    retryAction?: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: string) => void,
+    gotoProcessAction?: (processInstanceId: string) => void,
+    gotoManualOrUserTaskAction?: (processInstanceId: string, flowNodeId: string) => void,
   ): void {
     const executedFlowNodes: FlowNode[] = this.getExecutedFlowNodes(
       flowNodeInstances,

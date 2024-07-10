@@ -20,9 +20,9 @@ type BpmnViewerComponentProps = {
   processInstanceState: string;
   flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstance[];
   flowNodeInstancesTriggeredByThisProcessInstance: DataModels.FlowNodeInstances.FlowNodeInstance[];
-  retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
-  gotoProcessAction: (processInstanceId: string) => void;
-  gotoManualOrUserTaskAction: (processInstanceId: string, flowNodeId: string) => void;
+  retryAction?: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
+  gotoProcessAction?: (processInstanceId: string) => void;
+  gotoManualOrUserTaskAction?: (processInstanceId: string, flowNodeId: string) => void;
   options?: BpmnViewerComponentOptions;
 };
 
