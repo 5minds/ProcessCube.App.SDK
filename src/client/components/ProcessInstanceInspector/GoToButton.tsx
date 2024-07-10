@@ -4,11 +4,7 @@ import { BottomButton } from './BottomButton';
 
 export function GoToButton({ onClick }: { onClick: () => void }) {
   return (
-    <BottomButton
-      title="Go to Target"
-      className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"
-      onClick={onClick}
-    >
+    <BottomButton title="Go to Target" onClick={onClick}>
       <svg
         className="!app-sdk-fill-white"
         width="10px"

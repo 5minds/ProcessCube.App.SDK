@@ -208,7 +208,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
           {showExecutionCount && (
             <BottomButton
-              className="app-sdk-select-none app-sdk-pointer-events-auto"
+              className="app-sdk-select-none !app-sdk-cursor-default !app-sdk-bg-slate-500"
               title={`Flow Node was executed ${instances.length} times.${isFirstShown ? '' : ` You are viewing instance #${shownInstanceIndex}.`}`}
             >
               {`${isFirstShown ? '' : `${shownInstanceIndex}/`}${instances.length}`}

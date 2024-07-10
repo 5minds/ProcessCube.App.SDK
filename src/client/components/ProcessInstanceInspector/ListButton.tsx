@@ -6,11 +6,7 @@ import { BottomButton } from './BottomButton';
 
 export function ListButton({ onClick }: { onClick: () => void }) {
   return (
-    <BottomButton
-      className="app-sdk-cursor-pointer !app-sdk-pointer-events-auto !app-sdk-bg-cyan-800"
-      onClick={onClick}
-      title="List Instances"
-    >
+    <BottomButton onClick={onClick} title="List Instances">
       <svg
         className="!app-sdk-fill-white"
         width="10px"
