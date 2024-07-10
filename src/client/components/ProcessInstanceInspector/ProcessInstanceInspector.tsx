@@ -433,7 +433,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   return (
     <>
       <CommandPalette {...commandPaletteProps} />
-      {(props.showRefreshButton || props.showRetryButton) && (
+      {(props.showRefreshButton || props.showRetryButton || props.showTerminateButton) && (
         <ProcessButtonsContainer>
           {props.showRetryButton && RETRYABLE_STATES.includes(processInstance.state) && (
             <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
