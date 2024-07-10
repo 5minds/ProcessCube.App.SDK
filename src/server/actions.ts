@@ -8,6 +8,7 @@ import {
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
   retryProcessInstance,
+  terminateProcessInstance,
 } from '.';
 
 export const finishTask = async (
@@ -23,6 +24,10 @@ export const finishTask = async (
   } else {
     console.error(`[@5minds/processcube_app_sdk:handlePlay]\t\tUnsupported flow node type: ${flowNodeType}`);
   }
+};
+
+export const terminateProcess = async (processInstanceId: string) => {
+  await terminateProcessInstance(processInstanceId);
 };
 
 export const retryProcess = async (processInstanceId: string, flowNodeInstanceId?: string) => {

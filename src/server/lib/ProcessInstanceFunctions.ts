@@ -87,6 +87,18 @@ export async function retryProcessInstance(
 }
 
 /**
+ * This function will terminate the ProcessInstance with the given ID.
+ *
+ * @param processInstanceId The ID of the ProcessInstance
+ * @param identity The Identity to use for the request
+ */
+export async function terminateProcessInstance(processInstanceId: string) {
+  // const identity = await getIdentity();
+
+  await Client.processInstances.terminateProcessInstance(processInstanceId);
+}
+
+/**
  * This function will return the running ProcessInstances.
  * If `query` is given, the ProcessInstances will be filtered by this query.
  * If `options` are given, the ProcessInstances will be queried with these options.
