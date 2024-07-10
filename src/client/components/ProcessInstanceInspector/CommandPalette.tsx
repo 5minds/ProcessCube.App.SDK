@@ -21,6 +21,7 @@ export type CommandPaletteProps<T extends CommandPaletteEntry> = {
   isOpen: boolean;
   placeholder: string;
   entries: T[];
+  noResultsText?: string;
   onConfirm: (entry: T) => void;
   onClose: () => void;
 };
@@ -96,7 +97,7 @@ export function CommandPalette<T extends CommandPaletteEntry>(props: CommandPale
                   aria-hidden="true"
                 />
                 <p className="app-sdk-mt-4 app-sdk-text-sm app-sdk-text-[color:var(--asdk-cmdp-text-color)]">
-                  No entries found using that search term.
+                  {props.noResultsText || 'No entries found using that search term.'}
                 </p>
               </div>
             )}
