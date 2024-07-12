@@ -105,9 +105,20 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
 }
 
 const arePropsEqual = (prevProps: PropsWithChildren<any>, nextProps: PropsWithChildren<any>) => {
-  return true;
+  console.log('prevProps8', prevProps);
+  console.log('nextProps8', nextProps);
+  return (
+    prevProps.task.flowNodeInstanceId === nextProps.task.flowNodeInstanceId &&
+    prevProps.headerComponent === nextProps.headerComponent &&
+    prevProps.className === nextProps.className &&
+    prevProps.classNames.base === nextProps.classNames.base &&
+    prevProps.darkMode === nextProps.darkMode
+  );
 }
 
+// TODO: DymamicUi wird als memoized Component exportiert, um ungewünschte Re
+//
+// Link zum Issue:
 export const DynamicUi = memo(function DynamicUi(
   props: PropsWithChildren<{
     /** UserTaskInstance with a defined dynamic form  */
@@ -316,8 +327,7 @@ function transformFormDataToUserTaskResult(
     );
   }
 
-  console.log('SDK');
-  console.trace();
+  console.log('SDK2');
 
   const confirmFormField = confirmFormFields.length === 1 ? confirmFormFields[0] : null;
 
