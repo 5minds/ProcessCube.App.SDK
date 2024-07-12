@@ -119,7 +119,7 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
   }
 
   if (elementsWithDocumentation.length === 1) {
-    const text = getBusinessObject(elements[0])?.documentation?.[0]?.text;
+    const text = getBusinessObject(elementsWithDocumentation[0])?.documentation?.[0]?.text;
     return <DocumentationViewer documentation={text} />;
   }
 
