@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, forwardRef, memo, useEffect, useRef, useState } from 'react';
+import React, { Fragment, PropsWithChildren, forwardRef, memo, useRef } from 'react';
 import * as ReactIs from 'react-is';
 import semverGt from 'semver/functions/gt';
 import semverPrerelease from 'semver/functions/prerelease';
@@ -105,8 +105,6 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
 }
 
 const arePropsEqual = (prevProps: PropsWithChildren<any>, nextProps: PropsWithChildren<any>) => {
-  console.log('prevProps8', prevProps);
-  console.log('nextProps8', nextProps);
   return (
     prevProps.task.flowNodeInstanceId === nextProps.task.flowNodeInstanceId &&
     prevProps.headerComponent === nextProps.headerComponent &&
@@ -317,8 +315,6 @@ function transformFormDataToUserTaskResult(
   const formFieldRefs = new Map<string, FormFieldRefsMapObj>(
     formFields.map((field) => [field.id, { ref: React.createRef<DynamicUiRefFunctions>() }]),
   );
-  const focusedElementRef = useRef<HTMLElement | null>(null);
-  const [focusedElement, setFocusedElement] = useState<any>(null);
 
   const confirmFormFields = formFields.filter((field) => field.type === 'confirm');
   if (confirmFormFields.length > 1) {
@@ -326,8 +322,6 @@ function transformFormDataToUserTaskResult(
       `[@5minds/processcube_app_sdk:DynamicUi]\t\tWarning while rendering UserTask "${props.task.flowNodeId}"!\n The UserTask has more than one confirm form field. Please use only one confirm form field per User Task.\n\nThe first confirm form field is used for rendering.`,
     );
   }
-
-  console.log('SDK2');
 
   const confirmFormField = confirmFormFields.length === 1 ? confirmFormFields[0] : null;
 
@@ -364,17 +358,6 @@ function transformFormDataToUserTaskResult(
     props.className ?? '',
   );
   const withDarkMode = props.darkMode || rootClassNames.split(' ').includes('dark');
-
-  useEffect(() => {
-    if (focusedElementRef.current) {
-      focusedElementRef.current.focus();
-    }
-  });
-
-  const handleFocus = (event: any) => {
-    focusedElementRef.current = event.target;
-    console.log('handleFocus', focusedElementRef)
-  };
 
   const submitAndActionAttributes = {
     // React supports functions as a form "action" in the current canary (used by Nextjs) release (next stable).
@@ -415,7 +398,6 @@ function transformFormDataToUserTaskResult(
         data-user-task-id={props.task.flowNodeId}
         data-user-task-instance-id={props.task.flowNodeInstanceId}
         onChange={onFormDataChange}
-        onFocus={handleFocus}
         {...submitAndActionAttributes}
       >
         <header
