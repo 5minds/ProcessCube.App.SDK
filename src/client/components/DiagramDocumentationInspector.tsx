@@ -112,19 +112,20 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
     return <p className="app-sdk-m-0 app-sdk-p-6">Please select an element</p>;
   }
 
-  if (elements.length === 1) {
-    if (filterElementsWithDocumentation(elements[0])) {
-      const text = getBusinessObject(elements[0])?.documentation?.[0]?.text;
-      return <DocumentationViewer documentation={text} />;
-    }
+  const elementsWithDocumentation = elements.filter(filterElementsWithDocumentation);
 
+  if (elementsWithDocumentation.length === 0) {
     return <p className="app-sdk-m-0 app-sdk-p-6">No documentation available</p>;
+  }
+
+  if (elementsWithDocumentation.length === 1) {
+    const text = getBusinessObject(elements[0])?.documentation?.[0]?.text;
+    return <DocumentationViewer documentation={text} />;
   }
 
   return (
     <DocumentationViewer
-      documentation={elements
-        .filter(filterElementsWithDocumentation)
+      documentation={elementsWithDocumentation
         .map((element) => getBusinessObject(element)?.documentation?.[0]?.text)
         .join('\n\n<hr />\n\n')}
     />
