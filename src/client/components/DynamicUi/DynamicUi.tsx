@@ -116,9 +116,9 @@ const arePropsEqual = (prevProps: PropsWithChildren<any>, nextProps: PropsWithCh
   );
 }
 
-// TODO: DymamicUi wird als memoized Component exportiert, um ungewünschte Re
-//
-// Link zum Issue:
+// TODO: DymamicUi wird aktuell als memoized Component exportiert, um unerwünschten Fokusverlust zu verhindern. (Siehe: https://5minds.atlassian.net/browse/PCE-1074)
+// Die aktuelle Implementierung ist jedoch nur ein workaround, stattdessen sollten wir das eigentliche Problem lösen.
+// Link zum Issue: https://5minds.atlassian.net/browse/PCE-1203
 export const DynamicUi = memo(function DynamicUi(
   props: PropsWithChildren<{
     /** UserTaskInstance with a defined dynamic form  */
