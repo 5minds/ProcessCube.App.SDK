@@ -47,8 +47,16 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         <FlowNodeColorArea onClick={flowNodeInfoModal.onOpen} {...props}></FlowNodeColorArea>
         <FlowNodeButtonArea
           onRetryClick={props.retryAction ? retryModal.onOpen : undefined}
-          onGotoClick={props.gotoProcessAction ? () => props.gotoProcessAction!(props.flowNode.LinkedProcessInstanceId ?? '') : undefined}
-          onPlayClick={props.gotoManualOrUserTaskAction ? () => props.gotoManualOrUserTaskAction!(props.flowNode.ProcessInstanceId, props.flowNode.Id) : undefined}
+          onGotoClick={
+            props.gotoProcessAction
+              ? () => props.gotoProcessAction!(props.flowNode.LinkedProcessInstanceId ?? '')
+              : undefined
+          }
+          onPlayClick={
+            props.gotoManualOrUserTaskAction
+              ? () => props.gotoManualOrUserTaskAction!(props.flowNode.ProcessInstanceId, props.flowNode.Id)
+              : undefined
+          }
           flowNode={props.flowNode}
         ></FlowNodeButtonArea>
       </div>
