@@ -22,7 +22,7 @@ export async function waitForUserTask(
     processInstanceId?: string;
     flowNodeId?: string;
   } = {},
-  identity?: Identity | boolean,
+  identity: Identity | boolean = true,
 ): Promise<UserTaskInstance> {
   const { correlationId, processInstanceId, flowNodeId } = filterBy;
   const resolvedIdentity =
@@ -105,7 +105,7 @@ export async function finishUserTaskAndGetNext(
   flowNodeInstanceId: string,
   filterBy: FilterBy = {},
   result: UserTaskResult = {},
-  identity?: Identity | boolean,
+  identity: Identity | boolean = true,
 ): Promise<UserTaskInstance | null> {
   const resolvedIdentity =
     typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
@@ -245,7 +245,7 @@ export async function getWaitingUserTasksByCorrelationId(
  * @returns {Promise<UserTaskList>}
  */
 export async function getReservedUserTasksByIdentity(
-  identity?: DataModels.Iam.Identity,
+  identity?: Identity,
   options?: {
     offset?: number;
     limit?: number;
@@ -276,7 +276,7 @@ export async function getReservedUserTasksByIdentity(
  * @returns {Promise<UserTaskList>}
  */
 export async function getAssignedUserTasksByIdentity(
-  identity?: DataModels.Iam.Identity,
+  identity?: Identity,
   options?: {
     offset?: number;
     limit?: number;

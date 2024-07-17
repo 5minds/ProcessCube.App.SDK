@@ -37,7 +37,7 @@ export async function waitForProcessEnd(
   filterBy: {
     processInstanceId?: string;
   },
-  identity?: Identity | boolean,
+  identity: Identity | boolean = true,
 ): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const { processInstanceId } = filterBy;
   const resolvedIdentity =
