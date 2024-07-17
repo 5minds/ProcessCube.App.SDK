@@ -3,7 +3,7 @@ import React from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function LocalDatetimeFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
+export function DatetimeLocalFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);

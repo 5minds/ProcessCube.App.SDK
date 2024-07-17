@@ -1,5 +1,3 @@
-import { Range } from 'postcss/lib/node';
-
 import { DataModels } from '@5minds/processcube_engine_sdk';
 
 import { DynamicUiFormFieldComponent } from '../DynamicUi';
@@ -7,6 +5,7 @@ import { BooleanFormField } from './BooleanFormField';
 import { ColorFormField } from './ColorFormField';
 import { ConfirmFormField } from './ConfirmFormField';
 import { DateFormField } from './DateFormField';
+import { DatetimeLocalFormField } from './DatetimeLocalFormField';
 import { DecimalFormField } from './DecimalFormField';
 import { EmailFormField } from './EmailFormField';
 import { EnumFormField } from './EnumFormField';
@@ -14,7 +13,6 @@ import { FileFormField } from './FileFormField';
 import { HeaderFormField } from './HeaderFormField';
 import { HiddenFormField } from './HiddenFormField';
 import { IntegerFormField } from './IntegerFormField';
-import { LocalDatetimeFormField } from './LocalDatetimeFormField';
 import { MonthFormField } from './MonthFormField';
 import { ParagraphFormField } from './ParagraphFormField';
 import { PasswordFormField } from './PasswordFormField';
@@ -56,7 +54,7 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   hidden: HiddenFormField,
   // longs are full numbers
   long: IntegerFormField,
-  datetime: LocalDatetimeFormField,
+  'datetime-local': DatetimeLocalFormField,
   month: MonthFormField,
   // numbers can be decimals
   number: DecimalFormField,
@@ -80,7 +78,7 @@ export { EnumFormField } from './EnumFormField';
 export { HiddenFormField } from './HiddenFormField';
 export { FileFormField } from './FileFormField';
 export { IntegerFormField } from './IntegerFormField';
-export { LocalDatetimeFormField } from './LocalDatetimeFormField';
+export { DatetimeLocalFormField } from './DatetimeLocalFormField';
 export { MonthFormField } from './MonthFormField';
 export { StringFormField } from './StringFormField';
 export { ParagraphFormField } from './ParagraphFormField';
