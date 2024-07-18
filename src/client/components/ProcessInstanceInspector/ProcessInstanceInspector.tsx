@@ -28,7 +28,7 @@ import { TerminateProcessButton } from './TerminateProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
-enum FlowNodeType {
+export enum FlowNodeType {
   boundaryEvent = 'bpmn:BoundaryEvent',
   endEvent = 'bpmn:EndEvent',
   intermediateCatchEvent = 'bpmn:IntermediateCatchEvent',
@@ -71,6 +71,7 @@ type ProcessInstanceInspectorProps = {
   showRetryButton?: boolean;
   showRefreshButton?: boolean;
   showTerminateButton?: boolean;
+  onPlay?: (taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task) => void | Promise<void>;
 };
 
 /**
@@ -305,6 +306,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
             <PlayButton
               flowNodeInstanceId={shownInstance.flowNodeInstanceId}
               flowNodeType={element.type}
+              onPlay={props.onPlay}
               // TODO use subscriptions to update data
               refresh={() => setTimeout(refresh, 500)}
             />

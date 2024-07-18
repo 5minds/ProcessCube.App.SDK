@@ -1,23 +1,36 @@
 import React from 'react';
 
 import { BottomButton } from './BottomButton';
+import { FlowNodeType } from './ProcessInstanceInspector';
 
 type PlayButtonProps = {
   flowNodeInstanceId: string;
-  flowNodeType: 'bpmn:UserTask' | 'bpmn:ManualTask' | 'bpmn:Task';
+  flowNodeType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task;
   refresh: () => void;
+  onPlay?: (taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task) => void | Promise<void>;
 };
 
-export function PlayButton({ flowNodeInstanceId, flowNodeType, refresh }: PlayButtonProps) {
+export function PlayButton({ flowNodeInstanceId, flowNodeType, refresh, onPlay }: PlayButtonProps) {
   return (
     <BottomButton
       title="Run Task"
       className="asdk-pii-play-button"
-      onClick={() =>
-        import('../../../server/actions').then(({ finishTask }) =>
-          finishTask(flowNodeInstanceId, flowNodeType).then(refresh),
-        )
-      }
+      onClick={() => {
+        if (typeof onPlay === 'function') {
+          new Promise(async (resolve, reject) => {
+            try {
+              await onPlay(flowNodeType);
+              resolve(true);
+            } catch (error) {
+              reject(error);
+            }
+          }).then(refresh);
+        } else {
+          import('../../../server/actions').then(({ finishTask }) =>
+            finishTask(flowNodeInstanceId, flowNodeType).then(refresh),
+          );
+        }
+      }}
     >
       <svg
         className="!app-sdk-fill-none !app-sdk-stroke-white !app-sdk-stroke-[2px]"
