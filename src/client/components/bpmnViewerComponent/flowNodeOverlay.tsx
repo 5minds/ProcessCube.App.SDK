@@ -21,9 +21,9 @@ type FlowNodeOverlayProps = {
   flowNode: FlowNode;
   width: number;
   height: number;
-  retryAction: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
-  gotoProcessAction: (processInstanceId: string) => void;
-  gotoManualOrUserTaskAction: (processInstanceId: string, flowNodeId: string) => void;
+  retryAction?: (processInstanceId: string, flowNodeInstanceId?: string, newToken?: any) => void;
+  gotoProcessAction?: (processInstanceId: string) => void;
+  gotoManualOrUserTaskAction?: (processInstanceId: string, flowNodeId: string) => void;
 };
 
 export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
@@ -46,9 +46,9 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
       <div style={style}>
         <FlowNodeColorArea onClick={flowNodeInfoModal.onOpen} {...props}></FlowNodeColorArea>
         <FlowNodeButtonArea
-          onRetryClick={retryModal.onOpen}
-          onGotoClick={() => props.gotoProcessAction(props.flowNode.LinkedProcessInstanceId ?? '')}
-          onPlayClick={() => props.gotoManualOrUserTaskAction(props.flowNode.ProcessInstanceId, props.flowNode.Id)}
+          onRetryClick={props.retryAction ? retryModal.onOpen : undefined}
+          onGotoClick={props.gotoProcessAction ? () => props.gotoProcessAction!(props.flowNode.LinkedProcessInstanceId ?? '') : undefined}
+          onPlayClick={props.gotoManualOrUserTaskAction ? () => props.gotoManualOrUserTaskAction!(props.flowNode.ProcessInstanceId, props.flowNode.Id) : undefined}
           flowNode={props.flowNode}
         ></FlowNodeButtonArea>
       </div>
@@ -84,7 +84,7 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                 <Button
                   color="primary"
                   onPress={() => {
-                    props.retryAction(
+                    props.retryAction?.(
                       props.flowNode.ProcessInstanceId,
                       props.flowNode.CurrentFlowNodeInstanceId,
                       JSON.parse(newToken),
