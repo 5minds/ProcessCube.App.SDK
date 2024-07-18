@@ -71,7 +71,12 @@ type ProcessInstanceInspectorProps = {
   showRetryButton?: boolean;
   showRefreshButton?: boolean;
   showTerminateButton?: boolean;
-  onPlay?: (taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task) => void | Promise<void>;
+  onPlay?: (taskContext: {
+    processInstanceId: string;
+    flowNodeInstanceId: string;
+    flowNodeId: string;
+    taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task;
+  }) => void | Promise<void>;
 };
 
 /**
@@ -304,8 +309,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           )}
           {showPlayButton && (
             <PlayButton
+              flowNodeId={shownInstance.flowNodeId}
               flowNodeInstanceId={shownInstance.flowNodeInstanceId}
               flowNodeType={element.type}
+              processInstanceId={shownInstance.processInstanceId}
               onPlay={props.onPlay}
               // TODO use subscriptions to update data
               refresh={() => setTimeout(refresh, 500)}

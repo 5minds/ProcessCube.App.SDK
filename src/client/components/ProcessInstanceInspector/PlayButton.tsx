@@ -4,13 +4,27 @@ import { BottomButton } from './BottomButton';
 import { FlowNodeType } from './ProcessInstanceInspector';
 
 type PlayButtonProps = {
+  flowNodeId: string;
   flowNodeInstanceId: string;
   flowNodeType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task;
+  processInstanceId: string;
   refresh: () => void;
-  onPlay?: (taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task) => void | Promise<void>;
+  onPlay?: (taskContext: {
+    processInstanceId: string;
+    flowNodeInstanceId: string;
+    flowNodeId: string;
+    taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task;
+  }) => void | Promise<void>;
 };
 
-export function PlayButton({ flowNodeInstanceId, flowNodeType, refresh, onPlay }: PlayButtonProps) {
+export function PlayButton({
+  flowNodeInstanceId,
+  flowNodeType,
+  refresh,
+  onPlay,
+  processInstanceId,
+  flowNodeId,
+}: PlayButtonProps) {
   return (
     <BottomButton
       title="Run Task"
@@ -19,7 +33,7 @@ export function PlayButton({ flowNodeInstanceId, flowNodeType, refresh, onPlay }
         if (typeof onPlay === 'function') {
           new Promise(async (resolve, reject) => {
             try {
-              await onPlay(flowNodeType);
+              await onPlay({ flowNodeId, processInstanceId, flowNodeInstanceId, taskType: flowNodeType });
               resolve(true);
             } catch (error) {
               reject(error);
