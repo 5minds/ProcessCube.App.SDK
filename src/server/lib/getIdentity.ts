@@ -16,7 +16,7 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
     req: { cookies: cookies(), headers: headers() } as any,
   });
 
-  const tokenIsExpired = token?.expiresAt && Date.now() >= token.expiresAt * 1000;
+  const tokenIsExpired = token?.expiresAt && Date.now() >= (token.expiresAt as number) * 1000;
   if (tokenIsExpired) {
     /**
      * This call triggers the jwt callback function to refresh the access token and
@@ -61,7 +61,7 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
   }
 
   return {
-    token: token?.accessToken,
+    token: token?.accessToken as string,
     userId: token?.sub,
   };
 }
