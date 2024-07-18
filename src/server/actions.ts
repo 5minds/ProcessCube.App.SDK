@@ -1,15 +1,13 @@
 'use server';
 
 import {
-  finishManualTask,
-  finishUntypedTask,
-  finishUserTask,
   getFlowNodeInstancesByProcessInstanceId,
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
   retryProcessInstance,
   terminateProcessInstance,
-} from '.';
+} from './lib/ProcessInstanceFunctions';
+import { finishManualTask, finishUntypedTask, finishUserTask } from './server-actions';
 
 export const finishTask = async (
   flowNodeInstanceId: string,

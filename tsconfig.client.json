@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./build/client",
     "lib": ["DOM", "DOM.Iterable"],
-    "tsBuildInfoFile": "./build/client.tsbuildinfo"
+    "tsBuildInfoFile": "./build/client.tsbuildinfo",
+    "declarationDir": "./build/",
   },
   "include": ["./src/client"],
   "references": [
