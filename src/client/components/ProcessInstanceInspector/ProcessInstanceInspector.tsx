@@ -430,15 +430,18 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     );
   }
 
+  const showTerminateButton = props.showTerminateButton && !RETRYABLE_STATES.includes(processInstance.state);
+  const showRetryButton = props.showRetryButton && RETRYABLE_STATES.includes(processInstance.state);
+
   return (
     <>
       <CommandPalette {...commandPaletteProps} />
-      {(props.showRefreshButton || props.showRetryButton || props.showTerminateButton) && (
+      {(props.showRefreshButton || showRetryButton || showTerminateButton) && (
         <ProcessButtonsContainer>
-          {props.showRetryButton && RETRYABLE_STATES.includes(processInstance.state) && (
+          {showRetryButton && (
             <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
           )}
-          {props.showTerminateButton && !RETRYABLE_STATES.includes(processInstance.state) && (
+          {showTerminateButton && (
             <TerminateProcessButton
               processInstanceId={props.processInstanceId}
               refresh={() => window.location.reload()}
