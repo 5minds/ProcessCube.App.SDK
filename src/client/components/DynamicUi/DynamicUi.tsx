@@ -9,6 +9,7 @@ import { DataModels } from '@5minds/processcube_engine_sdk';
 import { UserTaskInstance, mapUserTask } from '../../../common/types';
 import { classNames } from '../../utils/classNames';
 import {
+  CustomFormField,
   type DynamicUiFormFieldComponentMap,
   FormFieldComponentMap,
   type GenericFormFieldTypeComponentMap,
@@ -108,7 +109,7 @@ export function DynamicUi(
 
   const formFieldComponentMap = {
     ...FormFieldComponentMap,
-    ...(props.customFieldComponents ? props.customFieldComponents : {}),
+    ...(props.customFieldComponents ? props.customFieldComponents : CustomFormField),
   };
 
   const onSubmit = (formData: FormData) => {
