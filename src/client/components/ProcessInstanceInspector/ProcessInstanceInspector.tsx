@@ -94,6 +94,19 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     setFlowNodeInstances(flowNodeInstances);
     setTriggeredFlowNodeInstances(triggeredFlowNodeInstances);
 
+    const searchParams = new URLSearchParams(window.location.search);
+    const preselectedInstanceIds = searchParams.getAll('instance');
+
+    const preselectedFlowNodeInstances = flowNodeInstances.filter((fni) =>
+      preselectedInstanceIds.includes(fni.flowNodeInstanceId),
+    );
+
+    if (preselectedFlowNodeInstances.length !== preselectedInstanceIds.length) {
+      searchParams.delete('instance');
+      preselectedFlowNodeInstances.forEach((fni) => searchParams.append('instance', fni.flowNodeInstanceId));
+      window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+    }
+
     const shownInstancesMap = new Map<string, string>();
     flowNodeInstances.sort(sortByNewest).forEach((fni) => {
       if (!shownInstancesMap.has(fni.flowNodeId)) {
@@ -101,6 +114,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       }
     });
 
+    preselectedFlowNodeInstances.forEach((fni) => shownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
     setShownInstancesMap(shownInstancesMap);
   }, [processInstanceId]);
 
@@ -143,10 +157,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
       const existingButtons = overlays.get({ element: element.id, type: SDK_OVERLAY_BUTTONS_TYPE });
       if (Array.isArray(existingButtons) && existingButtons.length > 0) {
-        overlays.remove({
-          element: element.id,
-          type: SDK_OVERLAY_BUTTONS_TYPE,
-        });
+        return;
       }
 
       const shownInstance = instances.find((fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
@@ -244,7 +255,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
                   }
 
                   // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
-                  window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+                  window.history.replaceState(
+                    {},
+                    '',
+                    `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+                  );
 
                   setShownInstancesMap((prev) => new Map(prev).set(element.id, entry.flowNodeInstanceId));
                   setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS);
@@ -326,44 +341,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   );
 
   useEffect(() => {
-    if (!window) {
-      return;
-    }
-
-    // Not using the useSearchParams hook, because the component should be able to run in non-Next.js environments
-    const searchParams = new URLSearchParams(window.location.search);
-    const instanceIds = searchParams.getAll('instance');
-
-    setSelectedInstanceIds(instanceIds);
-  }, []);
-
-  useEffect(() => {
-    if (selectedInstanceIds.length === 0 || flowNodeInstances.length === 0) {
-      return;
-    }
-
-    const selectedFlowNodeInstances = flowNodeInstances.filter((fni) =>
-      selectedInstanceIds.includes(fni.flowNodeInstanceId),
-    );
-
-    if (selectedFlowNodeInstances.length !== selectedInstanceIds.length) {
-      selectedInstanceIds.forEach((instanceId) => {
-        if (!flowNodeInstances.some((fni) => fni.flowNodeInstanceId === instanceId)) {
-          const searchParams = new URLSearchParams(window.location.search);
-          searchParams.delete('instance', instanceId);
-
-          // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
-          window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
-        }
-      });
-    }
-
-    selectedFlowNodeInstances.forEach((fni) =>
-      setShownInstancesMap((prev) => new Map(prev).set(fni.flowNodeId, fni.flowNodeInstanceId)),
-    );
-  }, [selectedInstanceIds, flowNodeInstances]);
-
-  useEffect(() => {
     init();
   }, [processInstanceId]);
 
@@ -399,11 +376,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         if (!shownInstance) {
           return;
         }
-
-        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--finished`);
-        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--suspended`);
-        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--running`);
-        bpmnViewer.removeMarker(element.id, `asdk-pii-flow-node-instance-state--terminated`);
 
         bpmnViewer.addMarker(element.id, 'asdk-pii-flow-node-instance-state');
         bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
