@@ -19,12 +19,12 @@ type PlayButtonProps = {
 };
 
 export function PlayButton({
+  flowNodeId,
   flowNodeInstanceId,
   flowNodeType,
-  refresh,
-  onPlay,
   processInstanceId,
-  flowNodeId,
+  onPlay,
+  refresh,
 }: PlayButtonProps) {
   return (
     <BottomButton
