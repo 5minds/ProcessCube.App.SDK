@@ -13,7 +13,9 @@ import { SplitterLayout } from './SplitterLayout';
 const DEFAULT_SPLITTER_SIZE = 30;
 
 export type DiagramDocumentationInspectorRef = {
-  bpmnViewerRef: BPMNViewerFunctions;
+  bpmnViewerRef: BPMNViewerFunctions & {
+    onImportDone(callback: () => void): void;
+  };
 };
 
 type DiagramDocumentationInspectorProps = {
