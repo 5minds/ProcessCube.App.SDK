@@ -71,6 +71,7 @@ type ProcessInstanceInspectorProps = {
  * The diagram is interactive and allows the user to inspect the flow node instances and navigate to related flow nodes.
  */
 export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
+  const { processInstanceId } = props;
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
@@ -81,8 +82,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
-    const processInstancePromise = serverActions.getProcessInstance(props.processInstanceId);
-    const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(props.processInstanceId);
+    const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
+    const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
 
     const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
@@ -101,7 +102,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     });
 
     setShownInstancesMap(shownInstancesMap);
-  }, [props.processInstanceId]);
+  }, [processInstanceId]);
 
   const sequenceFlowFinished = useCallback(
     (element: ElementLike) => {
@@ -364,7 +365,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
   useEffect(() => {
     init();
-  }, [props.processInstanceId]);
+  }, [processInstanceId]);
 
   useEffect(() => {
     if (!processInstance?.xml) {
@@ -434,15 +435,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       <CommandPalette {...commandPaletteProps} />
       {(props.showRefreshButton || showRetryButton || showTerminateButton) && (
         <ProcessButtonsContainer>
-          {showRetryButton && (
-            <RetryProcessButton processInstanceId={props.processInstanceId} refresh={() => window.location.reload()} />
-          )}
-          {showTerminateButton && (
-            <TerminateProcessButton
-              processInstanceId={props.processInstanceId}
-              refresh={() => window.location.reload()}
-            />
-          )}
+          {showRetryButton && <RetryProcessButton processInstanceId={processInstanceId} refresh={refresh} />}
+          {showTerminateButton && <TerminateProcessButton processInstanceId={processInstanceId} refresh={refresh} />}
           {props.showRefreshButton && <RefreshProcessButton onClick={refresh} />}
         </ProcessButtonsContainer>
       )}
