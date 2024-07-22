@@ -15,14 +15,7 @@ import { SplitterLayout } from './SplitterLayout';
 const DEFAULT_SPLITTER_SIZE = 30;
 
 export type DiagramDocumentationInspectorRef = {
-  bpmnViewerRef: {
-    getElementRegistry(): ElementRegistry | undefined;
-    getOverlays(): Overlays | undefined;
-    addMarker(elementId: string, className: string): void;
-    removeMarker(elementId: string, className: string): void;
-    hasMarker(elementId: string, className: string): boolean | undefined;
-    onImportDone(callback: () => void): void;
-  };
+  bpmnViewerRef: BPMNViewerFunctions;
 };
 
 type DiagramDocumentationInspectorProps = {
