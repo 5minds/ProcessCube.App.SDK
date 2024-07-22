@@ -52,11 +52,11 @@ const SDK_OVERLAY_BUTTONS_TYPE = 'asdk-buttons';
 type ProcessInstanceInspectorProps = {
   processInstanceId: string;
   showExecutionCount?: boolean;
+  showFlowNodeInstancesListButton?: boolean;
   showGoToButton?: boolean;
-  showListButton?: boolean;
   showPlayButton?: boolean;
-  showRetryButton?: boolean;
   showRefreshButton?: boolean;
+  showRetryButton?: boolean;
   showTerminateButton?: boolean;
   onPlay?: (taskContext: {
     processInstanceId: string;
@@ -155,7 +155,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       }
 
       const showExecutionCount = props.showExecutionCount && instances.length > 1;
-      const showListButton = props.showListButton && instances.length > 1;
+      const showFlowNodeInstancesListButton = props.showFlowNodeInstancesListButton && instances.length > 1;
       const showPlayButton =
         props.showPlayButton &&
         PLAYABLE_TYPES.includes(element.type) &&
@@ -208,7 +208,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               {`${isFirstShown ? '' : `${shownInstanceIndex}/`}${instances.length}`}
             </BottomButton>
           )}
-          {showListButton && (
+          {showFlowNodeInstancesListButton && (
             <ListButton
               onClick={() => {
                 const entries = instances.map((fni) => ({
