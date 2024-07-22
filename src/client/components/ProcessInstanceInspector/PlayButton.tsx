@@ -1,19 +1,20 @@
 import React from 'react';
 
+import { BpmnType } from '@5minds/processcube_engine_sdk';
+
 import { BottomButton } from './BottomButton';
-import { FlowNodeType } from './ProcessInstanceInspector';
 
 type PlayButtonProps = {
   flowNodeId: string;
   flowNodeInstanceId: string;
-  flowNodeType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task;
+  flowNodeType: BpmnType.userTask | BpmnType.manualTask | BpmnType.untypedTask;
   processInstanceId: string;
   refresh: () => void;
   onPlay?: (taskContext: {
     processInstanceId: string;
     flowNodeInstanceId: string;
     flowNodeId: string;
-    taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task;
+    taskType: BpmnType.userTask | BpmnType.manualTask | BpmnType.untypedTask;
   }) => void | Promise<void>;
 };
 

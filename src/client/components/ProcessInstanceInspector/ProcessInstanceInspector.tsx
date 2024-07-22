@@ -7,6 +7,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import {
+  BpmnType,
   FlowNodeInstance,
   FlowNodeInstanceState,
   ProcessInstance,
@@ -28,28 +29,14 @@ import { TerminateProcessButton } from './TerminateProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
 
-export enum FlowNodeType {
-  boundaryEvent = 'bpmn:BoundaryEvent',
-  endEvent = 'bpmn:EndEvent',
-  intermediateCatchEvent = 'bpmn:IntermediateCatchEvent',
-  intermediateThrowEvent = 'bpmn:IntermediateThrowEvent',
-  manualTask = 'bpmn:ManualTask',
-  receiveTask = 'bpmn:ReceiveTask',
-  sendTask = 'bpmn:SendTask',
-  sequenceFlow = 'bpmn:SequenceFlow',
-  startEvent = 'bpmn:StartEvent',
-  task = 'bpmn:Task',
-  userTask = 'bpmn:UserTask',
-}
-
 const RETRYABLE_STATES = [ProcessInstanceState.error, ProcessInstanceState.terminated];
-const PLAYABLE_TYPES = [FlowNodeType.manualTask, FlowNodeType.userTask, FlowNodeType.task];
-const SENDER_TYPES = [FlowNodeType.endEvent, FlowNodeType.intermediateThrowEvent, FlowNodeType.sendTask];
+const PLAYABLE_TYPES = [BpmnType.manualTask, BpmnType.userTask, BpmnType.untypedTask];
+const SENDER_TYPES = [BpmnType.endEvent, BpmnType.intermediateThrowEvent, BpmnType.sendTask];
 const RECEIVER_TYPES = [
-  FlowNodeType.startEvent,
-  FlowNodeType.intermediateCatchEvent,
-  FlowNodeType.boundaryEvent,
-  FlowNodeType.receiveTask,
+  BpmnType.startEvent,
+  BpmnType.intermediateCatchEvent,
+  BpmnType.boundaryEvent,
+  BpmnType.receiveTask,
 ];
 
 const EMPTY_COMMAND_PALETTE_PROPS: CommandPaletteProps<FlowNodeInstance & CommandPaletteEntry> = {
@@ -75,7 +62,7 @@ type ProcessInstanceInspectorProps = {
     processInstanceId: string;
     flowNodeInstanceId: string;
     flowNodeId: string;
-    taskType: FlowNodeType.userTask | FlowNodeType.manualTask | FlowNodeType.task;
+    taskType: BpmnType.userTask | BpmnType.manualTask | BpmnType.untypedTask;
   }) => void | Promise<void>;
 };
 
@@ -394,7 +381,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       const flowNodeIds = new Set(flowNodeInstances.map((fni) => fni.flowNodeId));
 
       elementRegistry.forEach((element: ElementLike) => {
-        if (element.type === FlowNodeType.sequenceFlow && sequenceFlowFinished(element)) {
+        if (element.type === 'bpmn:SequenceFlow' && sequenceFlowFinished(element)) {
           bpmnViewer.addMarker(element.id, 'asdk-pii-sequence-flow-finished');
           return;
         }
