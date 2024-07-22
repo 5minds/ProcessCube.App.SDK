@@ -1,10 +1,8 @@
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
-import type ElementRegistry from 'diagram-js/lib/core/ElementRegistry';
 import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
-import type Overlays from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
-import React, { ForwardedRef, forwardRef } from 'react';
+import React, { ForwardedRef, Ref, forwardRef } from 'react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 
@@ -22,7 +20,10 @@ type DiagramDocumentationInspectorProps = {
   xml: string;
 };
 
-function DiagramDocumentationInspectorFunction(props: DiagramDocumentationInspectorProps, ref: any) {
+function DiagramDocumentationInspectorFunction(
+  props: DiagramDocumentationInspectorProps,
+  ref: Ref<DiagramDocumentationInspectorRef>,
+) {
   const [onImportDoneCallbacks, setOnImportDoneCallbacks] = useState<(() => void)[]>([]);
   const bpmnViewerRef = useRef<BPMNViewerFunctions>(null);
   const splitterRef = useRef<SplitterLayout>(null);
