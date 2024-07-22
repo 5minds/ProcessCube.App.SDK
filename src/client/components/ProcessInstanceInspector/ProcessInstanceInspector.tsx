@@ -435,8 +435,12 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       <CommandPalette {...commandPaletteProps} />
       {(props.showRefreshButton || showRetryButton || showTerminateButton) && (
         <ProcessButtonsContainer>
-          {showRetryButton && <RetryProcessButton processInstanceId={processInstanceId} refresh={refresh} />}
-          {showTerminateButton && <TerminateProcessButton processInstanceId={processInstanceId} refresh={refresh} />}
+          {showRetryButton && (
+            <RetryProcessButton processInstanceId={processInstanceId} refresh={() => setTimeout(refresh, 500)} />
+          )}
+          {showTerminateButton && (
+            <TerminateProcessButton processInstanceId={processInstanceId} refresh={() => setTimeout(refresh, 500)} />
+          )}
           {props.showRefreshButton && <RefreshProcessButton onClick={refresh} />}
         </ProcessButtonsContainer>
       )}
