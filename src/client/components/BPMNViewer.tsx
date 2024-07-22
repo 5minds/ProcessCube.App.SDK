@@ -9,7 +9,7 @@ import type { ElementLike } from 'diagram-js/lib/model/Types';
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 import dynamic from 'next/dynamic';
-import { ForwardedRef, Ref, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { ForwardedRef, Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import React from 'react';
 
 export type BPMNViewerProps = {
@@ -29,7 +29,6 @@ export type BPMNViewerFunctions = {
 };
 
 function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions>) {
-  const [canvas, setCanvas] = useState<Canvas | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<BpmnViewer>(
     new BpmnViewer({
@@ -50,16 +49,16 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
         return viewerRef.current.get<ElementRegistry>('elementRegistry');
       },
       addMarker(elementId: string, className: string) {
-        canvas?.addMarker(elementId, className);
+        viewerRef.current.get<Canvas>('canvas')?.addMarker(elementId, className);
       },
       removeMarker(elementId: string, className: string) {
-        canvas?.removeMarker(elementId, className);
+        viewerRef.current.get<Canvas>('canvas')?.removeMarker(elementId, className);
       },
       hasMarker(elementId: string, className: string) {
-        return canvas?.hasMarker(elementId, className);
+        return viewerRef.current.get<Canvas>('canvas')?.hasMarker(elementId, className);
       },
     };
-  }, [canvas]);
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -70,7 +69,6 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
     viewer.attachTo(containerRef.current);
 
     const canvas = viewer.get<Canvas>('canvas');
-    setCanvas(canvas);
 
     const onSelectionChange = (event: { newSelection: ElementLike[] }) => {
       props.onSelectionChanged?.(event.newSelection);
