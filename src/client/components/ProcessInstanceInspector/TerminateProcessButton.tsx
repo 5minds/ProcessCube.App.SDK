@@ -18,13 +18,13 @@ export function TerminateProcessButton({
       }
     >
       <svg
-        className="!app-sdk-stroke-[color:var(--asdk-bv-foreground-color)] !app-sdk-fill-[color:var(--asdk-bv-foreground-color)]"
+        className="!app-sdk-stroke-red-600 !app-sdk-fill-red-600"
         width="2rem"
         height="2rem"
-        viewBox="0 0 512 512"
+        viewBox="0 0 516 516"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M416 398.9c58.5-41.1 96-104.1 96-174.9C512 100.3 397.4 0 256 0S0 100.3 0 224c0 70.7 37.5 133.8 96 174.9c0 .4 0 .7 0 1.1v64c0 26.5 21.5 48 48 48h48V464c0-8.8 7.2-16 16-16s16 7.2 16 16v48h64V464c0-8.8 7.2-16 16-16s16 7.2 16 16v48h48c26.5 0 48-21.5 48-48V400c0-.4 0-.7 0-1.1zM96 256a64 64 0 1 1 128 0A64 64 0 1 1 96 256zm256-64a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm192-96l128 0c17.7 0 32 14.3 32 32l0 128c0 17.7-14.3 32-32 32l-128 0c-17.7 0-32-14.3-32-32l0-128c0-17.7 14.3-32 32-32z" />
       </svg>
     </button>
   );
