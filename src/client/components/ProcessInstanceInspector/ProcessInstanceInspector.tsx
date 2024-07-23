@@ -51,14 +51,14 @@ const SDK_OVERLAY_BUTTONS_TYPE = 'asdk-buttons';
 
 type ProcessInstanceInspectorProps = {
   processInstanceId: string;
-  showExecutionCount?: boolean;
+  showFinishTaskButton?: boolean;
+  showFlowNodeExecutionCount?: boolean;
   showFlowNodeInstancesListButton?: boolean;
-  showGoToButton?: boolean;
-  showPlayButton?: boolean;
-  showRefreshButton?: boolean;
-  showRetryButton?: boolean;
-  showTerminateButton?: boolean;
-  onPlay?: (taskContext: {
+  showGoToFlowNodeButton?: boolean;
+  enableProcessRefreshButton?: boolean;
+  enableProcessRetryButton?: boolean;
+  enableProcessTerminateButton?: boolean;
+  onFinish?: (taskContext: {
     processInstanceId: string;
     flowNodeInstanceId: string;
     flowNodeId: string;
@@ -77,7 +77,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [shownInstancesMap, setShownInstancesMap] = useState<Map<string, string>>(new Map());
-  const [selectedInstanceIds, setSelectedInstanceIds] = useState<string[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
   const init = useCallback(async () => {
@@ -165,23 +164,23 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         return;
       }
 
-      const showExecutionCount = props.showExecutionCount && instances.length > 1;
+      const showExecutionCount = props.showFlowNodeExecutionCount && instances.length > 1;
       const showFlowNodeInstancesListButton = props.showFlowNodeInstancesListButton && instances.length > 1;
       const showPlayButton =
-        props.showPlayButton &&
+        props.showFinishTaskButton &&
         PLAYABLE_TYPES.includes(element.type) &&
         shownInstance.state === FlowNodeInstanceState.suspended;
 
       const showRetryButton =
-        props.showRetryButton && processInstance && RETRYABLE_STATES.includes(processInstance.state);
+        props.enableProcessRetryButton && processInstance && RETRYABLE_STATES.includes(processInstance.state);
 
       let showGoToButton = false;
       let targetInstances: FlowNodeInstance[] = [];
-      if (props.showGoToButton && RECEIVER_TYPES.includes(element.type)) {
+      if (props.showGoToFlowNodeButton && RECEIVER_TYPES.includes(element.type)) {
         const triggeredByFlowNodeInstance = shownInstance.triggeredByFlowNodeInstance;
         showGoToButton = triggeredByFlowNodeInstance !== undefined;
         targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
-      } else if (props.showGoToButton && SENDER_TYPES.includes(element.type)) {
+      } else if (props.showGoToFlowNodeButton && SENDER_TYPES.includes(element.type)) {
         const matchingTriggeredInstances = triggeredFlowNodeInstances
           .filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId)
           .sort(sortByNewest);
@@ -316,7 +315,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               flowNodeInstanceId={shownInstance.flowNodeInstanceId}
               flowNodeType={element.type}
               processInstanceId={shownInstance.processInstanceId}
-              onPlay={props.onPlay}
+              onPlay={props.onFinish}
               // TODO use subscriptions to update data
               refresh={() => setTimeout(refresh, 500)}
             />
@@ -377,8 +376,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           return;
         }
 
-        bpmnViewer.addMarker(element.id, 'asdk-pii-flow-node-instance-state');
-        bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
+        if (!bpmnViewer.hasMarker(element.id, 'asdk-pii-flow-node-instance-state')) {
+          bpmnViewer.addMarker(element.id, 'asdk-pii-flow-node-instance-state');
+        }
+
+        if (!bpmnViewer.hasMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`)) {
+          bpmnViewer.addMarker(element.id, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
+        }
 
         renderFlowNodeButtons(element, matchingInstances);
       });
@@ -399,23 +403,23 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     );
   }
 
-  const showTerminateButton = props.showTerminateButton && !RETRYABLE_STATES.includes(processInstance.state);
-  const showRetryButton = props.showRetryButton && RETRYABLE_STATES.includes(processInstance.state);
+  const enableTerminateButton = props.enableProcessTerminateButton && !RETRYABLE_STATES.includes(processInstance.state);
+  const enableRetryButton = props.enableProcessRetryButton && RETRYABLE_STATES.includes(processInstance.state);
 
   return (
     <>
       <CommandPalette {...commandPaletteProps} />
       <ProcessButtonsContainer>
-        <RefreshProcessButton onClick={refresh} disabled={!props.showRefreshButton} />
+        <RefreshProcessButton onClick={refresh} disabled={!props.enableProcessRefreshButton} />
         <RetryProcessButton
           processInstanceId={processInstanceId}
           refresh={() => setTimeout(refresh, 500)}
-          disabled={!showRetryButton}
+          disabled={!enableRetryButton}
         />
         <TerminateProcessButton
           processInstanceId={processInstanceId}
           refresh={() => setTimeout(refresh, 500)}
-          disabled={!showTerminateButton}
+          disabled={!enableTerminateButton}
         />
       </ProcessButtonsContainer>
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
