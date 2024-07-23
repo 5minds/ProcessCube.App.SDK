@@ -137,14 +137,68 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       return;
     }
 
-    shownInstancesMap.forEach((flowNodeInstanceId) => {
-      const fni = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
-      fni && bpmnViewer.removeMarker(fni.flowNodeId, `asdk-pii-flow-node-instance-state--${fni.state}`);
+    const serverActions = await import('../../../server/actions');
+    const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
+    const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
+    const [newProcessInstance, newFlowNodeInstances] = await Promise.all([
+      processInstancePromise,
+      flowNodeInstancesPromise,
+    ]);
+
+    const newTriggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
+      newFlowNodeInstances.map((fni) => fni.flowNodeInstanceId),
+    );
+
+    newFlowNodeInstances.sort(sortByNewest);
+
+    for (const [flowNodeId, flowNodeInstanceId] of shownInstancesMap.entries()) {
+      const newestInstance = newFlowNodeInstances.find((fni) => fni.flowNodeId === flowNodeId);
+      if (!newestInstance) {
+        continue;
+      }
+
+      const shownInstance = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
+      if (!shownInstance) {
+        continue;
+      }
+
+      const showingNewestInstance = newestInstance.flowNodeInstanceId === flowNodeInstanceId;
+      const showingSameInstance = showingNewestInstance && shownInstance?.state === newestInstance.state;
+      if (showingSameInstance) {
+        continue;
+      }
+
+      bpmnViewer.removeMarker(flowNodeId, `asdk-pii-flow-node-instance-state--${shownInstance?.state}`);
+      overlays.remove({ element: flowNodeId, type: SDK_OVERLAY_BUTTONS_TYPE });
+    }
+
+    setProcessInstance(newProcessInstance);
+    setFlowNodeInstances(newFlowNodeInstances);
+    setTriggeredFlowNodeInstances(newTriggeredFlowNodeInstances);
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const preselectedInstanceIds = searchParams.getAll('instance');
+
+    const preselectedFlowNodeInstances = newFlowNodeInstances.filter((fni) =>
+      preselectedInstanceIds.includes(fni.flowNodeInstanceId),
+    );
+
+    if (preselectedFlowNodeInstances.length !== preselectedInstanceIds.length) {
+      searchParams.delete('instance');
+      preselectedFlowNodeInstances.forEach((fni) => searchParams.append('instance', fni.flowNodeInstanceId));
+      window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+    }
+
+    const newShownInstancesMap = new Map<string, string>();
+    newFlowNodeInstances.forEach((fni) => {
+      if (!newShownInstancesMap.has(fni.flowNodeId)) {
+        newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId);
+      }
     });
 
-    overlays.clear();
-    await init();
-  }, [diagramDocumentationInspectorRef.current, shownInstancesMap, flowNodeInstances, init]);
+    preselectedFlowNodeInstances.forEach((fni) => newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
+    setShownInstancesMap(newShownInstancesMap);
+  }, [diagramDocumentationInspectorRef.current, shownInstancesMap, flowNodeInstances]);
 
   const renderFlowNodeButtons = useCallback(
     (element: ElementLike, instances: FlowNodeInstance[]) => {
