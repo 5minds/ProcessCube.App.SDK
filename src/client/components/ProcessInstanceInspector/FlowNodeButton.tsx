@@ -2,13 +2,13 @@ import React, { PropsWithChildren } from 'react';
 
 import { classNames } from '../../utils/classNames';
 
-type BottomButtonProps = {
+type FlowNodeButtonProps = {
   title?: string;
   className?: string;
   onClick?: () => void;
 };
 
-export function BottomButton({ title, children, className, onClick }: PropsWithChildren<BottomButtonProps>) {
+export function FlowNodeButton({ title, children, className, onClick }: PropsWithChildren<FlowNodeButtonProps>) {
   return (
     <button
       title={title}

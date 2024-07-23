@@ -15,9 +15,9 @@ import {
 } from '@5minds/processcube_engine_sdk';
 
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
-import { BottomButton } from './BottomButton';
-import { BottomButtonContainer } from './BottomButtonContainer';
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
+import { FlowNodeButton } from './FlowNodeButton';
+import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
 import { GoToButton } from './GoToButton';
 import { ListButton } from './ListButton';
 import { PlayButton } from './PlayButton';
@@ -210,14 +210,14 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       const shownInstanceIndex = instances.length - instances.indexOf(shownInstance);
 
       root.render(
-        <BottomButtonContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
+        <FlowNodeButtonsContainer width={isTooNarrowForTwoButtons ? element.width * 2 : element.width}>
           {showExecutionCount && (
-            <BottomButton
+            <FlowNodeButton
               className="app-sdk-select-none !app-sdk-cursor-default !app-sdk-bg-slate-500"
               title={`Flow Node was executed ${instances.length} times.${isFirstShown ? '' : ` You are viewing instance #${shownInstanceIndex}.`}`}
             >
               {`${isFirstShown ? '' : `${shownInstanceIndex}/`}${instances.length}`}
-            </BottomButton>
+            </FlowNodeButton>
           )}
           {showFlowNodeInstancesListButton && (
             <ListButton
@@ -328,7 +328,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               refresh={() => setTimeout(refresh, 500)}
             />
           )}
-        </BottomButtonContainer>,
+        </FlowNodeButtonsContainer>,
       );
     },
     [
@@ -405,17 +405,19 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   return (
     <>
       <CommandPalette {...commandPaletteProps} />
-      {(props.showRefreshButton || showRetryButton || showTerminateButton) && (
-        <ProcessButtonsContainer>
-          {showRetryButton && (
-            <RetryProcessButton processInstanceId={processInstanceId} refresh={() => setTimeout(refresh, 500)} />
-          )}
-          {showTerminateButton && (
-            <TerminateProcessButton processInstanceId={processInstanceId} refresh={() => setTimeout(refresh, 500)} />
-          )}
-          {props.showRefreshButton && <RefreshProcessButton onClick={refresh} />}
-        </ProcessButtonsContainer>
-      )}
+      <ProcessButtonsContainer>
+        <RefreshProcessButton onClick={refresh} disabled={!props.showRefreshButton} />
+        <RetryProcessButton
+          processInstanceId={processInstanceId}
+          refresh={() => setTimeout(refresh, 500)}
+          disabled={!showRetryButton}
+        />
+        <TerminateProcessButton
+          processInstanceId={processInstanceId}
+          refresh={() => setTimeout(refresh, 500)}
+          disabled={!showTerminateButton}
+        />
+      </ProcessButtonsContainer>
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
   );

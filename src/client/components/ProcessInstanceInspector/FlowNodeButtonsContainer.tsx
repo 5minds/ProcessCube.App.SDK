@@ -1,10 +1,10 @@
 import React, { PropsWithChildren } from 'react';
 
-type BottomButtonContainer = {
+type FlowNodeButtonsContainerProps = {
   width: number;
 };
 
-export function BottomButtonContainer({ width, children }: PropsWithChildren<BottomButtonContainer>) {
+export function FlowNodeButtonsContainer({ width, children }: PropsWithChildren<FlowNodeButtonsContainerProps>) {
   return (
     <div
       className="app-sdk-flex app-sdk-gap-1 app-sdk-justify-center app-sdk-flex-wrap"
