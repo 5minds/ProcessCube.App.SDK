@@ -161,17 +161,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     }
 
     for (const [flowNodeId, flowNodeInstanceId] of shownInstancesMap.entries()) {
-      const newestInstance = newFlowNodeInstances.find((fni) => fni.flowNodeId === flowNodeId);
-      if (!newestInstance) {
-        continue;
-      }
-
       const shownInstance = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
       if (!shownInstance) {
         continue;
       }
 
-      const showingNewestInstance = newestInstance.flowNodeInstanceId === flowNodeInstanceId;
+      const newestInstance = newFlowNodeInstances.find((fni) => fni.flowNodeId === flowNodeId);
+      const showingNewestInstance = newestInstance?.flowNodeInstanceId === flowNodeInstanceId;
       const showingSameInstance = showingNewestInstance && shownInstance?.state === newestInstance.state;
       if (showingSameInstance) {
         continue;
@@ -421,8 +417,12 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       const flowNodeIds = new Set(flowNodeInstances.map((fni) => fni.flowNodeId));
 
       elementRegistry.forEach((element: ElementLike) => {
-        if (element.type === 'bpmn:SequenceFlow' && sequenceFlowFinished(element)) {
-          bpmnViewer.addMarker(element.id, 'asdk-pii-sequence-flow-finished');
+        if (element.type === 'bpmn:SequenceFlow') {
+          if (sequenceFlowFinished(element)) {
+            bpmnViewer.addMarker(element.id, 'asdk-pii-sequence-flow-finished');
+          } else if (bpmnViewer.hasMarker(element.id, 'asdk-pii-sequence-flow-finished')) {
+            bpmnViewer.removeMarker(element.id, 'asdk-pii-sequence-flow-finished');
+          }
           return;
         }
 
