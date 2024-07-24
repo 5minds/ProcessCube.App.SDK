@@ -82,7 +82,7 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     document.addEventListener('touchmove', this.handleTouchMove);
 
     let secondaryPaneSize;
-    if (this.props.secondaryInitialSize) {
+    if (this.props.secondaryInitialSize != null) {
       secondaryPaneSize = this.props.secondaryInitialSize;
     } else {
       const containerRect = this.container.getBoundingClientRect();
