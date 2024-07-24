@@ -20,8 +20,8 @@ import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
 import { GoToButton } from './GoToButton';
 import { InfoPopover } from './InfoPopover';
 import { ListButton } from './ListButton';
-import { MenuButton } from './MenuButton';
 import { PlayButton } from './PlayButton';
+import { PopoverButton } from './PopoverButton';
 import { ProcessButtonSeparator } from './ProcessButtonSeparator';
 import { ProcessButtonsContainer } from './ProcessButtonsContainer';
 import { RefreshProcessButton } from './RefreshProcessButton';
@@ -481,7 +481,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           disabled={!enableTerminateButton}
         />
         <ProcessButtonSeparator />
-        <MenuButton
+        <PopoverButton
           disabled={!props.enablePopoverButton}
           open={() => setIsInfoPopoverOpen(true)}
           close={() => setIsInfoPopoverOpen(false)}

@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 
 import { ProcessButton } from './ProcessButton';
 
-type MenuButtonProps = {
+type PopoverButtonProps = {
   disabled?: boolean;
   isOpen?: boolean;
   open: () => void;
   close: () => void;
 };
 
-export function MenuButton(props: MenuButtonProps) {
+export function PopoverButton(props: PopoverButtonProps) {
   const [isOpen, setIsOpen] = useState(props.isOpen ?? false);
   useEffect(() => {});
 
