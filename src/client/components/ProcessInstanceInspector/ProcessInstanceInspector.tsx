@@ -21,13 +21,13 @@ import { FlowNodeButton } from './FlowNodeButton';
 import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
 import { GoToButton } from './GoToButton';
 import { ListButton } from './ListButton';
+import { MenuButton } from './MenuButton';
 import { PlayButton } from './PlayButton';
 import { ProcessButtonSeparator } from './ProcessButtonSeparator';
 import { ProcessButtonsContainer } from './ProcessButtonsContainer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
-import { SidepanelButton } from './SidepanelButton';
 import { TerminateProcessButton } from './TerminateProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
@@ -480,7 +480,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           disabled={!enableTerminateButton}
         />
         <ProcessButtonSeparator />
-        <SidepanelButton splitterLayoutRef={splitterLayoutRef.current} />
+        <MenuButton
+          open={() => splitterLayoutRef.current?.setSecondaryPaneSize(300)}
+          close={() => splitterLayoutRef.current?.setSecondaryPaneSize(0)}
+        />
       </ProcessButtonsContainer>
       <SplitterLayout ref={splitterLayoutRef} secondaryInitialSize={0}>
         <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />

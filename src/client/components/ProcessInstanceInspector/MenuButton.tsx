@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
 
-import { SplitterLayout } from '../SplitterLayout';
 import { ProcessButton } from './ProcessButton';
 
-const SIDEPANEL_SIZE = 300;
+type MenuButtonProps = {
+  isOpen?: boolean;
+  open: () => void;
+  close: () => void;
+};
 
-export function SidepanelButton({ splitterLayoutRef }: { splitterLayoutRef: SplitterLayout | null }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function MenuButton(props: MenuButtonProps) {
+  const [isOpen, setIsOpen] = useState(props.isOpen ?? false);
   useEffect(() => {});
 
   return (
     <ProcessButton
       onClick={() => {
         if (isOpen) {
-          splitterLayoutRef?.setSecondaryPaneSize(0);
+          props.close();
         } else {
-          splitterLayoutRef?.setSecondaryPaneSize(SIDEPANEL_SIZE);
+          props.open();
         }
 
         setIsOpen((prev) => !prev);
