@@ -1,9 +1,9 @@
+import Editor from '@monaco-editor/react';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import {
@@ -484,7 +484,15 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       </ProcessButtonsContainer>
       <SplitterLayout ref={splitterLayoutRef} secondaryInitialSize={0}>
         <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
-        <div>Sidepanel</div>
+        <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-p-2 app-sdk-border-b app-sdk-border-t-0 app-sdk-border-l-0 app-sdk-border-r-0 app-sdk-border-solid">
+          <label>Start Token</label>
+          <Editor
+            height="7rem"
+            defaultLanguage="json"
+            defaultValue={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
+            options={{ lineNumbersMinChars: 2, readOnly: true }}
+          />
+        </div>
       </SplitterLayout>
     </>
   );

@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { SplitterLayout } from '../SplitterLayout';
 import { ProcessButton } from './ProcessButton';
+
+const SIDEPANEL_SIZE = 300;
 
 export function SidepanelButton({ splitterLayoutRef }: { splitterLayoutRef: SplitterLayout | null }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +15,7 @@ export function SidepanelButton({ splitterLayoutRef }: { splitterLayoutRef: Spli
         if (isOpen) {
           splitterLayoutRef?.setSecondaryPaneSize(0);
         } else {
-          splitterLayoutRef?.setSecondaryPaneSize(250);
+          splitterLayoutRef?.setSecondaryPaneSize(SIDEPANEL_SIZE);
         }
 
         setIsOpen((prev) => !prev);
