@@ -156,6 +156,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
     newFlowNodeInstances.sort(sortByNewest);
 
+    if (newProcessInstance.state !== processInstance?.state) {
+      overlays.clear();
+    }
+
     for (const [flowNodeId, flowNodeInstanceId] of shownInstancesMap.entries()) {
       const newestInstance = newFlowNodeInstances.find((fni) => fni.flowNodeId === flowNodeId);
       if (!newestInstance) {
