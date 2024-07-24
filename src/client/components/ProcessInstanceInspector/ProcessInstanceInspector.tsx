@@ -15,11 +15,11 @@ import {
 } from '@5minds/processcube_engine_sdk';
 
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
-import { SplitterLayout } from '../SplitterLayout';
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { FlowNodeButton } from './FlowNodeButton';
 import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
 import { GoToButton } from './GoToButton';
+import { InfoPopup } from './InfoPopup';
 import { ListButton } from './ListButton';
 import { MenuButton } from './MenuButton';
 import { PlayButton } from './PlayButton';
@@ -76,12 +76,12 @@ type ProcessInstanceInspectorProps = {
 export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const { processInstanceId } = props;
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
+  const [isInfoPopupOpen, setIsInfoPopupOpen] = useState(false);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [shownInstancesMap, setShownInstancesMap] = useState<Map<string, string>>(new Map());
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
-  const splitterLayoutRef = useRef<SplitterLayout>(null);
 
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
@@ -480,23 +480,23 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           disabled={!enableTerminateButton}
         />
         <ProcessButtonSeparator />
-        <MenuButton
-          open={() => splitterLayoutRef.current?.setSecondaryPaneSize(300)}
-          close={() => splitterLayoutRef.current?.setSecondaryPaneSize(0)}
-        />
+        <MenuButton open={() => setIsInfoPopupOpen(true)} close={() => setIsInfoPopupOpen(false)} />
       </ProcessButtonsContainer>
-      <SplitterLayout ref={splitterLayoutRef} secondaryInitialSize={0}>
-        <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
+      <InfoPopup
+        className={`${isInfoPopupOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
+      >
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-p-2 app-sdk-border-b app-sdk-border-t-0 app-sdk-border-l-0 app-sdk-border-r-0 app-sdk-border-solid">
-          <label>Start Token</label>
+          <label className="app-sdk-text-white">Start Token</label>
           <Editor
             height="7rem"
             defaultLanguage="json"
             defaultValue={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
+            theme="vs-dark"
             options={{ lineNumbersMinChars: 2, readOnly: true }}
           />
         </div>
-      </SplitterLayout>
+      </InfoPopup>
+      <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
   );
 }
