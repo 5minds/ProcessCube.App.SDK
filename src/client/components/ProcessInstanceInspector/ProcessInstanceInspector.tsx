@@ -1,4 +1,3 @@
-import Editor from '@monaco-editor/react';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
@@ -28,6 +27,7 @@ import { ProcessButtonsContainer } from './ProcessButtonsContainer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
+import { StartTokenViewer } from './StartTokenViewer';
 import { TerminateProcessButton } from './TerminateProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
@@ -485,16 +485,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       <InfoPopover
         className={`${isInfoPopupOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
       >
-        <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-p-2 app-sdk-border-b app-sdk-border-t-0 app-sdk-border-l-0 app-sdk-border-r-0 app-sdk-border-solid">
-          <label className="app-sdk-text-white">Start Token</label>
-          <Editor
-            height="7rem"
-            defaultLanguage="json"
-            defaultValue={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
-            theme="vs-dark"
-            options={{ lineNumbersMinChars: 2, readOnly: true }}
-          />
-        </div>
+        <StartTokenViewer startToken={processInstance.startToken} />
       </InfoPopover>
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
