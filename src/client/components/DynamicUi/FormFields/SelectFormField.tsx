@@ -3,7 +3,7 @@ import React from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function EnumFormField(
+export function SelectFormField(
   { formField, state }: DynamicUiComponentProps<string | Array<string> | null>,
   ref: DynamicUiFormFieldRef,
 ) {

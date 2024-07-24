@@ -2,6 +2,7 @@ import { DataModels } from '@5minds/processcube_engine_sdk';
 
 import { DynamicUiFormFieldComponent } from '../DynamicUi';
 import { BooleanFormField } from './BooleanFormField';
+import { CheckboxFormField } from './CheckboxFormField';
 import { ColorFormField } from './ColorFormField';
 import { ConfirmFormField } from './ConfirmFormField';
 import { DateFormField } from './DateFormField';
@@ -16,9 +17,12 @@ import { IntegerFormField } from './IntegerFormField';
 import { MonthFormField } from './MonthFormField';
 import { ParagraphFormField } from './ParagraphFormField';
 import { PasswordFormField } from './PasswordFormField';
+import { RadioFormField } from './RadioFormField';
 import { RangeFormField } from './RangeFormField';
+import { SelectFormField } from './SelectFormField';
 import { StringFormField } from './StringFormField';
 import { TelFormField } from './TelFormField';
+import { TextareaFormField } from './TextareaFormField';
 import { TimeFormField } from './TimeFormField';
 import { UrlFormField } from './UrlFormField';
 import { WeekFormField } from './WeekFormField';
@@ -46,6 +50,7 @@ export type DynamicUiFormFieldComponentMap = CommonFormFieldTypeComponentMap | G
 
 export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   boolean: BooleanFormField,
+  checkbox: CheckboxFormField,
   color: ColorFormField,
   date: DateFormField,
   email: EmailFormField,
@@ -61,15 +66,19 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   string: StringFormField,
   paragraph: ParagraphFormField,
   password: PasswordFormField,
+  radio: RadioFormField,
   range: RangeFormField,
+  select: SelectFormField,
   header: HeaderFormField,
   confirm: ConfirmFormField,
   tel: TelFormField,
+  textarea: TextareaFormField,
   time: TimeFormField,
   url: UrlFormField,
   week: WeekFormField,
 };
 export { BooleanFormField } from './BooleanFormField';
+export { CheckboxFormField } from './CheckboxFormField';
 export { ColorFormField } from './ColorFormField';
 export { DateFormField } from './DateFormField';
 export { DecimalFormField } from './DecimalFormField';
@@ -83,10 +92,13 @@ export { MonthFormField } from './MonthFormField';
 export { StringFormField } from './StringFormField';
 export { ParagraphFormField } from './ParagraphFormField';
 export { PasswordFormField } from './PasswordFormField';
+export { RadioFormField } from './RadioFormField';
 export { RangeFormField } from './RangeFormField';
+export { SelectFormField } from './SelectFormField';
 export { HeaderFormField } from './HeaderFormField';
 export { ConfirmFormField } from './ConfirmFormField';
 export { TelFormField } from './TelFormField';
+export { TextareaFormField } from './TextareaFormField';
 export { TimeFormField } from './TimeFormField';
 export { UrlFormField } from './UrlFormField';
 export { WeekFormField } from './WeekFormField';

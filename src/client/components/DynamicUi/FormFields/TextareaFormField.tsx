@@ -4,17 +4,17 @@ import { classNames } from '../../../utils/classNames';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function StringFormField(
+export function TextareaFormField(
   { formField, state }: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
-  const inputType = 'text';
-  const textInput = React.createElement(inputType, {
+  const inputType = 'textarea';
+  const textareaInput = React.createElement(inputType, {
     className: classNames(
-      'app-sdk-form-input',
+      'app-sdk-form-textarea',
       'app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-shadow-sm focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] app-sdk-block app-sdk-w-full sm:app-sdk-text-sm app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 dark:app-sdk-border-solid dark:app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] dark:focus:app-sdk-shadow-app-sdk-dark app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] dark:invalid:app-sdk-shadow-app-sdk-dark-invalid',
     ),
     id: formField.id,
@@ -22,7 +22,7 @@ export function StringFormField(
     defaultValue: state || (formField.defaultValue?.toString() ?? ''),
     placeholder: parsedCustomFormConfig?.placeholder,
     'aria-describedby': parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined,
-    type: 'text',
+    rows: 4,
     'data-form-field-type': 'string',
   });
 
@@ -40,7 +40,7 @@ export function StringFormField(
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {label}
       </label>
-      <div className="app-sdk-mt-1">{textInput}</div>
+      <div className="app-sdk-mt-1">{textareaInput}</div>
       {hint}
     </div>
   );
