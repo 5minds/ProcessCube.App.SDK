@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ProcessButton } from './ProcessButton';
 
 type MenuButtonProps = {
+  disabled?: boolean;
   isOpen?: boolean;
   open: () => void;
   close: () => void;
@@ -14,6 +15,7 @@ export function MenuButton(props: MenuButtonProps) {
 
   return (
     <ProcessButton
+      disabled={props.disabled}
       onClick={() => {
         if (isOpen) {
           props.close();

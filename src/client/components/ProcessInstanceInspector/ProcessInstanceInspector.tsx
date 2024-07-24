@@ -61,6 +61,7 @@ type ProcessInstanceInspectorProps = {
   enableProcessRefreshButton?: boolean;
   enableProcessRetryButton?: boolean;
   enableProcessTerminateButton?: boolean;
+  enablePopoverButton?: boolean;
   onFinish?: (taskContext: {
     processInstanceId: string;
     flowNodeInstanceId: string;
@@ -480,7 +481,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           disabled={!enableTerminateButton}
         />
         <ProcessButtonSeparator />
-        <MenuButton open={() => setIsInfoPopoverOpen(true)} close={() => setIsInfoPopoverOpen(false)} />
+        <MenuButton
+          disabled={!props.enablePopoverButton}
+          open={() => setIsInfoPopoverOpen(true)}
+          close={() => setIsInfoPopoverOpen(false)}
+        />
       </ProcessButtonsContainer>
       <InfoPopover
         className={`${isInfoPopoverOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
