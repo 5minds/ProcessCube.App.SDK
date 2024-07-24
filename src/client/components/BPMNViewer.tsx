@@ -58,7 +58,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
         return viewerRef.current.get<Canvas>('canvas')?.hasMarker(elementId, className);
       },
     };
-  }, []);
+  }, [viewerRef.current, containerRef.current]);
 
   useEffect(() => {
     if (!containerRef.current) {
