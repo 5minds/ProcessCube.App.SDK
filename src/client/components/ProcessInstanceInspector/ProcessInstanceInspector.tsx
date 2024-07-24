@@ -15,16 +15,19 @@ import {
 } from '@5minds/processcube_engine_sdk';
 
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
+import { SplitterLayout } from '../SplitterLayout';
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { FlowNodeButton } from './FlowNodeButton';
 import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
 import { GoToButton } from './GoToButton';
 import { ListButton } from './ListButton';
 import { PlayButton } from './PlayButton';
+import { ProcessButtonSeparator } from './ProcessButtonSeparator';
 import { ProcessButtonsContainer } from './ProcessButtonsContainer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
+import { SidepanelButton } from './SidepanelButton';
 import { TerminateProcessButton } from './TerminateProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
@@ -78,6 +81,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [shownInstancesMap, setShownInstancesMap] = useState<Map<string, string>>(new Map());
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
+  const splitterLayoutRef = useRef<SplitterLayout>(null);
 
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
@@ -475,8 +479,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           refresh={() => setTimeout(refresh, 500)}
           disabled={!enableTerminateButton}
         />
+        <ProcessButtonSeparator />
+        <SidepanelButton splitterLayoutRef={splitterLayoutRef.current} />
       </ProcessButtonsContainer>
-      <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
+      <SplitterLayout ref={splitterLayoutRef} secondaryInitialSize={0}>
+        <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
+        <div>Sidepanel</div>
+      </SplitterLayout>
     </>
   );
 }
