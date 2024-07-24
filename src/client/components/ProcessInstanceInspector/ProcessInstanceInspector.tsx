@@ -76,7 +76,7 @@ type ProcessInstanceInspectorProps = {
 export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const { processInstanceId } = props;
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
-  const [isInfoPopupOpen, setIsInfoPopupOpen] = useState(false);
+  const [isInfoPopoverOpen, setIsInfoPopoverOpen] = useState(false);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
@@ -480,10 +480,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           disabled={!enableTerminateButton}
         />
         <ProcessButtonSeparator />
-        <MenuButton open={() => setIsInfoPopupOpen(true)} close={() => setIsInfoPopupOpen(false)} />
+        <MenuButton open={() => setIsInfoPopoverOpen(true)} close={() => setIsInfoPopoverOpen(false)} />
       </ProcessButtonsContainer>
       <InfoPopover
-        className={`${isInfoPopupOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
+        className={`${isInfoPopoverOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
       >
         <StartTokenViewer startToken={processInstance.startToken} />
       </InfoPopover>
