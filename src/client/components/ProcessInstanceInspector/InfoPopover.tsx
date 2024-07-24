@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from 'react';
 
 import { classNames } from '../../utils/classNames';
 
-export function InfoPopup({ className, children }: PropsWithChildren<{ className?: string }>) {
+export function InfoPopover({ className, children }: PropsWithChildren<{ className?: string }>) {
   return (
     <div
       className={classNames(

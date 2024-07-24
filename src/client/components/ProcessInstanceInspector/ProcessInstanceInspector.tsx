@@ -19,7 +19,7 @@ import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './Comm
 import { FlowNodeButton } from './FlowNodeButton';
 import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
 import { GoToButton } from './GoToButton';
-import { InfoPopup } from './InfoPopup';
+import { InfoPopover } from './InfoPopover';
 import { ListButton } from './ListButton';
 import { MenuButton } from './MenuButton';
 import { PlayButton } from './PlayButton';
@@ -482,7 +482,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         <ProcessButtonSeparator />
         <MenuButton open={() => setIsInfoPopupOpen(true)} close={() => setIsInfoPopupOpen(false)} />
       </ProcessButtonsContainer>
-      <InfoPopup
+      <InfoPopover
         className={`${isInfoPopupOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
       >
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-p-2 app-sdk-border-b app-sdk-border-t-0 app-sdk-border-l-0 app-sdk-border-r-0 app-sdk-border-solid">
@@ -495,7 +495,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
             options={{ lineNumbersMinChars: 2, readOnly: true }}
           />
         </div>
-      </InfoPopup>
+      </InfoPopover>
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
   );
