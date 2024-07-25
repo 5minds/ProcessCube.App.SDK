@@ -10,9 +10,6 @@ export function HiddenFormField(props: DynamicUiComponentProps<string | null>, r
 
   return (
     <div>
-      <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
-        {formField.label}
-      </label>
       <div className="app-sdk-mt-1">
         <input
           className="app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-app-sdk-dark"
@@ -24,14 +21,6 @@ export function HiddenFormField(props: DynamicUiComponentProps<string | null>, r
           data-form-field-type="hidden"
         />
       </div>
-      {parsedCustomFormConfig?.hint && (
-        <p
-          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
-          id={hintId}
-        >
-          {parsedCustomFormConfig?.hint}
-        </p>
-      )}
     </div>
   );
 }
