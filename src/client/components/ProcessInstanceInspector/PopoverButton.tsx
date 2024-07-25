@@ -28,7 +28,7 @@ export function PopoverButton(props: PopoverButtonProps) {
     >
       {isOpen ? (
         <svg
-          className="!app-sdk-stroke-[color:var(--asdk-bv-background-color)] !app-sdk-fill-[color:var(--asdk-bv-background-color)]"
+          className="!app-sdk-stroke-app-sdk-gray-50 !app-sdk-fill-app-sdk-gray-50"
           xmlns="http://www.w3.org/2000/svg"
           width="1.5rem"
           height="1.5rem"
@@ -38,7 +38,7 @@ export function PopoverButton(props: PopoverButtonProps) {
         </svg>
       ) : (
         <svg
-          className="!app-sdk-stroke-[color:var(--asdk-bv-background-color)] !app-sdk-fill-[color:var(--asdk-bv-background-color)]"
+          className="!app-sdk-stroke-app-sdk-gray-50 !app-sdk-fill-app-sdk-gray-50"
           xmlns="http://www.w3.org/2000/svg"
           width="1.5rem"
           height="1.5rem"
