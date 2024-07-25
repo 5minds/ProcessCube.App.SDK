@@ -19,8 +19,8 @@ export function RetryProcessButton({ processInstanceId, disabled, refresh }: Ret
     >
       <svg
         className="!app-sdk-stroke-app-sdk-gray-50 !app-sdk-fill-app-sdk-gray-50"
-        width="1.5rem"
-        height="1.5rem"
+        width="1.25rem"
+        height="1.25rem"
         viewBox="0 0 512 512"
         xmlns="http://www.w3.org/2000/svg"
       >
