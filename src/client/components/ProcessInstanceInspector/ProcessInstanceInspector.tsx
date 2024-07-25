@@ -58,6 +58,7 @@ type ProcessInstanceInspectorProps = {
   showFlowNodeExecutionCount?: boolean;
   showFlowNodeInstancesListButton?: boolean;
   showGoToFlowNodeButton?: boolean;
+  showRetryFlowNodeInstanceButton?: boolean;
   enableProcessRefreshButton?: boolean;
   enableProcessRetryButton?: boolean;
   enableProcessTerminateButton?: boolean;
@@ -231,7 +232,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         shownInstance.state === FlowNodeInstanceState.suspended;
 
       const showRetryButton =
-        props.enableProcessRetryButton && processInstance && RETRYABLE_STATES.includes(processInstance.state);
+        props.showRetryFlowNodeInstanceButton && processInstance && RETRYABLE_STATES.includes(processInstance.state);
 
       let showGoToButton = false;
       let targetInstances: FlowNodeInstance[] = [];
