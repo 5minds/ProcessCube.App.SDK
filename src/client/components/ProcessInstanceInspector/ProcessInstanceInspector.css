@@ -30,8 +30,9 @@
     );
     --asdk-pii-state-terminated-color: var(
       --app-sdk-process-instance-inspector-state-terminated-color,
-      theme(colors.red.500)
+      theme(colors.orange.500)
     );
+    --asdk-pii-state-error-color: var(--app-sdk-process-instance-inspector-state-error-color, theme(colors.red.500));
   }
 
   .asdk-pii-play-button:hover {
@@ -72,13 +73,23 @@
     }
   }
 
-  .asdk-pii-flow-node-instance-state--terminated {
+  .asdk-pii-flow-node-instance-state--error {
     .djs-hit {
-      fill: var(--asdk-pii-state-terminated-color, theme(colors.red.500)) !important;
+      fill: var(--asdk-pii-state-error-color, theme(colors.red.500)) !important;
     }
 
     .djs-visual > :first-child {
-      filter: drop-shadow(0 0 3px var(--asdk-pii-state-terminated-color, theme(colors.red.500)));
+      filter: drop-shadow(0 0 3px var(--asdk-pii-state-error-color, theme(colors.red.500)));
+    }
+  }
+
+  .asdk-pii-flow-node-instance-state--terminated {
+    .djs-hit {
+      fill: var(--asdk-pii-state-terminated-color, theme(colors.orange.500)) !important;
+    }
+
+    .djs-visual > :first-child {
+      filter: drop-shadow(0 0 3px var(--asdk-pii-state-terminated-color, theme(colors.orange.500)));
     }
   }
 
