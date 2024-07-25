@@ -13,7 +13,6 @@ export function EnumFormField(
   const options = formField.enumValues;
 
   let enumInput: JSX.Element;
-  console.log('displayAs', parsedCustomFormConfig);
 
   switch (parsedCustomFormConfig?.displayAs) {
     case 'checkbox':
