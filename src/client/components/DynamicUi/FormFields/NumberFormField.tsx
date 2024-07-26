@@ -11,6 +11,7 @@ export function NumberFormField(props: DynamicUiComponentProps<string | null>, r
   if (!isNumber(formField.defaultValue)) {
     console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for number field "${formField.id}"`);
   }
+  console.log('Step', parsedCustomFormConfig?.step ?? 'kein Step eingetragen');
 
   // let numberInput: JSX.Element;
 
