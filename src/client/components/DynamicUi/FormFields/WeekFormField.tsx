@@ -26,6 +26,7 @@ export function WeekFormField(props: DynamicUiComponentProps<string | null>, ref
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
+          placeholder={parsedCustomFormConfig?.placeholder || 'yyyy-Www'}
           aria-describedby={hintId}
           data-form-field-type="week"
         />

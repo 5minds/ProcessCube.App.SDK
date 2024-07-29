@@ -25,7 +25,7 @@ export function NumberFormField(props: DynamicUiComponentProps<string | null>, r
           id={formField.id}
           name={formField.id}
           defaultValue={state || formField.defaultValue?.toString()}
-          placeholder={parsedCustomFormConfig?.placeholder ?? '0'}
+          placeholder={parsedCustomFormConfig?.placeholder ?? '0.01'}
           aria-describedby={`${formField.id}-hint`}
           data-form-field-type="number"
         />

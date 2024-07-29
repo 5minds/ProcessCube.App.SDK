@@ -26,6 +26,7 @@ export function DateFormField(props: DynamicUiComponentProps<string | null>, ref
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
+          placeholder={parsedCustomFormConfig?.placeholder || 'yyyy-mm-dd'}
           aria-describedby={hintId}
           data-form-field-type="date"
         />

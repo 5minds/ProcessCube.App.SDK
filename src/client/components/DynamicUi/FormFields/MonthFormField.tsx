@@ -26,6 +26,7 @@ export function MonthFormField(props: DynamicUiComponentProps<string | null>, re
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
+          placeholder={parsedCustomFormConfig?.placeholder || 'yyyy-mm'}
           aria-describedby={hintId}
           data-form-field-type="month"
         />

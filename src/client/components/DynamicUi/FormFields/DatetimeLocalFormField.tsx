@@ -28,6 +28,7 @@ export function DatetimeLocalFormField(props: DynamicUiComponentProps<string | n
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
+          placeholder={parsedCustomFormConfig?.placeholder || 'yyyy-mm-ddThh:mm:ss'}
           aria-describedby={hintId}
           data-form-field-type="datetime-local"
         />
