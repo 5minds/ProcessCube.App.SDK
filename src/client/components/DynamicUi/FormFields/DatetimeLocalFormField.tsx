@@ -64,6 +64,10 @@ function isValidTime(value: any) {
 }
 
 function isValidDateTimeLocal(value: any) {
+  if (typeof value !== 'string' || !value.includes('T')) {
+    return false;
+  }
+
   const [date, time] = value.split('T');
   return isValidDate(date) && isValidTime(time);
 }
