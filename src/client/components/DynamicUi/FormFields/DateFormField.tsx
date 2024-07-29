@@ -43,5 +43,7 @@ export function DateFormField(props: DynamicUiComponentProps<string | null>, ref
 }
 
 function isValidDate(value: any) {
-  return new Date(value?.toString()).toString() !== 'Invalid Date';
+  const date = new Date(value?.toString()).toString();
+  console.log('date: ', date);
+  return date !== 'Invalid Date';
 }
