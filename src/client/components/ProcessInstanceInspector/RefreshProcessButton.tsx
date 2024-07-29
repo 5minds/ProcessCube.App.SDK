@@ -3,7 +3,7 @@ import React from 'react';
 import { ProcessButton } from './ProcessButton';
 
 type RefreshProcessButtonProps = {
-  disabled: boolean;
+  disabled?: boolean;
   onClick: () => void;
 };
 

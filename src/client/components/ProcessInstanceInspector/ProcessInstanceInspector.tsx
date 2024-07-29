@@ -59,10 +59,10 @@ type ProcessInstanceInspectorProps = {
   showFlowNodeInstancesListButton?: boolean;
   showGoToFlowNodeButton?: boolean;
   showRetryFlowNodeInstanceButton?: boolean;
-  enableProcessRefreshButton?: boolean;
-  enableProcessRetryButton?: boolean;
-  enableProcessTerminateButton?: boolean;
-  enablePopoverButton?: boolean;
+  showProcessRefreshButton?: boolean;
+  showProcessRetryButton?: boolean;
+  showProcessTerminateButton?: boolean;
+  showPopoverButton?: boolean;
   onFinish?: (taskContext: {
     processInstanceId: string;
     flowNodeInstanceId: string;
@@ -467,31 +467,42 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     );
   }
 
-  const enableTerminateButton = props.enableProcessTerminateButton && !RETRYABLE_STATES.includes(processInstance.state);
-  const enableRetryButton = props.enableProcessRetryButton && RETRYABLE_STATES.includes(processInstance.state);
+  const showProcessButtonsContainer =
+    props.showProcessRefreshButton ||
+    props.showProcessRetryButton ||
+    props.showProcessTerminateButton ||
+    props.showPopoverButton;
+
+  const showProcessButtonSeparator =
+    props.showPopoverButton &&
+    (props.showProcessRefreshButton || props.showProcessRetryButton || props.showProcessTerminateButton);
 
   return (
     <>
       <CommandPalette {...commandPaletteProps} />
-      <ProcessButtonsContainer>
-        <RefreshProcessButton onClick={refresh} disabled={!props.enableProcessRefreshButton} />
-        <RetryProcessButton
-          processInstanceId={processInstanceId}
-          refresh={() => setTimeout(refresh, 500)}
-          disabled={!enableRetryButton}
-        />
-        <TerminateProcessButton
-          processInstanceId={processInstanceId}
-          refresh={() => setTimeout(refresh, 500)}
-          disabled={!enableTerminateButton}
-        />
-        <ProcessButtonSeparator />
-        <PopoverButton
-          disabled={!props.enablePopoverButton}
-          open={() => setIsInfoPopoverOpen(true)}
-          close={() => setIsInfoPopoverOpen(false)}
-        />
-      </ProcessButtonsContainer>
+      {showProcessButtonsContainer && (
+        <ProcessButtonsContainer>
+          {props.showProcessRefreshButton && <RefreshProcessButton onClick={refresh} />}
+          {props.showProcessRetryButton && (
+            <RetryProcessButton
+              processInstanceId={processInstanceId}
+              refresh={() => setTimeout(refresh, 500)}
+              disabled={!RETRYABLE_STATES.includes(processInstance.state)}
+            />
+          )}
+          {props.showProcessTerminateButton && (
+            <TerminateProcessButton
+              processInstanceId={processInstanceId}
+              refresh={() => setTimeout(refresh, 500)}
+              disabled={RETRYABLE_STATES.includes(processInstance.state)}
+            />
+          )}
+          {showProcessButtonSeparator && <ProcessButtonSeparator />}
+          {props.showPopoverButton && (
+            <PopoverButton open={() => setIsInfoPopoverOpen(true)} close={() => setIsInfoPopoverOpen(false)} />
+          )}
+        </ProcessButtonsContainer>
+      )}
       <InfoPopover
         className={`${isInfoPopoverOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
       >
