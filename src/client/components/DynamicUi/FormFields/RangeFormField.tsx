@@ -13,6 +13,8 @@ export function RangeFormField({ formField }: DynamicUiComponentProps<number | n
   const defaultMax = parsedCustomFormConfig?.max || 100;
   const defaultStep = parsedCustomFormConfig?.step || 1;
 
+  console.log('default Value:', parsedCustomFormConfig?.defaultValue);
+
   const rangeInput = (
     <input
       className={classNames(
