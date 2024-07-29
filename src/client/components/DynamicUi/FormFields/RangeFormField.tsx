@@ -4,10 +4,7 @@ import { classNames } from '../../../utils/classNames';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function RangeFormField(
-  { formField, state }: DynamicUiComponentProps<number | null>,
-  ref: DynamicUiFormFieldRef,
-) {
+export function RangeFormField({ formField }: DynamicUiComponentProps<number | null>, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
@@ -15,7 +12,6 @@ export function RangeFormField(
   const defaultMin = parsedCustomFormConfig?.min || 0;
   const defaultMax = parsedCustomFormConfig?.max || 100;
   const defaultStep = parsedCustomFormConfig?.step || 1;
-  console.log(state);
 
   const rangeInput = (
     <input
@@ -29,11 +25,9 @@ export function RangeFormField(
       max={defaultMax.toString()}
       step={defaultStep.toString()}
       defaultValue={
-        state !== null
-          ? state?.toString()
-          : parsedCustomFormConfig?.defaultValue !== null
-            ? parsedCustomFormConfig?.defaultValue.toString()
-            : defaultMin.toString()
+        parsedCustomFormConfig?.defaultValue !== null
+          ? parsedCustomFormConfig?.defaultValue.toString()
+          : defaultMin.toString()
       }
       aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
       data-form-field-type="range"
