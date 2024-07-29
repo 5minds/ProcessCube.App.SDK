@@ -9,7 +9,7 @@ export function WeekFormField(props: DynamicUiComponentProps<string | null>, ref
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   if (!isValidDate(formField.defaultValue)) {
-    console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for date field "${formField.id}"`);
+    console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for week field "${formField.id}"`);
   }
 
   const defaultValue = props.state || formField.defaultValue?.toString();

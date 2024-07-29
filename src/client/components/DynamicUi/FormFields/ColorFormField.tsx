@@ -8,6 +8,10 @@ export function ColorFormField(props: DynamicUiComponentProps<string | null>, re
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
+  if (!isValidColor(formField.defaultValue)) {
+    console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for color field "${formField.id}"`);
+  }
+
   const defaultValue = props.state || formField.defaultValue?.toString();
 
   return (
@@ -15,7 +19,7 @@ export function ColorFormField(props: DynamicUiComponentProps<string | null>, re
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {formField.label}
       </label>
-      <div className="app-sdk-mt-1">
+      <div className="app-sdk-mt-1 app-sdk-w-20">
         <input
           className="app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-h-12 app-sdk app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:invalid:app-sdk-shadow-app-sdk-dark-invalid dark:focus:app-sdk-shadow-app-sdk-dark"
           type="color"
@@ -37,4 +41,10 @@ export function ColorFormField(props: DynamicUiComponentProps<string | null>, re
       )}
     </div>
   );
+}
+
+function isValidColor(value: any) {
+  const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+
+  return hexColorRegex.test(value?.toString());
 }

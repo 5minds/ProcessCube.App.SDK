@@ -9,7 +9,7 @@ export function MonthFormField(props: DynamicUiComponentProps<string | null>, re
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   if (!isValidDate(formField.defaultValue)) {
-    console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for date field "${formField.id}"`);
+    console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for month field "${formField.id}"`);
   }
 
   const defaultValue = props.state || formField.defaultValue?.toString();
