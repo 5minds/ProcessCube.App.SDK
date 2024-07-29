@@ -22,6 +22,7 @@ export function ColorFormField(props: DynamicUiComponentProps<string | null>, re
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
+          placeholder={parsedCustomFormConfig?.placeholder || '#ffffff'}
           aria-describedby={hintId}
           data-form-field-type="color"
         />
