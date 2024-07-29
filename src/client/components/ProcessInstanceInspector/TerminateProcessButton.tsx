@@ -20,7 +20,11 @@ export function TerminateProcessButton({ processInstanceId, disabled, refresh }:
       }
     >
       <svg
-        className="!app-sdk-stroke-red-600 !app-sdk-fill-red-600"
+        className={
+          disabled
+            ? '!app-sdk-stroke-app-sdk-gray-400 !app-sdk-fill-app-sdk-gray-400'
+            : '!app-sdk-stroke-red-600 !app-sdk-fill-red-600'
+        }
         width="1.25rem"
         height="1.25rem"
         viewBox="0 0 516 516"
