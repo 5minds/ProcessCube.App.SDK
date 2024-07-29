@@ -15,6 +15,7 @@ export function RangeFormField(
   const defaultMin = parsedCustomFormConfig?.min || 0;
   const defaultMax = parsedCustomFormConfig?.max || 100;
   const defaultStep = parsedCustomFormConfig?.step || 1;
+  console.log(state);
 
   const rangeInput = (
     <input
@@ -27,7 +28,13 @@ export function RangeFormField(
       min={defaultMin.toString()}
       max={defaultMax.toString()}
       step={defaultStep.toString()}
-      defaultValue={state !== null ? state?.toString() : defaultMin.toString()}
+      defaultValue={
+        state !== null
+          ? state?.toString()
+          : parsedCustomFormConfig?.defaultValue !== null
+            ? parsedCustomFormConfig?.defaultValue.toString()
+            : defaultMin.toString()
+      }
       aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
       data-form-field-type="range"
     />
