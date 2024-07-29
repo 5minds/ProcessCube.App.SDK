@@ -24,10 +24,10 @@ import { PlayButton } from './PlayButton';
 import { PopoverButton } from './PopoverButton';
 import { ProcessButtonSeparator } from './ProcessButtonSeparator';
 import { ProcessButtonsContainer } from './ProcessButtonsContainer';
+import { ProcessTokenViewer } from './ProcessTokenViewer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
-import { StartTokenViewer } from './StartTokenViewer';
 import { TerminateProcessButton } from './TerminateProcessButton';
 
 const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
@@ -506,7 +506,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       <InfoPopover
         className={`${isInfoPopoverOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
       >
-        <StartTokenViewer startToken={processInstance.startToken} />
+        <ProcessTokenViewer startToken={processInstance.startToken} endToken={processInstance.endToken} />
       </InfoPopover>
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </>
