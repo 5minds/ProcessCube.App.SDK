@@ -25,7 +25,7 @@ export function RangeFormField({ formField }: DynamicUiComponentProps<number | n
       max={defaultMax.toString()}
       step={defaultStep.toString()}
       defaultValue={
-        parsedCustomFormConfig?.defaultValue !== null
+        parsedCustomFormConfig?.defaultValue !== undefined
           ? parsedCustomFormConfig?.defaultValue.toString()
           : defaultMin.toString()
       }
