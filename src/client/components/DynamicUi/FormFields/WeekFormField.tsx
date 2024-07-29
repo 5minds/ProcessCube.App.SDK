@@ -42,7 +42,7 @@ export function WeekFormField(props: DynamicUiComponentProps<string | null>, ref
   );
 }
 
-function isValidWeek(value) {
+function isValidWeek(value: any) {
   if (typeof value !== 'string' || !/^(\d{4})-W(0[1-9]|[1-4][0-9]|5[0-3])$/.test(value)) {
     return false;
   }

@@ -42,7 +42,7 @@ export function TimeFormField(props: DynamicUiComponentProps<string | null>, ref
   );
 }
 
-function isValidTime(value) {
+function isValidTime(value: any) {
   if (typeof value !== 'string' || !/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/.test(value)) {
     return false;
   }
