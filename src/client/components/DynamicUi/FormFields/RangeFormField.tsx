@@ -19,7 +19,7 @@ export function RangeFormField(
   const defaultValue = state || formField.defaultValue?.toString() || defaultMin.toString();
   const [currentValue, setCurrentValue] = useState(defaultValue);
 
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setCurrentValue(event.target.value);
   };
 
