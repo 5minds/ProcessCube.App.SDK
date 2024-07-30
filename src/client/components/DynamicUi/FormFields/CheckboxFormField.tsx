@@ -9,7 +9,7 @@ export function CheckboxFormField(
 ) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
   const options = formField.enumValues;
-  console.log('optiones', options);
+  console.log('formField', formField);
   const hintId = `${formField.id}-hint`;
 
   let multipleStateOrDefaultValue: any[];
