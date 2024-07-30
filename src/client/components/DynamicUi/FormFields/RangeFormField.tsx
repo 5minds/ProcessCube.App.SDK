@@ -63,9 +63,9 @@ export function RangeFormField(
         <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
           {defaultMax}
         </span>
-        <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
-          Aktueller Wert: {currentValue}
-        </div>
+      </div>
+      <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+        Aktueller Wert: {currentValue}
       </div>
       {hint}
     </div>
