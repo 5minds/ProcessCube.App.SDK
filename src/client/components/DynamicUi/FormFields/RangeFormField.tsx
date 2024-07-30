@@ -35,7 +35,6 @@ export function RangeFormField(
       max={defaultMax.toString()}
       step={defaultStep.toString()}
       defaultValue={defaultValue}
-      value={currentValue}
       onChange={handleChange}
       aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
       data-form-field-type="range"
@@ -57,12 +56,20 @@ export function RangeFormField(
         {label}
       </label>
       <div className="app-sdk-mt-1 app-sdk-flex app-sdk-flex-row">
-        <span className="app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">{defaultMin}</span>
+        <span className="app-sdk-mt-2 app-sdk-mr-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+          {defaultMin}
+        </span>
         {rangeInput}
-        <span className="app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">{defaultMax}</span>
-      </div>
-      <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
-        Aktueller Wert: {currentValue}
+        <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+          {defaultMax}
+        </span>
+        <input
+          type="text"
+          readOnly
+          className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]"
+        >
+          {currentValue}
+        </input>
       </div>
       {hint}
     </div>
