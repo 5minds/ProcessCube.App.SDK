@@ -478,7 +478,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     (props.showProcessRefreshButton || props.showProcessRetryButton || props.showProcessTerminateButton);
 
   return (
-    <>
+    <div className="app-sdk-relative app-sdk-w-full app-sdk-h-full">
       <CommandPalette {...commandPaletteProps} />
       {showProcessButtonsContainer && (
         <ProcessButtonsContainer>
@@ -509,7 +509,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         <ProcessTokenViewer startToken={processInstance.startToken} endToken={processInstance.endToken} />
       </InfoPopover>
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
-    </>
+    </div>
   );
 }
 
