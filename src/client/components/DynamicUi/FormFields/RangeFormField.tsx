@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { classNames } from '../../../utils/classNames';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
@@ -17,6 +17,11 @@ export function RangeFormField(
   const defaultStep = parsedCustomFormConfig?.step || 1;
 
   const defaultValue = state || formField.defaultValue?.toString() || defaultMin.toString();
+  const [currentValue, setCurrentValue] = useState(defaultValue);
+
+  const handleChange = (event) => {
+    setCurrentValue(event.target.value);
+  };
 
   const rangeInput = (
     <input
@@ -30,6 +35,8 @@ export function RangeFormField(
       max={defaultMax.toString()}
       step={defaultStep.toString()}
       defaultValue={defaultValue}
+      value={currentValue}
+      onChange={handleChange}
       aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
       data-form-field-type="range"
     />
@@ -49,7 +56,12 @@ export function RangeFormField(
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {label}
       </label>
-      <div className="app-sdk-mt-1">{rangeInput}</div>
+      <div className="app-sdk-mt-1">
+        <span className="app-sdk-text-sm app-sdk-text-gray-700">{defaultMin}</span>
+        {rangeInput}
+        <span className="app-sdk-text-sm app-sdk-text-gray-700">{defaultMax}</span>
+      </div>
+      <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-gray-600">Aktueller Wert: {currentValue}</div>
       {hint}
     </div>
   );
