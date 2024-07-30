@@ -56,12 +56,14 @@ export function RangeFormField(
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {label}
       </label>
-      <div className="app-sdk-mt-1">
-        <span className="app-sdk-text-sm app-sdk-text-gray-700">{defaultMin}</span>
+      <div className="app-sdk-mt-1 app-sdk-flex app-sdk-flex-row">
+        <span className="app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">{defaultMin}</span>
         {rangeInput}
-        <span className="app-sdk-text-sm app-sdk-text-gray-700">{defaultMax}</span>
+        <span className="app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">{defaultMax}</span>
       </div>
-      <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-gray-600">Aktueller Wert: {currentValue}</div>
+      <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+        Aktueller Wert: {currentValue}
+      </div>
       {hint}
     </div>
   );
