@@ -3,11 +3,13 @@ import React from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function CheckboxFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
-  const { formField, state } = props;
-  const hintId = `${formField.id}-hint`;
+export function CheckboxFormField(
+  { formField, state }: DynamicUiComponentProps<string | Array<string> | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
   const options = formField.enumValues;
+  const hintId = `${formField.id}-hint`;
 
   let multipleStateOrDefaultValue: any[];
   if (Array.isArray(state) && state.length) {
@@ -21,13 +23,12 @@ export function CheckboxFormField(props: DynamicUiComponentProps<string | null>,
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {formField.label}
       </label>
-      <input
-        className="app-sdk-pl-0 app-sdk-pb-0 app-sdk-space-y-2"
-        type="checkbox"
+      <fieldset
         id={formField.id}
-        name={formField.id}
-        aria-describedby={hintId}
-        data-form-field-type="checkbox"
+        className="app-sdk-pl-0 app-sdk-pb-0 app-sdk-space-y-2"
+        data-type="checkbox"
+        aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
+        data-form-field-type="enum"
       >
         {options?.map((option) => {
           const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
@@ -55,7 +56,7 @@ export function CheckboxFormField(props: DynamicUiComponentProps<string | null>,
             </div>
           );
         })}
-      </input>
+      </fieldset>
       {parsedCustomFormConfig?.hint && (
         <p
           className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
