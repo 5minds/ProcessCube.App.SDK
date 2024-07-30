@@ -28,7 +28,7 @@ export function CheckboxFormField(
         className="app-sdk-pl-0 app-sdk-pb-0 app-sdk-space-y-2"
         data-type="checkbox"
         aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
-        data-form-field-type="enum"
+        data-form-field-type="checkbox"
       >
         {options?.map((option) => {
           const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
