@@ -8,6 +8,7 @@ export function FileFormField(props: DynamicUiComponentProps<File | null>, ref: 
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
   const options = formField.enumValues;
+  console.log('FileFormField', formField);
 
   let multipleStateOrDefaultValue: any[];
   if (Array.isArray(state) && state.length) {

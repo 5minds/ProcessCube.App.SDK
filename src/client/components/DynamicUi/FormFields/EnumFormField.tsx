@@ -11,7 +11,7 @@ export function EnumFormField(
 
   const label = formField.label;
   const options = formField.enumValues;
-  console.log('formField', formField);
+  console.log('EnumFormField', formField);
 
   let enumInput: JSX.Element;
 
