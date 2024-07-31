@@ -32,7 +32,7 @@ enum MissingFormFieldType {
   paragraph = 'paragraph',
   header = 'header',
   confirm = 'confirm',
-  checkbox = 'enum',
+  checkbox = 'checkbox',
 }
 
 const UserTaskFormFieldType = {
