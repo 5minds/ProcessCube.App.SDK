@@ -30,8 +30,6 @@ import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
 import { TerminateProcessButton } from './TerminateProcessButton';
 
-const sortByNewest = (a: FlowNodeInstance, b: FlowNodeInstance) => ((a.startedAt ?? 0) > (b.startedAt ?? 0) ? -1 : 1);
-
 const RETRYABLE_STATES = [ProcessInstanceState.error, ProcessInstanceState.terminated];
 const PLAYABLE_TYPES = [BpmnType.manualTask, BpmnType.userTask, BpmnType.untypedTask];
 const SENDER_TYPES = [BpmnType.endEvent, BpmnType.intermediateThrowEvent, BpmnType.sendTask];
@@ -119,7 +117,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     }
 
     const shownInstancesMap = new Map<string, string>();
-    flowNodeInstances.sort(sortByNewest).forEach((fni) => {
+    flowNodeInstances.forEach((fni) => {
       if (!shownInstancesMap.has(fni.flowNodeId)) {
         shownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId);
       }
@@ -160,8 +158,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     const newTriggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
       newFlowNodeInstances.map((fni) => fni.flowNodeInstanceId),
     );
-
-    newFlowNodeInstances.sort(sortByNewest);
 
     if (newProcessInstance.state !== processInstance?.state) {
       overlays.clear();
@@ -247,10 +243,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         showGoToButton = triggeredByFlowNodeInstance !== undefined;
         targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
       } else if (props.showGoToFlowNodeButton && SENDER_TYPES.includes(element.type)) {
-        const matchingTriggeredInstances = triggeredFlowNodeInstances
-          .filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId)
-          .sort(sortByNewest);
-
+        const matchingTriggeredInstances = triggeredFlowNodeInstances.filter(
+          (fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId,
+        );
         showGoToButton = matchingTriggeredInstances.length > 0;
         targetInstances = matchingTriggeredInstances;
       }
@@ -438,7 +433,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           return;
         }
 
-        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id).sort(sortByNewest);
+        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id);
         const shownInstance = matchingInstances.find(
           (fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId),
         );

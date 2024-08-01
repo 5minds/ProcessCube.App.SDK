@@ -23,19 +23,21 @@ export async function getProcessInstanceById(
 /**
  * This function will return the FlowNodeInstances of the ProcessInstance with the given ID.
  *
- * @param processInstanceId The ID of the ProcessInstance
+ * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
+ * @param options The options for the {@link Client.flowNodeInstances.query}
  * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
  */
 export async function getFlowNodeInstancesByProcessInstanceId(
   processInstanceId: string,
+  options: Parameters<typeof Client.flowNodeInstances.query>[1] = {
+    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
+  },
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  // const identity = await getIdentity();
-
   const result = await Client.flowNodeInstances.query(
     { processInstanceId: processInstanceId },
     {
-      sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
-      // identity: identity,
+      ...options,
+      identity: options.identity ?? (await getIdentity()),
     },
   );
 

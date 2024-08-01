@@ -1,5 +1,7 @@
 'use server';
 
+import { DataModels } from '@5minds/processcube_engine_client';
+
 import {
   getFlowNodeInstancesByProcessInstanceId,
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
@@ -37,7 +39,9 @@ export const getProcessInstance = async (processInstanceId: string) => {
 };
 
 export const getFlowNodeInstances = async (processInstanceId: string) => {
-  return getFlowNodeInstancesByProcessInstanceId(processInstanceId);
+  return getFlowNodeInstancesByProcessInstanceId(processInstanceId, {
+    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
+  });
 };
 
 export const getTriggeredFlowNodeInstances = async (flowNodeInstanceIds: string[]) => {
