@@ -100,6 +100,12 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     setTriggeredFlowNodeInstances(triggeredFlowNodeInstances);
 
     const searchParams = new URLSearchParams(window.location.search);
+    const popoverIsOpen = searchParams.get('popover');
+
+    if (popoverIsOpen === 'true') {
+      setIsInfoPopoverOpen(true);
+    }
+
     const preselectedInstanceIds = searchParams.getAll('instance');
 
     const preselectedFlowNodeInstances = flowNodeInstances.filter((fni) =>
@@ -500,7 +506,29 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           )}
           {showProcessButtonSeparator && <ProcessButtonSeparator />}
           {props.showPopoverButton && (
-            <PopoverButton open={() => setIsInfoPopoverOpen(true)} close={() => setIsInfoPopoverOpen(false)} />
+            <PopoverButton
+              isOpen={isInfoPopoverOpen}
+              open={() => {
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('popover', 'true');
+                window.history.replaceState(
+                  {},
+                  '',
+                  `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+                );
+                setIsInfoPopoverOpen(true);
+              }}
+              close={() => {
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.delete('popover');
+                window.history.replaceState(
+                  {},
+                  '',
+                  `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+                );
+                setIsInfoPopoverOpen(false);
+              }}
+            />
           )}
         </ProcessButtonsContainer>
       )}
