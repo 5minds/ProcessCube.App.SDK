@@ -16,6 +16,7 @@ export function PopoverButton(props: PopoverButtonProps) {
   return (
     <ProcessButton
       disabled={props.disabled}
+      title="View Process Tokens"
       onClick={() => {
         if (isOpen) {
           props.close();
