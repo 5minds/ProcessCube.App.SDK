@@ -204,7 +204,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
     preselectedFlowNodeInstances.forEach((fni) => newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
     setShownInstancesMap(newShownInstancesMap);
-  }, [diagramDocumentationInspectorRef.current, shownInstancesMap, flowNodeInstances]);
+  }, [diagramDocumentationInspectorRef.current, shownInstancesMap, flowNodeInstances, processInstanceId]);
 
   const renderFlowNodeButtons = useCallback(
     (element: ElementLike, instances: FlowNodeInstance[]) => {
@@ -336,6 +336,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           )}
           {showGoToButton && (
             <GoToButton
+              isSender={SENDER_TYPES.includes(element.type)}
               onClick={() => {
                 if (targetInstances.length === 1) {
                   const searchParams = new URLSearchParams();

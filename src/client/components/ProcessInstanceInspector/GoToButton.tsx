@@ -2,9 +2,9 @@ import React from 'react';
 
 import { FlowNodeButton } from './FlowNodeButton';
 
-export function GoToButton({ onClick }: { onClick: () => void }) {
+export function GoToButton({ isSender, onClick }: { isSender: boolean; onClick: () => void }) {
   return (
-    <FlowNodeButton title="Go to Target" onClick={onClick}>
+    <FlowNodeButton title={`Go to ${isSender ? 'Target' : 'Source'}`} onClick={onClick}>
       <svg
         className="!app-sdk-fill-white"
         width="10px"
