@@ -535,7 +535,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       <InfoPopover
         className={`${isInfoPopoverOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
       >
-        <ProcessTokenViewer startToken={processInstance.startToken} endToken={processInstance.endToken} />
+        <ProcessTokenViewer
+          startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
+          endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
+        />
       </InfoPopover>
       <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
     </div>

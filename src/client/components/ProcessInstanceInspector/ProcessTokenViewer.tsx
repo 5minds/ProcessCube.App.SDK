@@ -1,15 +1,15 @@
 import Editor from '@monaco-editor/react';
 import React from 'react';
 
-export function ProcessTokenViewer({ startToken, endToken }: { startToken: any; endToken: any }) {
+export function ProcessTokenViewer({ startToken, endToken }: { startToken: string; endToken: string }) {
   return (
-    <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3 app-sdk-p-2">
+    <div key={`${startToken}${endToken}`} className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3 app-sdk-p-2">
       <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
         <label className="app-sdk-text-white">Start Token</label>
         <Editor
           height="7rem"
           defaultLanguage="json"
-          defaultValue={JSON.stringify(startToken ?? {}, null, 2)}
+          defaultValue={startToken}
           theme="vs-dark"
           options={{ lineNumbersMinChars: 2, readOnly: true }}
         />
@@ -19,7 +19,7 @@ export function ProcessTokenViewer({ startToken, endToken }: { startToken: any; 
         <Editor
           height="7rem"
           defaultLanguage="json"
-          defaultValue={JSON.stringify(endToken ?? {}, null, 2)}
+          defaultValue={endToken}
           theme="vs-dark"
           options={{ lineNumbersMinChars: 2, readOnly: true }}
         />
