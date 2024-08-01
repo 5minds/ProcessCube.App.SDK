@@ -494,7 +494,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
             <TerminateProcessButton
               processInstanceId={processInstanceId}
               refresh={() => setTimeout(refresh, 500)}
-              disabled={RETRYABLE_STATES.includes(processInstance.state)}
+              disabled={processInstance.state !== ProcessInstanceState.running}
             />
           )}
           {showProcessButtonSeparator && <ProcessButtonSeparator />}
