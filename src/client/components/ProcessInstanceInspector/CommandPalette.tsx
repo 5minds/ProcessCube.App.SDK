@@ -36,7 +36,7 @@ export function CommandPalette<T extends CommandPaletteEntry>(props: CommandPale
 
   return (
     <Dialog
-      className="app-sdk-relative app-sdk-z-10"
+      className="app-sdk-relative app-sdk-z-50"
       open={props.isOpen}
       onClose={() => {
         props.onClose();
