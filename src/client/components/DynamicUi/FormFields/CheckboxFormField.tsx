@@ -32,7 +32,7 @@ export function CheckboxFormField(
         aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
         data-form-field-type="checkbox"
       >
-        {options?.map((option) => {
+        {options?.map((option: any) => {
           const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
 
           return (
