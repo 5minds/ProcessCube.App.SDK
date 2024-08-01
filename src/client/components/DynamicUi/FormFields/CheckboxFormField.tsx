@@ -4,12 +4,12 @@ import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
 export function CheckboxFormField(
-  { formField, state }: DynamicUiComponentProps<string | Array<string> | null>,
+  { formField, state }: DynamicUiComponentProps<string | Array<Object> | null>,
   ref: DynamicUiFormFieldRef,
 ) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
   console.log('parsedCustomFormConfig', parsedCustomFormConfig?.entries);
-  const options = formField.enumValues;
+  const options = parsedCustomFormConfig?.entries;
   console.log('CheckboxFormField', formField);
   const hintId = `${formField.id}-hint`;
 
