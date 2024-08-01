@@ -8,6 +8,7 @@ export function CheckboxFormField(
   ref: DynamicUiFormFieldRef,
 ) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+  console.log('parsedCustomFormConfig', parsedCustomFormConfig);
   const options = formField.enumValues;
   console.log('CheckboxFormField', formField);
   const hintId = `${formField.id}-hint`;
