@@ -109,8 +109,7 @@ export function DynamicUi(
 
   const formFieldComponentMap = {
     ...FormFieldComponentMap,
-    ...(props.customFieldComponents ? props.customFieldComponents : CustomFormField),
-    default: CustomFormField,
+    ...(props.customFieldComponents ? props.customFieldComponents : {}),
   };
 
   const onSubmit = (formData: FormData) => {
@@ -203,8 +202,8 @@ export function DynamicUi(
           <div className="app-sdk-flex app-sdk-flex-col app-sdk-space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
               const DynamicUiFormFieldComponent =
-                (formFieldComponentMap as GenericFormFieldTypeComponentMap)[field.type] ||
-                formFieldComponentMap.default;
+                (formFieldComponentMap as GenericFormFieldTypeComponentMap)?.[field.type] ||
+                (formFieldComponentMap as GenericFormFieldTypeComponentMap).custom;
 
               if (!DynamicUiFormFieldComponent) {
                 return null;
