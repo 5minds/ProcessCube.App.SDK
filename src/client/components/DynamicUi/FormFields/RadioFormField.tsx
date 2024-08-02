@@ -20,12 +20,11 @@ export function RadioFormField(
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
         {formField.label}
       </label>
-      <input
-        className="app-sdk-pl-0 app-sdk-pb-0 app-sdk-space-y-2"
-        type="radio"
+      <fieldset
         id={formField.id}
-        name={formField.id}
-        aria-describedby={hintId}
+        className="app-sdk-pl-0 app-sdk-pb-0 app-sdk-space-y-2"
+        data-type="radio"
+        aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
         data-form-field-type="radio"
       >
         {options?.map((option: any) => {
@@ -52,7 +51,7 @@ export function RadioFormField(
             </div>
           );
         })}
-      </input>
+      </fieldset>
       {parsedCustomFormConfig?.hint && (
         <p
           className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
