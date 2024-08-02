@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
-import { isNumber } from '../utils/isNumber';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
 export function CustomFormField(
@@ -24,7 +23,7 @@ export function CustomFormField(
           defaultValue={state || (formField.defaultValue?.toString() ?? '')}
           placeholder={parsedCustomFormConfig?.placeholder}
           aria-describedby={`${formField.id}-hint`}
-          data-form-field-type="string"
+          data-form-field-type="custom"
         />
       </div>
       {parsedCustomFormConfig?.hint && (
