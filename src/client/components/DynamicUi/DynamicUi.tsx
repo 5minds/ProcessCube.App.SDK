@@ -92,6 +92,7 @@ export function DynamicUi(
 
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
+  console.log('formFields', formFields);
   const timeoutRef = useRef<number>();
   const formRef = useRef<HTMLFormElement>(null);
   const formFieldRefs = new Map<string, FormFieldRefsMapObj>(
