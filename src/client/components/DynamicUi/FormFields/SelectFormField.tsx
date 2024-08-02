@@ -3,12 +3,15 @@ import React from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function SelectFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
-  const { formField, state } = props;
-  const hintId = `${formField.id}-hint`;
+export function SelectFormField(
+  { formField, state }: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
-  const options = formField.enumValues;
-  const defaultSelect = state || options?.find((option) => option.id === formField.defaultValue)?.id || '';
+  const options = parsedCustomFormConfig?.entries;
+  const hintId = `${formField.id}-hint`;
+
+  const defaultSelect = state || options?.find((option: any) => option.key === formField.defaultValue)?.key || '';
 
   return (
     <div>
@@ -22,14 +25,14 @@ export function SelectFormField(props: DynamicUiComponentProps<string | null>, r
         onChange={(event) => (event.target.dataset.value = event.target.value)}
         data-value={defaultSelect}
         aria-describedby={parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined}
-        data-form-field-type="enum"
+        data-form-field-type="select"
         defaultValue={defaultSelect}
       >
         <option value="">{!defaultSelect && parsedCustomFormConfig?.placeholder}</option>
-        {options?.map((option) => {
+        {options?.map((option: any) => {
           return (
-            <option key={option.id} value={option.id}>
-              {option.name}
+            <option key={option.key} value={option.key}>
+              {option.value}
             </option>
           );
         })}

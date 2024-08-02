@@ -3,11 +3,13 @@ import React from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function RadioFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
-  const { formField, state } = props;
-  const hintId = `${formField.id}-hint`;
+export function RadioFormField(
+  { formField, state }: DynamicUiComponentProps<string | Array<Object> | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
-  const options = formField.enumValues;
+  const options = parsedCustomFormConfig?.entries;
+  const hintId = `${formField.id}-hint`;
 
   return (
     <div>
@@ -22,25 +24,25 @@ export function RadioFormField(props: DynamicUiComponentProps<string | null>, re
         aria-describedby={hintId}
         data-form-field-type="radio"
       >
-        {options?.map((option) => {
+        {options?.map((option: any) => {
           return (
-            <div key={option.id} className="app-sdk-relative app-sdk-flex app-sdk-items-start">
+            <div key={option.key} className="app-sdk-relative app-sdk-flex app-sdk-items-start">
               <div className="app-sdk-flex app-sdk-h-5 app-sdk-items-center">
                 <input
                   type="radio"
-                  defaultChecked={(state || formField.defaultValue) == option.id}
+                  defaultChecked={(state || formField.defaultValue) == option.key}
                   name={formField.id}
-                  id={option.id}
-                  value={option.id}
+                  id={option.key}
+                  value={option.key}
                   className="app-sdk-form-radio app-sdk-border app-sdk-h-4 app-sdk-w-4 app-sdk-rounded app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-text-[color:var(--asdk-dui-formfield-checkbox-text-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] dark:app-sdk-border-2 dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-app-sdk-dark"
                 />
               </div>
               <div className="app-sdk-ml-3 app-sdk-text-sm">
                 <label
-                  htmlFor={option.id}
+                  htmlFor={option.key}
                   className="app-sdk-font-medium app-sdk-text-[color:var(--asdk-dui-text-color)]"
                 >
-                  {option.name}
+                  {option.value}
                 </label>
               </div>
             </div>
