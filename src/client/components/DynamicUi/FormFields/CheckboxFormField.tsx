@@ -8,9 +8,7 @@ export function CheckboxFormField(
   ref: DynamicUiFormFieldRef,
 ) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
-  console.log('parsedCustomFormConfig', parsedCustomFormConfig?.entries);
   const options = parsedCustomFormConfig?.entries;
-  console.log('CheckboxFormField', formField);
   const hintId = `${formField.id}-hint`;
 
   let multipleStateOrDefaultValue: any[];
@@ -33,11 +31,10 @@ export function CheckboxFormField(
         data-form-field-type="checkbox"
       >
         {options?.map((option: any) => {
-          console.log('option', option);
           const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
 
           return (
-            <div key={option.id} className="app-sdk-relative app-sdk-flex app-sdk-items-start">
+            <div key={option.key} className="app-sdk-relative app-sdk-flex app-sdk-items-start">
               <div className="app-sdk-flex app-sdk-h-5 app-sdk-items-center">
                 <input
                   type="checkbox"
