@@ -20,6 +20,7 @@ export type DiagramDocumentationInspectorRef = {
 
 type DiagramDocumentationInspectorProps = {
   xml: string;
+  setSelectedElementIds?: (elementIds: string[]) => void;
 };
 
 function DiagramDocumentationInspectorFunction(
@@ -99,6 +100,10 @@ function DiagramDocumentationInspectorFunction(
       overlays?.add(element.id, getOverlay(element));
     });
   }, [bpmnRendered]);
+
+  useEffect(() => {
+    props.setSelectedElementIds?.(selectedElements.map((element) => element.id));
+  }, [selectedElements]);
 
   useImperativeHandle(
     ref,

@@ -17,6 +17,7 @@ import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from 
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { FlowNodeButton } from './FlowNodeButton';
 import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
+import { FlowNodeTokenViewer } from './FlowNodeTokenViewer';
 import { GoToButton } from './GoToButton';
 import { InfoPopover } from './InfoPopover';
 import { ListButton } from './ListButton';
@@ -24,11 +25,11 @@ import { PlayButton } from './PlayButton';
 import { PopoverButton } from './PopoverButton';
 import { ProcessButtonSeparator } from './ProcessButtonSeparator';
 import { ProcessButtonsContainer } from './ProcessButtonsContainer';
-import { ProcessTokenViewer } from './ProcessTokenViewer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
 import { TerminateProcessButton } from './TerminateProcessButton';
+import { TokenViewer } from './TokenViewer';
 
 const RETRYABLE_STATES = [ProcessInstanceState.error, ProcessInstanceState.terminated];
 const PLAYABLE_TYPES = [BpmnType.manualTask, BpmnType.userTask, BpmnType.untypedTask];
@@ -81,6 +82,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [shownInstancesMap, setShownInstancesMap] = useState<Map<string, string>>(new Map());
+  const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
+  const [selectedInstances, setSelectedInstances] = useState<FlowNodeInstance[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
   const init = useCallback(async () => {
@@ -98,14 +101,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     setTriggeredFlowNodeInstances(triggeredFlowNodeInstances);
 
     const searchParams = new URLSearchParams(window.location.search);
-    const popoverIsOpen = searchParams.get('popover');
 
+    const popoverIsOpen = searchParams.get('popover');
     if (popoverIsOpen === 'true') {
       setIsInfoPopoverOpen(true);
     }
 
     const preselectedInstanceIds = searchParams.getAll('instance');
-
     const preselectedFlowNodeInstances = flowNodeInstances.filter((fni) =>
       preselectedInstanceIds.includes(fni.flowNodeInstanceId),
     );
@@ -284,7 +286,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               onClick={() => {
                 const entries = instances.map((fni) => ({
                   id: fni.flowNodeInstanceId,
-                  name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.state}` : ''}${fni.flowNodeInstanceId === shownInstance.flowNodeInstanceId ? ' (selected)' : ''}`,
+                  name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeInstanceId} - ${fni.state}${fni.flowNodeInstanceId === shownInstance.flowNodeInstanceId ? ' (selected)' : ''}`,
                   ...fni,
                 }));
 
@@ -404,6 +406,16 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   useEffect(() => {
     init();
   }, [processInstanceId]);
+
+  useEffect(() => {
+    const selectedInstances = flowNodeInstances.filter((fni) => {
+      const isFlowNodeSelected = selectedElementIds.includes(fni.flowNodeId);
+      const isInstanceShown = shownInstancesMap.get(fni.flowNodeId) === fni.flowNodeInstanceId;
+      return isFlowNodeSelected && isInstanceShown;
+    });
+
+    setSelectedInstances(selectedInstances);
+  }, [flowNodeInstances, selectedElementIds, shownInstancesMap]);
 
   useEffect(() => {
     if (!processInstance?.xml) {
@@ -530,12 +542,25 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       <InfoPopover
         className={`${isInfoPopoverOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
       >
-        <ProcessTokenViewer
-          startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
-          endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
-        />
+        {selectedInstances.length === 0 ? (
+          <TokenViewer
+            startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
+            endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
+          />
+        ) : selectedInstances.length === 1 ? (
+          <TokenViewer
+            startToken={JSON.stringify(selectedInstances[0].startToken, null, 2)}
+            endToken={JSON.stringify(selectedInstances[0].endToken, null, 2)}
+          />
+        ) : (
+          <FlowNodeTokenViewer flowNodeInstances={selectedInstances} />
+        )}
       </InfoPopover>
-      <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} />
+      <DiagramDocumentationInspector
+        xml={processInstance.xml}
+        ref={diagramDocumentationInspectorRef}
+        setSelectedElementIds={setSelectedElementIds}
+      />
     </div>
   );
 }
