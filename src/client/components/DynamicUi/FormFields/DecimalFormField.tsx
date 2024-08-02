@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { isNumber } from '../utils/isNumber';
@@ -19,6 +19,7 @@ export function DecimalFormField(
 
   const [isValid, setIsValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function onFocusLeave(e: any) {
     if (onValidate) {
@@ -32,6 +33,9 @@ export function DecimalFormField(
   function resetErrors() {
     setErrorMessage('');
     setIsValid(true);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   }
 
   return (
