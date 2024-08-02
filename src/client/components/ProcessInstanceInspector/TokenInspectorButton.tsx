@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ProcessButton } from './ProcessButton';
 
-type PopoverButtonProps = {
+type TokenInspectorButtonProps = {
   disabled?: boolean;
   isOpen?: boolean;
   open: () => void;
   close: () => void;
 };
 
-export function PopoverButton(props: PopoverButtonProps) {
+export function TokenInspectorButton(props: TokenInspectorButtonProps) {
   const [isOpen, setIsOpen] = useState(props.isOpen ?? false);
-  useEffect(() => {});
 
   return (
     <ProcessButton

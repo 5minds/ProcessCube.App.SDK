@@ -1,3 +1,4 @@
+import { Transition } from '@headlessui/react';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
@@ -17,19 +18,18 @@ import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from 
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { FlowNodeButton } from './FlowNodeButton';
 import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
-import { FlowNodeTokenViewer } from './FlowNodeTokenViewer';
+import { FlowNodeTokenInspector } from './FlowNodeTokenInspector';
 import { GoToButton } from './GoToButton';
-import { InfoPopover } from './InfoPopover';
 import { ListButton } from './ListButton';
 import { PlayButton } from './PlayButton';
-import { PopoverButton } from './PopoverButton';
 import { ProcessButtonSeparator } from './ProcessButtonSeparator';
 import { ProcessButtonsContainer } from './ProcessButtonsContainer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
 import { RetryProcessButton } from './RetryProcessButton';
 import { TerminateProcessButton } from './TerminateProcessButton';
-import { TokenViewer } from './TokenViewer';
+import { TokenInspector } from './TokenInspector';
+import { TokenInspectorButton } from './TokenInspectorButton';
 
 const RETRYABLE_STATES = [ProcessInstanceState.error, ProcessInstanceState.terminated];
 const PLAYABLE_TYPES = [BpmnType.manualTask, BpmnType.userTask, BpmnType.untypedTask];
@@ -61,7 +61,7 @@ type ProcessInstanceInspectorProps = {
   showProcessRefreshButton?: boolean;
   showProcessRetryButton?: boolean;
   showProcessTerminateButton?: boolean;
-  showPopoverButton?: boolean;
+  showTokenInspectorButton?: boolean;
   onFinish?: (taskContext: {
     processInstanceId: string;
     flowNodeInstanceId: string;
@@ -77,7 +77,7 @@ type ProcessInstanceInspectorProps = {
 export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const { processInstanceId } = props;
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
-  const [isInfoPopoverOpen, setIsInfoPopoverOpen] = useState(false);
+  const [isTokenInspectorOpen, setIsTokenInspectorOpen] = useState(false);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
   const [triggeredFlowNodeInstances, setTriggeredFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
@@ -102,9 +102,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
     const searchParams = new URLSearchParams(window.location.search);
 
-    const popoverIsOpen = searchParams.get('popover');
-    if (popoverIsOpen === 'true') {
-      setIsInfoPopoverOpen(true);
+    const isTokenInspectorOpen = searchParams.get('tokenInspector');
+    if (isTokenInspectorOpen === 'true') {
+      setIsTokenInspectorOpen(true);
     }
 
     const preselectedInstanceIds = searchParams.getAll('instance');
@@ -485,10 +485,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     props.showProcessRefreshButton ||
     props.showProcessRetryButton ||
     props.showProcessTerminateButton ||
-    props.showPopoverButton;
+    props.showTokenInspectorButton;
 
   const showProcessButtonSeparator =
-    props.showPopoverButton &&
+    props.showTokenInspectorButton &&
     (props.showProcessRefreshButton || props.showProcessRetryButton || props.showProcessTerminateButton);
 
   return (
@@ -512,50 +512,47 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
             />
           )}
           {showProcessButtonSeparator && <ProcessButtonSeparator />}
-          {props.showPopoverButton && (
-            <PopoverButton
-              isOpen={isInfoPopoverOpen}
+          {props.showTokenInspectorButton && (
+            <TokenInspectorButton
+              isOpen={isTokenInspectorOpen}
               open={() => {
                 const searchParams = new URLSearchParams(window.location.search);
-                searchParams.set('popover', 'true');
+                searchParams.set('tokenInspector', 'true');
                 window.history.replaceState(
                   {},
                   '',
                   `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
                 );
-                setIsInfoPopoverOpen(true);
+                setIsTokenInspectorOpen(true);
               }}
               close={() => {
                 const searchParams = new URLSearchParams(window.location.search);
-                searchParams.delete('popover');
+                searchParams.delete('tokenInspector');
                 window.history.replaceState(
                   {},
                   '',
                   `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
                 );
-                setIsInfoPopoverOpen(false);
+                setIsTokenInspectorOpen(false);
               }}
             />
           )}
         </ProcessButtonsContainer>
       )}
-      <InfoPopover
-        className={`${isInfoPopoverOpen ? 'app-sdk-opacity-100 app-sdk-pointer-events-auto' : 'app-sdk-opacity-0 app-sdk-pointer-events-none'}`}
-      >
-        {selectedInstances.length === 0 ? (
-          <TokenViewer
-            startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
-            endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
-          />
-        ) : selectedInstances.length === 1 ? (
-          <TokenViewer
-            startToken={JSON.stringify(selectedInstances[0].startToken, null, 2)}
-            endToken={JSON.stringify(selectedInstances[0].endToken, null, 2)}
-          />
-        ) : (
-          <FlowNodeTokenViewer flowNodeInstances={selectedInstances} />
-        )}
-      </InfoPopover>
+      <Transition show={isTokenInspectorOpen}>
+        <div className="app-sdk-transition app-sdk-duration-200 data-[closed]:app-sdk-opacity-0 app-sdk-w-1/4 app-sdk-min-w-64 app-sdk-absolute app-sdk-top-0 app-sdk-right-0 app-sdk-z-40 app-sdk-pt-2 app-sdk-pr-2">
+          <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-p-4 app-sdk-gap-1 app-sdk-bg-black/85">
+            {selectedInstances.length === 0 ? (
+              <TokenInspector
+                startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
+                endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
+              />
+            ) : (
+              <FlowNodeTokenInspector flowNodeInstances={selectedInstances} />
+            )}
+          </div>
+        </div>
+      </Transition>
       <DiagramDocumentationInspector
         xml={processInstance.xml}
         ref={diagramDocumentationInspectorRef}

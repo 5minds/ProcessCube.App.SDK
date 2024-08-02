@@ -6,7 +6,7 @@ type TokenViewerProps = {
   endToken: string;
 };
 
-export function TokenViewer({ startToken, endToken }: TokenViewerProps) {
+export function TokenInspector({ startToken, endToken }: TokenViewerProps) {
   return (
     <div key={`${startToken}${endToken}`} className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3">
       <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
