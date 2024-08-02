@@ -1,7 +1,7 @@
 import { Identity } from '@5minds/processcube_engine_sdk';
 
 export type StartPayload = {
-  identity: Identity | boolean;
+  identity: Identity;
   moduleString: string;
   topic: string;
   workerPath: string;

@@ -2,7 +2,6 @@ import { pid } from 'node:process';
 
 import { ExternalTaskWorker, IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
 import { Identity, Logger } from '@5minds/processcube_engine_sdk';
-import { getIdentity } from './getIdentity';
 
 import type { IPCMessageType, StartPayload } from '../../common';
 
@@ -51,10 +50,6 @@ async function create({
 }: StartPayload & {
   workerId?: string;
 }) {
-  if (identity === undefined) {
-    identity = true;
-  }
-  const resolvedIdentity = typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
   workerTopic = topic;
   const module = await requireFromString(moduleString, workerPath);
   if (module === null) {
@@ -72,7 +67,7 @@ async function create({
     process.exit(2);
   }
   const config: IExternalTaskWorkerConfig = {
-    resolvedIdentity,
+    identity,
     ...module?.config,
     workerId,
   };
@@ -120,10 +115,7 @@ function restart({ topic, identity, moduleString, workerPath }: StartPayload) {
   });
 }
 
-async function updateIdentity({ identity }: { identity?: Identity}) {
-  if (identity === undefined) {
-    identity = await getIdentity()
-  }
+async function updateIdentity({ identity }: { identity: Identity }) {
   if (externalTaskWorker) {
     externalTaskWorker.identity = identity;
   }

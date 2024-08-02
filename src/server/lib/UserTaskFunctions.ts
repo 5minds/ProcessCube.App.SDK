@@ -5,6 +5,10 @@ import { UserTaskInstance, UserTaskList, mapUserTask, mapUserTaskList } from '..
 import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
 
+type OptionsWithBoolIdentity = Omit<Parameters<typeof Client.userTasks.query>[1], 'identity'> & {
+  identity?: Identity | boolean;
+};
+
 /**
  * If there is no UserTask waiting, this function will wait for the next UserTask to be created.
  * If there is already a UserTask waiting, this function will return it.
@@ -125,8 +129,22 @@ export async function finishUserTaskAndGetNext(
   return mapUserTask(userTasks.userTasks[0]);
 }
 
-export async function getUserTasks(...args: Parameters<typeof Client.userTasks.query>): Promise<UserTaskList> {
-  const result = await Client.userTasks.query(...args);
+export async function getUserTasks(
+  query: DataModels.FlowNodeInstances.UserTaskQuery,
+  options: OptionsWithBoolIdentity = { identity: true },
+): Promise<UserTaskList> {
+  switch (options?.identity) {
+    case true:
+      options.identity = await getIdentity();
+      break;
+    case false:
+      options.identity = undefined;
+      break;
+    case undefined:
+      options.identity = await getIdentity();
+      break;
+  }
+  const result = await Client.userTasks.query(query, options as Parameters<typeof Client.userTasks.query>[1]);
 
   return mapUserTaskList(result);
 }
@@ -137,13 +155,26 @@ export async function getUserTasks(...args: Parameters<typeof Client.userTasks.q
  * @returns {Promise<UserTaskList>}
  */
 export async function getWaitingUserTasks(
-  options?: Parameters<typeof Client.userTasks.query>[1],
+  options: OptionsWithBoolIdentity = { identity: true },
 ): Promise<UserTaskList> {
+  switch (options?.identity) {
+    case true:
+      options.identity = await getIdentity();
+      break;
+    case false:
+      options.identity = undefined;
+      break;
+    case undefined:
+      options.identity = await getIdentity();
+      break;
+  }
+
+  console.log('luis777', options);
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
-    options,
+    options as Parameters<typeof Client.userTasks.query>[1],
   );
 
   return mapUserTaskList(result);
@@ -157,14 +188,27 @@ export async function getWaitingUserTasks(
  */
 export async function getWaitingUserTasksByProcessInstanceId(
   processInstanceId: string | Array<string>,
-  options?: Parameters<typeof Client.userTasks.query>[1],
+  options: OptionsWithBoolIdentity = {
+    identity: true,
+  },
 ): Promise<UserTaskList> {
+  switch (options?.identity) {
+    case true:
+      options.identity = await getIdentity();
+      break;
+    case false:
+      options.identity = undefined;
+      break;
+    case undefined:
+      options.identity = await getIdentity();
+      break;
+  }
   const result = await Client.userTasks.query(
     {
       processInstanceId: processInstanceId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
-    options,
+    options as Parameters<typeof Client.userTasks.query>[1],
   );
 
   return mapUserTaskList(result);
@@ -178,14 +222,25 @@ export async function getWaitingUserTasksByProcessInstanceId(
  */
 export async function getWaitingUserTasksByFlowNodeId(
   flowNodeId: string | string[],
-  options?: Parameters<typeof Client.userTasks.query>[1],
+  options: OptionsWithBoolIdentity = { identity: true },
 ): Promise<UserTaskList> {
+  switch (options?.identity) {
+    case true:
+      options.identity = await getIdentity();
+      break;
+    case false:
+      options.identity = undefined;
+      break;
+    case undefined:
+      options.identity = await getIdentity();
+      break;
+  }
   const result = await Client.userTasks.query(
     {
       flowNodeId: flowNodeId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
-    options,
+    options as Parameters<typeof Client.userTasks.query>[1],
   );
 
   return mapUserTaskList(result);
@@ -199,15 +254,26 @@ export async function getWaitingUserTasksByFlowNodeId(
  */
 export async function getWaitingUserTaskByFlowNodeInstanceId(
   flowNodeInstanceId: string,
-  options?: Parameters<typeof Client.userTasks.query>[1],
+  options: OptionsWithBoolIdentity = { identity: true },
 ): Promise<UserTaskInstance | null> {
+  switch (options?.identity) {
+    case true:
+      options.identity = await getIdentity();
+      break;
+    case false:
+      options.identity = undefined;
+      break;
+    case undefined:
+      options.identity = await getIdentity();
+      break;
+  }
   const result = await Client.userTasks.query(
     {
       flowNodeInstanceId: flowNodeInstanceId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
     {
-      ...options,
+      ...(options as Parameters<typeof Client.userTasks.query>[1]),
       limit: 1,
     },
   );
@@ -226,14 +292,25 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
  */
 export async function getWaitingUserTasksByCorrelationId(
   correlationId: string,
-  options?: Parameters<typeof Client.userTasks.query>[1],
+  options: OptionsWithBoolIdentity = { identity: true },
 ): Promise<UserTaskList> {
+  switch (options?.identity) {
+    case true:
+      options.identity = await getIdentity();
+      break;
+    case false:
+      options.identity = undefined;
+      break;
+    case undefined:
+      options.identity = await getIdentity();
+      break;
+  }
   const result = await Client.userTasks.query(
     {
       correlationId: correlationId,
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,
     },
-    options,
+    options as Parameters<typeof Client.userTasks.query>[1],
   );
 
   return mapUserTaskList(result);
