@@ -7,15 +7,10 @@ export function SelectFormField(
   { formField, state }: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ) {
-  console.log('select1');
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
-  console.log('select2');
   const options = parsedCustomFormConfig?.entries;
-  console.log('select3');
   const hintId = `${formField.id}-hint`;
-  console.log('select4');
   const defaultSelect = state || options?.find((option: any) => option.key === formField.defaultValue)?.key || '';
-  console.log('select5');
 
   return (
     <div>

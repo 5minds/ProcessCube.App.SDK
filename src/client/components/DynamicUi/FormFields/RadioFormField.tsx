@@ -7,13 +7,9 @@ export function RadioFormField(
   { formField, state }: DynamicUiComponentProps<string | Array<Object> | null>,
   ref: DynamicUiFormFieldRef,
 ) {
-  console.log('radio1');
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
-  console.log('radio2');
   const options = parsedCustomFormConfig?.entries;
-  console.log('radio3');
   const hintId = `${formField.id}-hint`;
-  console.log('radio4');
 
   return (
     <div>
