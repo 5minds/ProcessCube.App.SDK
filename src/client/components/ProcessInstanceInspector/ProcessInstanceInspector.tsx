@@ -408,11 +408,26 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   }, [processInstanceId]);
 
   useEffect(() => {
+    if (selectedElementIds.length === 0 || flowNodeInstances.length === 0) {
+      setSelectedInstances([]);
+      return;
+    }
+
     const selectedInstances = flowNodeInstances.filter((fni) => {
       const isFlowNodeSelected = selectedElementIds.includes(fni.flowNodeId);
       const isInstanceShown = shownInstancesMap.get(fni.flowNodeId) === fni.flowNodeInstanceId;
       return isFlowNodeSelected && isInstanceShown;
     });
+
+    if (selectedInstances.length === 0) {
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.delete('tokenInspectorFocus');
+      window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+      );
+    }
 
     setSelectedInstances(selectedInstances);
   }, [flowNodeInstances, selectedElementIds, shownInstancesMap]);
@@ -543,10 +558,15 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         <div className="app-sdk-transition app-sdk-duration-200 data-[closed]:app-sdk-opacity-0 app-sdk-w-1/4 app-sdk-min-w-64 app-sdk-absolute app-sdk-top-0 app-sdk-right-0 app-sdk-z-40 app-sdk-pt-2 app-sdk-pr-2">
           <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-p-4 app-sdk-gap-1 app-sdk-bg-black/85">
             {selectedInstances.length === 0 ? (
-              <TokenInspector
-                startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
-                endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
-              />
+              <div className=" app-sdk-flex app-sdk-flex-col app-sdk-gap-4">
+                <label className="app-sdk-text-white app-sdk-break-all">
+                  Process: {processInstance.processModelName}
+                </label>
+                <TokenInspector
+                  startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
+                  endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
+                />
+              </div>
             ) : (
               <FlowNodeTokenInspector flowNodeInstances={selectedInstances} />
             )}

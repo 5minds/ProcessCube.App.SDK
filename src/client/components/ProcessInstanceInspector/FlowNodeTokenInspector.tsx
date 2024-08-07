@@ -8,45 +8,53 @@ export function FlowNodeTokenInspector({ flowNodeInstances }: { flowNodeInstance
   const [selectedInstance, setSelectedInstance] = useState<FlowNodeInstance>();
 
   useEffect(() => {
-    if (!selectedInstance) {
-      return;
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if (flowNodeInstances.length === 1) {
+      searchParams.delete('tokenInspectorFocus');
+
+      window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+      );
+
+      setSelectedInstance(flowNodeInstances[0]);
+    } else {
+      const selectedInstanceId = searchParams.get('tokenInspectorFocus');
+      if (!selectedInstanceId) {
+        return;
+      }
+
+      const selectedInstance = flowNodeInstances.find((fni) => fni.flowNodeId === selectedInstanceId);
+      if (!selectedInstance) {
+        return;
+      }
+
+      setSelectedInstance(selectedInstance);
     }
+  }, [flowNodeInstances]);
+
+  useEffect(() => {
+    if (!selectedInstance || flowNodeInstances.length === 1) return;
 
     const searchParams = new URLSearchParams(window.location.search);
-    if (selectedInstance.flowNodeId === flowNodeInstances[0].flowNodeId) {
-      searchParams.delete('tokenInspectorId');
-    } else {
-      searchParams.set('tokenInspectorId', selectedInstance.flowNodeId);
-    }
+    searchParams.set('tokenInspectorFocus', selectedInstance.flowNodeId);
 
     window.history.replaceState(
       {},
       '',
       `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
     );
-  }, [selectedInstance]);
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const selectedTokenFlowNodeId = searchParams.get('tokenInspectorId');
-    const selectedInstance = flowNodeInstances.find((fni) => fni.flowNodeId === selectedTokenFlowNodeId);
-
-    if (selectedInstance?.flowNodeId === flowNodeInstances[0].flowNodeId) {
-      return;
-    }
-
-    setSelectedInstance(selectedInstance ?? flowNodeInstances[0]);
-  }, [flowNodeInstances]);
+  }, [selectedInstance, flowNodeInstances]);
 
   return (
     <div className=" app-sdk-flex app-sdk-flex-col app-sdk-gap-4">
       {flowNodeInstances.length === 1 ? (
-        <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-w-full">
-          <label className="app-sdk-text-white">Flow Node:</label>
-          <span className="app-sdk-text-white">
-            {`${flowNodeInstances[0].flowNodeName ? `${flowNodeInstances[0].flowNodeName} (${flowNodeInstances[0].flowNodeId})` : flowNodeInstances[0].flowNodeId}`}
-          </span>
-        </div>
+        <label className="app-sdk-text-white app-sdk-break-all">
+          Flow Node: {flowNodeInstances[0].flowNodeId}
+          {flowNodeInstances[0].flowNodeName && `(${flowNodeInstances[0].flowNodeName})`}
+        </label>
       ) : (
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-w-full">
           <label className="app-sdk-text-white">Select Flow Node:</label>
