@@ -63,6 +63,7 @@ type ProcessInstanceInspectorProps = {
   showProcessRetryButton?: boolean;
   showProcessTerminateButton?: boolean;
   showTokenInspectorButton?: boolean;
+  loadingComponent?: React.ReactNode;
   onFinish?: (taskContext: {
     processInstanceId: string;
     flowNodeInstanceId: string;
@@ -513,6 +514,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   ]);
 
   if (!processInstance?.xml) {
+    if (props.loadingComponent) {
+      return props.loadingComponent;
+    }
+
     return (
       <div className="app-sdk-absolute app-sdk-w-screen app-sdk-h-screen app-sdk-flex">
         <div className="app-sdk-m-auto">Fetching diagram...</div>
