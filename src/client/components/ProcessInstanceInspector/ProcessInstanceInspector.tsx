@@ -2,6 +2,7 @@ import { Transition } from '@headlessui/react';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
+import { isEqual } from 'lodash';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -161,6 +162,14 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       newFlowNodeInstances.map((fni) => fni.flowNodeInstanceId),
     );
 
+    if (
+      isEqual(newProcessInstance, processInstance) &&
+      isEqual(newFlowNodeInstances, flowNodeInstances) &&
+      isEqual(newTriggeredFlowNodeInstances, triggeredFlowNodeInstances)
+    ) {
+      return;
+    }
+
     if (newProcessInstance.state !== processInstance?.state) {
       overlays.clear();
     }
@@ -208,7 +217,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
     preselectedFlowNodeInstances.forEach((fni) => newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
     setShownInstancesMap(newShownInstancesMap);
-  }, [diagramDocumentationInspectorRef.current, shownInstancesMap, flowNodeInstances, processInstanceId]);
+  }, [
+    diagramDocumentationInspectorRef.current,
+    processInstance,
+    shownInstancesMap,
+    flowNodeInstances,
+    processInstanceId,
+  ]);
 
   const renderFlowNodeButtons = useCallback(
     (element: ElementLike, instances: FlowNodeInstance[]) => {
@@ -406,6 +421,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   useEffect(() => {
     init();
   }, [processInstanceId]);
+
+  useEffect(() => {
+    const interval = setInterval(refresh, 2000);
+    return () => clearInterval(interval);
+  }, [refresh]);
 
   useEffect(() => {
     if (selectedElementIds.length === 0 || flowNodeInstances.length === 0) {
