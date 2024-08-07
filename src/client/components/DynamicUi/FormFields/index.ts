@@ -3,6 +3,7 @@ import { DataModels } from '@5minds/processcube_engine_sdk';
 import { DynamicUiFormFieldComponent } from '../DynamicUi';
 import { BooleanFormField } from './BooleanFormField';
 import { ConfirmFormField } from './ConfirmFormField';
+import { CustomFormField } from './CustomFormField';
 import { DateFormField } from './DateFormField';
 import { DecimalFormField } from './DecimalFormField';
 import { EnumFormField } from './EnumFormField';
@@ -44,6 +45,7 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   paragraph: ParagraphFormField,
   header: HeaderFormField,
   confirm: ConfirmFormField,
+  custom: CustomFormField,
 };
 export { BooleanFormField } from './BooleanFormField';
 export { DateFormField } from './DateFormField';
@@ -54,3 +56,4 @@ export { StringFormField } from './StringFormField';
 export { ParagraphFormField } from './ParagraphFormField';
 export { HeaderFormField } from './HeaderFormField';
 export { ConfirmFormField } from './ConfirmFormField';
+export { CustomFormField } from './CustomFormField';
