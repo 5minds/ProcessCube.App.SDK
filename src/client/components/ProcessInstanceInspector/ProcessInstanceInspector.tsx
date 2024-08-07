@@ -423,7 +423,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   }, [processInstanceId]);
 
   useEffect(() => {
-    const interval = setInterval(refresh, 2000);
+    if (processInstance?.state === ProcessInstanceState.finished) {
+      return;
+    }
+
+    const interval = setInterval(refresh, 1000);
     return () => clearInterval(interval);
   }, [refresh]);
 
