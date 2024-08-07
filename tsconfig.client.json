@@ -4,7 +4,7 @@
     "outDir": "./build/client",
     "lib": ["DOM", "DOM.Iterable"],
     "tsBuildInfoFile": "./build/client.tsbuildinfo",
-    "declarationDir": "./build/",
+    "declarationDir": "./build/"
   },
   "include": ["./src/client"],
   "references": [
