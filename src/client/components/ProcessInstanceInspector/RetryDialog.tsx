@@ -27,7 +27,7 @@ export function RetryDialog(props: RetryDialogProps) {
         className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-gray-500 app-sdk-bg-opacity-25 app-sdk-transition-opacity data-[closed]:app-sdk-opacity-0 data-[enter]:app-sdk-duration-300 data-[leave]:app-sdk-duration-150 data-[enter]:app-sdk-ease-out data-[leave]:app-sdk-ease-in"
       >
         <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-flex app-sdk-w-screen app-sdk-items-center app-sdk-justify-center app-sdk-p-4">
-          <DialogPanel className="app-sdk-max-w-lg app-sdk-space-y-4 app-sdk-border app-sdk-bg-black/85 app-sdk-p-8 app-sdk-rounded-xl app-sdk-text-white">
+          <DialogPanel className="app-sdk-max-w-lg app-sdk-space-y-4 app-sdk-border app-sdk-border-app-sdk-gray-300 app-sdk-border-solid app-sdk-shadow-md app-sdk-shadow-[color:var(--asdk-rd-shadow-color)] app-sdk-bg-[color:var(--asdk-rd-background-color)] app-sdk-p-8 app-sdk-rounded-xl app-sdk-text-[color:var(--asdk-rd-text-color)]">
             <DialogTitle className="app-sdk-font-bold">Retry Process Instance</DialogTitle>
             <Description className="app-sdk-break-words">
               Are you sure you want to retry the Process Instance
@@ -41,7 +41,7 @@ export function RetryDialog(props: RetryDialogProps) {
                 defaultLanguage="json"
                 defaultValue={startToken}
                 onChange={(value) => setStartToken(value ?? '')}
-                theme="vs-dark"
+                theme={window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'vs-dark' : 'vs'}
                 options={{
                   lineNumbersMinChars: 2,
                   readOnly: false,
@@ -51,15 +51,15 @@ export function RetryDialog(props: RetryDialogProps) {
                 }}
               />
             </div>
-            <div className="app-sdk-flex app-sdk-gap-4">
+            <div className="app-sdk-flex app-sdk-justify-end app-sdk-gap-2">
               <button
-                className="app-sdk-bg-transparent app-sdk-text-white app-sdk-rounded-md app-sdk-p-2 app-sdk-border hover:app-sdk-cursor-pointer hover:app-sdk-bg-white/10"
+                className="app-sdk-bg-[color:var(--asdk-rd-secondary-button-color)] app-sdk-text-[color:var(--asdk-rd-secondary-button-text-color)] app-sdk-rounded-md app-sdk-p-2 app-sdk-border hover:app-sdk-cursor-pointer hover:app-sdk-bg-[color:var(--asdk-rd-secondary-button-hover-color)]"
                 onClick={props.onClose}
               >
                 Cancel
               </button>
               <button
-                className="app-sdk-bg-transparent app-sdk-text-white app-sdk-rounded-md app-sdk-p-2 app-sdk-border hover:app-sdk-cursor-pointer hover:app-sdk-bg-white/10"
+                className="app-sdk-bg-[color:var(--asdk-rd-primary-button-color)] app-sdk-text-[color:var(--asdk-rd-primary-button-text-color)] app-sdk-rounded-md app-sdk-p-2 app-sdk-border-0 hover:app-sdk-cursor-pointer hover:app-sdk-bg-[color:var(--asdk-rd-primary-button-hover-color)]"
                 onClick={async () => {
                   const newStartToken = JSON.parse(startToken);
                   const serverActions = await import('../../../server/actions');

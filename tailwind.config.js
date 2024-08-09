@@ -12,6 +12,10 @@ export default {
         'app-sdk-dark-invalid': '0 0 0 0.2rem rgb(220 53 69 / 25%)',
       },
       colors: {
+        '5minds-orange': '#f7a823',
+        '5minds-orange-light': '#f9b745',
+        '5minds-secondary': '#9ca3af',
+        '5minds-secondary-light': '#a8b1bf',
         'app-sdk-inherit': 'inherit',
         'app-sdk-gray': {
           50: '#cdcdcd',

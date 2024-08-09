@@ -1,4 +1,5 @@
 @import './CommandPalette.css';
+@import './RetryDialog.css';
 @import '../DiagramDocumentationInspector.css';
 @import '../../root.css';
 @layer base {

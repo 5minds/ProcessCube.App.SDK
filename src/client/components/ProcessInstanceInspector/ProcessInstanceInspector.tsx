@@ -551,7 +551,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         <RetryDialog
           {...retryDialogProps}
           processInstance={processInstance}
-          onClose={() => setRetryDialogProps({ isOpen: false })}
+          onClose={() =>
+            setRetryDialogProps((prev) => {
+              return { ...prev, isOpen: false };
+            })
+          }
         />
       )}
       {showProcessButtonsContainer && (
