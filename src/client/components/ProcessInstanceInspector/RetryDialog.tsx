@@ -27,7 +27,7 @@ export function RetryDialog(props: RetryDialogProps) {
         className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-gray-500 app-sdk-bg-opacity-25 app-sdk-transition-opacity data-[closed]:app-sdk-opacity-0 data-[enter]:app-sdk-duration-300 data-[leave]:app-sdk-duration-150 data-[enter]:app-sdk-ease-out data-[leave]:app-sdk-ease-in"
       >
         <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-flex app-sdk-w-screen app-sdk-items-center app-sdk-justify-center app-sdk-p-4">
-          <DialogPanel className="app-sdk-max-w-lg app-sdk-space-y-4 app-sdk-border app-sdk-bg-black/85 app-sdk-px-8 app-sdk-pb-8 app-sdk-rounded-xl app-sdk-text-white">
+          <DialogPanel className="app-sdk-max-w-lg app-sdk-space-y-4 app-sdk-border app-sdk-bg-black/85 app-sdk-p-8 app-sdk-rounded-xl app-sdk-text-white">
             <DialogTitle className="app-sdk-font-bold">Retry Process Instance</DialogTitle>
             <Description className="app-sdk-break-words">
               Are you sure you want to retry the Process Instance
