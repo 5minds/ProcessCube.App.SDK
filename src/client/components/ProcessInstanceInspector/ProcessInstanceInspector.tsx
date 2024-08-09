@@ -27,6 +27,7 @@ import { ProcessButtonSeparator } from './ProcessButtonSeparator';
 import { ProcessButtonsContainer } from './ProcessButtonsContainer';
 import { RefreshProcessButton } from './RefreshProcessButton';
 import { RetryButton } from './RetryButton';
+import { RetryDialog } from './RetryDialog';
 import { RetryProcessButton } from './RetryProcessButton';
 import { TerminateProcessButton } from './TerminateProcessButton';
 import { TokenInspector } from './TokenInspector';
@@ -48,6 +49,13 @@ const EMPTY_COMMAND_PALETTE_PROPS: CommandPaletteProps<FlowNodeInstance & Comman
   entries: [],
   onConfirm: () => {},
   onClose: () => {},
+};
+
+const EMPTRY_RETRY_DIALOG_PROPS: {
+  isOpen: boolean;
+  flowNodeInstance?: FlowNodeInstance;
+} = {
+  isOpen: false,
 };
 
 const SDK_OVERLAY_BUTTONS_TYPE = 'asdk-buttons';
@@ -79,6 +87,7 @@ type ProcessInstanceInspectorProps = {
 export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const { processInstanceId } = props;
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
+  const [retryDialogProps, setRetryDialogProps] = useState(EMPTRY_RETRY_DIALOG_PROPS);
   const [isTokenInspectorOpen, setIsTokenInspectorOpen] = useState(false);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
@@ -402,9 +411,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           )}
           {showRetryButton && (
             <RetryButton
-              processInstanceId={shownInstance.processInstanceId}
-              flowNodeInstanceId={shownInstance.flowNodeInstanceId}
-              refresh={() => setTimeout(refresh, 500)}
+              onClick={() => {
+                setRetryDialogProps({ isOpen: true, flowNodeInstance: shownInstance });
+              }}
             />
           )}
         </FlowNodeButtonsContainer>,
@@ -538,13 +547,19 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   return (
     <div className="app-sdk-relative app-sdk-w-full app-sdk-h-full">
       <CommandPalette {...commandPaletteProps} />
+      {(props.showRetryFlowNodeInstanceButton || props.showProcessRetryButton) && (
+        <RetryDialog
+          {...retryDialogProps}
+          processInstance={processInstance}
+          onClose={() => setRetryDialogProps({ isOpen: false })}
+        />
+      )}
       {showProcessButtonsContainer && (
         <ProcessButtonsContainer>
           {props.showProcessRefreshButton && <RefreshProcessButton onClick={refresh} />}
           {props.showProcessRetryButton && (
             <RetryProcessButton
-              processInstanceId={processInstanceId}
-              refresh={() => setTimeout(refresh, 500)}
+              onClick={() => setRetryDialogProps({ isOpen: true })}
               disabled={!RETRYABLE_STATES.includes(processInstance.state)}
             />
           )}

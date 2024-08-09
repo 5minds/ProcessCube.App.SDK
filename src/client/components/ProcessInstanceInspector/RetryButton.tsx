@@ -3,21 +3,12 @@ import React from 'react';
 import { FlowNodeButton } from './FlowNodeButton';
 
 type RetryButtonProps = {
-  processInstanceId: string;
-  flowNodeInstanceId?: string;
-  refresh: () => void;
+  onClick: () => void;
 };
 
-export function RetryButton({ processInstanceId, flowNodeInstanceId, refresh }: RetryButtonProps) {
+export function RetryButton({ onClick }: RetryButtonProps) {
   return (
-    <FlowNodeButton
-      title="Retry Process Here"
-      onClick={() =>
-        import('../../../server/actions').then(({ retryProcess }) =>
-          retryProcess(processInstanceId, flowNodeInstanceId).then(refresh),
-        )
-      }
-    >
+    <FlowNodeButton title="Retry Process Here" onClick={onClick}>
       <svg
         className="!app-sdk-fill-white !app-sdk-stroke-white"
         width="10px"

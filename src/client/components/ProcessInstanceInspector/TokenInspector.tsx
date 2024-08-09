@@ -16,7 +16,7 @@ export function TokenInspector({ startToken, endToken }: TokenViewerProps) {
           defaultLanguage="json"
           defaultValue={startToken}
           theme="vs-dark"
-          options={{ lineNumbersMinChars: 2, readOnly: true }}
+          options={{ lineNumbersMinChars: 2, readOnly: true, minimap: { enabled: false } }}
         />
       </div>
       <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
@@ -26,7 +26,7 @@ export function TokenInspector({ startToken, endToken }: TokenViewerProps) {
           defaultLanguage="json"
           defaultValue={endToken}
           theme="vs-dark"
-          options={{ lineNumbersMinChars: 2, readOnly: true }}
+          options={{ lineNumbersMinChars: 2, readOnly: true, minimap: { enabled: false } }}
         />
       </div>
     </div>

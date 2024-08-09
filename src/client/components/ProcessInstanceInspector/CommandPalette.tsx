@@ -47,7 +47,6 @@ export function CommandPalette<T extends CommandPaletteEntry>(props: CommandPale
         transition
         className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-gray-500 app-sdk-bg-opacity-25 app-sdk-transition-opacity data-[closed]:app-sdk-opacity-0 data-[enter]:app-sdk-duration-300 data-[leave]:app-sdk-duration-150 data-[enter]:app-sdk-ease-out data-[leave]:app-sdk-ease-in"
       />
-
       <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-z-10 app-sdk-w-screen app-sdk-overflow-y-auto app-sdk-p-4 sm:app-sdk-p-6 md:app-sdk-p-20">
         <DialogPanel
           transition

@@ -30,8 +30,8 @@ export const terminateProcess = async (processInstanceId: string) => {
   await terminateProcessInstance(processInstanceId);
 };
 
-export const retryProcess = async (processInstanceId: string, flowNodeInstanceId?: string) => {
-  await retryProcessInstance(processInstanceId, flowNodeInstanceId);
+export const retryProcess = async (processInstanceId: string, flowNodeInstanceId?: string, newStartToken?: any) => {
+  await retryProcessInstance(processInstanceId, flowNodeInstanceId, newStartToken);
 };
 
 export const getProcessInstance = async (processInstanceId: string) => {

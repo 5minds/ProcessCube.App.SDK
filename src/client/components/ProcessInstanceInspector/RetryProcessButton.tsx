@@ -3,20 +3,13 @@ import React from 'react';
 import { ProcessButton } from './ProcessButton';
 
 type RetryProcessButtonProps = {
-  processInstanceId: string;
   disabled: boolean;
-  refresh: () => void;
+  onClick: () => void;
 };
 
-export function RetryProcessButton({ processInstanceId, disabled, refresh }: RetryProcessButtonProps) {
+export function RetryProcessButton({ disabled, onClick }: RetryProcessButtonProps) {
   return (
-    <ProcessButton
-      title="Retry Process"
-      disabled={disabled}
-      onClick={() =>
-        import('../../../server/actions').then(({ retryProcess }) => retryProcess(processInstanceId).then(refresh))
-      }
-    >
+    <ProcessButton title="Retry Process" disabled={disabled} onClick={onClick}>
       <svg
         className={
           disabled
