@@ -16,6 +16,20 @@ export function TokenInspector({ processInstance, flowNodeInstances }: TokenInsp
     if (initialRender && flowNodeInstances.length > 1) {
       setInitialRender(false);
     }
+
+    return () => {
+      if (initialRender) {
+        return;
+      }
+
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.delete('tokenInspectorFocus');
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+      );
+    };
   }, [initialRender, flowNodeInstances]);
 
   useEffect(() => {
