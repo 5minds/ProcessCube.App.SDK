@@ -27,7 +27,7 @@ export function RetryDialog(props: RetryDialogProps) {
         className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-gray-500 app-sdk-bg-opacity-25 app-sdk-transition-opacity data-[closed]:app-sdk-opacity-0 data-[enter]:app-sdk-duration-300 data-[leave]:app-sdk-duration-150 data-[enter]:app-sdk-ease-out data-[leave]:app-sdk-ease-in"
       >
         <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-flex app-sdk-w-screen app-sdk-items-center app-sdk-justify-center app-sdk-p-4">
-          <DialogPanel className="app-sdk-max-w-lg app-sdk-space-y-4 app-sdk-border app-sdk-border-app-sdk-gray-300 app-sdk-border-solid app-sdk-shadow-md app-sdk-shadow-[color:var(--asdk-rd-shadow-color)] app-sdk-bg-[color:var(--asdk-rd-background-color)] app-sdk-p-8 app-sdk-rounded-xl app-sdk-text-[color:var(--asdk-rd-text-color)]">
+          <DialogPanel className="app-sdk-max-w-lg app-sdk-space-y-4 app-sdk-shadow-2xl app-sdk-bg-[color:var(--asdk-rd-background-color)] app-sdk-p-8 app-sdk-rounded-xl app-sdk-text-[color:var(--asdk-rd-text-color)]">
             <DialogTitle className="app-sdk-font-bold">Retry Process Instance</DialogTitle>
             <Description className="app-sdk-break-words">
               Are you sure you want to retry the Process Instance
@@ -41,7 +41,7 @@ export function RetryDialog(props: RetryDialogProps) {
                 defaultLanguage="json"
                 defaultValue={startToken}
                 onChange={(value) => setStartToken(value ?? '')}
-                theme={window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'vs-dark' : 'vs'}
+                theme="vs-dark"
                 options={{
                   lineNumbersMinChars: 2,
                   readOnly: false,
