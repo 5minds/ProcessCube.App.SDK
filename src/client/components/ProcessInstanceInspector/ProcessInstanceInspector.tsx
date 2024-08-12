@@ -19,7 +19,6 @@ import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from 
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { FlowNodeButton } from './FlowNodeButton';
 import { FlowNodeButtonsContainer } from './FlowNodeButtonsContainer';
-import { FlowNodeTokenInspector } from './FlowNodeTokenInspector';
 import { GoToButton } from './GoToButton';
 import { ListButton } from './ListButton';
 import { PlayButton } from './PlayButton';
@@ -603,19 +602,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       <Transition show={isTokenInspectorOpen}>
         <div className="app-sdk-transition app-sdk-duration-200 data-[closed]:app-sdk-opacity-0 app-sdk-w-1/4 app-sdk-min-w-64 app-sdk-absolute app-sdk-top-0 app-sdk-right-0 app-sdk-z-40 app-sdk-pt-2 app-sdk-pr-2">
           <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-p-4 app-sdk-gap-1 app-sdk-bg-black/85">
-            {selectedInstances.length === 0 ? (
-              <div className=" app-sdk-flex app-sdk-flex-col app-sdk-gap-4">
-                <label className="app-sdk-text-white app-sdk-break-all">
-                  Process: {processInstance.processModelName}
-                </label>
-                <TokenInspector
-                  startToken={JSON.stringify(processInstance.startToken ?? {}, null, 2)}
-                  endToken={JSON.stringify(processInstance.endToken ?? {}, null, 2)}
-                />
-              </div>
-            ) : (
-              <FlowNodeTokenInspector flowNodeInstances={selectedInstances} />
-            )}
+            <TokenInspector processInstance={processInstance} flowNodeInstances={selectedInstances} />
           </div>
         </div>
       </Transition>
