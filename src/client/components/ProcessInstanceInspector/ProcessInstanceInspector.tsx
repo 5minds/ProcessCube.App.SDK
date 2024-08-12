@@ -192,12 +192,12 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
       const newestInstance = newFlowNodeInstances.find((fni) => fni.flowNodeId === flowNodeId);
       const showingNewestInstance = newestInstance?.flowNodeInstanceId === flowNodeInstanceId;
-      const showingSameInstance = showingNewestInstance && shownInstance?.state === newestInstance.state;
+      const showingSameInstance = showingNewestInstance && shownInstance.state === newestInstance.state;
       if (showingSameInstance) {
         continue;
       }
 
-      bpmnViewer.removeMarker(flowNodeId, `asdk-pii-flow-node-instance-state--${shownInstance?.state}`);
+      bpmnViewer.removeMarker(flowNodeId, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
       overlays.remove({ element: flowNodeId, type: SDK_OVERLAY_BUTTONS_TYPE });
     }
 
@@ -405,8 +405,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               flowNodeType={element.type}
               processInstanceId={shownInstance.processInstanceId}
               onPlay={props.onFinish}
-              // TODO use subscriptions to update data
-              refresh={() => setTimeout(refresh, 500)}
             />
           )}
           {showRetryButton && (
@@ -434,6 +432,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
   useEffect(() => {
     if (processInstance?.state === ProcessInstanceState.finished) {
+      refresh();
       return;
     }
 
@@ -570,7 +569,6 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           {props.showProcessTerminateButton && (
             <TerminateProcessButton
               processInstanceId={processInstanceId}
-              refresh={() => setTimeout(refresh, 500)}
               disabled={processInstance.state !== ProcessInstanceState.running}
             />
           )}

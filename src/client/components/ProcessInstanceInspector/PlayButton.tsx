@@ -9,7 +9,6 @@ type PlayButtonProps = {
   flowNodeInstanceId: string;
   flowNodeType: BpmnType.userTask | BpmnType.manualTask | BpmnType.untypedTask;
   processInstanceId: string;
-  refresh: () => void;
   onPlay?: (taskContext: {
     processInstanceId: string;
     flowNodeInstanceId: string;
@@ -24,7 +23,6 @@ export function PlayButton({
   flowNodeType,
   processInstanceId,
   onPlay,
-  refresh,
 }: PlayButtonProps) {
   return (
     <FlowNodeButton
@@ -39,11 +37,9 @@ export function PlayButton({
             } catch (error) {
               reject(error);
             }
-          }).then(refresh);
+          });
         } else {
-          import('../../../server/actions').then(({ finishTask }) =>
-            finishTask(flowNodeInstanceId, flowNodeType).then(refresh),
-          );
+          import('../../../server/actions').then(({ finishTask }) => finishTask(flowNodeInstanceId, flowNodeType));
         }
       }}
     >

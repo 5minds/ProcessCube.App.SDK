@@ -5,18 +5,15 @@ import { ProcessButton } from './ProcessButton';
 type TerminateProcessButtonProps = {
   processInstanceId: string;
   disabled: boolean;
-  refresh: () => void;
 };
 
-export function TerminateProcessButton({ processInstanceId, disabled, refresh }: TerminateProcessButtonProps) {
+export function TerminateProcessButton({ processInstanceId, disabled }: TerminateProcessButtonProps) {
   return (
     <ProcessButton
       title="Terminate Process"
       disabled={disabled}
       onClick={() =>
-        import('../../../server/actions').then(({ terminateProcess }) =>
-          terminateProcess(processInstanceId).then(refresh),
-        )
+        import('../../../server/actions').then(({ terminateProcess }) => terminateProcess(processInstanceId))
       }
     >
       <svg
