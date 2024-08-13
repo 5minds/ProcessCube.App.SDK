@@ -4,6 +4,14 @@ import type { EventMessage, Identity, Subscription } from '@5minds/processcube_e
 import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
 
+async function tryGetIdentity(): Promise<Identity | undefined> {
+  try {
+    return getIdentity();
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * This function will return the ProcessInstance with the given ID.
  *
@@ -13,9 +21,9 @@ import { Client } from './internal/EngineClient';
 export async function getProcessInstanceById(
   processInstanceId: string,
 ): Promise<DataModels.ProcessInstances.ProcessInstance> {
-  // const identity = await getIdentity();
+  const identity = await tryGetIdentity();
 
-  const result = await Client.processInstances.query({ processInstanceId: processInstanceId });
+  const result = await Client.processInstances.query({ processInstanceId: processInstanceId }, { identity: identity });
 
   return result.processInstances[0];
 }
@@ -37,7 +45,7 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     { processInstanceId: processInstanceId },
     {
       ...options,
-      identity: options.identity, // ?? (await getIdentity()),
+      identity: options.identity ?? (await tryGetIdentity()),
     },
   );
 
@@ -53,13 +61,13 @@ export async function getFlowNodeInstancesByProcessInstanceId(
 export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
   flowNodeInstanceIds: string[],
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  // const identity = await getIdentity();
+  const identity = await tryGetIdentity();
 
   const queryResult = await Client.flowNodeInstances.query(
     {
       triggeredByFlowNodeInstance: flowNodeInstanceIds,
     },
-    // { identity: identity },
+    { identity: identity },
   );
 
   return queryResult.flowNodeInstances;
@@ -79,12 +87,12 @@ export async function retryProcessInstance(
   flowNodeInstanceId?: string,
   newStartToken?: any,
 ) {
-  // const identity = await getIdentity();
+  const identity = await tryGetIdentity();
 
   await Client.processInstances.retryProcessInstance(processInstanceId, {
     flowNodeInstanceId: flowNodeInstanceId,
     newStartToken: newStartToken,
-    // identity: identity,
+    identity: identity,
   });
 }
 
@@ -95,9 +103,9 @@ export async function retryProcessInstance(
  * @param identity The Identity to use for the request
  */
 export async function terminateProcessInstance(processInstanceId: string) {
-  // const identity = await getIdentity();
+  const identity = await tryGetIdentity();
 
-  await Client.processInstances.terminateProcessInstance(processInstanceId);
+  await Client.processInstances.terminateProcessInstance(processInstanceId, identity);
 }
 
 /**
