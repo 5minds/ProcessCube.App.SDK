@@ -19,7 +19,7 @@ export function TerminateProcessButton({ processInstanceId, disabled }: Terminat
       <svg
         className={
           disabled
-            ? '!app-sdk-stroke-app-sdk-gray-400 !app-sdk-fill-app-sdk-gray-400'
+            ? '!app-sdk-stroke-app-sdk-gray-200 dark:!app-sdk-stroke-app-sdk-gray-400 !app-sdk-fill-app-sdk-gray-200 dark:!app-sdk-fill-app-sdk-gray-400'
             : '!app-sdk-stroke-red-600 !app-sdk-fill-red-600'
         }
         width="1.25rem"

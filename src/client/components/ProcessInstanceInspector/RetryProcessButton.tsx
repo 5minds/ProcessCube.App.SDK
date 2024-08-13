@@ -13,8 +13,8 @@ export function RetryProcessButton({ disabled, onClick }: RetryProcessButtonProp
       <svg
         className={
           disabled
-            ? '!app-sdk-stroke-app-sdk-gray-400 !app-sdk-fill-app-sdk-gray-400'
-            : '!app-sdk-stroke-app-sdk-gray-50 !app-sdk-fill-app-sdk-gray-50'
+            ? '!app-sdk-stroke-app-sdk-gray-200 dark:!app-sdk-stroke-app-sdk-gray-400 !app-sdk-fill-app-sdk-gray-200 dark:!app-sdk-fill-app-sdk-gray-400'
+            : 'dark:!app-sdk-stroke-app-sdk-gray-50 dark:!app-sdk-fill-app-sdk-gray-50'
         }
         width="1.25rem"
         height="1.25rem"

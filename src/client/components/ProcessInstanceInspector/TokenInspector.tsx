@@ -94,55 +94,55 @@ export function TokenInspector({ processInstance, flowNodeInstances }: TokenInsp
   }, [selectedInstance, flowNodeInstances, processInstance]);
 
   return (
-    <div className=" app-sdk-flex app-sdk-flex-col app-sdk-gap-4">
-      {flowNodeInstances.length === 0 ? (
-        <label className="app-sdk-text-white app-sdk-break-all">
-          Process: {processInstance.processModelId}
-          {processInstance.processModelName && ` (${processInstance.processModelName})`}
-        </label>
-      ) : flowNodeInstances.length === 1 ? (
-        <label className="app-sdk-text-white app-sdk-break-all">
-          Flow Node: {flowNodeInstances[0].flowNodeId}
-          {flowNodeInstances[0].flowNodeName && ` (${flowNodeInstances[0].flowNodeName})`}
-        </label>
-      ) : (
-        <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-w-full">
-          <label className="app-sdk-text-white">Select Flow Node:</label>
-          <select
-            className="app-sdk-text-white app-sdk-max-w-full app-sdk-bg-transparent app-sdk-border app-sdk-rounded-md app-sdk-py-2 app-sdk-px-1 app-sdk-text-ellipsis"
-            onChange={(event) =>
-              setSelectedInstance(flowNodeInstances.find((fni) => fni.flowNodeId === event.target.value)!)
-            }
-            value={selectedInstance?.flowNodeId ?? flowNodeInstances[0].flowNodeId}
-          >
-            {flowNodeInstances.map((instance) => (
-              <option key={`token-inspector-option-${instance.flowNodeId}`} value={instance.flowNodeId}>
-                {`${instance.flowNodeName ? `${instance.flowNodeName} (${instance.flowNodeId})` : instance.flowNodeId}`}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-      <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3">
-        <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
-          <label className="app-sdk-text-white">Start Token</label>
-          <Editor
-            height="7rem"
-            defaultLanguage="json"
-            value={startToken}
-            theme="vs-dark"
-            options={{ lineNumbersMinChars: 2, readOnly: true, minimap: { enabled: false } }}
-          />
-        </div>
-        <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
-          <label className="app-sdk-text-white">End Token</label>
-          <Editor
-            height="7rem"
-            defaultLanguage="json"
-            value={endToken}
-            theme="vs-dark"
-            options={{ lineNumbersMinChars: 2, readOnly: true, minimap: { enabled: false } }}
-          />
+    <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-p-4 app-sdk-gap-1 app-sdk-bg-white/95 dark:app-sdk-bg-black/85 dark:app-sdk-text-white app-sdk-border app-sdk-border-solid dark:app-sdk-border-none">
+      <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-4">
+        {flowNodeInstances.length === 0 ? (
+          <label className="app-sdk-break-all">
+            Process: {processInstance.processModelId}
+            {processInstance.processModelName && ` (${processInstance.processModelName})`}
+          </label>
+        ) : flowNodeInstances.length === 1 ? (
+          <label className="app-sdk-break-all">
+            Flow Node: {flowNodeInstances[0].flowNodeId}
+            {flowNodeInstances[0].flowNodeName && ` (${flowNodeInstances[0].flowNodeName})`}
+          </label>
+        ) : (
+          <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-w-full">
+            <label>Select Flow Node:</label>
+            <select
+              className="app-sdk-max-w-full app-sdk-bg-transparent app-sdk-border app-sdk-rounded-md app-sdk-py-2 app-sdk-px-1 app-sdk-text-ellipsis"
+              onChange={(event) =>
+                setSelectedInstance(flowNodeInstances.find((fni) => fni.flowNodeId === event.target.value)!)
+              }
+              value={selectedInstance?.flowNodeId ?? flowNodeInstances[0].flowNodeId}
+            >
+              {flowNodeInstances.map((instance) => (
+                <option key={`token-inspector-option-${instance.flowNodeId}`} value={instance.flowNodeId}>
+                  {`${instance.flowNodeName ? `${instance.flowNodeName} (${instance.flowNodeId})` : instance.flowNodeId}`}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3">
+          <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
+            <label>Start Token</label>
+            <Editor
+              height="7rem"
+              defaultLanguage="json"
+              value={startToken}
+              options={{ lineNumbersMinChars: 2, readOnly: true, minimap: { enabled: false } }}
+            />
+          </div>
+          <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
+            <label>End Token</label>
+            <Editor
+              height="7rem"
+              defaultLanguage="json"
+              value={endToken}
+              options={{ lineNumbersMinChars: 2, readOnly: true, minimap: { enabled: false } }}
+            />
+          </div>
         </div>
       </div>
     </div>

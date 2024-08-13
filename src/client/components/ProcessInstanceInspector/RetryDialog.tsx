@@ -41,7 +41,6 @@ export function RetryDialog(props: RetryDialogProps) {
                 defaultLanguage="json"
                 defaultValue={startToken}
                 onChange={(value) => setStartToken(value ?? '')}
-                theme="vs-dark"
                 options={{
                   lineNumbersMinChars: 2,
                   readOnly: false,

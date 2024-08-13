@@ -10,6 +10,16 @@
       --app-sdk-process-instance-inspector-background-color,
       theme('colors.app-sdk-gray.700')
     );
+
+    .monaco-editor,
+    .monaco-editor * {
+      background-color: black !important;
+      color: white !important;
+
+      .cursor.monaco-mouse-cursor-text {
+        background-color: white !important;
+      }
+    }
   }
 
   *,

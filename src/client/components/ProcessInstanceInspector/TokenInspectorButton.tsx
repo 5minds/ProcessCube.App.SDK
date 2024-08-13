@@ -28,7 +28,7 @@ export function TokenInspectorButton(props: TokenInspectorButtonProps) {
     >
       {isOpen ? (
         <svg
-          className="!app-sdk-stroke-app-sdk-gray-50 !app-sdk-fill-app-sdk-gray-50"
+          className="dark:!app-sdk-stroke-app-sdk-gray-50 dark:!app-sdk-fill-app-sdk-gray-50"
           xmlns="http://www.w3.org/2000/svg"
           width="1.25rem"
           height="1.25rem"
@@ -38,7 +38,7 @@ export function TokenInspectorButton(props: TokenInspectorButtonProps) {
         </svg>
       ) : (
         <svg
-          className="!app-sdk-stroke-app-sdk-gray-50 !app-sdk-fill-app-sdk-gray-50"
+          className="dark:!app-sdk-stroke-app-sdk-gray-50 dark:!app-sdk-fill-app-sdk-gray-50"
           xmlns="http://www.w3.org/2000/svg"
           width="1.25rem"
           height="1.25rem"

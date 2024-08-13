@@ -3,15 +3,14 @@ import React from 'react';
 import { ProcessButton } from './ProcessButton';
 
 type RefreshProcessButtonProps = {
-  disabled?: boolean;
   onClick: () => void;
 };
 
-export function RefreshProcessButton({ disabled, onClick }: RefreshProcessButtonProps) {
+export function RefreshProcessButton({ onClick }: RefreshProcessButtonProps) {
   return (
-    <ProcessButton title="Refresh Process Instance Data" disabled={disabled} onClick={onClick}>
+    <ProcessButton title="Refresh Process Instance Data" onClick={onClick}>
       <svg
-        className="!app-sdk-stroke-app-sdk-gray-50 !app-sdk-fill-app-sdk-gray-50"
+        className="dark:!app-sdk-stroke-app-sdk-gray-50 dark:!app-sdk-fill-app-sdk-gray-50"
         width="1.25rem"
         height="1.25rem"
         viewBox="0 0 512 512"
