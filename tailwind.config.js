@@ -38,7 +38,7 @@ export default {
     },
   },
   plugins: [require('@tailwindcss/forms')({ strategy: 'class' })],
-  darkMode: 'class',
+  darkMode: ['class', "[class~='dark']"],
   safelist: [
     'asdk-pii-flow-node-instance-state--finished',
     'asdk-pii-flow-node-instance-state--running',
