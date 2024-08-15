@@ -1,5 +1,5 @@
 import DOMPurify from 'isomorphic-dompurify';
-import { Tokens, marked } from 'marked';
+import { type Tokens, marked } from 'marked';
 import React from 'react';
 import { useEffect, useState } from 'react';
 
