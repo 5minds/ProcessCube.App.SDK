@@ -1,5 +1,5 @@
 import DOMPurify from 'isomorphic-dompurify';
-import { marked } from 'marked';
+import { Tokens, marked } from 'marked';
 import React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -49,14 +49,14 @@ export function ParagraphFormField(
 }
 
 class MarkdownRenderer extends marked.Renderer {
-  link(href: string, title: string | null | undefined, text: string): string {
-    const link = super.link(href, title, text);
+  link(params: Tokens.Link): string {
+    const link = super.link(params);
 
     return link.replace('<a', "<a target='_blank'");
   }
 
-  html(html: string, block?: boolean | undefined): string {
-    const result = super.html(html, block);
+  html(params: Tokens.HTML | Tokens.Tag): string {
+    const result = super.html(params);
 
     if (result.startsWith('<a ') && !result.includes('target=')) {
       return result.replace('<a ', `<a target="_blank" `);
