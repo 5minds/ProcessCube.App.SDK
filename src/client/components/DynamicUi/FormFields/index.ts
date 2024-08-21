@@ -5,6 +5,7 @@ import { BooleanFormField } from './BooleanFormField';
 import { CheckboxFormField } from './CheckboxFormField';
 import { ColorFormField } from './ColorFormField';
 import { ConfirmFormField } from './ConfirmFormField';
+import { CustomFormField } from './CustomFormField';
 import { DateFormField } from './DateFormField';
 import { DatetimeLocalFormField } from './DatetimeLocalFormField';
 import { DecimalFormField } from './DecimalFormField';
@@ -79,6 +80,7 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   time: TimeFormField,
   url: UrlFormField,
   week: WeekFormField,
+  custom: CustomFormField,
 };
 export { BooleanFormField } from './BooleanFormField';
 export { CheckboxFormField } from './CheckboxFormField';
@@ -105,3 +107,4 @@ export { TextareaFormField } from './TextareaFormField';
 export { TimeFormField } from './TimeFormField';
 export { UrlFormField } from './UrlFormField';
 export { WeekFormField } from './WeekFormField';
+export { CustomFormField } from './CustomFormField';

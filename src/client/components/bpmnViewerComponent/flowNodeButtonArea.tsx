@@ -8,9 +8,9 @@ import RetryButton from './retryButton';
 
 type FlowNodeButtonAreaProps = {
   flowNode: FlowNode;
-  onRetryClick: () => void;
-  onGotoClick: () => void;
-  onPlayClick: () => void;
+  onRetryClick?: () => void;
+  onGotoClick?: () => void;
+  onPlayClick?: () => void;
 };
 
 export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
@@ -20,25 +20,36 @@ export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
 
   const flowNode = props.flowNode;
 
+  const isOnRetryClickDefined = !!props.onRetryClick;
+
   const showRetryButton =
-    !flowNode.IsGateway && flowNode.ProcessInstanceState !== 'running' && flowNode.ProcessInstanceState !== 'finished';
+    !flowNode.IsGateway &&
+    flowNode.ProcessInstanceState !== 'running' &&
+    flowNode.ProcessInstanceState !== 'finished' &&
+    isOnRetryClickDefined;
+
+  const isOnGotoClickDefined = !!props.onGotoClick;
 
   const showGotoButton =
-    flowNode.IsCallActivity ||
-    ((flowNode.IsEventReceiver || flowNode.IsEventSender) && flowNode.LinkedProcessInstanceId);
+    (flowNode.IsCallActivity ||
+      ((flowNode.IsEventReceiver || flowNode.IsEventSender) && flowNode.LinkedProcessInstanceId)) &&
+    isOnGotoClickDefined;
 
-  const showPlayButton = (flowNode.IsUserTask || flowNode.IsManualTask) && flowNode.State === 'suspended';
+  const isOnPlayClickDefined = !!props.onPlayClick;
+
+  const showPlayButton =
+    (flowNode.IsUserTask || flowNode.IsManualTask) && flowNode.State === 'suspended' && isOnPlayClickDefined;
 
   return (
     <div className="flownode-overlay" style={style}>
       <div className="bpmn-element-overlay__below">
-        {showRetryButton && <RetryButton onClick={props.onRetryClick} flowNode={props.flowNode}></RetryButton>}
+        {showRetryButton && <RetryButton onClick={props.onRetryClick!} flowNode={props.flowNode}></RetryButton>}
 
         <ExecutionCount count={props.flowNode.ExecutionCount}></ExecutionCount>
 
-        {showGotoButton && <GotoButton onClick={props.onGotoClick}></GotoButton>}
+        {showGotoButton && <GotoButton onClick={props.onGotoClick!}></GotoButton>}
 
-        {showPlayButton && <PlayButton onClick={props.onPlayClick}></PlayButton>}
+        {showPlayButton && <PlayButton onClick={props.onPlayClick!}></PlayButton>}
       </div>
     </div>
   );

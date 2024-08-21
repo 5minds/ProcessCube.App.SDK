@@ -37,20 +37,16 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
     }),
   );
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        getOverlays() {
-          return viewerRef.current.get<Overlays>('overlays');
-        },
-        getElementRegistry() {
-          return viewerRef.current.get<ElementRegistry>('elementRegistry');
-        },
-      };
-    },
-    [],
-  );
+  useImperativeHandle(ref, () => {
+    return {
+      getOverlays() {
+        return viewerRef.current.get<Overlays>('overlays');
+      },
+      getElementRegistry() {
+        return viewerRef.current.get<ElementRegistry>('elementRegistry');
+      },
+    };
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) {

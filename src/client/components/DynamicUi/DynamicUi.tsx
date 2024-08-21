@@ -200,9 +200,9 @@ export function DynamicUi(
         >
           <div className="app-sdk-flex app-sdk-flex-col app-sdk-space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
-              const DynamicUiFormFieldComponent = (formFieldComponentMap as GenericFormFieldTypeComponentMap)[
-                field.type
-              ];
+              const DynamicUiFormFieldComponent =
+                (formFieldComponentMap as GenericFormFieldTypeComponentMap)?.[field.type] ||
+                (formFieldComponentMap as GenericFormFieldTypeComponentMap).custom;
 
               if (!DynamicUiFormFieldComponent) {
                 return null;
