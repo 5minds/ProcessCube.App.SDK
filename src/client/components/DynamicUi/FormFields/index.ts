@@ -15,7 +15,6 @@ import { HeaderFormField } from './HeaderFormField';
 import { HiddenFormField } from './HiddenFormField';
 import { IntegerFormField } from './IntegerFormField';
 import { MonthFormField } from './MonthFormField';
-import { NumberFormField } from './NumberFormField';
 import { ParagraphFormField } from './ParagraphFormField';
 import { PasswordFormField } from './PasswordFormField';
 import { RadioFormField } from './RadioFormField';
@@ -65,7 +64,6 @@ export const FormFieldComponentMap: DynamicUiFormFieldComponentMap = {
   long: IntegerFormField,
   'datetime-local': DatetimeLocalFormField,
   month: MonthFormField,
-  num: NumberFormField,
   // numbers can be decimals
   number: DecimalFormField,
   string: StringFormField,
@@ -94,7 +92,6 @@ export { FileFormField } from './FileFormField';
 export { IntegerFormField } from './IntegerFormField';
 export { DatetimeLocalFormField } from './DatetimeLocalFormField';
 export { MonthFormField } from './MonthFormField';
-export { NumberFormField } from './NumberFormField';
 export { StringFormField } from './StringFormField';
 export { ParagraphFormField } from './ParagraphFormField';
 export { PasswordFormField } from './PasswordFormField';
