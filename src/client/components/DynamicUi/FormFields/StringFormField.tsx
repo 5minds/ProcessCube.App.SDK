@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { classNames } from '../../../utils/classNames';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function StringFormField(
+export const StringFormField = forwardRef(function StringFormField(
   { formField, state }: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ) {
@@ -45,4 +45,4 @@ export function StringFormField(
       {hint}
     </div>
   );
-}
+});
