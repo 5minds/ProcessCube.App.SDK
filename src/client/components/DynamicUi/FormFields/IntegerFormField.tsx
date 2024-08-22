@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import type { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { isNumber } from '../utils/isNumber';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function IntegerFormField(
+export const IntegerFormField = forwardRef(function IntegerFormField(
   { formField, state }: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ) {
@@ -45,4 +45,4 @@ export function IntegerFormField(
       )}
     </div>
   );
-}
+});
