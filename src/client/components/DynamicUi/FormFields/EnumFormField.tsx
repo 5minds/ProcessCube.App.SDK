@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function EnumFormField(
+export const EnumFormField = forwardRef(function EnumFormField(
   { formField, state }: DynamicUiComponentProps<string | Array<string> | null>,
   ref: DynamicUiFormFieldRef,
 ) {
@@ -143,4 +143,4 @@ export function EnumFormField(
       {hint}
     </div>
   );
-}
+});
