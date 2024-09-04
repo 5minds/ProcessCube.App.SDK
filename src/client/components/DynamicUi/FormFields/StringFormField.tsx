@@ -21,6 +21,7 @@ export function StringFormField(props: DynamicUiComponentProps<string>, ref: Dyn
           name={formField.id}
           aria-describedby={hintId}
           data-form-field-type="text"
+          placeholder={parsedCustomFormConfig?.placeholder ?? 'Enter text...'}
         />
       </div>
       {parsedCustomFormConfig?.hint && (

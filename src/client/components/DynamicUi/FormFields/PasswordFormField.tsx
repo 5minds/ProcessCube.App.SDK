@@ -8,6 +8,8 @@ export function PasswordFormField(props: DynamicUiComponentProps<string | null>,
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
+  const defaultValue = props.state || (formField.defaultValue?.toString() ?? '');
+
   return (
     <div>
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
@@ -19,6 +21,8 @@ export function PasswordFormField(props: DynamicUiComponentProps<string | null>,
           type="password"
           id={formField.id}
           name={formField.id}
+          defaultValue={defaultValue}
+          placeholder={parsedCustomFormConfig?.placeholder ?? 'Enter password...'}
           aria-describedby={hintId}
           data-form-field-type="password"
         />
