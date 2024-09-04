@@ -31,7 +31,7 @@ export function CheckboxFormField(
         data-form-field-type="checkbox"
       >
         {options?.map((option: any) => {
-          const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.id);
+          const hasValueToBeChecked = multipleStateOrDefaultValue.find((value) => value.trim() === option.key);
 
           return (
             <div key={option.key} className="app-sdk-relative app-sdk-flex app-sdk-items-start">
