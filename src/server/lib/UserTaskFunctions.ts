@@ -169,7 +169,6 @@ export async function getWaitingUserTasks(
       break;
   }
 
-  console.log('luis777', options);
   const result = await Client.userTasks.query(
     {
       state: DataModels.FlowNodeInstances.FlowNodeInstanceState.suspended,

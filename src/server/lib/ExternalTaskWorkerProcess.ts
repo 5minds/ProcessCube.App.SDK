@@ -115,7 +115,7 @@ function restart({ topic, identity, moduleString, workerPath }: StartPayload) {
   });
 }
 
-async function updateIdentity({ identity }: { identity: Identity }) {
+function updateIdentity({ identity }: { identity: Identity }) {
   if (externalTaskWorker) {
     externalTaskWorker.identity = identity;
   }
