@@ -1,25 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { classNames } from '../../../utils/classNames';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
 export function StringFormField(
-  { formField, state }: DynamicUiComponentProps<string | null>,
+  { formField, state, onValidate }: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  function onFocusLeave(e: any) {
+    if (onValidate) {
+      onValidate(formField.id, formField.type, e.target.value).then((res) => {
+        setErrorMessage(res.join('\n'));
+        setIsValid(false);
+      });
+    }
+  }
+
+  function resetErrors() {
+    setErrorMessage('');
+    setIsValid(true);
+  }
 
   const label = formField.label;
   const inputType = parsedCustomFormConfig?.multiline === 'true' ? 'textarea' : 'input';
   const textInput = React.createElement(inputType, {
     className: classNames(
       inputType === 'input' ? 'app-sdk-form-input' : 'app-sdk-form-textarea',
+      isValid ? '' : 'app-sdk-bg-red-600/20',
       'app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-shadow-sm focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] app-sdk-block app-sdk-w-full sm:app-sdk-text-sm app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 dark:app-sdk-border-solid dark:app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] dark:focus:app-sdk-shadow-app-sdk-dark app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] dark:invalid:app-sdk-shadow-app-sdk-dark-invalid',
     ),
     id: formField.id,
     name: formField.id,
     defaultValue: state || (formField.defaultValue?.toString() ?? ''),
+    onBlur: onFocusLeave,
+    onChange: resetErrors,
     placeholder: parsedCustomFormConfig?.placeholder,
     'aria-describedby': parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined,
     type: inputType === 'input' ? 'text' : undefined,
@@ -43,6 +62,11 @@ export function StringFormField(
       </label>
       <div className="app-sdk-mt-1">{textInput}</div>
       {hint}
+      {!isValid && (
+        <pre className="app-sdk-block app-sdk-text-sm app-sdk-font-medium app-sdk-text-red-600 app-sdk-mt-1">
+          {errorMessage}
+        </pre>
+      )}
     </div>
   );
 }

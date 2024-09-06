@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, forwardRef, useRef } from 'react';
+import React, { Fragment, PropsWithChildren, forwardRef, useRef, useState } from 'react';
 import * as ReactIs from 'react-is';
 import semverGt from 'semver/functions/gt';
 import semverPrerelease from 'semver/functions/prerelease';
@@ -13,6 +13,7 @@ import {
   FormFieldComponentMap,
   type GenericFormFieldTypeComponentMap,
 } from './FormFields';
+import { combineChangeValidationFns, combineSubmitValidationFns, type CombinedChangeValidationFn } from './utils/combineValidationFns';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
 const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=18.0.0 <19', { includePrerelease: true });
@@ -53,11 +54,22 @@ export type DynamicUiFormFieldRef = React.ForwardedRef<DynamicUiRefFunctions>;
 export type DynamicUiComponentProps<TState = any> = {
   formField: DataModels.FlowNodeInstances.UserTaskFormField;
   state?: TState;
+  onValidate?: (id: string, type: FormFieldTypes, value: any) => Promise<Array<string>>;
 };
 export type UserTaskResult = DataModels.FlowNodeInstances.UserTaskResult;
 export type FormState = {
   [formFieldId: string]: JSONValue;
 };
+
+export type FormFieldTypes = 'string' | 'number' | 'decimal-number' | 'boolean' | 'enum' | 'date' | string;
+
+export type ClientValidationFn = (
+  id: string,
+  type: FormFieldTypes,
+  value: any,
+) => Promise<string | void>;
+
+export type ServerValidationFn = (formData: FormData) => Promise<string | void>;
 
 export function DynamicUi(
   props: PropsWithChildren<{
@@ -67,6 +79,10 @@ export function DynamicUi(
     headerComponent?: JSX.Element;
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
+    /** Callback, that will be called when the form is submitted */
+    onSubmitValidation?: Array<ServerValidationFn>;
+    /** Callback, that will be called after the focus on a formfield changes */
+    onFocusChangeValidation?: Array<ClientValidationFn>;
     /** Custom class name for the root element */
     className?: string;
     /** Custom class names for the different parts of the component */
@@ -111,13 +127,22 @@ export function DynamicUi(
     ...(props.customFieldComponents ? props.customFieldComponents : {}),
   };
 
-  const onSubmit = (formData: FormData) => {
-    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
+  const onSubmit = async (formData: FormData) => {
+    if (props.onSubmitValidation) {
+      const validationFns = [props.onSubmitValidation].flat();
+      const combinedValidationFn = combineSubmitValidationFns(validationFns);
+      const validationErrors = await combinedValidationFn(formData);
+      if (validationErrors.length > 0) {
+        setGlobalError(validationErrors);
+      }
+    }
 
+    const userTaskResult = transformFormDataToUserTaskResult(formData, formFields, formFieldRefs);
     props.onSubmit(userTaskResult, formData, mapUserTask(props.task));
   };
 
-  function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
+  async function onFormDataChange(event: React.FormEvent<HTMLFormElement>) {
+    setGlobalError(['']);
     const target = event.target as HTMLInputElement;
     if (timeoutRef.current != null) {
       window.clearTimeout(timeoutRef.current);
@@ -131,6 +156,14 @@ export function DynamicUi(
       const formState = transformFormDataToFormState(formData, formFieldRefs);
       props.onStateChange?.(target.value, target.name, formState);
     }, 100);
+  }
+
+  function setGlobalError(errorMessage: Array<string>) {
+    const errorElement = document.getElementById(props.task.flowNodeInstanceId);
+    if (errorElement) {
+      errorElement.style.display = 'block';
+      errorElement.innerText = errorMessage.join('\n');
+    }
   }
 
   const rootClassNames: string = classNames(
@@ -168,7 +201,6 @@ export function DynamicUi(
           : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'app-sdk-dark'))
       }
       data-dynamic-ui
-      data-blablabl
     >
       <form
         ref={formRef}
@@ -239,9 +271,22 @@ export function DynamicUi(
 
               const ref = formFieldRefs.get(field.id)?.ref;
 
+              let combinedValidationFn: CombinedChangeValidationFn =
+                undefined;
+
+              if (props.onFocusChangeValidation) {
+                const validationFns = [props.onFocusChangeValidation].flat();
+                combinedValidationFn = combineChangeValidationFns(validationFns);
+              }
+
               return (
                 <Fragment key={field.id}>
-                  <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
+                  <ReactElement
+                    ref={ref}
+                    formField={field}
+                    state={props.state?.[field.id]}
+                    onValidate={combinedValidationFn}
+                  />
                 </Fragment>
               );
             })}
@@ -253,6 +298,10 @@ export function DynamicUi(
             props.classNames?.footer ?? '',
           )}
         >
+          <h1
+            id={props.task.flowNodeInstanceId}
+            className="app-sdk-w-fit app-sdk-mx-auto app-sdk-text-red-600 app-sdk-hidden app-sdk-mb-2"
+            />
           <FormButtons confirmFormField={confirmFormField} />
         </footer>
       </form>
