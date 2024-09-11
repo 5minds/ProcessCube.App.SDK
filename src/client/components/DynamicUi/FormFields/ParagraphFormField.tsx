@@ -1,12 +1,12 @@
 import DOMPurify from 'isomorphic-dompurify';
 import { type Tokens, marked } from 'marked';
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { useEffect, useState } from 'react';
 
 import { classNames } from '../../../utils/classNames';
-import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import type { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 
-export function ParagraphFormField(
+export const ParagraphFormField = forwardRef(function ParagraphFormField(
   { formField: { defaultValue, label } }: DynamicUiComponentProps,
   ref: DynamicUiFormFieldRef,
 ) {
@@ -46,7 +46,7 @@ export function ParagraphFormField(
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>
   );
-}
+});
 
 class MarkdownRenderer extends marked.Renderer {
   link(params: Tokens.Link): string {
