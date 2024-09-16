@@ -1,47 +1,40 @@
 import React from 'react';
 
-import { classNames } from '../../../utils/classNames';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function TextareaFormField(
-  { formField, state }: DynamicUiComponentProps<string | null>,
-  ref: DynamicUiFormFieldRef,
-) {
+export function TextareaFormField(props: DynamicUiComponentProps<string>, ref: DynamicUiFormFieldRef) {
+  const { formField } = props;
+  const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  const label = formField.label;
-  const inputType = 'textarea';
-  const textareaInput = React.createElement(inputType, {
-    className: classNames(
-      'app-sdk-form-textarea',
-      'app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-shadow-sm focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] app-sdk-block app-sdk-w-full sm:app-sdk-text-sm app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] invalid:app-sdk-border-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-[color:var(--asdk-dui-formfield-invalid-color)] invalid:app-sdk-ring-1 dark:app-sdk-border-solid dark:app-sdk-border-transparent app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] dark:focus:app-sdk-shadow-app-sdk-dark app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] dark:invalid:app-sdk-shadow-app-sdk-dark-invalid',
-    ),
-    id: formField.id,
-    name: formField.id,
-    defaultValue: state || (formField.defaultValue?.toString() ?? ''),
-    placeholder: parsedCustomFormConfig?.placeholder,
-    'aria-describedby': parsedCustomFormConfig?.hint ? `${formField.id}-hint` : undefined,
-    rows: 4,
-    'data-form-field-type': 'string',
-  });
-
-  const hint = parsedCustomFormConfig?.hint ? (
-    <p
-      id={`${formField.id}-hint`}
-      className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
-    >
-      {parsedCustomFormConfig.hint}
-    </p>
-  ) : null;
+  const defaultValue = props.state || (formField.defaultValue?.toString() ?? '');
 
   return (
     <div>
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
-        {label}
+        {formField.label}
       </label>
-      <div className="app-sdk-mt-1">{textareaInput}</div>
-      {hint}
+      <div className="app-sdk-mt-1">
+        <textarea
+          className="app-sdk-form-input app-sdk-text-app-sdk-inherit app-sdk-border app-sdk-py-2 app-sdk-px-3 app-sdk-block app-sdk-w-full app-sdk-rounded-md app-sdk-border-[color:var(--asdk-dui-border-color)] app-sdk-bg-[color:var(--asdk-dui-formfield-background-color)] app-sdk-placeholder-[color:var(--asdk-dui-formfield-placeholder-text-color)] app-sdk-shadow-sm focus:app-sdk-border-[color:var(--asdk-dui-focus-color)] focus:app-sdk-ring-[color:var(--asdk-dui-focus-color)] sm:app-sdk-text-sm dark:app-sdk-border-solid dark:app-sdk-border-transparent dark:focus:app-sdk-shadow-app-sdk-dark"
+          defaultValue={defaultValue}
+          id={formField.id}
+          name={formField.id}
+          rows={parsedCustomFormConfig?.rows ?? 4}
+          aria-describedby={hintId}
+          data-form-field-type="textarea"
+          placeholder={parsedCustomFormConfig?.placeholder ?? 'Enter text...'}
+        />
+      </div>
+      {parsedCustomFormConfig?.hint && (
+        <p
+          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+          id={hintId}
+        >
+          {parsedCustomFormConfig?.hint}
+        </p>
+      )}
     </div>
   );
 }
