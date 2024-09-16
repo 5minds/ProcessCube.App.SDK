@@ -97,7 +97,7 @@
   },
   "dependencies": {
     "@5minds/processcube_engine_client": "5.1.0-beta.1",
-    "@5minds/processcube_engine_sdk": "6.0.0-beta.1",
+    "@5minds/processcube_engine_sdk": "6.0.0-renovate-fa4cf2-m0ud74q6",
     "@headlessui/react": "^2.0.0",
     "bpmn-js": "^17.6.0",
     "@monaco-editor/react": "^4.6.0",
