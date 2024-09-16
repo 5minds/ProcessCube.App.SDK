@@ -78,6 +78,12 @@ Im Zielprojekt anschließend:
 npm link @5minds/processcube_app_sdk
 ```
 
+Bei Problemen mit React muss ggf. noch die React Dependency des Zielprojekts zurück in das SDK gelinkt werden, damit nur eine React Instanz zur Laufzeit existiert:
+
+```shell
+npm link <path-to-project>/node_modules/react
+```
+
 ## Wen kann ich auf das Projekt ansprechen?
 
 1. [Alexander Kasten](mailto:alexander.kasten@5minds.de)

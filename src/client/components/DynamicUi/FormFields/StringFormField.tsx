@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function StringFormField(props: DynamicUiComponentProps<string>, ref: DynamicUiFormFieldRef) {
-  const { formField } = props;
+export const StringFormField = forwardRef(function StringFormField(
+  { formField, state }: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  const defaultValue = props.state || (formField.defaultValue?.toString() ?? '');
+  const defaultValue = state || (formField.defaultValue?.toString() ?? '');
 
   return (
     <div>
@@ -37,4 +39,4 @@ export function StringFormField(props: DynamicUiComponentProps<string>, ref: Dyn
       )}
     </div>
   );
-}
+});

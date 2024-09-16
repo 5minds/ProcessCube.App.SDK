@@ -24,22 +24,28 @@ interface DynamicUiForwardedRefRenderFunction
   extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
   (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
 }
+type DynamicUiForwardedRefExoticComponent = React.ForwardRefExoticComponent<
+  DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>
+>;
+
 type DynamicUiComponentType = React.ComponentClass<DynamicUiComponentProps>;
 export type DynamicUiFormFieldComponent =
+  | DynamicUiForwardedRefExoticComponent
   | DynamicUiForwardedRefRenderFunction
   | typeof DynamicUiComponent<DynamicUiComponentProps, {}>;
 
 type DynamicUiRefFunctions = Omit<DynamicUiComponent, keyof React.Component>;
 type FormFieldRenderer =
-  | React.ForwardRefExoticComponent<DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>>
+  | DynamicUiForwardedRefExoticComponent
+  | DynamicUiForwardedRefRenderFunction
   | DynamicUiComponentType;
 type FormFieldRefsMapObj = {
   ref: React.MutableRefObject<DynamicUiRefFunctions | null>;
 };
-type JSONPrimitive = string | number | boolean | null;
-type JSONValue = JSONPrimitive | JSONObject | JSONArray;
-type JSONObject = { [member: string]: JSONValue };
-interface JSONArray extends Array<JSONValue> {}
+export type JSONPrimitive = string | number | boolean | null;
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
+export type JSONObject = { [member: string]: JSONValue };
+export interface JSONArray extends Array<JSONValue> {}
 
 export abstract class DynamicUiComponent<
   P extends DynamicUiComponentProps = DynamicUiComponentProps,
@@ -168,7 +174,6 @@ export function DynamicUi(
           : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'app-sdk-dark'))
       }
       data-dynamic-ui
-      data-blablabl
     >
       <form
         ref={formRef}
@@ -223,25 +228,32 @@ export function DynamicUi(
               if (isReactClassComponent(DynamicUiFormFieldComponent)) {
                 assertElementIsReactComponent(DynamicUiFormFieldComponent);
                 ReactElement = DynamicUiFormFieldComponent;
+              } else if (isForwardedExoticComponent(DynamicUiFormFieldComponent)) {
+                assertElementIsForwardedExoticComponent(DynamicUiFormFieldComponent);
+                ReactElement = DynamicUiFormFieldComponent;
               } else {
-                let formFieldComponentToUse = DynamicUiFormFieldComponent;
-
-                // has only one parameter => wrap to function with two params because, forwardRef needs 0 or 2.
-                if (DynamicUiFormFieldComponent.length === 1) {
-                  formFieldComponentToUse = (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) => (
-                    <DynamicUiFormFieldComponent {...props} />
+                if (DynamicUiFormFieldComponent.length === 2) {
+                  console.warn(
+                    `[@5minds/processcube_app_sdk:DynamicUi]\t\tFunction components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?\n\nFormField ID: ${field.id}\nFormField Type: ${field.type}\nComponent Name: ${DynamicUiFormFieldComponent.name} ${(DynamicUiFormFieldComponent as any).displayName ?? ''}`,
                   );
                 }
-
-                assertElementIsRenderFunction(formFieldComponentToUse);
-                ReactElement = forwardRef(formFieldComponentToUse);
+                assertElementIsRenderFunction(DynamicUiFormFieldComponent);
+                ReactElement = DynamicUiFormFieldComponent;
               }
 
               const ref = formFieldRefs.get(field.id)?.ref;
-
               return (
                 <Fragment key={field.id}>
-                  <ReactElement ref={ref} formField={field} state={props.state?.[field.id]} />
+                  <ReactElement
+                    ref={
+                      isReactClassComponent(DynamicUiFormFieldComponent) ||
+                      isForwardedExoticComponent(DynamicUiFormFieldComponent)
+                        ? ref
+                        : undefined
+                    }
+                    formField={field}
+                    state={props.state?.[field.id]}
+                  />
                 </Fragment>
               );
             })}
@@ -332,6 +344,24 @@ function assertElementIsReactComponent(
   }
 
   throw new Error(`Expected Element to be a React Component`);
+}
+
+function isForwardedExoticComponent(element: DynamicUiFormFieldComponent): boolean {
+  return (
+    ReactIs.isValidElementType(element) &&
+    (element as React.ExoticComponent).$$typeof === ReactIs.ForwardRef &&
+    !isReactClassComponent(element)
+  );
+}
+
+function assertElementIsForwardedExoticComponent(
+  element: DynamicUiFormFieldComponent,
+): asserts element is DynamicUiForwardedRefExoticComponent {
+  if (isForwardedExoticComponent(element)) {
+    return;
+  }
+
+  throw new Error(`Expected Element to be a functional Component wrapped with React.forwardRef`);
 }
 
 function assertElementIsRenderFunction(
