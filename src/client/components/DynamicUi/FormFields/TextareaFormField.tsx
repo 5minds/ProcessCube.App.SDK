@@ -10,6 +10,8 @@ export function TextareaFormField(props: DynamicUiComponentProps<string>, ref: D
 
   const defaultValue = props.state || (formField.defaultValue?.toString() ?? '');
 
+  console.log('This is a TextareaFormField', formField);
+
   return (
     <div>
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
