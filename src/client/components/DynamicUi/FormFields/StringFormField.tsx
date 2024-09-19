@@ -12,8 +12,6 @@ export const StringFormField = forwardRef(function StringFormField(
 
   const defaultValue = state || (formField.defaultValue?.toString() ?? '');
 
-  console.log('This is a TextFormField', formField);
-
   return (
     <div>
       <label className="app-sdk-block app-sdk-text-sm app-sdk-font-medium" htmlFor={formField.id}>
