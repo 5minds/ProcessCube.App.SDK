@@ -1,12 +1,9 @@
 import React from 'react';
 
-import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function SelectFormField(
-  { formField, state }: DynamicUiComponentProps<string | null>,
-  ref: DynamicUiFormFieldRef,
-) {
+export function SelectFormField({ formField, state }: DynamicUiComponentProps<string | null>) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
   const options = parsedCustomFormConfig?.entries;
   const hintId = `${formField.id}-hint`;
