@@ -26,7 +26,7 @@ export const StringFormField = forwardRef(function StringFormField(
           name={formField.id}
           aria-describedby={hintId}
           data-form-field-type="text"
-          placeholder={parsedCustomFormConfig?.placeholder ?? 'Enter text...'}
+          placeholder={parsedCustomFormConfig?.placeholder}
         />
       </div>
       {parsedCustomFormConfig?.hint && (

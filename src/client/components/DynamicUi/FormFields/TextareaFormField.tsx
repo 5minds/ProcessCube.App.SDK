@@ -24,7 +24,7 @@ export function TextareaFormField(props: DynamicUiComponentProps<string>, ref: D
           rows={parsedCustomFormConfig?.rows ?? 4}
           aria-describedby={hintId}
           data-form-field-type="textarea"
-          placeholder={parsedCustomFormConfig?.placeholder ?? 'Enter text...'}
+          placeholder={parsedCustomFormConfig?.placeholder}
         />
       </div>
       {parsedCustomFormConfig?.hint && (

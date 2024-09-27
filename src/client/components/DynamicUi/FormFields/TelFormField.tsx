@@ -23,7 +23,7 @@ export function TelFormField({ formField, state }: DynamicUiComponentProps<strin
           name={formField.id}
           type="tel"
           defaultValue={state || (formField.defaultValue?.toString() ?? '')}
-          placeholder={parsedCustomFormConfig?.placeholder || 'Enter phone number...'}
+          placeholder={parsedCustomFormConfig?.placeholder}
           aria-describedby={parsedCustomFormConfig?.hint ? hintId : undefined}
           data-form-field-type="tel"
         />

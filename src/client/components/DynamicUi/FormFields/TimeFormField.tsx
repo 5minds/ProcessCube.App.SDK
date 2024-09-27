@@ -26,7 +26,6 @@ export function TimeFormField(props: DynamicUiComponentProps<string | null>) {
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
-          placeholder={parsedCustomFormConfig?.placeholder || 'hh:mm:ss'}
           aria-describedby={hintId}
           data-form-field-type="time"
         />

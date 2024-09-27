@@ -29,7 +29,6 @@ export const DateFormField = forwardRef(function DateFormField(
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
-          placeholder={parsedCustomFormConfig?.placeholder || 'yyyy-mm-dd'}
           aria-describedby={hintId}
           data-form-field-type="date"
         />
