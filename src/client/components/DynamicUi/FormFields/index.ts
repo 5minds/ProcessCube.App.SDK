@@ -35,6 +35,20 @@ enum MissingFormFieldType {
   checkbox = 'checkbox',
   radio = 'radio',
   select = 'select',
+  range = 'range',
+  file = 'file',
+  hidden = 'hidden',
+  tel = 'tel',
+  textarea = 'textarea',
+  url = 'url',
+  week = 'week',
+  time = 'time',
+  month = 'month',
+  datetimeLocal = 'datetime-local',
+  email = 'email',
+  color = 'color',
+  password = 'password',
+  custom = 'custom',
 }
 
 const UserTaskFormFieldType = {
