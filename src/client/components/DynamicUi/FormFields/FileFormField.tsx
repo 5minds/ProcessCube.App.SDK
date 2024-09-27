@@ -20,7 +20,7 @@ export function FileFormField(props: DynamicUiComponentProps<File | null>) {
         name={formField.id}
         aria-describedby={hintId}
         data-form-field-type="file"
-        multiple
+        multiple={parsedCustomFormConfig?.multiple}
       ></input>
       {parsedCustomFormConfig?.hint && (
         <p
