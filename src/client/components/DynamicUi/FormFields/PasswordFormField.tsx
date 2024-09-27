@@ -22,7 +22,7 @@ export function PasswordFormField(props: DynamicUiComponentProps<string | null>)
           id={formField.id}
           name={formField.id}
           defaultValue={defaultValue}
-          placeholder={parsedCustomFormConfig?.placeholder ?? 'Enter password...'}
+          placeholder={parsedCustomFormConfig?.placeholder}
           aria-describedby={hintId}
           data-form-field-type="password"
         />

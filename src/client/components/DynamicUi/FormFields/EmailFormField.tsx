@@ -22,7 +22,7 @@ export function EmailFormField(props: DynamicUiComponentProps<string | null>) {
           defaultValue={defaultValue}
           id={formField.id}
           name={formField.id}
-          placeholder={parsedCustomFormConfig?.placeholder ?? 'Enter email...'}
+          placeholder={parsedCustomFormConfig?.placeholder}
           aria-describedby={hintId}
           data-form-field-type="email"
         />
