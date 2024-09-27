@@ -8,7 +8,7 @@ export function ColorFormField(props: DynamicUiComponentProps<string | null>) {
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  if (!isValidColor(formField.defaultValue)) {
+  if (formField.defaultValue && !isValidColor(formField.defaultValue.toString())) {
     console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for color field "${formField.id}"`);
   }
 
@@ -43,7 +43,7 @@ export function ColorFormField(props: DynamicUiComponentProps<string | null>) {
   );
 }
 
-function isValidColor(value: any) {
+function isValidColor(value: string) {
   const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
 
   return hexColorRegex.test(value?.toString());

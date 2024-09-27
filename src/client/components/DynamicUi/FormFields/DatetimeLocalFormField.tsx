@@ -8,7 +8,7 @@ export function DatetimeLocalFormField(props: DynamicUiComponentProps<string | n
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  if (!isValidDateTimeLocal(formField.defaultValue)) {
+  if (formField.defaultValue && !isValidDateTimeLocal(formField.defaultValue.toString())) {
     console.warn(
       `[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for dateteime-local field "${formField.id}"`,
     );
@@ -45,26 +45,16 @@ export function DatetimeLocalFormField(props: DynamicUiComponentProps<string | n
   );
 }
 
-function isValidDate(value: any) {
+function isValidDate(value: string) {
   return new Date(value?.toString()).toString() !== 'Invalid Date';
 }
 
-function isValidTime(value: any) {
-  if (typeof value !== 'string' || !/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/.test(value)) {
-    return false;
-  }
-  const [hours, minutes, seconds] = value.split(':').map(Number);
-  return (
-    hours >= 0 &&
-    hours <= 23 &&
-    minutes >= 0 &&
-    minutes <= 59 &&
-    (seconds === undefined || (seconds >= 0 && seconds <= 59))
-  );
+function isValidTime(value: string) {
+  return /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/.test(value);
 }
 
-function isValidDateTimeLocal(value: any) {
-  if (typeof value !== 'string' || !value.includes('T')) {
+function isValidDateTimeLocal(value: string) {
+  if (!value.includes('T')) {
     return false;
   }
 

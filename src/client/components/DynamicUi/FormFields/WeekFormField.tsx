@@ -8,7 +8,7 @@ export function WeekFormField(props: DynamicUiComponentProps<string | null>) {
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  if (!isValidWeek(formField.defaultValue)) {
+  if (formField.defaultValue && !isValidWeek(formField.defaultValue.toString())) {
     console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for week field "${formField.id}"`);
   }
 
@@ -43,14 +43,6 @@ export function WeekFormField(props: DynamicUiComponentProps<string | null>) {
   );
 }
 
-function isValidWeek(value: any) {
-  if (typeof value !== 'string' || !/^(\d{4})-W(0[1-9]|[1-4][0-9]|5[0-3])$/.test(value)) {
-    return false;
-  }
-  const [year, week] = value.split('-W');
-  const firstDayOfYear = new Date(Number(year), 0, 1);
-  const dayOfWeek = firstDayOfYear.getUTCDay();
-  const dayOffset = dayOfWeek <= 4 ? dayOfWeek - 1 : dayOfWeek - 8;
-  const weekStartDate = new Date(firstDayOfYear.setDate(firstDayOfYear.getDate() - dayOffset + (Number(week) - 1) * 7));
-  return !isNaN(weekStartDate.getTime());
+function isValidWeek(value: string) {
+  return /^(\d{4})-W(0[1-9]|[1-4][0-9]|5[0-3])$/.test(value);
 }

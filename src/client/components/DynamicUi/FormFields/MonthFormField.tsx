@@ -8,7 +8,7 @@ export function MonthFormField(props: DynamicUiComponentProps<string | null>) {
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  if (!isValidMonth(formField.defaultValue)) {
+  if (formField.defaultValue && !isValidMonth(formField.defaultValue.toString())) {
     console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for month field "${formField.id}"`);
   }
 
@@ -43,10 +43,6 @@ export function MonthFormField(props: DynamicUiComponentProps<string | null>) {
   );
 }
 
-function isValidMonth(value: any) {
-  if (typeof value !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) {
-    return false;
-  }
-  const [year, month] = value.split('-').map(Number);
-  return month >= 1 && month <= 12;
+function isValidMonth(value: string) {
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 }

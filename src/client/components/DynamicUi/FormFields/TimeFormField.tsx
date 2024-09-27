@@ -8,7 +8,7 @@ export function TimeFormField(props: DynamicUiComponentProps<string | null>) {
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  if (!isValidTime(formField.defaultValue)) {
+  if (formField.defaultValue && !isValidTime(formField.defaultValue.toString())) {
     console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for time field "${formField.id}"`);
   }
 
@@ -43,16 +43,6 @@ export function TimeFormField(props: DynamicUiComponentProps<string | null>) {
   );
 }
 
-function isValidTime(value: any) {
-  if (typeof value !== 'string' || !/^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/.test(value)) {
-    return false;
-  }
-  const [hours, minutes, seconds] = value.split(':').map(Number);
-  return (
-    hours >= 0 &&
-    hours <= 23 &&
-    minutes >= 0 &&
-    minutes <= 59 &&
-    (seconds === undefined || (seconds >= 0 && seconds <= 59))
-  );
+function isValidTime(value: string) {
+  return /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/.test(value);
 }
