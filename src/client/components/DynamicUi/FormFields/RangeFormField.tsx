@@ -53,17 +53,20 @@ export function RangeFormField({ formField, state }: DynamicUiComponentProps<num
         {label}
       </label>
       <div className="app-sdk-mt-1 app-sdk-flex app-sdk-flex-row">
-        <span className="app-sdk-mt-2 app-sdk-mr-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+        {/* <span className="app-sdk-mt-2 app-sdk-mr-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
           {defaultMin}
-        </span>
+        </span> */}
         {rangeInput}
-        <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+        {/* <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
           {defaultMax}
+        </span> */}
+        <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+          {currentValue}
         </span>
       </div>
-      <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+      {/* <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
         Aktueller Wert: {currentValue}
-      </div>
+      </div> */}
       {hint}
     </div>
   );
