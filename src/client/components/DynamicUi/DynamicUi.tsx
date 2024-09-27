@@ -140,7 +140,7 @@ export function DynamicUi(
   }
 
   const rootClassNames: string = classNames(
-    'app-sdk-default-styles app-sdk-mx-auto app-sdk-block app-sdk-h-full app-sdk-min-h-[200px] app-sdk-rounded-lg app-sdk-shadow-lg app-sdk-shadow-[color:var(--asdk-dui-shadow-color)] sm:app-sdk-w-full sm:app-sdk-max-w-lg',
+    'app-sdk-default-styles app-sdk-mx-auto app-sdk-block app-sdk-h-full app-sdk-min-h-[200px] app-sdk-rounded-lg app-sdk-content-center sm:app-sdk-w-full sm:app-sdk-max-w-lg',
     props.classNames?.wrapper ?? '',
     props.className ?? '',
   );
