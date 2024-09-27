@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 
 import { classNames } from '../../../utils/classNames';
-import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function RangeFormField(
-  { formField, state }: DynamicUiComponentProps<number | null>,
-  ref: DynamicUiFormFieldRef,
-) {
+export function RangeFormField({ formField, state }: DynamicUiComponentProps<number | null>) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;

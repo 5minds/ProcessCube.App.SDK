@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import { DynamicUiComponentProps } from '../DynamicUi';
 
-export function HiddenFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
+export function HiddenFormField(props: DynamicUiComponentProps<string | null>) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
 
