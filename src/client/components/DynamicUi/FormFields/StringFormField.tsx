@@ -2,14 +2,20 @@ import React, { forwardRef } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
+import { TextareaFormField } from './TextareaFormField';
 
 export const StringFormField = forwardRef(function StringFormField(
   { formField, state }: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ) {
-  const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
+  const isMultiline = parsedCustomFormConfig?.multiline === 'true';
 
+  if (isMultiline) {
+    return <TextareaFormField formField={formField} state={state} />;
+  }
+
+  const hintId = `${formField.id}-hint`;
   const defaultValue = state || (formField.defaultValue?.toString() ?? '');
 
   return (
