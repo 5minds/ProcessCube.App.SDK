@@ -14,7 +14,7 @@ npm i @5minds/processcube_app_sdk
 
 ## Benutzung
 
-Das NPM Paket hat *drei* Exports.
+Das NPM Paket hat _drei_ Exports.
 
 ### Default/Common
 
@@ -23,7 +23,7 @@ Hier werden Komponenten und Funktionen exportiert, die im Client und Server genu
 Zum Beispiel die React Komponente RemoteUserTask:
 
 ```javascript
-import { RemoteUserTask } from "@5minds/processcube_app_sdk";
+import { RemoteUserTask } from '@5minds/processcube_app_sdk';
 ```
 
 ### Server
@@ -33,7 +33,7 @@ Hier steht alles ausschließlich für eine serverseitige Umgebung zur Verfügung
 Beispiel:
 
 ```javascript
-import { startProcess } from "@5minds/processcube_app_sdk/server";
+import { startProcess } from '@5minds/processcube_app_sdk/server';
 ```
 
 Um die Engine URL anzupassen, die von den exportierten Funktionen genutzt wird, muss `PROCESSCUBE_ENGINE_URL` als Umgebungsvariable gesetzt werden. Andernfalls wird localhost mit dem Standardport der Engine genutzt `10560`.
@@ -43,7 +43,7 @@ Um die Engine URL anzupassen, die von den exportierten Funktionen genutzt wird, 
 Es können nur Komponenten und Funktionen importiert werden, die im Browser funktionieren. Zum Beispiel React Komponenten, die einen clientseitigen Router und dessen React Hooks nutzen oder Funktionen, die auf `window` oder generell globale Browser APIs zugreifen möchten.
 
 ```javascript
-import { DynamicLink } from "@5minds/processcube_app_sdk/client";
+import { DynamicLink } from '@5minds/processcube_app_sdk/client';
 ```
 
 ## Wie kann ich das Projekt aufsetzen?
@@ -76,6 +76,12 @@ Im Zielprojekt anschließend:
 
 ```shell
 npm link @5minds/processcube_app_sdk
+```
+
+Bei Problemen mit React muss ggf. noch die React Dependency des Zielprojekts zurück in das SDK gelinkt werden, damit nur eine React Instanz zur Laufzeit existiert:
+
+```shell
+npm link <path-to-project>/node_modules/react
 ```
 
 ## Wen kann ich auf das Projekt ansprechen?

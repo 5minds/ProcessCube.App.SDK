@@ -1,0 +1,20 @@
+@import url('BPMNViewer.css');
+@import url('DocumentationViewer.css');
+@import url('SplitterLayout.css');
+
+@import '../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-ddi-background-color: var(
+      --app-sdk-diagram-documentation-inspector-background-color,
+      theme('colors.app-sdk-gray.700')
+    );
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-ddi-background-color: var(--app-sdk-diagram-documentation-inspector-background-color, theme(colors.white));
+  }
+}

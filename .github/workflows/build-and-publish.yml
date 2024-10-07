@@ -7,14 +7,13 @@ on:
       - '*/*'
 
 env:
-  CI_TOOLS_VERSION: '^4.0.0'
-  # NOTE: Um den Releasezyklus von Alpha nach Beta zu ändern, einfach die nachfolgend deklarierten Env Variablen switchen.
-  CI_TOOLS_ALPHA_BRANCH: next
-  CI_TOOLS_ALPHA_NPM_TAG: next
-  CI_TOOLS_STABLE_BRANCH: main
-  # CI_TOOLS_BETA_BRANCH: next
-  # CI_TOOLS_BETA_NPM_TAG: next
-  BOX_RELEASE_TAG: 2024-1
+  CI_TOOLS_VERSION: '^4.3.0'
+  # NOTE: Um die Entwicklungsphase von Alpha nach Beta zu ändern, einfach die nachfolgend deklarierten Env Variablen switchen.
+  # CI_TOOLS_ALPHA_BRANCH: next
+  # CI_TOOLS_ALPHA_NPM_TAG: next
+  CI_TOOLS_BETA_BRANCH: next
+  CI_TOOLS_BETA_NPM_TAG: next
+  BOX_RELEASE_TAG: 2024-2
 
 jobs:
   build_and_publish:

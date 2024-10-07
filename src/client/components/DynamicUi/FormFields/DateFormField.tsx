@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function DateFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
+export const DateFormField = forwardRef(function DateFormField(
+  props: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -40,7 +43,7 @@ export function DateFormField(props: DynamicUiComponentProps<string | null>, ref
       )}
     </div>
   );
-}
+});
 
 function isValidDate(value: any) {
   return new Date(value?.toString()).toString() !== 'Invalid Date';

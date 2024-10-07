@@ -1,12 +1,12 @@
 import DOMPurify from 'isomorphic-dompurify';
-import { marked } from 'marked';
-import React from 'react';
+import { type Tokens, marked } from 'marked';
+import React, { forwardRef } from 'react';
 import { useEffect, useState } from 'react';
 
 import { classNames } from '../../../utils/classNames';
-import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
+import type { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 
-export function ParagraphFormField(
+export const ParagraphFormField = forwardRef(function ParagraphFormField(
   { formField: { defaultValue, label } }: DynamicUiComponentProps,
   ref: DynamicUiFormFieldRef,
 ) {
@@ -14,13 +14,10 @@ export function ParagraphFormField(
   useEffect(() => {
     const html = marked.parse(defaultValue?.toString() ?? label?.toString() ?? '', {
       renderer: new MarkdownRenderer(),
-      hooks: {
-        postprocess: (html) => DOMPurify.sanitize(html, { ADD_ATTR: ['target'] }),
-        preprocess: marked.Hooks.prototype.preprocess,
-      },
+      hooks: new MarkedHooks(),
     });
 
-    setGeneratedHtml(html);
+    setGeneratedHtml(html as Awaited<string>);
   }, [defaultValue, label]);
 
   return (
@@ -49,22 +46,28 @@ export function ParagraphFormField(
       dangerouslySetInnerHTML={{ __html: generatedHtml }}
     ></div>
   );
-}
+});
 
 class MarkdownRenderer extends marked.Renderer {
-  link(href: string, title: string | null | undefined, text: string): string {
-    const link = super.link(href, title, text);
+  link(params: Tokens.Link): string {
+    const link = super.link(params);
 
     return link.replace('<a', "<a target='_blank'");
   }
 
-  html(html: string, block?: boolean | undefined): string {
-    const result = super.html(html, block);
+  html(params: Tokens.HTML | Tokens.Tag): string {
+    const result = super.html(params);
 
     if (result.startsWith('<a ') && !result.includes('target=')) {
       return result.replace('<a ', `<a target="_blank" `);
     }
 
     return result;
+  }
+}
+
+class MarkedHooks extends marked.Hooks {
+  postprocess(html: string): string {
+    return DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
   }
 }
