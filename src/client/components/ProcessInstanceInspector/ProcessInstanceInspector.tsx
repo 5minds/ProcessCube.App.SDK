@@ -437,7 +437,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
     const interval = setInterval(refresh, 1000);
     return () => clearInterval(interval);
-  }, [refresh]);
+  }, [refresh, processInstance?.state]);
 
   useEffect(() => {
     if (selectedElementIds.length === 0 || flowNodeInstances.length === 0) {
