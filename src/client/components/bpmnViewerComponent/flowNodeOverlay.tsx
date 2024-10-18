@@ -12,6 +12,7 @@ import {
 } from '@nextui-org/react';
 import React, { useState } from 'react';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import { FlowNode } from './bpmnViewerOverlayCreator';
 import FlowNodeButtonArea from './flowNodeButtonArea';
 import FlowNodeColorArea from './flowNodeColorArea';
@@ -26,7 +27,11 @@ type FlowNodeOverlayProps = {
   gotoManualOrUserTaskAction?: (processInstanceId: string, flowNodeId: string) => void;
 };
 
+/**
+ * @deprecated
+ */
 export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
+  warnOnceForDeprecation('FlowNodeOverlay');
   const retryModal = useDisclosure();
   const flowNodeInfoModal = useDisclosure();
   const [newToken, setNewToken] = useState(JSON.stringify(props.flowNode.CurrentStartToken));

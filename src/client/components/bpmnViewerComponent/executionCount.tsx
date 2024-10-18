@@ -1,10 +1,16 @@
 import React from 'react';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
+
 type ExecutionCountProps = {
   count: number;
 };
 
+/**
+ * @deprecated
+ */
 export default function ExecutionCount(props: ExecutionCountProps) {
+  warnOnceForDeprecation('ExecutionCount');
   const style = {
     width: 30,
   };
