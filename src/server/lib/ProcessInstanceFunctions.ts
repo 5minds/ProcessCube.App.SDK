@@ -115,18 +115,33 @@ export async function terminateProcessInstance(processInstanceId: string) {
  *
  * @param query.query The query of {@link Client.processInstances.query}
  * @param query.options The options of {@link Client.processInstances.query}
+ * @param indentity The Identity fo the User
  * @returns The list of active process instances as promise {@link DataModels.ProcessInstances.ProcessInstanceList}
  */
-export async function getActiveProcessInstances(query?: {
-  query?: Omit<DataModels.ProcessInstances.ProcessInstanceQuery, 'state'>;
-  options?: Parameters<typeof Client.processInstances.query>[1];
-}): Promise<DataModels.ProcessInstances.ProcessInstanceList> {
+export async function getActiveProcessInstances(
+  query: {
+    query?: Omit<DataModels.ProcessInstances.ProcessInstanceQuery, 'state'>;
+    options: Omit<Parameters<typeof Client.processInstances.query>[1], 'identity'> & { identity?: Identity | boolean };
+  } = { options: { identity: true } },
+): Promise<DataModels.ProcessInstances.ProcessInstanceList> {
+  switch (query.options.identity) {
+    case true:
+      query.options.identity = await getIdentity();
+      break;
+    case false:
+      query.options.identity = undefined;
+      break;
+    case undefined:
+      query.options.identity = await getIdentity();
+
+      break;
+  }
   const result = await Client.processInstances.query(
     {
       ...query?.query,
       state: DataModels.ProcessInstances.ProcessInstanceState.running,
     },
-    query?.options,
+    query?.options as Parameters<typeof Client.processInstances.query>[1],
   );
 
   return result;
@@ -144,10 +159,12 @@ export async function getActiveProcessInstances(query?: {
 export async function waitForProcessEnd(
   filterBy: {
     processInstanceId?: string;
-  },
-  identity?: Identity,
+  } = {},
+  identity: Identity | boolean = true,
 ): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const { processInstanceId } = filterBy;
+  const resolvedIdentity =
+    typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
 
   return new Promise<DataModels.ProcessInstances.ProcessInstance>(async (resolve, reject) => {
     const subscriptions: Array<Subscription> = [];
@@ -162,10 +179,10 @@ export async function waitForProcessEnd(
 
       const processInstance = await Client.processInstances.query(
         { processInstanceId: event.processInstanceId },
-        { identity },
+        { identity: resolvedIdentity },
       );
       for (const sub of subscriptions) {
-        Client.notification.removeSubscription(sub, identity);
+        Client.notification.removeSubscription(sub, resolvedIdentity);
       }
 
       if (processInstance.totalCount === 0) {
@@ -175,9 +192,11 @@ export async function waitForProcessEnd(
       return resolve(processInstance.processInstances[0]);
     };
 
-    subscriptions.push(await Client.notification.onProcessEnded(handleSubscription, { identity }));
-    subscriptions.push(await Client.notification.onProcessError(handleSubscription, { identity }));
-    subscriptions.push(await Client.notification.onProcessTerminated(handleSubscription, { identity }));
+    subscriptions.push(await Client.notification.onProcessEnded(handleSubscription, { identity: resolvedIdentity }));
+    subscriptions.push(await Client.notification.onProcessError(handleSubscription, { identity: resolvedIdentity }));
+    subscriptions.push(
+      await Client.notification.onProcessTerminated(handleSubscription, { identity: resolvedIdentity }),
+    );
 
     if (processInstanceId) {
       const finishedProcessInstance = await Client.processInstances.query(
@@ -189,12 +208,12 @@ export async function waitForProcessEnd(
             DataModels.ProcessInstances.ProcessInstanceState.error,
           ],
         },
-        { identity },
+        { identity: resolvedIdentity },
       );
 
       if (finishedProcessInstance.totalCount > 0) {
         for (const sub of subscriptions) {
-          Client.notification.removeSubscription(sub, identity);
+          Client.notification.removeSubscription(sub, resolvedIdentity);
         }
         resolve(finishedProcessInstance.processInstances[0]);
       }
