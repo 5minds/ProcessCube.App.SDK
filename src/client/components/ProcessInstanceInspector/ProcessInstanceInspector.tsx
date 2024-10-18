@@ -50,7 +50,7 @@ const EMPTY_COMMAND_PALETTE_PROPS: CommandPaletteProps<FlowNodeInstance & Comman
   onClose: () => {},
 };
 
-const EMPTRY_RETRY_DIALOG_PROPS: {
+const EMPTY_RETRY_DIALOG_PROPS: {
   isOpen: boolean;
   flowNodeInstance?: FlowNodeInstance;
 } = {
@@ -86,7 +86,7 @@ type ProcessInstanceInspectorProps = {
 export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const { processInstanceId } = props;
   const [commandPaletteProps, setCommandPaletteProps] = useState(EMPTY_COMMAND_PALETTE_PROPS);
-  const [retryDialogProps, setRetryDialogProps] = useState(EMPTRY_RETRY_DIALOG_PROPS);
+  const [retryDialogProps, setRetryDialogProps] = useState(EMPTY_RETRY_DIALOG_PROPS);
   const [isTokenInspectorOpen, setIsTokenInspectorOpen] = useState(false);
   const [processInstance, setProcessInstance] = useState<ProcessInstance>();
   const [flowNodeInstances, setFlowNodeInstances] = useState<FlowNodeInstance[]>([]);
