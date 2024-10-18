@@ -2,10 +2,7 @@ import { getToken } from 'next-auth/jwt';
 import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
 import { cookies, headers } from 'next/headers';
 
-import type { DataModels } from '@5minds/processcube_engine_client';
-
-const IS_SECURE_COOKIE = process.env.NEXTAUTH_URL?.startsWith('https://');
-const SESSION_TOKEN_COOKIE_NAME = `${IS_SECURE_COOKIE ? '__Secure-' : ''}next-auth.session-token`;
+import type { DataModels } from '@5minds/processcube_engine_sdk';
 
 /**
  *
@@ -33,15 +30,16 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
     });
 
     const responseCookies = new ResponseCookies(response.headers);
-    const newSessionTokenCookie = responseCookies.get(SESSION_TOKEN_COOKIE_NAME);
 
-    if (newSessionTokenCookie) {
+    if (responseCookies.getAll().length) {
       let errorOnSetCookies = false;
       // update the server cookie with the new session and refreshed access token
       try {
-        cookies().set(SESSION_TOKEN_COOKIE_NAME, newSessionTokenCookie.value, {
-          ...newSessionTokenCookie,
-        });
+        for (const cookie of responseCookies.getAll()) {
+          cookies().set(cookie.name, cookie.value, {
+            ...cookie,
+          });
+        }
       } catch {
         // Cookies can only be modified in a Server Action or Route Handler, not in a React Server Component
         // so in this case we use the responseCookie to get the refreshed token

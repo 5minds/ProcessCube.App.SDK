@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function BooleanFormField(
+export const BooleanFormField = forwardRef(function BooleanFormField(
   props: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
 ): JSX.Element {
@@ -36,4 +36,4 @@ export function BooleanFormField(
       </div>
     </div>
   );
-}
+});

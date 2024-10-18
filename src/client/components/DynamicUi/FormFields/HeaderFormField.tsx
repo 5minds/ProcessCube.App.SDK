@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export function HeaderFormField({ formField }: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) {
+export const HeaderFormField = forwardRef(function HeaderFormField(
+  { formField }: DynamicUiComponentProps,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   let headerElement: JSX.Element;
@@ -40,4 +43,4 @@ export function HeaderFormField({ formField }: DynamicUiComponentProps, ref: Dyn
   }
 
   return <div className="app-sdk-header-form-field">{headerElement}</div>;
-}
+});

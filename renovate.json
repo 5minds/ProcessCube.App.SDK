@@ -5,5 +5,27 @@
   "prHourlyLimit": 5,
   "prConcurrentLimit": 10,
   "reviewers": ["alexanderkasten"],
-  "updateLockFiles": true
+  "updateLockFiles": true,
+  "ignoreDeps": ["@5minds/processcube_engine_sdk", "@5minds/processcube_engine_client"],
+  "packageRules": [
+    {
+      "groupName": "Minor and Patch Type Updates",
+      "groupSlug": "types-minor",
+      "matchPackagePatterns": ["@types/*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "groupName": "Prettier",
+      "groupSlug": "prettier",
+      "matchPackagePatterns": ["prettier", "@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+      "automerge": true
+    },
+    {
+      "groupName": "Typescript",
+      "groupSlug": "typescript",
+      "matchPackagePatterns": ["typescript"],
+      "automerge": true
+    }
+  ]
 }
