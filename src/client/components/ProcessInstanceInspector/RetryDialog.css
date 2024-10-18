@@ -1,0 +1,51 @@
+@import '../../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-rd-background-color: var(--app-sdk-retry-dialog-background-color, theme('colors.app-sdk-gray.700'));
+    --asdk-rd-text-color: var(--app-sdk-retry-dialog-text-color, theme('colors.white'));
+    --asdk-rd-primary-button-color: var(--app-sdk-retry-dialog-primary-button-color, theme('colors.5minds-orange'));
+    --asdk-rd-primary-button-hover-color: var(
+      --app-sdk-retry-dialog-primary-button-hover-color,
+      theme('colors.5minds-orange-light')
+    );
+    --asdk-rd-primary-button-text-color: var(--app-sdk-retry-dialog-primary-button-text-color, theme('colors.white'));
+    --asdk-rd-secondary-button-color: var(
+      --app-sdk-retry-dialog-secondary-button-color,
+      theme('colors.app-sdk-gray.700')
+    );
+    --asdk-rd-secondary-button-hover-color: var(
+      --app-sdk-retry-dialog-secondary-button-hover-color,
+      theme('colors.app-sdk-gray.500')
+    );
+    --asdk-rd-secondary-button-text-color: var(
+      --app-sdk-retry-dialog-secondary-button-text-color,
+      theme('colors.white')
+    );
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-rd-background-color: var(--app-sdk-retry-dialog-background-color, theme('colors.white'));
+    --asdk-rd-text-color: var(--app-sdk-retry-dialog-text-color, theme('colors.gray.800'));
+    --asdk-rd-primary-button-color: var(
+      --app-sdk-retry-dialog-primary-button-color,
+      theme('colors.5minds-orange-light')
+    );
+    --asdk-rd-primary-button-hover-color: var(
+      --app-sdk-retry-dialog-primary-button-hover-color,
+      theme('colors.5minds-orange')
+    );
+    --asdk-rd-primary-button-text-color: var(--app-sdk-retry-dialog-primary-button-text-color, theme('colors.white'));
+    --asdk-rd-secondary-button-color: var(--app-sdk-retry-dialog-secondary-button-color, theme('colors.white'));
+    --asdk-rd-secondary-button-hover-color: var(
+      --app-sdk-retry-dialog-secondary-button-hover-color,
+      theme('colors.app-sdk-gray.50')
+    );
+    --asdk-rd-secondary-button-text-color: var(
+      --app-sdk-retry-dialog-secondary-button-text-color,
+      theme('colors.black')
+    );
+  }
+}

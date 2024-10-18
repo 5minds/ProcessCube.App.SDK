@@ -1,10 +1,16 @@
 import React from 'react';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
+
 type PlayButtonProps = {
   onClick: (e: any) => void;
 };
 
+/**
+ * @deprecated
+ */
 export default function PlayButton(props: PlayButtonProps) {
+  warnOnceForDeprecation('PlayButton');
   return (
     <div onClick={props.onClick} className="bpmn-element-overlay__below-item bpmn-element-overlay__below-item--action">
       <div className="action-icon">

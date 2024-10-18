@@ -4,7 +4,115 @@ import type { EventMessage, Identity, Subscription } from '@5minds/processcube_e
 import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
 
+async function tryGetIdentity(): Promise<Identity | undefined> {
+  try {
+    return getIdentity();
+  } catch {
+    return undefined;
+  }
+}
+
 /**
+ * This function will return the ProcessInstance with the given ID.
+ *
+ * @param processInstanceId The ID of the ProcessInstance
+ * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The {@link DataModels.ProcessInstances.ProcessInstance}
+ */
+export async function getProcessInstanceById(
+  processInstanceId: string,
+): Promise<DataModels.ProcessInstances.ProcessInstance> {
+  const identity = await tryGetIdentity();
+
+  const result = await Client.processInstances.query({ processInstanceId: processInstanceId }, { identity: identity });
+
+  return result.processInstances[0];
+}
+
+/**
+ * This function will return the FlowNodeInstances of the ProcessInstance with the given ID.
+ *
+ * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
+ * @param options The options for the {@link Client.flowNodeInstances.query}
+ * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
+ */
+export async function getFlowNodeInstancesByProcessInstanceId(
+  processInstanceId: string,
+  options: Parameters<typeof Client.flowNodeInstances.query>[1] = {
+    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
+  },
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+  const result = await Client.flowNodeInstances.query(
+    { processInstanceId: processInstanceId },
+    {
+      ...options,
+      identity: options.identity ?? (await tryGetIdentity()),
+    },
+  );
+
+  return result.flowNodeInstances;
+}
+
+/**
+ * This function will return the FlowNodeInstances that are triggered by the FlowNodeInstances with the given IDs.
+ *
+ * @param flowNodeInstanceIds The IDs of the FlowNodeInstances
+ * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
+ */
+export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
+  flowNodeInstanceIds: string[],
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+  const identity = await tryGetIdentity();
+
+  const queryResult = await Client.flowNodeInstances.query(
+    {
+      triggeredByFlowNodeInstance: flowNodeInstanceIds,
+    },
+    { identity: identity },
+  );
+
+  return queryResult.flowNodeInstances;
+}
+
+/**
+ * This function will retry the ProcessInstance with the given ID.
+ * If the `flowNodeInstanceId` is given, the ProcessInstance will be retried from this FlowNodeInstance.
+ * If the `newStartToken` is given, the ProcessInstance will be retried with this StartToken.
+ *
+ * @param processInstanceId The ID of the ProcessInstance
+ * @param flowNodeInstanceId The ID of the FlowNodeInstance
+ * @param newStartToken The new StartToken
+ */
+export async function retryProcessInstance(
+  processInstanceId: string,
+  flowNodeInstanceId?: string,
+  newStartToken?: any,
+) {
+  const identity = await tryGetIdentity();
+
+  await Client.processInstances.retryProcessInstance(processInstanceId, {
+    flowNodeInstanceId: flowNodeInstanceId,
+    newStartToken: newStartToken,
+    identity: identity,
+  });
+}
+
+/**
+ * This function will terminate the ProcessInstance with the given ID.
+ *
+ * @param processInstanceId The ID of the ProcessInstance
+ * @param identity The Identity to use for the request
+ */
+export async function terminateProcessInstance(processInstanceId: string) {
+  const identity = await tryGetIdentity();
+
+  await Client.processInstances.terminateProcessInstance(processInstanceId, identity);
+}
+
+/**
+ * This function will return the running ProcessInstances.
+ * If `query` is given, the ProcessInstances will be filtered by this query.
+ * If `options` are given, the ProcessInstances will be queried with these options.
+ *
  * @param query.query The query of {@link Client.processInstances.query}
  * @param query.options The options of {@link Client.processInstances.query}
  * @returns The list of active process instances as promise {@link DataModels.ProcessInstances.ProcessInstanceList}
@@ -24,80 +132,14 @@ export async function getActiveProcessInstances(query?: {
   return result;
 }
 
-export async function getProcessInstanceById(
-  processInstanceId: string,
-): Promise<DataModels.ProcessInstances.ProcessInstance> {
-  const identity = await tryGetIdentity();
-
-  const result = await Client.processInstances.query({ processInstanceId: processInstanceId }, { identity: identity });
-
-  return result.processInstances[0];
-}
-
-export async function getFlowNodeInstancesByProcessInstanceId(
-  processInstanceId: string,
-): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const identity = await tryGetIdentity();
-
-  const result = await Client.flowNodeInstances.query(
-    { processInstanceId: processInstanceId },
-    {
-      sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
-      identity: identity,
-    },
-  );
-
-  return result.flowNodeInstances;
-}
-
-export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
-  flowNodeInstanceIds: string[],
-): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const identity = await tryGetIdentity();
-
-  const queryResult = await Client.flowNodeInstances.query(
-    {
-      triggeredByFlowNodeInstance: flowNodeInstanceIds,
-    },
-    { identity: identity },
-  );
-
-  if (queryResult.totalCount > 0) {
-    return queryResult.flowNodeInstances;
-  }
-
-  return [];
-}
-
-export async function retryProcessInstance(
-  processInstanceId: string,
-  flowNodeInstanceId?: string,
-  newStartToken?: any,
-) {
-  const identity = await tryGetIdentity();
-
-  await Client.processInstances.retryProcessInstance(processInstanceId, {
-    flowNodeInstanceId: flowNodeInstanceId,
-    newStartToken: newStartToken,
-    identity: identity,
-  });
-}
-
-async function tryGetIdentity(): Promise<DataModels.Iam.Identity | undefined> {
-  try {
-    return await getIdentity();
-  } catch {
-    return undefined;
-  }
-}
 /**
  * This function will wait until a ProcessInstance is finished, terminated or errored.
- * If the processInstance is already finished, it will instantly be returned.
+ * If the ProcessInstance is already finished, it will instantly be returned.
  *
  * @param filterBy Additional filter options
  * @param filterBy.processInstanceId The ID of the ProcessInstance to wait for
- * @param identity The Identity of the User
- * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The ProcessInstance.
+ * @param identity The Identity to use for the request
+ * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The {@link DataModels.ProcessInstances.ProcessInstance}
  */
 export async function waitForProcessEnd(
   filterBy: {

@@ -2,8 +2,9 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from 'react';
-import React from 'react';
+import React, { ForwardedRef, Ref, forwardRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { renderToString } from 'react-dom/server';
 
 import { BPMNViewer, BPMNViewerFunctions } from './BPMNViewer';
 import { DocumentationViewer } from './DocumentationViewer';
@@ -11,7 +12,22 @@ import { SplitterLayout } from './SplitterLayout';
 
 const DEFAULT_SPLITTER_SIZE = 30;
 
-export function DiagramDocumentationInspector(props: { xml: string }) {
+export type DiagramDocumentationInspectorRef = {
+  bpmnViewerRef: BPMNViewerFunctions & {
+    onImportDone(callback: () => void): void;
+  };
+};
+
+type DiagramDocumentationInspectorProps = {
+  xml: string;
+  setSelectedElementIds?: (elementIds: string[]) => void;
+};
+
+function DiagramDocumentationInspectorFunction(
+  props: DiagramDocumentationInspectorProps,
+  ref: Ref<DiagramDocumentationInspectorRef>,
+) {
+  const [onImportDoneCallbacks, setOnImportDoneCallbacks] = useState<(() => void)[]>([]);
   const bpmnViewerRef = useRef<BPMNViewerFunctions>(null);
   const splitterRef = useRef<SplitterLayout>(null);
   const [selectedElements, setSelectedElements] = useState<Array<ElementLike>>([]);
@@ -70,19 +86,55 @@ export function DiagramDocumentationInspector(props: { xml: string }) {
   }, [selectedElements, splitterSize]);
 
   useEffect(() => {
+    if (!bpmnRendered) {
+      return;
+    }
+
+    onImportDoneCallbacks.forEach((callback) => callback());
+
     const overlays = bpmnViewerRef.current?.getOverlays();
     const registry = bpmnViewerRef.current?.getElementRegistry();
     const documentatedElements = registry?.filter(filterElementsWithDocumentation);
 
     documentatedElements?.forEach((element) => {
-      const position = getOverlayPosition(element);
-
-      overlays?.add(element.id, {
-        position: position,
-        html: '<div title="This element has documentation" class="app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-p-[2px] app-sdk-rounded-s"><svg xmlns="http://www.w3.org/2000/svg" height=17 viewBox="0 0 448 512"><!--!Font Awesome Pro 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2024 Fonticons, Inc.--><path d="M64 0C28.7 0 0 28.7 0 64L0 448l0 0c0 35.3 28.7 64 64 64H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H416V413.3c18.6-6.6 32-24.4 32-45.3V48c0-26.5-21.5-48-48-48H64zM384 416v64H64c-17.7 0-32-14.3-32-32s14.3-32 32-32H384zM64 384c-11.7 0-22.6 3.1-32 8.6L32 64c0-17.7 14.3-32 32-32H96V384H64zm64 0V32H400c8.8 0 16 7.2 16 16V368c0 8.8-7.2 16-16 16H128zm48-240c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16z"/></svg></div>',
-      });
+      overlays?.add(element.id, getOverlay(element));
     });
   }, [bpmnRendered]);
+
+  useEffect(() => {
+    props.setSelectedElementIds?.(selectedElements.map((element) => element.id));
+  }, [selectedElements]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      bpmnViewerRef: {
+        getElementRegistry() {
+          return bpmnViewerRef.current?.getElementRegistry();
+        },
+        getOverlays() {
+          return bpmnViewerRef.current?.getOverlays();
+        },
+        addMarker(elementId: string, className: string) {
+          bpmnViewerRef.current?.addMarker(elementId, className);
+        },
+        removeMarker(elementId: string, className: string) {
+          bpmnViewerRef.current?.removeMarker(elementId, className);
+        },
+        hasMarker(elementId: string, className: string) {
+          return bpmnViewerRef.current?.hasMarker(elementId, className);
+        },
+        onImportDone(callback: () => void) {
+          if (bpmnRendered) {
+            callback();
+          } else {
+            setOnImportDoneCallbacks((prev) => [...prev, callback]);
+          }
+        },
+      },
+    }),
+    [bpmnViewerRef.current],
+  );
 
   return (
     <SplitterLayout
@@ -132,6 +184,22 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
   );
 }
 
+const DocumentationOverlayIcon = ({ showBackground }: { showBackground?: boolean }) => (
+  <div title="This element has documentation">
+    <svg
+      className={`${
+        showBackground ? 'app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-p-[2px] app-sdk-rounded' : ''
+      }`}
+      xmlns="http://www.w3.org/2000/svg"
+      height="16"
+      viewBox="0 0 448 512"
+    >
+      {/* <!--!Font Awesome Pro 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2024 Fonticons, Inc.--> */}
+      <path d="M64 0C28.7 0 0 28.7 0 64L0 448l0 0c0 35.3 28.7 64 64 64H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H416V413.3c18.6-6.6 32-24.4 32-45.3V48c0-26.5-21.5-48-48-48H64zM384 416v64H64c-17.7 0-32-14.3-32-32s14.3-32 32-32H384zM64 384c-11.7 0-22.6 3.1-32 8.6L32 64c0-17.7 14.3-32 32-32H96V384H64zm64 0V32H400c8.8 0 16 7.2 16 16V368c0 8.8-7.2 16-16 16H128zm48-240c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H352c8.8 0 16-7.2 16-16s-7.2-16-16-16H192c-8.8 0-16 7.2-16 16z" />
+    </svg>
+  </div>
+);
+
 const HIDE_DOCUMENTATION_OVERLAY_FOR_BPMN_TYPES: string[] = [
   'bpmn:DataInputAssociation',
   'bpmn:DataOutputAssociation',
@@ -141,8 +209,8 @@ const HIDE_DOCUMENTATION_OVERLAY_FOR_BPMN_TYPES: string[] = [
 
 const DOCUMENTATION_OVERLAYS_POSITION: Record<string, OverlayAttrs['position']> = {
   DEFAULT: {
-    top: 3,
-    right: 22,
+    top: 4,
+    right: 21,
   },
   PARTICIPANT: {
     top: 3,
@@ -162,7 +230,7 @@ const DOCUMENTATION_OVERLAYS_POSITION: Record<string, OverlayAttrs['position']> 
   },
 } as const;
 
-const getOverlayPosition = (element: ElementLike) => {
+function getOverlay(element: ElementLike) {
   if (
     element.type.endsWith('Task') ||
     element.type === 'bpmn:CallActivity' ||
@@ -171,27 +239,60 @@ const getOverlayPosition = (element: ElementLike) => {
     element.type === 'bpmn:Lane' ||
     element.type === 'bpmn:SubProcess'
   ) {
-    return DOCUMENTATION_OVERLAYS_POSITION.DEFAULT;
+    return {
+      position: DOCUMENTATION_OVERLAYS_POSITION.DEFAULT,
+      html: renderToString(<DocumentationOverlayIcon />),
+    };
   } else if (element.type === 'bpmn:Participant') {
-    return DOCUMENTATION_OVERLAYS_POSITION.PARTICIPANT;
+    return {
+      position: DOCUMENTATION_OVERLAYS_POSITION.PARTICIPANT,
+      html: renderToString(<DocumentationOverlayIcon />),
+    };
   } else if (element.type.endsWith('Gateway')) {
-    return DOCUMENTATION_OVERLAYS_POSITION.GATEWAY;
+    return {
+      position: DOCUMENTATION_OVERLAYS_POSITION.GATEWAY,
+      html: renderToString(<DocumentationOverlayIcon showBackground />),
+    };
   } else if (element.type === 'bpmn:TextAnnotation') {
-    return DOCUMENTATION_OVERLAYS_POSITION.ANNOTATION;
+    return {
+      position: DOCUMENTATION_OVERLAYS_POSITION.ANNOTATION,
+      html: renderToString(<DocumentationOverlayIcon showBackground />),
+    };
   }
 
-  return DOCUMENTATION_OVERLAYS_POSITION.OTHER;
-};
+  return {
+    position: DOCUMENTATION_OVERLAYS_POSITION.OTHER,
+    html: renderToString(<DocumentationOverlayIcon showBackground />),
+  };
+}
 
-const filterElementsWithDocumentation = (element: ElementLike) => {
+function filterElementsWithDocumentation(element: ElementLike) {
   if (HIDE_DOCUMENTATION_OVERLAY_FOR_BPMN_TYPES.includes(element.type)) {
     return false;
   }
   const businessObject = getBusinessObject(element);
   const documentation = businessObject?.documentation?.[0]?.text;
   return documentation != null && documentation.trim() !== '';
+}
+
+export const DiagramDocumentationInspector = forwardRef(DiagramDocumentationInspectorFunction);
+
+export type DiagramDocumentationInspectorNextJSProps = DiagramDocumentationInspectorProps & {
+  viewerRef?: ForwardedRef<DiagramDocumentationInspectorRef>;
 };
 
-export const DiagramDocumentationInspectorNextJS = dynamic(() => Promise.resolve(DiagramDocumentationInspector), {
-  ssr: false,
-});
+/**
+ *
+ * Nextjs has problems to pass a ref to a function component that was loaded via dynamic() import().
+ * This wrapper enables passing refs.
+ */
+function ForwardedDiagramDocumentationInspector(props: DiagramDocumentationInspectorNextJSProps) {
+  return <DiagramDocumentationInspector {...props} ref={props.viewerRef} />;
+}
+
+export const DiagramDocumentationInspectorNextJS = dynamic(
+  () => Promise.resolve(ForwardedDiagramDocumentationInspector),
+  {
+    ssr: false,
+  },
+);

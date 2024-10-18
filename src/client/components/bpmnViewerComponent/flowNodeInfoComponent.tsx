@@ -7,13 +7,18 @@ import { createRoot } from 'react-dom/client';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import { FlowNode } from './bpmnViewerOverlayCreator';
 
 type FlowNodeInfoComponentProps = {
   flowNode: FlowNode;
 };
 
+/**
+ * @deprecated
+ */
 export default function FlowNodeInfoComponent(props: FlowNodeInfoComponentProps) {
+  warnOnceForDeprecation('FlowNodeInfoComponent');
   function handleOnMount(editor: any) {
     setTimeout(() => {
       editor.getAction('editor.action.formatDocument').run();

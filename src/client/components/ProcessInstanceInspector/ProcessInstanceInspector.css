@@ -1,0 +1,110 @@
+@import './CommandPalette.css';
+@import './RetryDialog.css';
+@import '../DiagramDocumentationInspector.css';
+@import '../../root.css';
+@layer base {
+  .dark,
+  .dark * {
+    --asdk-pii-text-color: var(--app-sdk-process-instance-inspector-text-color, theme('colors.app-sdk-gray.50'));
+    --asdk-pii-background-color: var(
+      --app-sdk-process-instance-inspector-background-color,
+      theme('colors.app-sdk-gray.700')
+    );
+
+    .monaco-editor,
+    .monaco-editor * {
+      background-color: black !important;
+      color: white !important;
+
+      .cursor.monaco-mouse-cursor-text {
+        background-color: white !important;
+      }
+    }
+  }
+
+  *,
+  ::before,
+  ::after {
+    --asdk-pii-text-color: var(--app-sdk-process-instance-inspector-text-color, theme('colors.app-sdk-gray.700'));
+    --asdk-pii-background-color: var(--app-sdk-process-instance-inspector-background-color, theme(colors.white));
+    --asdk-pii-state-finished-color: var(
+      --app-sdk-process-instance-inspector-state-finished-color,
+      theme(colors.green.500)
+    );
+    --asdk-pii-state-running-color: var(
+      --app-sdk-process-instance-inspector-state-running-color,
+      theme(colors.sky.500)
+    );
+    --asdk-pii-state-suspended-color: var(
+      --app-sdk-process-instance-inspector-state-suspended-color,
+      theme(colors.sky.500)
+    );
+    --asdk-pii-state-terminated-color: var(
+      --app-sdk-process-instance-inspector-state-terminated-color,
+      theme(colors.orange.500)
+    );
+    --asdk-pii-state-error-color: var(--app-sdk-process-instance-inspector-state-error-color, theme(colors.red.500));
+  }
+
+  .asdk-pii-play-button:hover {
+    svg {
+      fill: var(--app-sdk-process-instance-inspector-play-button-hover-color, theme(colors.white)) !important;
+    }
+  }
+
+  .asdk-pii-flow-node-instance-state {
+    .djs-hit {
+      fill-opacity: 0.2;
+      filter: blur(10px);
+    }
+
+    .djs-visual > :first-child {
+      fill-opacity: 0.4 !important;
+    }
+  }
+
+  .asdk-pii-flow-node-instance-state--finished {
+    .djs-hit {
+      fill: var(--asdk-pii-state-finished-color, theme(colors.green.500)) !important;
+    }
+
+    .djs-visual > :first-child {
+      filter: drop-shadow(0 0 3px var(--asdk-pii-state-finished-color, theme(colors.green.500)));
+    }
+  }
+
+  .asdk-pii-flow-node-instance-state--running,
+  .asdk-pii-flow-node-instance-state--suspended {
+    .djs-hit {
+      fill: var(--asdk-pii-state-running-color, theme(colors.sky.500)) !important;
+    }
+
+    .djs-visual > :first-child {
+      filter: drop-shadow(0 0 3px var(--asdk-pii-state-running-color, theme(colors.sky.500)));
+    }
+  }
+
+  .asdk-pii-flow-node-instance-state--error {
+    .djs-hit {
+      fill: var(--asdk-pii-state-error-color, theme(colors.red.500)) !important;
+    }
+
+    .djs-visual > :first-child {
+      filter: drop-shadow(0 0 3px var(--asdk-pii-state-error-color, theme(colors.red.500)));
+    }
+  }
+
+  .asdk-pii-flow-node-instance-state--terminated {
+    .djs-hit {
+      fill: var(--asdk-pii-state-terminated-color, theme(colors.orange.500)) !important;
+    }
+
+    .djs-visual > :first-child {
+      filter: drop-shadow(0 0 3px var(--asdk-pii-state-terminated-color, theme(colors.orange.500)));
+    }
+  }
+
+  .asdk-pii-sequence-flow-finished .djs-visual > * {
+    stroke: var(--asdk-pii-state-finished-color, theme(colors.green.400)) !important;
+  }
+}

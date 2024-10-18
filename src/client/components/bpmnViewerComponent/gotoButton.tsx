@@ -1,10 +1,16 @@
 import React from 'react';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
+
 type GotoButtonProps = {
   onClick: (e: any) => void;
 };
 
+/**
+ * @deprecated
+ */
 export default function GotoButton(props: GotoButtonProps) {
+  warnOnceForDeprecation('GotoButton');
   return (
     <div onClick={props.onClick} className="bpmn-element-overlay__below-item bpmn-element-overlay__below-item--action">
       <div className="action-icon">

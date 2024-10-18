@@ -5,6 +5,7 @@ import React from 'react';
 
 import { DataModels } from '@5minds/processcube_engine_client';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import './bpmnViewer.css';
 import BpmnViewerOverlayCreator from './bpmnViewerOverlayCreator';
 
@@ -30,6 +31,9 @@ type BpmnViewerComponentState = {
   diagramXML: string;
 };
 
+/**
+ * @deprecated
+ */
 export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProps, BpmnViewerComponentState> {
   private readonly containerRef;
   private bpmnViewer: any;
@@ -37,6 +41,8 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
 
   constructor(props: BpmnViewerComponentProps) {
     super(props);
+
+    warnOnceForDeprecation('BpmnViewerComponent');
 
     this.state = { diagramXML: '' };
     this.containerRef = React.createRef<HTMLDivElement>();

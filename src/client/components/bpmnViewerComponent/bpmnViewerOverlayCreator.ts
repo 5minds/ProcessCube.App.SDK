@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { DataModels } from '@5minds/processcube_engine_client';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import FlowNodeOverlay from './flowNodeOverlay';
 
 export class FlowNode {
@@ -152,6 +153,9 @@ export class FlowNode {
   }
 }
 
+/**
+ * @deprecated
+ */
 export default class BpmnViewerOverlayCreator {
   private readonly canvas: any;
   private readonly overlays: any;
@@ -160,6 +164,7 @@ export default class BpmnViewerOverlayCreator {
   private overlayRoots: { [flowNodeId: string]: Root };
 
   constructor(viewer: BpmnViewer) {
+    warnOnceForDeprecation('BpmnViewerOverlayCreator');
     this.canvas = viewer.get('canvas');
     this.overlays = viewer.get('overlays');
     this.elementRegistry = viewer.get('elementRegistry');

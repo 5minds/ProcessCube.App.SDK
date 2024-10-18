@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import { FlowNode } from './bpmnViewerOverlayCreator';
 import ExecutionCount from './executionCount';
 import GotoButton from './gotoButton';
@@ -13,7 +14,11 @@ type FlowNodeButtonAreaProps = {
   onPlayClick?: () => void;
 };
 
+/**
+ * @deprecated
+ */
 export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
+  warnOnceForDeprecation('FlowNodeButtonArea');
   const style = {
     marginTop: '7px',
   };
