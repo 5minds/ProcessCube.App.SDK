@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "schedule": ["before 7am on Monday"],
   "prHourlyLimit": 5,
   "prConcurrentLimit": 10,
@@ -11,21 +11,21 @@
     {
       "groupName": "Minor and Patch Type Updates",
       "groupSlug": "types-minor",
-      "matchPackagePatterns": ["@types/*"],
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
+      "automerge": true,
+      "matchPackageNames": ["/@types/*/"]
     },
     {
       "groupName": "Prettier",
       "groupSlug": "prettier",
-      "matchPackagePatterns": ["prettier", "@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
-      "automerge": true
+      "automerge": true,
+      "matchPackageNames": ["/prettier/", "/@trivago/prettier-plugin-sort-imports/", "/prettier-plugin-tailwindcss/"]
     },
     {
       "groupName": "Typescript",
       "groupSlug": "typescript",
-      "matchPackagePatterns": ["typescript"],
-      "automerge": true
+      "automerge": true,
+      "matchPackageNames": ["/typescript/"]
     }
   ]
 }
