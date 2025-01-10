@@ -12,6 +12,10 @@ export default {
         'app-sdk-dark-invalid': '0 0 0 0.2rem rgb(220 53 69 / 25%)',
       },
       colors: {
+        '5minds-orange': '#f7a823',
+        '5minds-orange-light': '#f9b745',
+        '5minds-secondary': '#9ca3af',
+        '5minds-secondary-light': '#a8b1bf',
         'app-sdk-inherit': 'inherit',
         'app-sdk-gray': {
           50: '#cdcdcd',
@@ -34,5 +38,14 @@ export default {
     },
   },
   plugins: [require('@tailwindcss/forms')({ strategy: 'class' })],
-  darkMode: 'class',
+  darkMode: ['class', "[class~='dark']"],
+  safelist: [
+    'asdk-pii-flow-node-instance-state--finished',
+    'asdk-pii-flow-node-instance-state--running',
+    'asdk-pii-flow-node-instance-state--error',
+    'asdk-pii-flow-node-instance-state--terminated',
+    'asdk-pii-flow-node-instance-state--canceled',
+    'asdk-pii-play-button',
+    // { pattern: /asdk-pii-flow-node-instance-state--[a-zA-Z]+/ },
+  ],
 };

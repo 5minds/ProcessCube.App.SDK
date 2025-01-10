@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import { FlowNode } from './bpmnViewerOverlayCreator';
 
 type RetryButtonProps = {
@@ -7,7 +8,11 @@ type RetryButtonProps = {
   onClick: (e: any) => void;
 };
 
+/**
+ * @deprecated
+ */
 export default function RetryButton(props: RetryButtonProps) {
+  warnOnceForDeprecation('RetryButton');
   return (
     <div onClick={props.onClick} className="bpmn-element-overlay__below-item bpmn-element-overlay__below-item--action">
       <div className="action-icon">

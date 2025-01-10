@@ -1,6 +1,8 @@
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
+import { warnOnceForDeprecation } from '../utils/warnOnceForDeprecation';
+
 type DynamicLinkProps = {
   href: string;
   children: any;
@@ -14,7 +16,7 @@ type DynamicLinkProps = {
  * Former workaround for https://github.com/vercel/next.js/issues/42991#issuecomment-1592921378
  */
 export function DynamicLink({ href, children }: DynamicLinkProps) {
-  console.warn('The DynamicLink component is deprecated. Please use the NextJS Link component instead.');
+  warnOnceForDeprecation('DynamicLink', 'Please use the NextJS Link component instead.');
   const router = useRouter();
 
   return (

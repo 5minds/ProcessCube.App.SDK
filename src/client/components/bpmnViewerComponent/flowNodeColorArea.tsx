@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import { FlowNode } from './bpmnViewerOverlayCreator';
 
 type FlowNodeColorAreaProps = {
@@ -9,7 +10,11 @@ type FlowNodeColorAreaProps = {
   onClick?: () => void;
 };
 
+/**
+ * @deprecated
+ */
 export default function FlowNodeColorArea(props: FlowNodeColorAreaProps) {
+  warnOnceForDeprecation('FlowNodeColorArea');
   const style = {
     width: props.width,
     height: props.height,
