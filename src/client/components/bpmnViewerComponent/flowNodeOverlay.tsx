@@ -1,15 +1,14 @@
-import Editor from '@monaco-editor/react';
 import {
   Button,
   Divider,
-  Link,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
   useDisclosure,
-} from '@nextui-org/react';
+} from '@heroui/react';
+import Editor from '@monaco-editor/react';
 import React, { useState } from 'react';
 
 import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
