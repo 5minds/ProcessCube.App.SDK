@@ -1,7 +1,7 @@
 'use client';
 
+import { Divider } from '@heroui/react';
 import Editor from '@monaco-editor/react';
-import { Divider } from '@nextui-org/react';
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import Markdown from 'react-markdown';
