@@ -109,7 +109,7 @@
     "isomorphic-dompurify": "^2.0.0",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
-    "marked": "^14.0.0",
+    "marked": "^15.0.0",
     "only-server": "^0.0.1",
     "openid-client": "^5.5.0",
     "react-dom": "^18.3.1",
