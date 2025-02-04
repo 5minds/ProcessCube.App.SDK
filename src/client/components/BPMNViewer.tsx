@@ -1,4 +1,5 @@
 import BpmnViewer from 'bpmn-js/lib/Viewer';
+import OutlineModule from 'bpmn-js/lib/features/outline';
 import clsx from 'clsx';
 import type Canvas from 'diagram-js/lib/core/Canvas';
 import type ElementRegistry from 'diagram-js/lib/core/ElementRegistry';
@@ -28,6 +29,12 @@ export type BPMNViewerFunctions = {
   hasMarker(elementId: string, className: string): boolean | undefined;
 };
 
+const DEFAULT_VIEWER_OPTIONS = {
+  canvas: {
+    autoFocus: true,
+  },
+};
+
 function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<BpmnViewer>(
@@ -36,7 +43,8 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
         defaultFillColor: 'var(--asdk-bv-background-color)',
         defaultStrokeColor: 'var(--asdk-bv-foreground-color)',
       },
-      additionalModules: [ZoomScrollModule, MoveCanvasModule, SelectionModule],
+      additionalModules: [ZoomScrollModule, MoveCanvasModule, SelectionModule, OutlineModule],
+      ...DEFAULT_VIEWER_OPTIONS,
     }),
   );
 

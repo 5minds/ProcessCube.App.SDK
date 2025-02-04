@@ -102,7 +102,7 @@
     "@heroicons/react": "^2.1.4",
     "@monaco-editor/react": "^4.6.0",
     "@heroui/react": "^2.6.14",
-    "bpmn-js": "^17.6.0",
+    "bpmn-js": "^18.0.0",
     "chokidar": "^3.5.3",
     "client-only": "^0.0.1",
     "esbuild": "^0.24.0",
