@@ -1,4 +1,5 @@
 import BpmnViewer from 'bpmn-js/lib/Viewer';
+import OutlineModule from 'bpmn-js/lib/features/outline';
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 import React from 'react';
@@ -31,6 +32,12 @@ type BpmnViewerComponentState = {
   diagramXML: string;
 };
 
+const DEFAULT_VIEWER_OPTIONS = {
+  canvas: {
+    autoFocus: true,
+  },
+};
+
 /**
  * @deprecated
  */
@@ -60,7 +67,8 @@ export class BpmnViewerComponent extends React.Component<BpmnViewerComponentProp
         defaultFillColor: options?.fillColor,
         defaultStrokeColor: options?.strokeColor,
       },
-      additionalModules: [ZoomScrollModule, MoveCanvasModule],
+      additionalModules: [ZoomScrollModule, MoveCanvasModule, OutlineModule],
+      ...DEFAULT_VIEWER_OPTIONS,
     });
     this.bpmnViewerOverlayCreator = new BpmnViewerOverlayCreator(this.bpmnViewer);
 
