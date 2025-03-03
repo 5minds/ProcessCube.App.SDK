@@ -142,7 +142,7 @@ export function TokenInspector(props: TokenInspectorProps) {
 
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3">
           {fullscreenToken && (
-            <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-black/30 app-sdk-backdrop-blur-md app-sdk-z-40 app-sdk-transition-opacity app-sdk-duration-300"></div>
+            <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-black/30 app-sdk-backdrop-blur-md app-sdk-z-40"></div>
           )}
 
           <div
