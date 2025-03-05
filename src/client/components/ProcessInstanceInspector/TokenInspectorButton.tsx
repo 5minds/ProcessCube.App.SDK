@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ProcessButton } from './ProcessButton';
 
@@ -11,6 +11,10 @@ type TokenInspectorButtonProps = {
 
 export function TokenInspectorButton(props: TokenInspectorButtonProps) {
   const [isOpen, setIsOpen] = useState(props.isOpen ?? false);
+
+  useEffect(() => {
+    setIsOpen(props.isOpen ?? false);
+  }, [props.isOpen]);
 
   return (
     <ProcessButton
