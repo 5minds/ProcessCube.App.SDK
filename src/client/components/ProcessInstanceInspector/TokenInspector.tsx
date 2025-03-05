@@ -107,6 +107,7 @@ export function TokenInspector(props: TokenInspectorProps) {
           props.close();
         }}
         className="app-sdk-text-white hover:app-sdk-text-gray-300"
+        title="Close Token Inspector"
       >
         <XMarkIcon className="app-sdk-w-6 app-sdk-h-6" />
       </button>
@@ -158,6 +159,7 @@ export function TokenInspector(props: TokenInspectorProps) {
               <button
                 className="app-sdk-text-white hover:app-sdk-text-gray-300 app-sdk-w-6 app-sdk-h-6"
                 onClick={() => toggleFullscreen('start')}
+                title={fullscreenToken === 'start' ? 'Minimize' : 'Maximize'}
               >
                 {fullscreenToken === 'start' ? (
                   <ArrowsPointingInIcon className="app-sdk-w-6 app-sdk-h-6" />
@@ -187,6 +189,7 @@ export function TokenInspector(props: TokenInspectorProps) {
               <button
                 className="app-sdk-text-white hover:app-sdk-text-gray-300 app-sdk-w-6 app-sdk-h-6"
                 onClick={() => toggleFullscreen('end')}
+                title={fullscreenToken === 'end' ? 'Minimize' : 'Maximize'}
               >
                 {fullscreenToken === 'end' ? (
                   <ArrowsPointingInIcon className="app-sdk-w-6 app-sdk-h-6" />
