@@ -15,6 +15,7 @@ import {
   ProcessInstanceState,
 } from '@5minds/processcube_engine_sdk';
 
+import { getTimesFromProcessInstances } from '../../utils/formatInstances';
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
 import { FlowNodeButton } from './FlowNodeButton';
@@ -77,6 +78,7 @@ type ProcessInstanceInspectorProps = {
     flowNodeId: string;
     taskType: BpmnType.userTask | BpmnType.manualTask | BpmnType.untypedTask;
   }) => void | Promise<void>;
+  databaseAction?: (processModelId: string, hash: string) => Promise<any[]>;
 };
 
 /**
@@ -95,6 +97,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
   const [selectedInstances, setSelectedInstances] = useState<FlowNodeInstance[]>([]);
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
+  const [isInstanceRunning, setIsInstanceRunning] = useState(true);
+  const [leadTimes, setLeadTimes] = useState<number[]>([]);
 
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
@@ -105,6 +109,26 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
       flowNodeInstances.map((fni) => fni.flowNodeInstanceId),
     );
+
+    if (props.databaseAction) {
+      const instances = await props.databaseAction(processInstance.processModelId, processInstance.hash);
+
+      const filteredInstances = instances.filter(
+        (instance) => instance.process_instance.processInstanceId !== processInstanceId,
+      );
+
+      const instancesTimes = await getTimesFromProcessInstances(filteredInstances);
+
+      if (processInstance.durationInMilliseconds) {
+        instancesTimes.unshift(processInstance.durationInMilliseconds);
+      }
+
+      setLeadTimes(instancesTimes);
+    }
+
+    if (processInstance.state !== ProcessInstanceState.running) {
+      setIsInstanceRunning(false);
+    }
 
     setProcessInstance(processInstance);
     setFlowNodeInstances(flowNodeInstances);
@@ -431,6 +455,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
   useEffect(() => {
     if (processInstance?.state === ProcessInstanceState.finished) {
+      setIsInstanceRunning(false);
       refresh();
       return;
     }
@@ -451,6 +476,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       return isFlowNodeSelected && isInstanceShown;
     });
 
+    console.log(selectedInstances);
     if (selectedInstances.length === 0) {
       const searchParams = new URLSearchParams(window.location.search);
       searchParams.delete('tokenInspectorFocus');
@@ -604,16 +630,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           <TokenInspector
             processInstance={processInstance}
             flowNodeInstances={selectedInstances}
-            close={() => {
-              const searchParams = new URLSearchParams(window.location.search);
-              searchParams.delete('tokenInspector');
-              window.history.replaceState(
-                {},
-                '',
-                `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
-              );
-              setIsTokenInspectorOpen(false);
-            }}
+            leadTimes={leadTimes}
+            isInstanceRunning={isInstanceRunning}
           />
         </div>
       </Transition>
