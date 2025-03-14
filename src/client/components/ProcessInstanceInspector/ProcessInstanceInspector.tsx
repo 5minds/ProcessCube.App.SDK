@@ -601,7 +601,20 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       )}
       <Transition show={isTokenInspectorOpen}>
         <div className="app-sdk-transition app-sdk-duration-200 data-[closed]:app-sdk-opacity-0 app-sdk-w-1/4 app-sdk-min-w-64 app-sdk-absolute app-sdk-top-0 app-sdk-right-0 app-sdk-z-40 app-sdk-pt-2 app-sdk-pr-2">
-          <TokenInspector processInstance={processInstance} flowNodeInstances={selectedInstances} />
+          <TokenInspector
+            processInstance={processInstance}
+            flowNodeInstances={selectedInstances}
+            close={() => {
+              const searchParams = new URLSearchParams(window.location.search);
+              searchParams.delete('tokenInspector');
+              window.history.replaceState(
+                {},
+                '',
+                `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+              );
+              setIsTokenInspectorOpen(false);
+            }}
+          />
         </div>
       </Transition>
       <DiagramDocumentationInspector
