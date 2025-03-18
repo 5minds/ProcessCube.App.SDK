@@ -1,9 +1,4 @@
 import type { NextConfig } from 'next';
-import {
-  PHASE_DEVELOPMENT_SERVER,
-  PHASE_PRODUCTION_BUILD,
-  PHASE_PRODUCTION_SERVER,
-} from 'next/dist/shared/lib/constants';
 
 import { subscribeToExternalTasks } from '../lib/ExternalTaskAdapter';
 
@@ -25,15 +20,18 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
   const { applicationSdk: applicationSdkConfig, ...nextConfig } = config;
 
   return async (phase, context) => {
-    isProductionBuild = isProductionBuild || phase === PHASE_PRODUCTION_BUILD;
-    const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
-    const shouldSubscribeToExternalTasks =
-      applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks && !isProductionBuild;
+    // isProductionBuild = isProductionBuild || phase === PHASE_PRODUCTION_BUILD;
+    // const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
+    // const shouldSubscribeToExternalTasks =
+    //   applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks && !isProductionBuild;
 
-    if (shouldSubscribeToExternalTasks) {
-      isSubscribedToExternalTasks = true;
-      await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
-    }
+    // if (shouldSubscribeToExternalTasks) {
+    //   isSubscribedToExternalTasks = true;
+    //   await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
+    // }
+
+    isSubscribedToExternalTasks = true;
+    await subscribeToExternalTasks(applicationSdkConfig?.customExternalTasksDirPath);
 
     return {
       ...nextConfig,
