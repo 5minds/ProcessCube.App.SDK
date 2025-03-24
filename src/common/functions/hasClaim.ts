@@ -124,10 +124,6 @@ export async function authConfigSessionCallback(args: Parameters<CallbacksOption
   const idTokenKeys = Object.keys(idToken);
   const claims = Object.fromEntries(Object.entries(accessToken).filter(([key, value]) => !idTokenKeys.includes(key)));
 
-  delete claims.scope;
-  delete claims.jti;
-  delete claims.client_id;
-
   session.user = token.user ?? {};
   session.user.claims = claims;
   session.error = token.error;
