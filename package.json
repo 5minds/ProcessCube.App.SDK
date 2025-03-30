@@ -96,8 +96,8 @@
     "react": ">=18.0.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "6.0.0-beta.3",
-    "@5minds/processcube_engine_sdk": "7.0.0-beta.3",
+    "@5minds/processcube_engine_client": "6.0.0-beta.5",
+    "@5minds/processcube_engine_sdk": "7.0.0-beta.5",
     "@headlessui/react": "^2.1.1",
     "@heroicons/react": "^2.1.4",
     "@monaco-editor/react": "^4.6.0",
