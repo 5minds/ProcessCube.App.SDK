@@ -2,9 +2,8 @@ import { DataModels } from '@5minds/processcube_engine_client';
 import type {
   EventMessage,
   FlowNodeInstance,
-  GenericFlowNodeInstanceQuery,
   Identity,
-  Subscription,
+  Subscription
 } from '@5minds/processcube_engine_sdk';
 
 import { getIdentity } from './getIdentity';
@@ -47,32 +46,10 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
   },
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const result = await Client.flowNodeInstances.query(
-    { processInstanceId: processInstanceId },
-    {
-      ...options,
-      identity: options.identity ?? (await tryGetIdentity()),
-    },
-  );
-
-  return result.flowNodeInstances;
-}
-
-/**
- * This function will return the FlowNodeInstances of the ProcessInstance with the given ID. Use this function if you query a large number of FlowNodeInstances.
- *
- * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
- * @param options The options for the {@link Client.flowNodeInstances.query}
- * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
- */
-export async function paginatedFlowNodeInstanceQuery(
-  query: GenericFlowNodeInstanceQuery,
-  options: Parameters<typeof Client.flowNodeInstances.query>[1],
-): Promise<Array<FlowNodeInstance>> {
   const maxQueryResultEntries = 1000;
   const flowNodeInstances: FlowNodeInstance[] = [];
 
-  const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+  const flowNodeInstanceResult = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId }, {
     ...options,
     identity: options?.identity ?? (await tryGetIdentity()),
     limit: maxQueryResultEntries,
@@ -86,7 +63,7 @@ export async function paginatedFlowNodeInstanceQuery(
     );
     await Promise.all(
       new Array(requiredQueries).fill(null).map(async (_, index) => {
-        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId }, {
           identity: options?.identity ?? (await tryGetIdentity()),
           limit: maxQueryResultEntries,
           offset: maxQueryResultEntries * (index + 1),
