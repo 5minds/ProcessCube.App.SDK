@@ -41,7 +41,7 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
   },
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const maxQueryResultEntries = 1000;
+  const maxQueryResultEntries = 100;
   const flowNodeInstances: FlowNodeInstance[] = [];
 
   console.log('GETTING FLOW NODE INSTANCES FOR PROCESS INSTANCE', processInstanceId);
