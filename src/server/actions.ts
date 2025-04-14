@@ -1,6 +1,6 @@
 'use server';
 
-import { type Identity, DataModels } from '@5minds/processcube_engine_client';
+import { DataModels, type Identity } from '@5minds/processcube_engine_client';
 
 import {
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
@@ -56,14 +56,21 @@ export const getFlowNodeInstances = async (processInstanceId?: string, flowNodeI
   }
 
   const flowNodeInstances: Array<DataModels.FlowNodeInstances.FlowNodeInstance> = [];
+  const options = {
+    identity: await tryGetIdentity(),
+  };
 
   if (flowNodeInstanceIds && flowNodeInstanceIds.length > maxIdsPerQuery) {
     // Required to avoid too big headers, when requesting hundreds or thousands of flownodeinstanceids
     await Promise.all(
       new Array(Math.ceil(flowNodeInstanceIds.length / maxIdsPerQuery)).fill(null).map(async (_, index) => {
-        const partialFlowNodeInstances = await paginatedFlowNodeInstanceQuery({
-          flowNodeInstanceId: flowNodeInstanceIds.slice(index * maxIdsPerQuery, (index + 1) * maxIdsPerQuery),
-        });
+        const partialFlowNodeInstances = await paginatedFlowNodeInstanceQuery(
+          {
+            flowNodeInstanceId: flowNodeInstanceIds.slice(index * maxIdsPerQuery, (index + 1) * maxIdsPerQuery),
+          },
+          options,
+        );
+
         flowNodeInstances.push(...partialFlowNodeInstances);
       }),
     );

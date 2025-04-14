@@ -43,7 +43,7 @@ export async function getProcessInstanceById(
  */
 export async function paginatedFlowNodeInstanceQuery(
   query: GenericFlowNodeInstanceQuery,
-  options?: any,
+  options?: Parameters<typeof Client.flowNodeInstances.query>[1],
 ): Promise<Array<FlowNodeInstance>> {
   const maxQueryResultEntries = 1000;
   const flowNodeInstances: FlowNodeInstance[] = [];
@@ -52,7 +52,7 @@ export async function paginatedFlowNodeInstanceQuery(
 
   const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
     ...options,
-    identity: options.identity ?? (await tryGetIdentity()),
+    identity: options?.identity ?? (await tryGetIdentity()),
     limit: maxQueryResultEntries,
   });
 
