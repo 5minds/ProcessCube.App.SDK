@@ -12,7 +12,7 @@ import {
   FlowNodeInstance,
   FlowNodeInstanceState,
   ProcessInstance,
-  ProcessInstanceState
+  ProcessInstanceState,
 } from '@5minds/processcube_engine_sdk';
 
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';

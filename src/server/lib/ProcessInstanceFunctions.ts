@@ -1,5 +1,11 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import type { EventMessage, FlowNodeInstance, GenericFlowNodeInstanceQuery, Identity, Subscription } from '@5minds/processcube_engine_sdk';
+import type {
+  EventMessage,
+  FlowNodeInstance,
+  GenericFlowNodeInstanceQuery,
+  Identity,
+  Subscription,
+} from '@5minds/processcube_engine_sdk';
 
 import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
@@ -61,13 +67,14 @@ export async function getFlowNodeInstancesByProcessInstanceId(
  */
 export async function paginatedFlowNodeInstanceQuery(
   query: GenericFlowNodeInstanceQuery,
-  options: Parameters<typeof Client.flowNodeInstances.query>[1]): Promise<Array<FlowNodeInstance>> {
+  options: Parameters<typeof Client.flowNodeInstances.query>[1],
+): Promise<Array<FlowNodeInstance>> {
   const maxQueryResultEntries = 1000;
   const flowNodeInstances: FlowNodeInstance[] = [];
 
   const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
     ...options,
-    identity: (options?.identity ?? (await tryGetIdentity())),
+    identity: options?.identity ?? (await tryGetIdentity()),
     limit: maxQueryResultEntries,
   });
 
