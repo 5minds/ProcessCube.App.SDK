@@ -48,7 +48,7 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     { processInstanceId: processInstanceId },
     {
       ...options,
-      identity: options?.identity ?? (await tryGetIdentity()),
+      identity: options.identity ?? (await tryGetIdentity()),
       limit: maxQueryResultEntries,
     },
   );
