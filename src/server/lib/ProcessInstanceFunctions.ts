@@ -1,10 +1,5 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import type {
-  EventMessage,
-  FlowNodeInstance,
-  Identity,
-  Subscription
-} from '@5minds/processcube_engine_sdk';
+import type { EventMessage, FlowNodeInstance, Identity, Subscription } from '@5minds/processcube_engine_sdk';
 
 import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
@@ -49,11 +44,14 @@ export async function getFlowNodeInstancesByProcessInstanceId(
   const maxQueryResultEntries = 1000;
   const flowNodeInstances: FlowNodeInstance[] = [];
 
-  const flowNodeInstanceResult = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId }, {
-    ...options,
-    identity: options?.identity ?? (await tryGetIdentity()),
-    limit: maxQueryResultEntries,
-  });
+  const flowNodeInstanceResult = await Client.flowNodeInstances.query(
+    { processInstanceId: processInstanceId },
+    {
+      ...options,
+      identity: options?.identity ?? (await tryGetIdentity()),
+      limit: maxQueryResultEntries,
+    },
+  );
 
   flowNodeInstances.push(...flowNodeInstanceResult.flowNodeInstances);
 
@@ -63,11 +61,14 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     );
     await Promise.all(
       new Array(requiredQueries).fill(null).map(async (_, index) => {
-        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query({ processInstanceId: processInstanceId }, {
-          identity: options?.identity ?? (await tryGetIdentity()),
-          limit: maxQueryResultEntries,
-          offset: maxQueryResultEntries * (index + 1),
-        });
+        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(
+          { processInstanceId: processInstanceId },
+          {
+            identity: options?.identity ?? (await tryGetIdentity()),
+            limit: maxQueryResultEntries,
+            offset: maxQueryResultEntries * (index + 1),
+          },
+        );
         flowNodeInstances.push(...parallelFlowNodeInstanceResult.flowNodeInstances);
       }),
     );

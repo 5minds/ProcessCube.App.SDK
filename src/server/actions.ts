@@ -7,7 +7,7 @@ import {
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
   retryProcessInstance,
-  terminateProcessInstance
+  terminateProcessInstance,
 } from './lib/ProcessInstanceFunctions';
 import { getIdentity } from './lib/getIdentity';
 import { finishManualTask, finishUntypedTask, finishUserTask } from './server-actions';
@@ -49,12 +49,9 @@ export const getProcessInstance = async (processInstanceId: string) => {
 };
 
 export const getFlowNodeInstances = async (processInstanceId: string) => {
-  return getFlowNodeInstancesByProcessInstanceId(
-    processInstanceId,
-    {
-      sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
-    },
-  );
+  return getFlowNodeInstancesByProcessInstanceId(processInstanceId, {
+    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
+  });
 };
 
 export const getTriggeredFlowNodeInstances = async (flowNodeInstanceIds: string[]) => {
