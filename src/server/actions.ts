@@ -1,7 +1,6 @@
 'use server';
 
-import { type Identity } from '@5minds/processcube_engine_client';
-import { FlowNodeInstance } from '@5minds/processcube_engine_sdk';
+import { type Identity, DataModels } from '@5minds/processcube_engine_client';
 
 import {
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
@@ -56,7 +55,7 @@ export const getFlowNodeInstances = async (processInstanceId?: string, flowNodeI
     return [];
   }
 
-  const flowNodeInstances: Array<FlowNodeInstance> = [];
+  const flowNodeInstances: Array<DataModels.FlowNodeInstances.FlowNodeInstance> = [];
 
   if (flowNodeInstanceIds && flowNodeInstanceIds.length > maxIdsPerQuery) {
     // Required to avoid too big headers, when requesting hundreds or thousands of flownodeinstanceids
