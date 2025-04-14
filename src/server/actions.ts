@@ -1,11 +1,12 @@
 'use server';
 
-import { DataModels, type Identity } from '@5minds/processcube_engine_client';
+import { type Identity } from '@5minds/processcube_engine_client';
+import { FlowNodeInstance } from '@5minds/processcube_engine_sdk';
 
 import {
-  getFlowNodeInstancesByProcessInstanceId,
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
+  paginatedFlowNodeInstanceQuery,
   retryProcessInstance,
   terminateProcessInstance,
 } from './lib/ProcessInstanceFunctions';
@@ -48,10 +49,49 @@ export const getProcessInstance = async (processInstanceId: string) => {
   return getProcessInstanceById(processInstanceId);
 };
 
-export const getFlowNodeInstances = async (processInstanceId: string) => {
-  return getFlowNodeInstancesByProcessInstanceId(processInstanceId, {
-    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
-  });
+export const getFlowNodeInstances = async (processInstanceId?: string, flowNodeInstanceIds?: string[]) => {
+  const maxIdsPerQuery = 300;
+
+  if (!processInstanceId && !flowNodeInstanceIds) {
+    return [];
+  }
+
+  const flowNodeInstances: Array<FlowNodeInstance> = [];
+
+  if (flowNodeInstanceIds && flowNodeInstanceIds.length > maxIdsPerQuery) {
+    // Required to avoid too big headers, when requesting hundreds or thousands of flownodeinstanceids
+    await Promise.all(
+      new Array(Math.ceil(flowNodeInstanceIds.length / maxIdsPerQuery)).fill(null).map(async (_, index) => {
+        const partialFlowNodeInstances = await paginatedFlowNodeInstanceQuery({
+          flowNodeInstanceId: flowNodeInstanceIds.slice(index * maxIdsPerQuery, (index + 1) * maxIdsPerQuery),
+        });
+        flowNodeInstances.push(...partialFlowNodeInstances);
+      }),
+    );
+  } else {
+    flowNodeInstances.push(
+      ...(await paginatedFlowNodeInstanceQuery({
+        processInstanceId: processInstanceId,
+        flowNodeInstanceId: flowNodeInstanceIds,
+      })),
+    );
+  }
+
+  return flowNodeInstances;
+
+  // TODO: Add subprocess handling
+
+  // const hasSubProcesses = flowNodeInstances.some(flowNodeInstanceIsSubProcess);
+  // if (!hasSubProcesses) {
+  //   return flowNodeInstances;
+  // }
+
+  // const subProcessFlowNodeInstances = await this.querySubProcessInstanceFlowNodeInstances();
+  // const uniqueSubProcessFlowNodeInstances = subProcessFlowNodeInstances.filter(
+  //   (fni) => !flowNodeInstanceIds?.includes(fni.flowNodeInstanceId),
+  // );
+
+  // return flowNodeInstances.concat(uniqueSubProcessFlowNodeInstances);
 };
 
 export const getTriggeredFlowNodeInstances = async (flowNodeInstanceIds: string[]) => {

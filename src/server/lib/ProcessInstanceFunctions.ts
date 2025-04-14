@@ -1,5 +1,11 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import type { EventMessage, FlowNodeInstance, Identity, Subscription } from '@5minds/processcube_engine_sdk';
+import type {
+  EventMessage,
+  FlowNodeInstance,
+  GenericFlowNodeInstanceQuery,
+  Identity,
+  Subscription,
+} from '@5minds/processcube_engine_sdk';
 
 import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
@@ -35,25 +41,20 @@ export async function getProcessInstanceById(
  * @param options The options for the {@link Client.flowNodeInstances.query}
  * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
  */
-export async function getFlowNodeInstancesByProcessInstanceId(
-  processInstanceId: string,
-  options: Parameters<typeof Client.flowNodeInstances.query>[1] = {
-    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
-  },
-): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const maxQueryResultEntries = 100;
+export async function paginatedFlowNodeInstanceQuery(
+  query: GenericFlowNodeInstanceQuery,
+  options?: any,
+): Promise<Array<FlowNodeInstance>> {
+  const maxQueryResultEntries = 1000;
   const flowNodeInstances: FlowNodeInstance[] = [];
 
-  console.log('GETTING FLOW NODE INSTANCES FOR PROCESS INSTANCE', processInstanceId);
+  console.log('GETTING FLOW NODE INSTANCES FOR PROCESS INSTANCE');
 
-  const flowNodeInstanceResult = await Client.flowNodeInstances.query(
-    { processInstanceId: processInstanceId },
-    {
-      ...options,
-      identity: options.identity ?? (await tryGetIdentity()),
-      limit: maxQueryResultEntries,
-    },
-  );
+  const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+    ...options,
+    identity: options.identity ?? (await tryGetIdentity()),
+    limit: maxQueryResultEntries,
+  });
 
   console.log('FLOW NODE INSTANCE RESULT', flowNodeInstanceResult);
 
@@ -70,14 +71,11 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     );
     await Promise.all(
       new Array(requiredQueries).fill(null).map(async (_, index) => {
-        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(
-          { processInstanceId: processInstanceId },
-          {
-            identity: options?.identity ?? (await tryGetIdentity()),
-            limit: maxQueryResultEntries,
-            offset: maxQueryResultEntries * (index + 1),
-          },
-        );
+        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+          identity: options?.identity ?? (await tryGetIdentity()),
+          limit: maxQueryResultEntries,
+          offset: maxQueryResultEntries * (index + 1),
+        });
         flowNodeInstances.push(...parallelFlowNodeInstanceResult.flowNodeInstances);
       }),
     );
@@ -86,6 +84,30 @@ export async function getFlowNodeInstancesByProcessInstanceId(
   console.log('FLOW NODE INSTANCE RESULT', flowNodeInstances.length, flowNodeInstances);
 
   return flowNodeInstances;
+}
+
+/**
+ * This function will return the FlowNodeInstances of the ProcessInstance with the given ID.
+ *
+ * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
+ * @param options The options for the {@link Client.flowNodeInstances.query}
+ * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
+ */
+export async function getFlowNodeInstancesByProcessInstanceId(
+  processInstanceId: string,
+  options: Parameters<typeof Client.flowNodeInstances.query>[1] = {
+    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
+  },
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+  const result = await Client.flowNodeInstances.query(
+    { processInstanceId: processInstanceId },
+    {
+      ...options,
+      identity: options.identity ?? (await tryGetIdentity()),
+    },
+  );
+
+  return result.flowNodeInstances;
 }
 
 /**
