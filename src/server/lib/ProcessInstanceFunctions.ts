@@ -44,6 +44,8 @@ export async function getFlowNodeInstancesByProcessInstanceId(
   const maxQueryResultEntries = 1000;
   const flowNodeInstances: FlowNodeInstance[] = [];
 
+  console.log('GETTING FLOW NODE INSTANCES FOR PROCESS INSTANCE', processInstanceId);
+
   const flowNodeInstanceResult = await Client.flowNodeInstances.query(
     { processInstanceId: processInstanceId },
     {
@@ -53,9 +55,16 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     },
   );
 
+  console.log('FLOW NODE INSTANCE RESULT', flowNodeInstanceResult);
+
   flowNodeInstances.push(...flowNodeInstanceResult.flowNodeInstances);
 
   if (flowNodeInstanceResult.flowNodeInstances.length !== flowNodeInstanceResult.totalCount) {
+    console.log(
+      'FLOW NODE INSTANCE RESULT',
+      flowNodeInstanceResult.flowNodeInstances.length,
+      flowNodeInstanceResult.totalCount,
+    );
     const requiredQueries = Math.floor(
       flowNodeInstanceResult.totalCount / flowNodeInstanceResult.flowNodeInstances.length,
     );
@@ -73,6 +82,8 @@ export async function getFlowNodeInstancesByProcessInstanceId(
       }),
     );
   }
+
+  console.log('FLOW NODE INSTANCE RESULT', flowNodeInstances.length, flowNodeInstances);
 
   return flowNodeInstances;
 }
