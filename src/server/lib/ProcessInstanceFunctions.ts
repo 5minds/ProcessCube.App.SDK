@@ -1,5 +1,5 @@
 import { DataModels } from '@5minds/processcube_engine_client';
-import type { EventMessage, Identity, Subscription } from '@5minds/processcube_engine_sdk';
+import type { EventMessage, FlowNodeInstance, GenericFlowNodeInstanceQuery, Identity, Subscription } from '@5minds/processcube_engine_sdk';
 
 import { getIdentity } from './getIdentity';
 import { Client } from './internal/EngineClient';
@@ -50,6 +50,36 @@ export async function getFlowNodeInstancesByProcessInstanceId(
   );
 
   return result.flowNodeInstances;
+}
+
+export async function paginatedFlowNodeInstanceQuery(query: GenericFlowNodeInstanceQuery, options: Parameters<typeof Client.flowNodeInstances.query>[1] ): Promise<Array<FlowNodeInstance>> {
+  const flowNodeInstances: FlowNodeInstance[] = [];
+
+  const flowNodeInstanceResult = await this.engineClient.flowNodeInstances.query(query, {
+    ...options,
+    identity: (options?.identity ?? (await tryGetIdentity())),
+    limit: this.maxQueryResultEntries,
+  });
+
+  flowNodeInstances.push(...flowNodeInstanceResult.flowNodeInstances);
+
+  if (flowNodeInstanceResult.flowNodeInstances.length !== flowNodeInstanceResult.totalCount) {
+    const requiredQueries = Math.floor(
+      flowNodeInstanceResult.totalCount / flowNodeInstanceResult.flowNodeInstances.length,
+    );
+    await Promise.all(
+      new Array(requiredQueries).fill(null).map(async (_, index) => {
+        const parallelFlowNodeInstanceResult = await this.engineClient.flowNodeInstances.query(query, {
+          identity: this.identity,
+          limit: this.maxQueryResultEntries,
+          offset: this.maxQueryResultEntries * (index + 1),
+        });
+        flowNodeInstances.push(...parallelFlowNodeInstanceResult.flowNodeInstances);
+      }),
+    );
+  }
+
+  return flowNodeInstances;
 }
 
 /**

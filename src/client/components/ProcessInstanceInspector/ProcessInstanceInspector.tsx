@@ -9,6 +9,7 @@ import { createRoot } from 'react-dom/client';
 
 import {
   BpmnType,
+  DataModels,
   FlowNodeInstance,
   FlowNodeInstanceState,
   ProcessInstance,
@@ -99,7 +100,12 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
     const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
-    const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
+    const flowNodeInstancesPromise = serverActions.getPaginatedFlowNodeInstances(
+      { processInstanceId: processInstanceId },
+      {
+        sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
+      },
+    );
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
 
     const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(

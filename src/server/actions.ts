@@ -6,8 +6,9 @@ import {
   getFlowNodeInstancesByProcessInstanceId,
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
+  paginatedFlowNodeInstanceQuery,
   retryProcessInstance,
-  terminateProcessInstance,
+  terminateProcessInstance
 } from './lib/ProcessInstanceFunctions';
 import { getIdentity } from './lib/getIdentity';
 import { finishManualTask, finishUntypedTask, finishUserTask } from './server-actions';
@@ -51,6 +52,18 @@ export const getProcessInstance = async (processInstanceId: string) => {
 export const getFlowNodeInstances = async (processInstanceId: string) => {
   return getFlowNodeInstancesByProcessInstanceId(processInstanceId, {
     sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
+  });
+};
+
+export const getPaginatedFlowNodeInstances = async (
+  query: DataModels.FlowNodeInstances.GenericFlowNodeInstanceQuery,
+  options: Parameters<typeof paginatedFlowNodeInstanceQuery>[1] = {
+    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
+  },
+) => {
+  return paginatedFlowNodeInstanceQuery(query, {
+    ...options,
+    identity: (options?.identity),
   });
 };
 
