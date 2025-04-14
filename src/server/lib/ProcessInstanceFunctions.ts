@@ -52,13 +52,23 @@ export async function getFlowNodeInstancesByProcessInstanceId(
   return result.flowNodeInstances;
 }
 
-export async function paginatedFlowNodeInstanceQuery(query: GenericFlowNodeInstanceQuery, options: Parameters<typeof Client.flowNodeInstances.query>[1] ): Promise<Array<FlowNodeInstance>> {
+/**
+ * This function will return the FlowNodeInstances of the ProcessInstance with the given ID. Use this function if you query a large number of FlowNodeInstances.
+ *
+ * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
+ * @param options The options for the {@link Client.flowNodeInstances.query}
+ * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
+ */
+export async function paginatedFlowNodeInstanceQuery(
+  query: GenericFlowNodeInstanceQuery,
+  options: Parameters<typeof Client.flowNodeInstances.query>[1]): Promise<Array<FlowNodeInstance>> {
+  const maxQueryResultEntries = 1000;
   const flowNodeInstances: FlowNodeInstance[] = [];
 
-  const flowNodeInstanceResult = await this.engineClient.flowNodeInstances.query(query, {
+  const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
     ...options,
     identity: (options?.identity ?? (await tryGetIdentity())),
-    limit: this.maxQueryResultEntries,
+    limit: maxQueryResultEntries,
   });
 
   flowNodeInstances.push(...flowNodeInstanceResult.flowNodeInstances);
@@ -69,10 +79,10 @@ export async function paginatedFlowNodeInstanceQuery(query: GenericFlowNodeInsta
     );
     await Promise.all(
       new Array(requiredQueries).fill(null).map(async (_, index) => {
-        const parallelFlowNodeInstanceResult = await this.engineClient.flowNodeInstances.query(query, {
-          identity: this.identity,
-          limit: this.maxQueryResultEntries,
-          offset: this.maxQueryResultEntries * (index + 1),
+        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+          identity: options?.identity ?? (await tryGetIdentity()),
+          limit: maxQueryResultEntries,
+          offset: maxQueryResultEntries * (index + 1),
         });
         flowNodeInstances.push(...parallelFlowNodeInstanceResult.flowNodeInstances);
       }),
