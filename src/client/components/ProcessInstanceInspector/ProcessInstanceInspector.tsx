@@ -9,11 +9,10 @@ import { createRoot } from 'react-dom/client';
 
 import {
   BpmnType,
-  DataModels,
   FlowNodeInstance,
   FlowNodeInstanceState,
   ProcessInstance,
-  ProcessInstanceState,
+  ProcessInstanceState
 } from '@5minds/processcube_engine_sdk';
 
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
@@ -100,12 +99,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
     const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
-    const flowNodeInstancesPromise = serverActions.getPaginatedFlowNodeInstances(
-      { processInstanceId: processInstanceId },
-      {
-        sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
-      },
-    );
+    const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
 
     const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
