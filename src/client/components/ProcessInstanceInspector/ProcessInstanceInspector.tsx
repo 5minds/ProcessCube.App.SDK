@@ -99,8 +99,20 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const init = useCallback(async () => {
     const serverActions = await import('../../../server/actions');
     const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
-    const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
-    const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
+
+    const chunkSize = 300;
+    const totalCount = 2000; // TODO: await serverActions.getFlowNodeInstanceCount(processInstanceId);
+
+    const chunkedPromises = new Array(Math.ceil(totalCount / chunkSize)).fill(null).map((_, index) => {
+      return serverActions.getFlowNodeInstances(processInstanceId, {
+        limit: chunkSize,
+        offset: index * chunkSize,
+      });
+    });
+
+    const [processInstance, chunkedResults] = await Promise.all([processInstancePromise, Promise.all(chunkedPromises)]);
+
+    const flowNodeInstances = chunkedResults.flat();
 
     const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
       flowNodeInstances.map((fni) => fni.flowNodeInstanceId),

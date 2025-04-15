@@ -1,6 +1,6 @@
 'use server';
 
-import { type Identity } from '@5minds/processcube_engine_client';
+import { DataModels, type Identity } from '@5minds/processcube_engine_client';
 
 import {
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
@@ -48,12 +48,20 @@ export const getProcessInstance = async (processInstanceId: string) => {
   return getProcessInstanceById(processInstanceId);
 };
 
-export const getFlowNodeInstances = async (processInstanceId?: string) => {
-  if (!processInstanceId) {
-    return [];
-  }
+export const getFlowNodeInstances = async (
+  processInstanceId: string,
+  pagination?: { limit?: number; offset?: number },
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> => {
+  const identity = await tryGetIdentity();
 
-  return await paginatedFlowNodeInstanceQuery({ processInstanceId }, { identity: await tryGetIdentity() });
+  return await paginatedFlowNodeInstanceQuery(
+    { processInstanceId: processInstanceId },
+    {
+      limit: pagination?.limit,
+      offset: pagination?.offset,
+      identity,
+    },
+  );
 
   // TODO: Add subprocess handling
 
