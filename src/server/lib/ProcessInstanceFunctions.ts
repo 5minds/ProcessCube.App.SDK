@@ -46,44 +46,112 @@ export async function paginatedFlowNodeInstanceQuery(
   options?: Parameters<typeof Client.flowNodeInstances.query>[1],
 ): Promise<Array<FlowNodeInstance>> {
   const maxQueryResultEntries = 1000;
+  const maxIdsPerQuery = 300;
+  const identity = options?.identity ?? (await tryGetIdentity());
   const flowNodeInstances: FlowNodeInstance[] = [];
 
-  console.log('GETTING FLOW NODE INSTANCES FOR PROCESS INSTANCE');
+  console.log(`Starting initial flow node instance query for processInstanceId: ${query.processInstanceId}`);
 
-  const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+  // Step 1: Initial query by processInstanceId
+  const firstResult = await Client.flowNodeInstances.query(query, {
     ...options,
-    identity: options?.identity ?? (await tryGetIdentity()),
+    identity,
     limit: maxQueryResultEntries,
   });
 
-  console.log('FLOW NODE INSTANCE RESULT', flowNodeInstanceResult);
+  flowNodeInstances.push(...firstResult.flowNodeInstances);
 
-  flowNodeInstances.push(...flowNodeInstanceResult.flowNodeInstances);
+  console.log(
+    `Fetched ${firstResult.flowNodeInstances.length} of ${firstResult.totalCount} flow node instances from the first page`,
+  );
 
-  if (flowNodeInstanceResult.flowNodeInstances.length !== flowNodeInstanceResult.totalCount) {
-    console.log(
-      'FLOW NODE INSTANCE RESULT',
-      flowNodeInstanceResult.flowNodeInstances.length,
-      flowNodeInstanceResult.totalCount,
-    );
-    const requiredQueries = Math.floor(
-      flowNodeInstanceResult.totalCount / flowNodeInstanceResult.flowNodeInstances.length,
-    );
-    await Promise.all(
-      new Array(requiredQueries).fill(null).map(async (_, index) => {
-        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
-          identity: options?.identity ?? (await tryGetIdentity()),
+  const totalCount = firstResult.totalCount;
+  const alreadyFetched = firstResult.flowNodeInstances.length;
+
+  // Step 2: Fetch remaining results via pagination (if needed)
+  if (alreadyFetched < totalCount) {
+    const requiredQueries = Math.ceil((totalCount - alreadyFetched) / maxQueryResultEntries);
+    console.log(`Paginating additional ${requiredQueries} pages to fetch remaining flow node instances`);
+
+    const results = await Promise.all(
+      new Array(requiredQueries).fill(null).map((_, i) =>
+        Client.flowNodeInstances.query(query, {
+          ...options,
+          identity,
           limit: maxQueryResultEntries,
-          offset: maxQueryResultEntries * (index + 1),
-        });
-        flowNodeInstances.push(...parallelFlowNodeInstanceResult.flowNodeInstances);
-      }),
+          offset: maxQueryResultEntries * (i + 1),
+        }),
+      ),
     );
+
+    for (const result of results) {
+      flowNodeInstances.push(...result.flowNodeInstances);
+    }
+
+    console.log(`Total flow node instances fetched after pagination: ${flowNodeInstances.length}`);
   }
 
-  console.log('FLOW NODE INSTANCE RESULT', flowNodeInstances.length, flowNodeInstances);
+  // Step 3: Re-fetch flow node instances by ID in safe chunks
+  const allIds = flowNodeInstances.map((f) => f.flowNodeInstanceId);
+  const uniqueIds = Array.from(new Set(allIds));
 
-  return flowNodeInstances;
+  console.log(`Preparing to re-fetch details for ${uniqueIds.length} unique flow node instance IDs`);
+
+  const idChunks = new Array(Math.ceil(uniqueIds.length / maxIdsPerQuery))
+    .fill(null)
+    .map((_, i) => uniqueIds.slice(i * maxIdsPerQuery, (i + 1) * maxIdsPerQuery));
+
+  const finalFlowNodeInstances: FlowNodeInstance[] = [];
+
+  const chunkResults = await Promise.all(
+    idChunks.map(async (ids, index) => {
+      console.log(`Querying chunk ${index + 1} of ${idChunks.length} with ${ids.length} IDs`);
+
+      const batchResult = await Client.flowNodeInstances.query(
+        { flowNodeInstanceId: ids },
+        {
+          ...options,
+          identity,
+          limit: maxQueryResultEntries,
+        },
+      );
+
+      const batchInstances = [...batchResult.flowNodeInstances];
+
+      if (batchInstances.length < batchResult.totalCount) {
+        const extraPages = Math.ceil((batchResult.totalCount - batchInstances.length) / maxQueryResultEntries);
+        console.log(`Chunk ${index + 1} has ${extraPages} additional pages`);
+
+        const extraResults = await Promise.all(
+          new Array(extraPages).fill(null).map((_, i) =>
+            Client.flowNodeInstances.query(
+              { flowNodeInstanceId: ids },
+              {
+                ...options,
+                identity,
+                limit: maxQueryResultEntries,
+                offset: maxQueryResultEntries * (i + 1),
+              },
+            ),
+          ),
+        );
+
+        for (const result of extraResults) {
+          batchInstances.push(...result.flowNodeInstances);
+        }
+      }
+
+      console.log(`Finished chunk ${index + 1}: fetched ${batchInstances.length} instances`);
+      return batchInstances;
+    }),
+  );
+
+  for (const batch of chunkResults) {
+    finalFlowNodeInstances.push(...batch);
+  }
+
+  console.log(`Completed flow node instance retrieval. Total instances fetched: ${finalFlowNodeInstances.length}`);
+  return finalFlowNodeInstances;
 }
 
 /**

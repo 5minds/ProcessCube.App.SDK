@@ -1,6 +1,6 @@
 'use server';
 
-import { DataModels, type Identity } from '@5minds/processcube_engine_client';
+import { type Identity } from '@5minds/processcube_engine_client';
 
 import {
   getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
@@ -48,42 +48,12 @@ export const getProcessInstance = async (processInstanceId: string) => {
   return getProcessInstanceById(processInstanceId);
 };
 
-export const getFlowNodeInstances = async (processInstanceId?: string, flowNodeInstanceIds?: string[]) => {
-  const maxIdsPerQuery = 300;
-
-  if (!processInstanceId && !flowNodeInstanceIds) {
+export const getFlowNodeInstances = async (processInstanceId?: string) => {
+  if (!processInstanceId) {
     return [];
   }
 
-  const flowNodeInstances: Array<DataModels.FlowNodeInstances.FlowNodeInstance> = [];
-  const options = {
-    identity: await tryGetIdentity(),
-  };
-
-  if (flowNodeInstanceIds && flowNodeInstanceIds.length > maxIdsPerQuery) {
-    // Required to avoid too big headers, when requesting hundreds or thousands of flownodeinstanceids
-    await Promise.all(
-      new Array(Math.ceil(flowNodeInstanceIds.length / maxIdsPerQuery)).fill(null).map(async (_, index) => {
-        const partialFlowNodeInstances = await paginatedFlowNodeInstanceQuery(
-          {
-            flowNodeInstanceId: flowNodeInstanceIds.slice(index * maxIdsPerQuery, (index + 1) * maxIdsPerQuery),
-          },
-          options,
-        );
-
-        flowNodeInstances.push(...partialFlowNodeInstances);
-      }),
-    );
-  } else {
-    flowNodeInstances.push(
-      ...(await paginatedFlowNodeInstanceQuery({
-        processInstanceId: processInstanceId,
-        flowNodeInstanceId: flowNodeInstanceIds,
-      })),
-    );
-  }
-
-  return flowNodeInstances;
+  return await paginatedFlowNodeInstanceQuery({ processInstanceId }, { identity: await tryGetIdentity() });
 
   // TODO: Add subprocess handling
 
