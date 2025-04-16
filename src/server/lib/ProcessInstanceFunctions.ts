@@ -37,49 +37,13 @@ export async function getProcessInstanceById(
   return result.processInstances[0];
 }
 
-/**
- * This function will return the FlowNodeInstances of the ProcessInstance with the given ID.
- *
- * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
- * @param options The options for the {@link Client.flowNodeInstances.query}
- * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
- */
-export async function paginatedFlowNodeInstanceQuery(
-  query: GenericFlowNodeInstanceQuery,
-): Promise<Array<FlowNodeInstance>> {
-  const flowNodeInstances: FlowNodeInstance[] = [];
-  const identity = await tryGetIdentity();
-
-  const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
-    identity: identity,
-    limit: MAX_QUERY_RESULT_ENTRIES,
-  });
-
-  flowNodeInstances.push(...flowNodeInstanceResult.flowNodeInstances);
-
-  if (flowNodeInstanceResult.flowNodeInstances.length !== flowNodeInstanceResult.totalCount) {
-    const requiredQueries = Math.floor(
-      flowNodeInstanceResult.totalCount / flowNodeInstanceResult.flowNodeInstances.length,
-    );
-    await Promise.all(
-      new Array(requiredQueries).fill(null).map(async (_, index) => {
-        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
-          identity: identity,
-          limit: MAX_QUERY_RESULT_ENTRIES,
-          offset: MAX_QUERY_RESULT_ENTRIES * (index + 1),
-        });
-        flowNodeInstances.push(...parallelFlowNodeInstanceResult.flowNodeInstances);
-      }),
-    );
-  }
-
-  return flowNodeInstances;
-}
-
 export async function queryFlowNodeInstances(
-  processInstanceId?: string,
-  flowNodeInstanceIds?: string[],
+  query: GenericFlowNodeInstanceQuery,
+  options?: Parameters<typeof Client.flowNodeInstances.query>[1],
 ): Promise<FlowNodeInstance[]> {
+  const { processInstanceId, flowNodeInstanceId } = query;
+  const flowNodeInstanceIds = flowNodeInstanceId as string[] | undefined;
+
   if (!processInstanceId && !flowNodeInstanceIds) {
     return [];
   }
@@ -90,76 +54,35 @@ export async function queryFlowNodeInstances(
     // Required to avoid too big headers, when requesting hundreds or thousands of flownodeinstanceids
     await Promise.all(
       new Array(Math.ceil(flowNodeInstanceIds.length / MAX_IDS_PER_QUERY)).fill(null).map(async (_, index) => {
-        const partialFlowNodeInstances = await paginatedFlowNodeInstanceQuery({
-          flowNodeInstanceId: flowNodeInstanceIds.slice(index * MAX_IDS_PER_QUERY, (index + 1) * MAX_IDS_PER_QUERY),
-        });
+        const partialFlowNodeInstances = await paginatedFlowNodeInstanceQuery(
+          {
+            flowNodeInstanceId: flowNodeInstanceIds.slice(index * MAX_IDS_PER_QUERY, (index + 1) * MAX_IDS_PER_QUERY),
+          },
+          {
+            ...options,
+            identity: options?.identity ?? (await tryGetIdentity()),
+          },
+        );
         flowNodeInstances.push(...partialFlowNodeInstances);
       }),
     );
   } else {
     flowNodeInstances.push(
-      ...(await paginatedFlowNodeInstanceQuery({
-        processInstanceId: processInstanceId,
-        flowNodeInstanceId: flowNodeInstanceIds,
-      })),
+      ...(await paginatedFlowNodeInstanceQuery(
+        {
+          processInstanceId: processInstanceId,
+          flowNodeInstanceId: flowNodeInstanceIds,
+        },
+        {
+          ...options,
+          identity: options?.identity ?? (await tryGetIdentity()),
+        },
+      )),
     );
   }
 
   return flowNodeInstances;
-  // const flowNodeInstanceIsSubProcess = (fni: FlowNodeInstance): boolean => fni.flowNodeType === BpmnType.subProcess;
-  // const hasSubProcesses = flowNodeInstances.some(flowNodeInstanceIsSubProcess);
-  // if (!hasSubProcesses) {
-  //   return flowNodeInstances;
-  // }
-
-  // const subProcessFlowNodeInstances = await querySubProcessInstanceFlowNodeInstances();
-  // const uniqueSubProcessFlowNodeInstances = subProcessFlowNodeInstances.filter(
-  //   (fni) => !flowNodeInstanceIds?.includes(fni.flowNodeInstanceId),
-  // );
-
-  // return flowNodeInstances.concat(uniqueSubProcessFlowNodeInstances);
 }
-
-// export async function querySubProcessInstanceFlowNodeInstances(): Promise<FlowNodeInstance[]> {
-//   if (!processModelId) {
-//     return [];
-//   }
-
-//   if (!engineSupportsReworkedSubProcesses) {
-//     const subProcessInstanceFlowNodeInstances = await paginatedFlowNodeInstanceQuery({
-//       parentProcessInstanceId: processInstanceId,
-//       processModelId: processModelId,
-//     });
-
-//     return subProcessInstanceFlowNodeInstances;
-//   }
-
-//   const embeddedProcessInstanceIds = await engineClient.processInstances.getChildProcessInstanceIds(
-//     processInstanceId,
-//     {
-//       identity: identity,
-//       includeNested: true,
-//       parentFlowNodeType: BpmnType.subProcess,
-//     },
-//   );
-
-//   const subProcessInstanceFlowNodeInstances: Array<FlowNodeInstance> = [];
-
-//   // Required to avoid too big headers, when requesting hundreds or thousands of processinstanceids
-//   await Promise.all(
-//     new Array(Math.ceil(embeddedProcessInstanceIds.length / MAX_IDS_PER_QUERY)).fill(null).map(async (_, index) => {
-//       const partialSubProcessInstanceFlowNodeInstances = await paginatedFlowNodeInstanceQuery({
-//         processInstanceId: embeddedProcessInstanceIds.slice(
-//           index * MAX_IDS_PER_QUERY,
-//           (index + 1) * MAX_IDS_PER_QUERY,
-//         ),
-//       });
-//       subProcessInstanceFlowNodeInstances.push(...partialSubProcessInstanceFlowNodeInstances);
-//     }),
-//   );
-
-//   return subProcessInstanceFlowNodeInstances;
-// }
 
 /**
  * This function will return the FlowNodeInstances of the ProcessInstance with the given ID.
@@ -174,15 +97,7 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
   },
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const result = await Client.flowNodeInstances.query(
-    { processInstanceId: processInstanceId },
-    {
-      ...options,
-      identity: options.identity ?? (await tryGetIdentity()),
-    },
-  );
-
-  return result.flowNodeInstances;
+  return await queryFlowNodeInstances({ processInstanceId: processInstanceId}, options);
 }
 
 /**
@@ -194,16 +109,9 @@ export async function getFlowNodeInstancesByProcessInstanceId(
 export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
   flowNodeInstanceIds: string[],
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  const identity = await tryGetIdentity();
-
-  const queryResult = await Client.flowNodeInstances.query(
-    {
-      triggeredByFlowNodeInstance: flowNodeInstanceIds,
-    },
-    { identity: identity },
-  );
-
-  return queryResult.flowNodeInstances;
+  return await queryFlowNodeInstances({
+    triggeredByFlowNodeInstance: flowNodeInstanceIds,
+  });
 }
 
 /**
@@ -352,4 +260,43 @@ export async function waitForProcessEnd(
       }
     }
   });
+}
+
+/**
+ * This function will return the FlowNodeInstances of the ProcessInstance with the given ID.
+ *
+ * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
+ * @param options The options for the {@link Client.flowNodeInstances.query}
+ * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
+ */
+async function paginatedFlowNodeInstanceQuery(
+  query: GenericFlowNodeInstanceQuery,
+  options: Parameters<typeof Client.flowNodeInstances.query>[1],
+): Promise<Array<FlowNodeInstance>> {
+  const flowNodeInstances: FlowNodeInstance[] = [];
+
+  const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+    ...options,
+    limit: MAX_QUERY_RESULT_ENTRIES,
+  });
+
+  flowNodeInstances.push(...flowNodeInstanceResult.flowNodeInstances);
+
+  if (flowNodeInstanceResult.flowNodeInstances.length !== flowNodeInstanceResult.totalCount) {
+    const requiredQueries = Math.floor(
+      flowNodeInstanceResult.totalCount / flowNodeInstanceResult.flowNodeInstances.length,
+    );
+    await Promise.all(
+      new Array(requiredQueries).fill(null).map(async (_, index) => {
+        const parallelFlowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
+          ...options,
+          limit: MAX_QUERY_RESULT_ENTRIES,
+          offset: MAX_QUERY_RESULT_ENTRIES * (index + 1),
+        });
+        flowNodeInstances.push(...parallelFlowNodeInstanceResult.flowNodeInstances);
+      }),
+    );
+  }
+
+  return flowNodeInstances;
 }

@@ -1,13 +1,14 @@
 'use server';
 
 import { type Identity } from '@5minds/processcube_engine_client';
-import { FlowNodeInstance } from '@5minds/processcube_engine_sdk';
+import { DataModels, FlowNodeInstance } from '@5minds/processcube_engine_sdk';
 
 import {
+  getFlowNodeInstancesByProcessInstanceId,
+  getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
-  queryFlowNodeInstances,
   retryProcessInstance,
-  terminateProcessInstance,
+  terminateProcessInstance
 } from './lib/ProcessInstanceFunctions';
 import { getIdentity } from './lib/getIdentity';
 import { finishManualTask, finishUntypedTask, finishUserTask } from './server-actions';
@@ -49,9 +50,11 @@ export const getProcessInstance = async (processInstanceId: string) => {
 };
 
 export const getFlowNodeInstances = async (processInstanceId: string): Promise<FlowNodeInstance[]> => {
-  return queryFlowNodeInstances(processInstanceId);
+  return getFlowNodeInstancesByProcessInstanceId(processInstanceId, {
+    sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
+  });
 };
 
 export const getTriggeredFlowNodeInstances = async (flowNodeInstanceIds: string[]): Promise<FlowNodeInstance[]> => {
-  return queryFlowNodeInstances(undefined, flowNodeInstanceIds);
+  return getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(flowNodeInstanceIds);
 };
