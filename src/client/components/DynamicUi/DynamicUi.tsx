@@ -254,7 +254,7 @@ export function DynamicUi(
                           : undefined,
                       formField: field,
                       state: props.state?.[field.id],
-                    }
+                    },
                   )}
                 </Fragment>
               );
