@@ -97,7 +97,7 @@ export async function getFlowNodeInstancesByProcessInstanceId(
     sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'ASC' },
   },
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
-  return await queryFlowNodeInstances({ processInstanceId: processInstanceId}, options);
+  return await queryFlowNodeInstances({ processInstanceId: processInstanceId }, options);
 }
 
 /**
