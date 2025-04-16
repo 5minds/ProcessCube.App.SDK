@@ -1,7 +1,6 @@
 import { DataModels } from '@5minds/processcube_engine_client';
 import type {
   EventMessage,
-  FlowNodeInstance,
   GenericFlowNodeInstanceQuery,
   Identity,
   Subscription,
@@ -40,7 +39,7 @@ export async function getProcessInstanceById(
 export async function queryFlowNodeInstances(
   query: GenericFlowNodeInstanceQuery,
   options?: Parameters<typeof Client.flowNodeInstances.query>[1],
-): Promise<FlowNodeInstance[]> {
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
   const { processInstanceId, flowNodeInstanceId } = query;
   const flowNodeInstanceIds = flowNodeInstanceId as string[] | undefined;
 
@@ -48,7 +47,7 @@ export async function queryFlowNodeInstances(
     return [];
   }
 
-  const flowNodeInstances: Array<FlowNodeInstance> = [];
+  const flowNodeInstances: Array<DataModels.FlowNodeInstances.FlowNodeInstance> = [];
 
   if (flowNodeInstanceIds && flowNodeInstanceIds.length > MAX_IDS_PER_QUERY) {
     // Required to avoid too big headers, when requesting hundreds or thousands of flownodeinstanceids
@@ -272,8 +271,8 @@ export async function waitForProcessEnd(
 async function paginatedFlowNodeInstanceQuery(
   query: GenericFlowNodeInstanceQuery,
   options: Parameters<typeof Client.flowNodeInstances.query>[1],
-): Promise<Array<FlowNodeInstance>> {
-  const flowNodeInstances: FlowNodeInstance[] = [];
+): Promise<Array<DataModels.FlowNodeInstances.FlowNodeInstance>> {
+  const flowNodeInstances: DataModels.FlowNodeInstances.FlowNodeInstance[] = [];
 
   const flowNodeInstanceResult = await Client.flowNodeInstances.query(query, {
     ...options,
