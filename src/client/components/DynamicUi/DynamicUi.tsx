@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, forwardRef, useRef } from 'react';
+import React, { Fragment, PropsWithChildren, createElement, useRef } from 'react';
 import * as ReactIs from 'react-is';
 import semverGt from 'semver/functions/gt';
 import semverPrerelease from 'semver/functions/prerelease';
@@ -244,16 +244,18 @@ export function DynamicUi(
               const ref = formFieldRefs.get(field.id)?.ref;
               return (
                 <Fragment key={field.id}>
-                  <ReactElement
-                    ref={
-                      isReactClassComponent(DynamicUiFormFieldComponent) ||
-                      isForwardedExoticComponent(DynamicUiFormFieldComponent)
-                        ? ref
-                        : undefined
+                  {createElement(
+                    DynamicUiFormFieldComponent as any, // TODO: fix any
+                    {
+                      ref:
+                        isReactClassComponent(DynamicUiFormFieldComponent) ||
+                        isForwardedExoticComponent(DynamicUiFormFieldComponent)
+                          ? ref
+                          : undefined,
+                      formField: field,
+                      state: props.state?.[field.id],
                     }
-                    formField={field}
-                    state={props.state?.[field.id]}
-                  />
+                  )}
                 </Fragment>
               );
             })}
