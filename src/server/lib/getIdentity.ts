@@ -36,7 +36,7 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
       // update the server cookie with the new session and refreshed access token
       try {
         for (const cookie of responseCookies.getAll()) {
-          cookies().set(cookie.name, cookie.value, {
+          (await cookies()).set(cookie.name, cookie.value, {
             ...cookie,
           });
         }
