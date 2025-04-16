@@ -70,7 +70,7 @@ export function DynamicUi(
     /** UserTaskInstance with a defined dynamic form  */
     task: DataModels.FlowNodeInstances.UserTaskInstance | UserTaskInstance;
     /** Custom element to insert into the DynamicUI Headline */
-    headerComponent?: JSX.Element;
+    headerComponent?: React.JSX.Element;
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
     /** Custom class name for the root element */
@@ -97,7 +97,7 @@ export function DynamicUi(
 
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<number>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const formFieldRefs = new Map<string, FormFieldRefsMapObj>(
     formFields.map((field) => [field.id, { ref: React.createRef<DynamicUiRefFunctions>() }]),
@@ -129,7 +129,7 @@ export function DynamicUi(
       window.clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = window.setTimeout(() => {
-      timeoutRef.current = undefined;
+      timeoutRef.current = null;
       if (formRef.current == null) {
         return;
       }
@@ -316,7 +316,7 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
   );
 }
 
-function Headline(props: { title?: React.ReactNode; headerComponent?: JSX.Element }) {
+function Headline(props: { title?: React.ReactNode; headerComponent?: React.JSX.Element }) {
   return (
     <div className="app-sdk-flex app-sdk-space-x-3">
       <div className="app-sdk-flex-1">

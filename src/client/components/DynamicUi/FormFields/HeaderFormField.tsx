@@ -9,7 +9,7 @@ export const HeaderFormField = forwardRef(function HeaderFormField(
 ) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
-  let headerElement: JSX.Element;
+  let headerElement: React.JSX.Element;
 
   switch (parsedCustomFormConfig?.style) {
     case 'heading_1':

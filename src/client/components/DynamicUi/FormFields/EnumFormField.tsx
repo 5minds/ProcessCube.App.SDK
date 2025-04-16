@@ -12,7 +12,7 @@ export const EnumFormField = forwardRef(function EnumFormField(
   const label = formField.label;
   const options = formField.enumValues;
 
-  let enumInput: JSX.Element;
+  let enumInput: React.JSX.Element;
 
   switch (parsedCustomFormConfig?.displayAs) {
     case 'checkbox':
