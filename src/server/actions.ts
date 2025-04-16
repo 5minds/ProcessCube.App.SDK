@@ -1,11 +1,11 @@
 'use server';
 
-import { DataModels, type Identity } from '@5minds/processcube_engine_client';
+import { type Identity } from '@5minds/processcube_engine_client';
+import { FlowNodeInstance } from '@5minds/processcube_engine_sdk';
 
 import {
-  getFlowNodeInstancesTriggeredByFlowNodeInstanceIds,
   getProcessInstanceById,
-  paginatedFlowNodeInstanceQuery,
+  queryFlowNodeInstances,
   retryProcessInstance,
   terminateProcessInstance,
 } from './lib/ProcessInstanceFunctions';
@@ -48,36 +48,10 @@ export const getProcessInstance = async (processInstanceId: string) => {
   return getProcessInstanceById(processInstanceId);
 };
 
-export const getFlowNodeInstances = async (
-  processInstanceId: string,
-  pagination?: { limit?: number; offset?: number },
-): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> => {
-  const identity = await tryGetIdentity();
-
-  return await paginatedFlowNodeInstanceQuery(
-    { processInstanceId: processInstanceId },
-    {
-      limit: pagination?.limit,
-      offset: pagination?.offset,
-      identity,
-    },
-  );
-
-  // TODO: Add subprocess handling
-
-  // const hasSubProcesses = flowNodeInstances.some(flowNodeInstanceIsSubProcess);
-  // if (!hasSubProcesses) {
-  //   return flowNodeInstances;
-  // }
-
-  // const subProcessFlowNodeInstances = await this.querySubProcessInstanceFlowNodeInstances();
-  // const uniqueSubProcessFlowNodeInstances = subProcessFlowNodeInstances.filter(
-  //   (fni) => !flowNodeInstanceIds?.includes(fni.flowNodeInstanceId),
-  // );
-
-  // return flowNodeInstances.concat(uniqueSubProcessFlowNodeInstances);
+export const getFlowNodeInstances = async (processInstanceId: string): Promise<FlowNodeInstance[]> => {
+  return queryFlowNodeInstances(processInstanceId);
 };
 
-export const getTriggeredFlowNodeInstances = async (flowNodeInstanceIds: string[]) => {
-  return getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(flowNodeInstanceIds);
+export const getTriggeredFlowNodeInstances = async (flowNodeInstanceIds: string[]): Promise<FlowNodeInstance[]> => {
+  return queryFlowNodeInstances(undefined, flowNodeInstanceIds);
 };
