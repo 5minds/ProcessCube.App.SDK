@@ -1,6 +1,5 @@
 import { revalidatePath } from 'next/cache';
-import { RedirectType } from 'next/dist/client/components/redirect';
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 
 /**
  * Navigates to an URL. This uses next's {@link redirect} function. As this is an server action, the {@link RedirectType} is 'push' only.
