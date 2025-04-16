@@ -49,6 +49,7 @@ export async function queryFlowNodeInstances(
 ): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
   const { processInstanceId, flowNodeInstanceId } = query;
   const flowNodeInstanceIds = flowNodeInstanceId as string[] | undefined;
+  const identity = options?.identity ?? (await tryGetIdentity());
 
   if (!processInstanceId && !flowNodeInstanceIds) {
     return [];
@@ -66,7 +67,7 @@ export async function queryFlowNodeInstances(
           },
           {
             ...options,
-            identity: options?.identity ?? (await tryGetIdentity()),
+            identity: identity,
           },
         );
         flowNodeInstances.push(...partialFlowNodeInstances);
@@ -81,7 +82,7 @@ export async function queryFlowNodeInstances(
         },
         {
           ...options,
-          identity: options?.identity ?? (await tryGetIdentity()),
+          identity: identity,
         },
       )),
     );
