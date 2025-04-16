@@ -37,7 +37,7 @@ export async function getProcessInstanceById(
 }
 
 /**
- * This function will return the ProcessInstance with the given ID.
+ * This function will return the FlowNodeInstances of the given query. Large queries will be split into smaller queries.
  *
  * @param query The query of {@link Client.flowNodeInstances.query}
  * @param options The options for the {@link Client.flowNodeInstances.query}
@@ -269,7 +269,7 @@ export async function waitForProcessEnd(
 }
 
 /**
- * This function will return the FlowNodeInstances of the given query.
+ * This function will return the FlowNodeInstances of the given query. Large queries will be split into smaller queries.
  *
  * @param query The query of {@link Client.flowNodeInstances.query}
  * @param options The options for the {@link Client.flowNodeInstances.query}
