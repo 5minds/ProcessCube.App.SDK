@@ -36,6 +36,13 @@ export async function getProcessInstanceById(
   return result.processInstances[0];
 }
 
+/**
+ * This function will return the ProcessInstance with the given ID.
+ *
+ * @param query The query of {@link Client.flowNodeInstances.query}
+ * @param options The options for the {@link Client.flowNodeInstances.query}
+ * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The {@link DataModels.ProcessInstances.ProcessInstance}
+ */
 export async function queryFlowNodeInstances(
   query: GenericFlowNodeInstanceQuery,
   options?: Parameters<typeof Client.flowNodeInstances.query>[1],
@@ -262,9 +269,9 @@ export async function waitForProcessEnd(
 }
 
 /**
- * This function will return the FlowNodeInstances of the ProcessInstance with the given ID.
+ * This function will return the FlowNodeInstances of the given query.
  *
- * @param processInstanceId The ID of the {@link DataModels.ProcessInstances.ProcessInstance}
+ * @param query The query of {@link Client.flowNodeInstances.query}
  * @param options The options for the {@link Client.flowNodeInstances.query}
  * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
  */
