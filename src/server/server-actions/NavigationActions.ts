@@ -1,4 +1,3 @@
-import { revalidatePath } from 'next/cache';
 import { RedirectType, redirect } from 'next/navigation';
 
 /**
@@ -7,6 +6,5 @@ import { RedirectType, redirect } from 'next/navigation';
  * @returns never
  */
 export function navigateToUrl(url: string): never {
-  revalidatePath(url);
   redirect(url);
 }
