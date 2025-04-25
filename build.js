@@ -69,13 +69,6 @@ const esmoduleBuildPromises = [
     packages: 'external',
   }),
   //server
-  build({
-    ...ESMODULE_CONFIG,
-    entryPoints: ['src/server/index.ts'],
-    outdir: 'build/server',
-    plugins: [getMarkCommonAsExternal(commonOutputFile)],
-    external: externalPackages,
-  }),
   //client
   build({
     ...ESMODULE_CONFIG,
@@ -116,12 +109,6 @@ const commonBuildPromises = [
     outdir: 'build/common',
   }),
   //server
-  build({
-    ...COMMONJS_CONFIG,
-    entryPoints: ['src/server/index.ts', 'src/server/lib/ExternalTaskWorkerProcess.ts'],
-    outdir: 'build/server',
-    plugins: [getMarkCommonAsExternal(commonOutputFile)],
-  }),
   //client
   build({
     ...COMMONJS_CONFIG,

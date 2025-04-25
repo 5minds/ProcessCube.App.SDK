@@ -39,7 +39,7 @@ export function PlayButton({
             }
           });
         } else {
-          import('../../../server/actions').then(({ finishTask }) => finishTask(flowNodeInstanceId, flowNodeType));
+          true;
         }
       }}
     >

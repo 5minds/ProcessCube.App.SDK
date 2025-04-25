@@ -97,13 +97,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
   const diagramDocumentationInspectorRef = useRef<DiagramDocumentationInspectorRef>(null);
 
   const init = useCallback(async () => {
-    const serverActions = await import('../../../server/actions');
+    const serverActions: any = true
     const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
     const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
 
     const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
-      flowNodeInstances.map((fni) => fni.flowNodeInstanceId),
+      flowNodeInstances.map((fni: any) => fni.flowNodeInstanceId),
     );
 
     setProcessInstance(processInstance);
@@ -118,33 +118,33 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     }
 
     const preselectedInstanceIds = searchParams.getAll('instance');
-    const preselectedFlowNodeInstances = flowNodeInstances.filter((fni) =>
+    const preselectedFlowNodeInstances = flowNodeInstances.filter((fni: any) =>
       preselectedInstanceIds.includes(fni.flowNodeInstanceId),
     );
 
     if (preselectedFlowNodeInstances.length !== preselectedInstanceIds.length) {
       searchParams.delete('instance');
-      preselectedFlowNodeInstances.forEach((fni) => searchParams.append('instance', fni.flowNodeInstanceId));
+      preselectedFlowNodeInstances.forEach((fni: any) => searchParams.append('instance', fni.flowNodeInstanceId));
       window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
     }
 
     const shownInstancesMap = new Map<string, string>();
-    flowNodeInstances.forEach((fni) => {
+    flowNodeInstances.forEach((fni: any) => {
       if (!shownInstancesMap.has(fni.flowNodeId)) {
         shownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId);
       }
     });
 
-    preselectedFlowNodeInstances.forEach((fni) => shownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
+    preselectedFlowNodeInstances.forEach((fni: any) => shownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
     setShownInstancesMap(shownInstancesMap);
   }, [processInstanceId]);
 
   const sequenceFlowFinished = useCallback(
     (element: ElementLike) => {
       const businessObject = getBusinessObject(element);
-      const targetInstanceExists = flowNodeInstances.some((fni) => fni.flowNodeId === businessObject.targetRef.id);
+      const targetInstanceExists = flowNodeInstances.some((fni: any) => fni.flowNodeId === businessObject.targetRef.id);
       const finishedSourceInstanceExists = flowNodeInstances.some(
-        (fni) => fni.flowNodeId === businessObject.sourceRef.id && fni.state === FlowNodeInstanceState.finished,
+        (fni: any) => fni.flowNodeId === businessObject.sourceRef.id && fni.state === FlowNodeInstanceState.finished,
       );
 
       return targetInstanceExists && finishedSourceInstanceExists;
@@ -159,7 +159,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       return;
     }
 
-    const serverActions = await import('../../../server/actions');
+    const serverActions: any = true
     const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
     const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
     const [newProcessInstance, newFlowNodeInstances] = await Promise.all([
@@ -168,7 +168,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     ]);
 
     const newTriggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
-      newFlowNodeInstances.map((fni) => fni.flowNodeInstanceId),
+      newFlowNodeInstances.map((fni: any) => fni.flowNodeInstanceId),
     );
 
     if (
@@ -184,12 +184,12 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     }
 
     for (const [flowNodeId, flowNodeInstanceId] of shownInstancesMap.entries()) {
-      const shownInstance = flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
+      const shownInstance = flowNodeInstances.find((fni: any) => fni.flowNodeInstanceId === flowNodeInstanceId);
       if (!shownInstance) {
         continue;
       }
 
-      const newestInstance = newFlowNodeInstances.find((fni) => fni.flowNodeId === flowNodeId);
+      const newestInstance = newFlowNodeInstances.find((fni: any) => fni.flowNodeId === flowNodeId);
       const showingNewestInstance = newestInstance?.flowNodeInstanceId === flowNodeInstanceId;
       const showingSameInstance = showingNewestInstance && shownInstance.state === newestInstance.state;
       if (showingSameInstance) {
@@ -207,24 +207,24 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     const searchParams = new URLSearchParams(window.location.search);
     const preselectedInstanceIds = searchParams.getAll('instance');
 
-    const preselectedFlowNodeInstances = newFlowNodeInstances.filter((fni) =>
+    const preselectedFlowNodeInstances = newFlowNodeInstances.filter((fni: any) =>
       preselectedInstanceIds.includes(fni.flowNodeInstanceId),
     );
 
     if (preselectedFlowNodeInstances.length !== preselectedInstanceIds.length) {
       searchParams.delete('instance');
-      preselectedFlowNodeInstances.forEach((fni) => searchParams.append('instance', fni.flowNodeInstanceId));
+      preselectedFlowNodeInstances.forEach((fni: any) => searchParams.append('instance', fni.flowNodeInstanceId));
       window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
     }
 
     const newShownInstancesMap = new Map<string, string>();
-    newFlowNodeInstances.forEach((fni) => {
+    newFlowNodeInstances.forEach((fni: any) => {
       if (!newShownInstancesMap.has(fni.flowNodeId)) {
         newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId);
       }
     });
 
-    preselectedFlowNodeInstances.forEach((fni) => newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
+    preselectedFlowNodeInstances.forEach((fni: any) => newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
     setShownInstancesMap(newShownInstancesMap);
   }, [
     diagramDocumentationInspectorRef.current,
@@ -247,7 +247,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         return;
       }
 
-      const shownInstance = instances.find((fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
+      const shownInstance = instances.find((fni: any) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
       if (!shownInstance) {
         return;
       }
@@ -270,7 +270,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
       } else if (props.showGoToFlowNodeButton && SENDER_TYPES.includes(element.type)) {
         const matchingTriggeredInstances = triggeredFlowNodeInstances.filter(
-          (fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId,
+          (fni: any) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId,
         );
         showGoToButton = matchingTriggeredInstances.length > 0;
         targetInstances = matchingTriggeredInstances;
@@ -308,14 +308,14 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           {showFlowNodeInstancesListButton && (
             <ListButton
               onClick={() => {
-                const entries = instances.map((fni) => ({
+                const entries = instances.map((fni: any) => ({
                   id: fni.flowNodeInstanceId,
                   name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeInstanceId} - ${fni.state}${fni.flowNodeInstanceId === shownInstance.flowNodeInstanceId ? ' (selected)' : ''}`,
                   ...fni,
                 }));
 
                 const onConfirm = async (entry: FlowNodeInstance & CommandPaletteEntry): Promise<void> => {
-                  const newShownInstance = instances.find((fni) => fni.flowNodeInstanceId === entry.flowNodeInstanceId);
+                  const newShownInstance = instances.find((fni: any) => fni.flowNodeInstanceId === entry.flowNodeInstanceId);
                   if (!newShownInstance) {
                     return;
                   }
@@ -374,7 +374,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
                   return;
                 }
 
-                const entries = targetInstances.map((fni) => ({
+                const entries = targetInstances.map((fni: any) => ({
                   id: fni.flowNodeInstanceId,
                   name: `${fni.startedAt?.toLocaleString('en-GB')} - ${fni.flowNodeId}${fni.flowNodeName ? ` - ${fni.flowNodeName}` : ''}`,
                   ...fni,
@@ -445,7 +445,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       return;
     }
 
-    const selectedInstances = flowNodeInstances.filter((fni) => {
+    const selectedInstances = flowNodeInstances.filter((fni: any) => {
       const isFlowNodeSelected = selectedElementIds.includes(fni.flowNodeId);
       const isInstanceShown = shownInstancesMap.get(fni.flowNodeId) === fni.flowNodeInstanceId;
       return isFlowNodeSelected && isInstanceShown;
@@ -476,7 +476,7 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     }
 
     bpmnViewer.onImportDone(() => {
-      const flowNodeIds = new Set(flowNodeInstances.map((fni) => fni.flowNodeId));
+      const flowNodeIds = new Set(flowNodeInstances.map((fni: any) => fni.flowNodeId));
 
       elementRegistry.forEach((element: ElementLike) => {
         if (element.type === 'bpmn:SequenceFlow') {
@@ -492,9 +492,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
           return;
         }
 
-        const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id);
+        const matchingInstances = flowNodeInstances.filter((fni: any) => fni.flowNodeId === element.id);
         const shownInstance = matchingInstances.find(
-          (fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId),
+          (fni: any) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId),
         );
 
         if (!shownInstance) {
