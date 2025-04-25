@@ -244,18 +244,15 @@ export function DynamicUi(
               const ref = formFieldRefs.get(field.id)?.ref;
               return (
                 <Fragment key={field.id}>
-                  {createElement(
-                    DynamicUiFormFieldComponent as React.ElementType,
-                    {
-                      ref:
-                        isReactClassComponent(DynamicUiFormFieldComponent) ||
-                        isForwardedExoticComponent(DynamicUiFormFieldComponent)
-                          ? ref
-                          : undefined,
-                      formField: field,
-                      state: props.state?.[field.id],
-                    },
-                  )}
+                  {createElement(DynamicUiFormFieldComponent as React.ElementType, {
+                    ref:
+                      isReactClassComponent(DynamicUiFormFieldComponent) ||
+                      isForwardedExoticComponent(DynamicUiFormFieldComponent)
+                        ? ref
+                        : undefined,
+                    formField: field,
+                    state: props.state?.[field.id],
+                  })}
                 </Fragment>
               );
             })}
