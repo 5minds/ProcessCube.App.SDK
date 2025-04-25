@@ -61,7 +61,7 @@ export function RetryDialog(props: RetryDialogProps) {
                 className="app-sdk-bg-[color:var(--asdk-rd-primary-button-color)] app-sdk-text-[color:var(--asdk-rd-primary-button-text-color)] app-sdk-rounded-md app-sdk-p-2 app-sdk-border-0 hover:app-sdk-cursor-pointer hover:app-sdk-bg-[color:var(--asdk-rd-primary-button-hover-color)]"
                 onClick={async () => {
                   const newStartToken = JSON.parse(startToken);
-                  const serverActions: any = true
+                  const serverActions = await import('../../../server/actions');
 
                   await serverActions.retryProcess(
                     props.processInstance.processInstanceId,

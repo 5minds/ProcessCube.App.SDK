@@ -12,8 +12,8 @@ export function TerminateProcessButton({ processInstanceId, disabled }: Terminat
     <ProcessButton
       title="Terminate Process"
       disabled={disabled}
-      onClick={() => true
-        // import('../../../server/actions').then(({ terminateProcess }) => terminateProcess(processInstanceId))
+      onClick={() =>
+        import('../../../server/actions').then(({ terminateProcess }) => terminateProcess(processInstanceId))
       }
     >
       <svg
