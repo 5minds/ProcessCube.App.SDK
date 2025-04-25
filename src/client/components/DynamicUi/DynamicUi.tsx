@@ -245,7 +245,7 @@ export function DynamicUi(
               return (
                 <Fragment key={field.id}>
                   {createElement(
-                    DynamicUiFormFieldComponent as any, // TODO: fix any
+                    DynamicUiFormFieldComponent as React.ElementType,
                     {
                       ref:
                         isReactClassComponent(DynamicUiFormFieldComponent) ||
