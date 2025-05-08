@@ -15,10 +15,10 @@ import {
 } from './FormFields';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
-const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=18.0.0 <19', { includePrerelease: true });
+const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=19.0.0 <20', { includePrerelease: true });
 const REACT_IS_STABLE = semverPrerelease(React.version) == null;
 const REACT_IS_CANARY_AND_GREATER_THAN_STABLE =
-  !REACT_IS_STABLE && semverGt(React.version, '18.2.0') && React.version.includes('canary');
+  !REACT_IS_STABLE && semverGt(React.version, '19.0.0') && React.version.includes('canary');
 
 interface DynamicUiForwardedRefRenderFunction
   extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
