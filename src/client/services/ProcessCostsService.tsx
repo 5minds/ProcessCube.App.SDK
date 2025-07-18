@@ -162,7 +162,6 @@ export class ProcessCostsService {
   }
 
   public getAllProcessCosts() {
-    this.costResultsByFlowNodeId;
     return this.costResultsByFlowNodeId;
   }
 
