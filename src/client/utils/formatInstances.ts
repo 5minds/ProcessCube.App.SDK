@@ -1,32 +1,25 @@
-import { calculateTimeBetweenTimestamps } from './calculations';
-
-export async function getTimesFromProcessInstances(instances: any[]) {
-  const extractedDatesFromProcessInstance: Date[] = [];
-
-  for (const instance of instances) {
-    const { processStartedAt, processFinishedAt } = instance.process_instance;
-
-    if (processStartedAt && processFinishedAt) {
-      extractedDatesFromProcessInstance.push(new Date(processStartedAt), new Date(processFinishedAt));
-    }
+export function formatDuration(ms: number | undefined): string {
+  if (ms === undefined) {
+    return '';
   }
 
-  const calculatedTimes = calculateTimeBetweenTimestamps(extractedDatesFromProcessInstance);
-
-  return calculatedTimes;
-}
-
-export async function getTimesFromFlowNodeInstances(flowNodeIds: string[], instances: any[]) {
-  const extractedDatesFromProcessInstance: Date[] = [];
-
-  for (const instance of instances) {
-    if (instance.process_instance.processStartedAt && instance.process_instance.processFinishedAt) {
-      extractedDatesFromProcessInstance.push(
-        instance.process_instance.processStartedAt,
-        instance.process_instance.processFinishedAt,
-      );
-    }
+  if (ms == 0) {
+    return '0ms';
   }
 
-  const calculatedTimes = calculateTimeBetweenTimestamps(extractedDatesFromProcessInstance);
+  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+  const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+  const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((ms % (60 * 1000)) / 1000);
+  const milliseconds = ms % 1000;
+  const formattedMs = +(milliseconds % 1 === 0 ? milliseconds : milliseconds.toFixed(2));
+
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}min`);
+  if (seconds > 0) parts.push(`${seconds}s`);
+  if (milliseconds > 0) parts.push(`${formattedMs}ms`);
+
+  return parts.length > 0 ? parts.join(' ') : '0ms';
 }

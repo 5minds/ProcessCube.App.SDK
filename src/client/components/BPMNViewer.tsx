@@ -13,6 +13,8 @@ import dynamic from 'next/dynamic';
 import { ForwardedRef, Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import React from 'react';
 
+import './BPMNHeatmap.css';
+
 export type BPMNViewerProps = {
   xml: string;
   className?: string;
@@ -27,12 +29,20 @@ export type BPMNViewerFunctions = {
   addMarker(elementId: string, className: string): void;
   removeMarker(elementId: string, className: string): void;
   hasMarker(elementId: string, className: string): boolean | undefined;
+  showHeatmap(data: Record<string, string>): void;
+  clearHeatmap(data: string[]): void;
 };
 
 const DEFAULT_VIEWER_OPTIONS = {
   canvas: {
     autoFocus: true,
   },
+};
+
+const statusColors: Record<string, string> = {
+  Critical: 'rgb(255, 0, 0)',
+  Warning: 'rgb(255, 220, 0)',
+  Stable: 'rgb(50, 205, 50)',
 };
 
 function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions>) {
@@ -64,6 +74,111 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
       },
       hasMarker(elementId: string, className: string) {
         return viewerRef.current.get<Canvas>('canvas')?.hasMarker(elementId, className);
+      },
+      showHeatmap(data: Record<string, string>) {
+        const registry = viewerRef.current.get<ElementRegistry>('elementRegistry');
+        if (!registry) return;
+
+        for (const [elementId, status] of Object.entries(data)) {
+          const element = registry.get(elementId);
+          if (!element) continue;
+
+          const gfx = registry.getGraphics(element) as SVGGElement | undefined;
+          if (!gfx) continue;
+
+          const visual = gfx.querySelector('.djs-visual > :first-child') as SVGElement | null;
+          const textVisual = gfx.querySelector('.djs-visual > :nth-child(2)') as SVGElement | null;
+
+          if (!visual) continue;
+
+          const svg = gfx.ownerSVGElement;
+          if (!svg) return;
+
+          const gradientId = `heatmap-gradient-${elementId}`;
+
+          let existingGradient = svg.querySelector(`#${gradientId}`);
+          if (existingGradient) {
+            existingGradient.remove();
+          }
+
+          const defs =
+            svg.querySelector('defs') ||
+            (() => {
+              const d = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+              svg.insertBefore(d, svg.firstChild);
+              return d;
+            })();
+
+          const radialGradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+          radialGradient.setAttribute('id', gradientId);
+          radialGradient.setAttribute('cx', '50%');
+          radialGradient.setAttribute('cy', '50%');
+          radialGradient.setAttribute('r', '90%');
+          radialGradient.setAttribute('fx', '50%');
+          radialGradient.setAttribute('fy', '50%');
+
+          const color = statusColors[status];
+
+          const stops = [
+            { offset: '0%', color },
+            { offset: '50%', color },
+            { offset: '100%', color },
+          ];
+
+          stops.forEach(({ offset, color }) => {
+            const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop.setAttribute('offset', offset);
+            stop.setAttribute('stop-color', color);
+            radialGradient.appendChild(stop);
+          });
+
+          defs.appendChild(radialGradient);
+
+          visual.classList.forEach((cls) => {
+            if (cls.startsWith('heatmap-')) {
+              visual.classList.remove(cls);
+            }
+          });
+
+          if (textVisual) textVisual.style.fill = '#1d1d1d';
+          visual.classList.add(`heatmap-${status.toLowerCase()}`);
+          visual.style.fill = `url(#${gradientId})`;
+        }
+      },
+      clearHeatmap(data: string[]) {
+        const registry = viewerRef.current.get<ElementRegistry>('elementRegistry');
+        if (!registry) return;
+
+        for (const elementId of data) {
+          const element = registry.get(elementId);
+          if (!element) continue;
+
+          const gfx = registry.getGraphics(element) as SVGGElement | undefined;
+          if (!gfx) continue;
+
+          const visual = gfx.querySelector('.djs-visual > :first-child') as SVGElement | null;
+          if (visual) {
+            visual.classList.forEach((cls) => {
+              if (cls.startsWith('heatmap-')) {
+                visual.classList.remove(cls);
+              }
+            });
+          }
+
+          const textVisual = gfx.querySelector('.djs-visual > :nth-child(2)') as SVGElement | null;
+          if (textVisual) {
+            textVisual.style.fill = '#cdcdcd';
+          }
+
+          const svg = gfx.ownerSVGElement;
+          if (!svg) continue;
+
+          const gradientId = `heatmap-gradient-${element.id}`;
+          const gradient = svg.querySelector(`#${gradientId}`);
+          if (gradient) {
+            gradient.remove();
+          }
+        }
       },
     };
   }, [viewerRef.current, containerRef.current]);

@@ -6,6 +6,8 @@ import React, { ForwardedRef, Ref, forwardRef } from 'react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 
+import { HeatmapService } from '../services';
+import { RuntimeService } from '../services';
 import { BPMNViewer, BPMNViewerFunctions } from './BPMNViewer';
 import { DocumentationViewer } from './DocumentationViewer';
 import { SplitterLayout } from './SplitterLayout';
@@ -21,6 +23,11 @@ export type DiagramDocumentationInspectorRef = {
 type DiagramDocumentationInspectorProps = {
   xml: string;
   setSelectedElementIds?: (elementIds: string[]) => void;
+  showHeatmap?: boolean;
+  runtimeService?: RuntimeService;
+  heatmapService?: HeatmapService;
+  processModel?: any;
+  heatmapType?: string;
 };
 
 function DiagramDocumentationInspectorFunction(
@@ -99,7 +106,24 @@ function DiagramDocumentationInspectorFunction(
     documentatedElements?.forEach((element) => {
       overlays?.add(element.id, getOverlay(element));
     });
-  }, [bpmnRendered]);
+
+    if (!props.processModel || !props.heatmapService || !bpmnViewerRef.current || !props.heatmapType) return;
+
+    const showHeatmap = props.showHeatmap === true;
+
+    props.heatmapService.applyHeatmap(showHeatmap, props.heatmapType, { viewer: bpmnViewerRef.current });
+  }, [bpmnRendered, props.showHeatmap, props.heatmapService, props.heatmapType]);
+
+  useEffect(() => {
+    if (!props.processModel || !props.heatmapService || !bpmnViewerRef.current || !bpmnRendered) return;
+
+    const showHeatmap = props.showHeatmap === true;
+
+    if (props.heatmapType === 'runtime' || props.heatmapType === 'processcosts') {
+      console.log(props.heatmapType);
+      props.heatmapService.applyHeatmap(showHeatmap, props.heatmapType ?? 'runtime', { viewer: bpmnViewerRef.current });
+    }
+  }, [bpmnRendered, props.showHeatmap, props.heatmapService, props.heatmapType]);
 
   useEffect(() => {
     props.setSelectedElementIds?.(selectedElements.map((element) => element.id));
@@ -123,6 +147,12 @@ function DiagramDocumentationInspectorFunction(
         },
         hasMarker(elementId: string, className: string) {
           return bpmnViewerRef.current?.hasMarker(elementId, className);
+        },
+        showHeatmap(data: Record<string, string>) {
+          bpmnViewerRef.current?.showHeatmap(data);
+        },
+        clearHeatmap(data: string[]) {
+          bpmnViewerRef.current?.clearHeatmap(data);
         },
         onImportDone(callback: () => void) {
           if (bpmnRendered) {
