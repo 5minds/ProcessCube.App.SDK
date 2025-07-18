@@ -120,7 +120,6 @@ function DiagramDocumentationInspectorFunction(
     const showHeatmap = props.showHeatmap === true;
 
     if (props.heatmapType === 'runtime' || props.heatmapType === 'processcosts') {
-      console.log(props.heatmapType);
       props.heatmapService.applyHeatmap(showHeatmap, props.heatmapType ?? 'runtime', { viewer: bpmnViewerRef.current });
     }
   }, [bpmnRendered, props.showHeatmap, props.heatmapService, props.heatmapType]);
