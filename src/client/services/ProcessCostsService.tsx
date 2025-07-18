@@ -162,7 +162,7 @@ export class ProcessCostsService {
   }
 
   public getAllProcessCosts() {
-    console.log(this.costResultsByFlowNodeId);
+    this.costResultsByFlowNodeId;
     return this.costResultsByFlowNodeId;
   }
 
