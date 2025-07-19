@@ -10,7 +10,7 @@ import type { DataModels } from '@5minds/processcube_engine_sdk';
  */
 export async function getIdentity(): Promise<DataModels.Iam.Identity> {
   let token = await getToken({
-    req: { cookies: cookies(), headers: headers() } as any,
+    req: { cookies: await cookies(), headers: await headers() } as any,
   });
 
   const tokenIsExpired = token?.expiresAt && Date.now() >= (token.expiresAt as number) * 1000;
@@ -25,7 +25,7 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        cookie: cookies().toString(),
+        cookie: (await cookies()).toString(),
       },
     });
 
@@ -36,7 +36,7 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
       // update the server cookie with the new session and refreshed access token
       try {
         for (const cookie of responseCookies.getAll()) {
-          cookies().set(cookie.name, cookie.value, {
+          (await cookies()).set(cookie.name, cookie.value, {
             ...cookie,
           });
         }
@@ -47,7 +47,7 @@ export async function getIdentity(): Promise<DataModels.Iam.Identity> {
       }
 
       token = await getToken({
-        req: { cookies: errorOnSetCookies ? responseCookies : cookies(), headers: headers() },
+        req: { cookies: errorOnSetCookies ? responseCookies : await cookies(), headers: await headers() },
       } as any);
 
       if (token?.error) throw token.error;

@@ -6,7 +6,7 @@ import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 export const BooleanFormField = forwardRef(function BooleanFormField(
   props: DynamicUiComponentProps<string | null>,
   ref: DynamicUiFormFieldRef,
-): JSX.Element {
+): React.JSX.Element {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
