@@ -304,7 +304,7 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     this.setState((prevState: SplitterLayoutState) => (prevState.resizing ? { resizing: false } : null));
   }
 
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     let containerClasses = 'app-sdk-splitter-layout';
     if (this.props.customClassName) {
       containerClasses += ` ${this.props.customClassName}`;
@@ -320,7 +320,7 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     if (children.length === 0) {
       children.push(<div />);
     }
-    const wrappedChildren: JSX.Element[] = [];
+    const wrappedChildren: React.JSX.Element[] = [];
     const primaryIndex = this.props.primaryIndex !== 0 && this.props.primaryIndex !== 1 ? 0 : this.props.primaryIndex;
     for (let i = 0; i < children.length; ++i) {
       let primary = true;
@@ -371,7 +371,7 @@ function SplitterPane(
     percentage: false,
     children: [],
   },
-): JSX.Element {
+): React.JSX.Element {
   const size = props.size || 0;
   const unit = props.percentage ? '%' : 'px';
   let classes = 'app-sdk-layout-pane';

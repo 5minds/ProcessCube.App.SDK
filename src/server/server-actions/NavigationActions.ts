@@ -1,6 +1,4 @@
-import { revalidatePath } from 'next/cache';
-import { RedirectType } from 'next/dist/client/components/redirect';
-import { redirect } from 'next/navigation';
+import { RedirectType, redirect } from 'next/navigation';
 
 /**
  * Navigates to an URL. This uses next's {@link redirect} function. As this is an server action, the {@link RedirectType} is 'push' only.
@@ -8,6 +6,5 @@ import { redirect } from 'next/navigation';
  * @returns never
  */
 export function navigateToUrl(url: string): never {
-  revalidatePath(url);
   redirect(url);
 }
