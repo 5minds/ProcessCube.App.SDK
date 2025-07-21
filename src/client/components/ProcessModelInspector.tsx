@@ -39,22 +39,24 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
     if (!getInstancesFromDatabase || !processModel?.processModelId || !processModel?.hash) return;
 
-    const runtimeService = new RuntimeService(instances, processModel.hash);
-    const processCostsService = new ProcessCostsService(instances, processModel.flowNodes);
-    const newHeatmapService = heatmapService
-      ? (heatmapService.updateHeatmapService(runtimeService, processCostsService, processModel), heatmapService)
-      : new HeatmapService(runtimeService, processCostsService, processModel);
+    const newRuntimeService = new RuntimeService(instances, processModel.hash);
+    const newProcessCostsService = new ProcessCostsService(instances, processModel.flowNodes);
 
-    setRuntimeService(runtimeService);
-    setProcessCostsService(processCostsService);
-    setHeatmapService(newHeatmapService);
+    setRuntimeService(newRuntimeService);
+    setProcessCostsService(newProcessCostsService);
 
-    if (newHeatmapService.hasRuntimeEntry()) {
-      setHeatmapType('runtime');
-      console.log('a');
-    } else if (newHeatmapService.hasCostEntry()) {
-      setHeatmapType('processcosts');
-      console.log('b');
+    const oldHeatmapService = heatmapService;
+    if (!oldHeatmapService) {
+      const newHeatmapService = new HeatmapService(newRuntimeService, newProcessCostsService, processModel);
+      setHeatmapService(newHeatmapService);
+
+      if (newHeatmapService.hasRuntimeEntry()) {
+        setHeatmapType('runtime');
+      } else if (newHeatmapService.hasCostEntry()) {
+        setHeatmapType('processcosts');
+      }
+    } else {
+      heatmapService.updateHeatmapService(newRuntimeService, newProcessCostsService, processModel);
     }
   };
 
