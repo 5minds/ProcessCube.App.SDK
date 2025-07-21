@@ -146,7 +146,7 @@ export function HeatmapInspector({
             )}
           </div>
 
-          {heatmapService && (
+          {(hasRuntimeEntry || hasCostEntry) && (
             <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
               <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">Heatmap Typ:</label>
               <select
