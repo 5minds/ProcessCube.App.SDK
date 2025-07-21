@@ -73,7 +73,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
       const instances = await props.getInstancesFromDatabase(
         props.processModel.processModelId,
         props.processModel.hash,
-        undefined,
+        { timeRange: 'today' },
       );
 
       if (instances.length > 0) {
