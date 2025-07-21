@@ -51,8 +51,10 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
     if (newHeatmapService.hasRuntimeEntry()) {
       setHeatmapType('runtime');
+      console.log('a');
     } else if (newHeatmapService.hasCostEntry()) {
       setHeatmapType('processcosts');
+      console.log('b');
     }
   };
 
