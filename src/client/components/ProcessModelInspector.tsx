@@ -129,22 +129,26 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
   return (
     <div className="app-sdk-relative app-sdk-w-full app-sdk-h-full">
-      <ProcessButtonsContainer>
-        <TokenInspectorButton isOpen={isHeatmapInspectorOpen} open={toggleInspector} close={toggleInspector} />
-      </ProcessButtonsContainer>
-      <Transition show={isHeatmapInspectorOpen}>
-        <div className="app-sdk-transition app-sdk-duration-200 data-[closed]:app-sdk-opacity-0 app-sdk-w-1/4 app-sdk-min-w-64 app-sdk-absolute app-sdk-top-0 app-sdk-right-0 app-sdk-z-40 app-sdk-pt-2 app-sdk-pr-2">
-          <HeatmapInspector
-            processModel={props.processModel}
-            processCostsService={processCostsService}
-            runtimeService={runtimeService}
-            heatmapService={heatmapService}
-            onChange={setFilters}
-            heatmapType={heatmapType}
-            setHeatmapType={setHeatmapType}
-          />
-        </div>
-      </Transition>
+      {props.getInstancesFromDatabase && (
+        <>
+          <ProcessButtonsContainer>
+            <TokenInspectorButton isOpen={isHeatmapInspectorOpen} open={toggleInspector} close={toggleInspector} />
+          </ProcessButtonsContainer>
+          <Transition show={isHeatmapInspectorOpen}>
+            <div className="app-sdk-transition app-sdk-duration-200 data-[closed]:app-sdk-opacity-0 app-sdk-w-1/4 app-sdk-min-w-64 app-sdk-absolute app-sdk-top-0 app-sdk-right-0 app-sdk-z-40 app-sdk-pt-2 app-sdk-pr-2">
+              <HeatmapInspector
+                processModel={props.processModel}
+                processCostsService={processCostsService}
+                runtimeService={runtimeService}
+                heatmapService={heatmapService}
+                onChange={setFilters}
+                heatmapType={heatmapType}
+                setHeatmapType={setHeatmapType}
+              />
+            </div>
+          </Transition>
+        </>
+      )}
       <DiagramDocumentationInspector
         xml={props.processModel.xml}
         processModel={props.processModel}
