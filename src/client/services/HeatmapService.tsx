@@ -168,7 +168,9 @@ export class HeatmapService {
 
       const warningThreshold = warningFactor ? targetRuntime * warningFactor : undefined;
       const criticalThreshold = criticalFactor ? targetRuntime * criticalFactor : undefined;
-
+      console.log('test', criticalThreshold, warningThreshold);
+      if (criticalThreshold && warningThreshold && criticalThreshold < warningThreshold) return;
+      console.log('##');
       const runtimeInfo: Partial<NodeHeatmapInfo> = {
         targetRuntime,
         warningThreshold,
