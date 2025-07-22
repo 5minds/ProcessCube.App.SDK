@@ -112,13 +112,7 @@ export class HeatmapService {
         const warningThreshold = warningFactor ? target * warningFactor : undefined;
         const criticalThreshold = criticalFactor ? target * criticalFactor : undefined;
 
-        if (
-          warningThreshold !== undefined &&
-          criticalThreshold !== undefined &&
-          warningThreshold >= criticalThreshold
-        ) {
-          continue;
-        }
+        if (warningThreshold && criticalThreshold && criticalThreshold < warningThreshold) continue;
 
         let status: HeatmapLevel = 'Stable';
         if (criticalThreshold !== undefined && average >= criticalThreshold) {
@@ -168,9 +162,9 @@ export class HeatmapService {
 
       const warningThreshold = warningFactor ? targetRuntime * warningFactor : undefined;
       const criticalThreshold = criticalFactor ? targetRuntime * criticalFactor : undefined;
-      console.log('test', criticalThreshold, warningThreshold);
+
       if (criticalThreshold && warningThreshold && criticalThreshold < warningThreshold) return;
-      console.log('##');
+
       const runtimeInfo: Partial<NodeHeatmapInfo> = {
         targetRuntime,
         warningThreshold,
