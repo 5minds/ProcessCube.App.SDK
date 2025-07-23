@@ -41,11 +41,11 @@ export function DropdownMenu(props: { children: React.ReactNode; collapsedIcon?:
 }
 
 export function DropdownMenuItem(props: {
-  title: string | JSX.Element;
+  title: string | React.JSX.Element;
   onClick: () => void | Promise<void>;
   isDanger?: boolean;
   className?: string;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <Menu.Item>
       {({ active }) => {

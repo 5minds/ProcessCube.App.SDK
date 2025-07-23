@@ -87,7 +87,7 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
           client_id: process.env.NEXTAUTH_CLIENT_ID as string,
           client_secret: process.env.NEXTAUTH_SECRET as string,
           grant_type: 'refresh_token',
-          refresh_token: token.refreshToken!,
+          refresh_token: String(token.refreshToken),
         }),
         method: 'POST',
       });
@@ -123,10 +123,6 @@ export async function authConfigSessionCallback(args: Parameters<CallbacksOption
 
   const idTokenKeys = Object.keys(idToken);
   const claims = Object.fromEntries(Object.entries(accessToken).filter(([key, value]) => !idTokenKeys.includes(key)));
-
-  delete claims.scope;
-  delete claims.jti;
-  delete claims.client_id;
 
   session.user = token.user ?? {};
   session.user.claims = claims;

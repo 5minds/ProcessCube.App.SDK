@@ -9,11 +9,11 @@ on:
 env:
   CI_TOOLS_VERSION: '^5.0.0'
   # NOTE: Um die Entwicklungsphase von Alpha nach Beta zu ändern, einfach die nachfolgend deklarierten Env Variablen switchen.
-  # CI_TOOLS_ALPHA_BRANCH: next
-  # CI_TOOLS_ALPHA_NPM_TAG: next
-  CI_TOOLS_BETA_BRANCH: next
-  CI_TOOLS_BETA_NPM_TAG: next
-  BOX_RELEASE_TAG: 2025-1
+  CI_TOOLS_ALPHA_BRANCH: next
+  CI_TOOLS_ALPHA_NPM_TAG: next
+  # CI_TOOLS_BETA_BRANCH: next
+  # CI_TOOLS_BETA_NPM_TAG: next
+  BOX_RELEASE_TAG: 2025-2
 
 jobs:
   build_and_publish:
@@ -30,7 +30,7 @@ jobs:
       - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install CI Tools

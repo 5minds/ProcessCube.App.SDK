@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, forwardRef, useRef } from 'react';
+import React, { Fragment, PropsWithChildren, createElement, useRef } from 'react';
 import * as ReactIs from 'react-is';
 import semverGt from 'semver/functions/gt';
 import semverPrerelease from 'semver/functions/prerelease';
@@ -15,10 +15,10 @@ import {
 } from './FormFields';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
-const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=18.0.0 <19', { includePrerelease: true });
+const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=19.0.0 <20', { includePrerelease: true });
 const REACT_IS_STABLE = semverPrerelease(React.version) == null;
 const REACT_IS_CANARY_AND_GREATER_THAN_STABLE =
-  !REACT_IS_STABLE && semverGt(React.version, '18.2.0') && React.version.includes('canary');
+  !REACT_IS_STABLE && semverGt(React.version, '19.0.0') && React.version.includes('canary');
 
 interface DynamicUiForwardedRefRenderFunction
   extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
@@ -70,7 +70,7 @@ export function DynamicUi(
     /** UserTaskInstance with a defined dynamic form  */
     task: DataModels.FlowNodeInstances.UserTaskInstance | UserTaskInstance;
     /** Custom element to insert into the DynamicUI Headline */
-    headerComponent?: JSX.Element;
+    headerComponent?: React.JSX.Element;
     /** Callback, that will be called when the form is submitted */
     onSubmit: (result: UserTaskResult, rawFormData: FormData, task: UserTaskInstance) => Promise<void>;
     /** Custom class name for the root element */
@@ -97,7 +97,7 @@ export function DynamicUi(
 
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<number>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const formFieldRefs = new Map<string, FormFieldRefsMapObj>(
     formFields.map((field) => [field.id, { ref: React.createRef<DynamicUiRefFunctions>() }]),
@@ -129,7 +129,7 @@ export function DynamicUi(
       window.clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = window.setTimeout(() => {
-      timeoutRef.current = undefined;
+      timeoutRef.current = null;
       if (formRef.current == null) {
         return;
       }
@@ -244,16 +244,15 @@ export function DynamicUi(
               const ref = formFieldRefs.get(field.id)?.ref;
               return (
                 <Fragment key={field.id}>
-                  <ReactElement
-                    ref={
+                  {createElement(DynamicUiFormFieldComponent as React.ElementType, {
+                    ref:
                       isReactClassComponent(DynamicUiFormFieldComponent) ||
                       isForwardedExoticComponent(DynamicUiFormFieldComponent)
                         ? ref
-                        : undefined
-                    }
-                    formField={field}
-                    state={props.state?.[field.id]}
-                  />
+                        : undefined,
+                    formField: field,
+                    state: props.state?.[field.id],
+                  })}
                 </Fragment>
               );
             })}
@@ -316,7 +315,7 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
   );
 }
 
-function Headline(props: { title?: React.ReactNode; headerComponent?: JSX.Element }) {
+function Headline(props: { title?: React.ReactNode; headerComponent?: React.JSX.Element }) {
   return (
     <div className="app-sdk-flex app-sdk-space-x-3">
       <div className="app-sdk-flex-1">
