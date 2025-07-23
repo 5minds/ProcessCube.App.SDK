@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { FilterOptions, TimeRange } from '../../common/types';
 import { HeatmapService } from '../services/HeatmapService';
@@ -28,6 +29,7 @@ export function HeatmapInspector({
   const [timeRange, setTimeRange] = useState<TimeRange>('today');
   const [customStartDate, setCustomStartDate] = useState<string>('');
   const [customEndDate, setCustomEndDate] = useState<string>('');
+  const location = useLocation();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as TimeRange;
@@ -55,19 +57,10 @@ export function HeatmapInspector({
   }, [timeRange, customStartDate, customEndDate]);
 
   useEffect(() => {
-    let prevSearch = window.location.search;
-
-    const interval = setInterval(() => {
-      if (window.location.search !== prevSearch) {
-        prevSearch = window.location.search;
-        const params = new URLSearchParams(window.location.search);
-        const selected = params.get('selected');
-        setSelectedInstance(selected || undefined);
-      }
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, []);
+    const params = new URLSearchParams(location.search);
+    const selected = params.get('selected');
+    setSelectedInstance(selected || undefined);
+  }, [location.search]);
 
   const setAndApplyHeatmap = (value: string) => {
     if (selectedInstance) setHeatmapType(value);
