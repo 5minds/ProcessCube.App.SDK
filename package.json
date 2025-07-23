@@ -91,7 +91,7 @@
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "next": ">=15",
+    "next": ">=14",
     "next-auth": "~4.24.6",
     "react": ">=19.0.0"
   },
