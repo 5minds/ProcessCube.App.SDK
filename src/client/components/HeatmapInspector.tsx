@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 
 import { FilterOptions, TimeRange } from '../../common/types';
 import { HeatmapService } from '../services/HeatmapService';
@@ -29,7 +28,6 @@ export function HeatmapInspector({
   const [timeRange, setTimeRange] = useState<TimeRange>('today');
   const [customStartDate, setCustomStartDate] = useState<string>('');
   const [customEndDate, setCustomEndDate] = useState<string>('');
-  const location = useLocation();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as TimeRange;
@@ -57,10 +55,34 @@ export function HeatmapInspector({
   }, [timeRange, customStartDate, customEndDate]);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const selected = params.get('selected');
-    setSelectedInstance(selected || undefined);
-  }, [location.search]);
+    const updateSelectedInstance = () => {
+      const params = new URLSearchParams(window.location.search);
+      const selected = params.get('selected');
+      setSelectedInstance(selected || undefined);
+    };
+
+    window.addEventListener('popstate', updateSelectedInstance);
+
+    const origPushState = history.pushState;
+    history.pushState = function (...args) {
+      origPushState.apply(this, args);
+      updateSelectedInstance();
+    };
+
+    const origReplaceState = history.replaceState;
+    history.replaceState = function (...args) {
+      origReplaceState.apply(this, args);
+      updateSelectedInstance();
+    };
+
+    updateSelectedInstance();
+
+    return () => {
+      window.removeEventListener('popstate', updateSelectedInstance);
+      history.pushState = origPushState;
+      history.replaceState = origReplaceState;
+    };
+  }, []);
 
   const setAndApplyHeatmap = (value: string) => {
     if (selectedInstance) setHeatmapType(value);
