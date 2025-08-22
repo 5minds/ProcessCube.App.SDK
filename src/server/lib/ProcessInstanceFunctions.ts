@@ -25,6 +25,8 @@ export async function getProcessInstanceById(
 
   const result = await Client.processInstances.query({ processInstanceId: processInstanceId }, { identity: identity });
 
+  console.log('1');
+  console.log(result);
   return result.processInstances[0];
 }
 

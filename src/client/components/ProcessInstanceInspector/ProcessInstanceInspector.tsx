@@ -106,6 +106,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       flowNodeInstances.map((fni) => fni.flowNodeInstanceId),
     );
 
+    console.log('2');
+    console.log(processInstance);
     setProcessInstance(processInstance);
     setFlowNodeInstances(flowNodeInstances);
     setTriggeredFlowNodeInstances(triggeredFlowNodeInstances);
@@ -200,6 +202,8 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
       overlays.remove({ element: flowNodeId, type: SDK_OVERLAY_BUTTONS_TYPE });
     }
 
+    console.log('3');
+    console.log(newProcessInstance);
     setProcessInstance(newProcessInstance);
     setFlowNodeInstances(newFlowNodeInstances);
     setTriggeredFlowNodeInstances(newTriggeredFlowNodeInstances);
