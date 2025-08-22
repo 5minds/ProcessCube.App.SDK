@@ -23,10 +23,11 @@ export async function getProcessInstanceById(
 ): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const identity = await tryGetIdentity();
 
-  const result = await Client.processInstances.query({ processInstanceId: processInstanceId }, { identity: identity });
+  const result = await Client.processInstances.query(
+    { processInstanceId: processInstanceId },
+    { identity: identity, includeXml: true },
+  );
 
-  console.log('1');
-  console.log(result);
   return result.processInstances[0];
 }
 
