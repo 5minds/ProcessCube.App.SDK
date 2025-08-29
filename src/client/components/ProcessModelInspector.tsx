@@ -163,4 +163,4 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
 export const ProcessModelInspectorNextJS = dynamic(() => Promise.resolve(ProcessModelInspector), {
   ssr: false,
-});
+}) as unknown as (props: ProcessModelInspectorProps) => React.JSX.Element;
