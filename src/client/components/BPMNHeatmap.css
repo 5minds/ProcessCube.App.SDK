@@ -1,4 +1,4 @@
-.flow-shadow {
+.heatmap-flow-shadow {
   filter: drop-shadow(0 0 10px rgb(128, 171, 188)) drop-shadow(0 0 10px rgb(128, 171, 188))
     drop-shadow(0 0 10px rgb(128, 171, 188));
 }

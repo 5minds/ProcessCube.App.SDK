@@ -26,33 +26,38 @@ export function HeatmapInspector({
   setHeatmapType,
 }: HeatmapInspectorProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>('today');
-  const [customStartDate, setCustomStartDate] = useState<string>('');
-  const [customEndDate, setCustomEndDate] = useState<string>('');
+  const [customStartDate, setCustomStartDate] = useState<string | undefined>(undefined);
+  const [customEndDate, setCustomEndDate] = useState<string | undefined>(undefined);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as TimeRange;
-    setTimeRange(value);
-
-    if (value !== 'custom') {
-      onChange({ timeRange: value });
+    const value = e.target.value as TimeRange | 'custom';
+    if (value === 'custom') {
+      setTimeRange({ custom: { startDate: customStartDate, endDate: customEndDate } });
+    } else {
+      setTimeRange(value);
     }
   };
+
+  useEffect(() => {
+    if (typeof timeRange === 'string') {
+      onChange({ timeRange });
+    } else {
+      onChange({
+        timeRange: {
+          custom: {
+            startDate: timeRange.custom.startDate,
+            endDate: timeRange.custom.endDate,
+          },
+        },
+      });
+    }
+  }, [timeRange, customStartDate, customEndDate, onChange]);
 
   const [selectedInstance, setSelectedInstance] = useState<string | undefined>(() => {
     if (typeof window === 'undefined') return undefined;
     const params = new URLSearchParams(window.location.search);
     return params.get('selected') || undefined;
   });
-
-  useEffect(() => {
-    if (timeRange === 'custom' && (customStartDate || customEndDate)) {
-      onChange({
-        timeRange: 'custom',
-        startDate: customStartDate || undefined,
-        endDate: customEndDate || undefined,
-      });
-    }
-  }, [timeRange, customStartDate, customEndDate]);
 
   useEffect(() => {
     const updateSelectedInstance = () => {
@@ -96,6 +101,7 @@ export function HeatmapInspector({
 
   const runtimeStats = useMemo(() => {
     if (!runtimeService || !selectedInstance) return undefined;
+    console.log(runtimeService);
     return runtimeService.getStats(selectedInstance);
   }, [runtimeService, selectedInstance]);
 
@@ -135,7 +141,7 @@ export function HeatmapInspector({
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3">
           <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
             <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">Zeitraum:</label>
-            <select value={timeRange} onChange={handleChange}>
+            <select value={typeof timeRange === 'string' ? timeRange : 'custom'} onChange={handleChange}>
               <option value="today">Heute</option>
               <option value="yesterday">Gestern</option>
               <option value="this_week">Diese Woche</option>
@@ -147,16 +153,28 @@ export function HeatmapInspector({
               <option value="custom">Benutzerdefiniert</option>
             </select>
 
-            {timeRange === 'custom' && (
+            {typeof timeRange !== 'string' && (
               <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1 app-sdk-pt-2">
                 <label>Startdatum:</label>
                 <input
                   type="datetime-local"
                   value={customStartDate}
-                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value || undefined;
+                    setCustomStartDate(e.target.value);
+                    setTimeRange({ custom: { startDate: value, endDate: customEndDate || undefined } });
+                  }}
                 />
                 <label>Enddatum:</label>
-                <input type="datetime-local" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} />
+                <input
+                  type="datetime-local"
+                  value={customEndDate}
+                  onChange={(e) => {
+                    const value = e.target.value || undefined;
+                    setCustomEndDate(e.target.value);
+                    setTimeRange({ custom: { startDate: customStartDate || undefined, endDate: value } });
+                  }}
+                />
               </div>
             )}
           </div>

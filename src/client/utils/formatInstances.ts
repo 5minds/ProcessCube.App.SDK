@@ -17,9 +17,9 @@ export function formatDuration(ms: number | undefined): string {
   const parts: string[] = [];
   if (days > 0) parts.push(`${days}d`);
   if (hours > 0) parts.push(`${hours}h`);
-  if (minutes > 0) parts.push(`${minutes}min`);
+  if (minutes > 0) parts.push(`${minutes}m`);
   if (seconds > 0) parts.push(`${seconds}s`);
   if (milliseconds > 0) parts.push(`${formattedMs}ms`);
 
-  return parts.length > 0 ? parts.join(' ') : '0ms';
+  return parts.join(' ');
 }

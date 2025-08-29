@@ -12,10 +12,8 @@ export type TimeRange =
   | 'this_month'
   | 'last_30_days'
   | 'this_year'
-  | 'custom';
+  | { custom: { startDate?: string; endDate?: string } };
 
 export type FilterOptions = {
-  timeRange?: TimeRange;
-  startDate?: string;
-  endDate?: string;
+  timeRange: TimeRange;
 };

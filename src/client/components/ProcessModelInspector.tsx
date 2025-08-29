@@ -1,3 +1,5 @@
+'use client';
+
 import { Transition } from '@headlessui/react';
 import dynamic from 'next/dynamic';
 import React from 'react';
@@ -18,9 +20,7 @@ type ProcessModelInspectorProps = {
     processModelId: string,
     hash: string,
     options?: {
-      timeRange?: TimeRange;
-      startDate?: string;
-      endDate?: string;
+      timeRange: TimeRange;
     },
   ) => Promise<any[]>;
 };

@@ -5,27 +5,11 @@ export function getAverageRuntime(times: number[]): number | undefined {
 }
 
 export function getShortestRuntime(times: number[]): number {
-  let shortestTime = times[0];
-
-  for (let i = 1; i < times.length; i++) {
-    if (times[i] < shortestTime) {
-      shortestTime = times[i];
-    }
-  }
-
-  return shortestTime;
+  return Math.min(...times);
 }
 
 export function getLongestRuntime(times: number[]): number {
-  let longestTime = times[0];
-
-  for (let i = 1; i < times.length; i++) {
-    if (times[i] > longestTime) {
-      longestTime = times[i];
-    }
-  }
-
-  return longestTime;
+  return Math.max(...times);
 }
 
 export function parseValidPercent(value?: string): number | undefined {
