@@ -48,12 +48,16 @@ export const getProcessInstance = async (processInstanceId: string) => {
   return getProcessInstanceById(processInstanceId);
 };
 
-export const getFlowNodeInstances = async (processInstanceId: string) => {
+export const getFlowNodeInstances = async (
+  processInstanceId: string,
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> => {
   return getFlowNodeInstancesByProcessInstanceId(processInstanceId, {
     sortSettings: { sortBy: DataModels.FlowNodeInstances.FlowNodeInstanceSortableColumns.createdAt, sortDir: 'DESC' },
   });
 };
 
-export const getTriggeredFlowNodeInstances = async (flowNodeInstanceIds: string[]) => {
+export const getTriggeredFlowNodeInstances = async (
+  flowNodeInstanceIds: string[],
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> => {
   return getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(flowNodeInstanceIds);
 };
