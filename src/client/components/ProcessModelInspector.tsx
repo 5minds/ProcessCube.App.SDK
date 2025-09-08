@@ -1,8 +1,5 @@
-'use client';
-
 import { Transition } from '@headlessui/react';
 import dynamic from 'next/dynamic';
-import React from 'react';
 import { useEffect, useState } from 'react';
 
 import { FilterOptions, TimeRange } from '../../common/types';
@@ -19,9 +16,7 @@ type ProcessModelInspectorProps = {
   getInstancesFromDatabase?: (
     processModelId: string,
     hash: string,
-    options?: {
-      timeRange: TimeRange;
-    },
+    options?: { timeRange: TimeRange },
   ) => Promise<any[]>;
 };
 
@@ -33,11 +28,11 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [filters, setFilters] = useState<FilterOptions | undefined>(undefined);
   const [heatmapType, setHeatmapType] = useState<string>('runtime');
+  const [timeRange, setTimeRange] = useState<TimeRange>('today');
 
   const setServices = (instances: any) => {
-    const { processModel, getInstancesFromDatabase } = props;
-
-    if (!getInstancesFromDatabase || !processModel?.processModelId || !processModel?.hash) return;
+    const { processModel } = props;
+    if (!processModel?.processModelId || !processModel?.hash) return;
 
     const newRuntimeService = new RuntimeService(instances, processModel.hash);
     const newProcessCostsService = new ProcessCostsService(instances, processModel.flowNodes);
@@ -45,16 +40,12 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
     setRuntimeService(newRuntimeService);
     setProcessCostsService(newProcessCostsService);
 
-    const oldHeatmapService = heatmapService;
-    if (!oldHeatmapService) {
+    if (!heatmapService) {
       const newHeatmapService = new HeatmapService(newRuntimeService, newProcessCostsService, processModel);
       setHeatmapService(newHeatmapService);
 
-      if (newHeatmapService.hasRuntimeEntry()) {
-        setHeatmapType('runtime');
-      } else if (newHeatmapService.hasCostEntry()) {
-        setHeatmapType('processcosts');
-      }
+      if (newHeatmapService.hasRuntimeEntry()) setHeatmapType('runtime');
+      else if (newHeatmapService.hasCostEntry()) setHeatmapType('processcosts');
     } else {
       heatmapService.updateHeatmapService(newRuntimeService, newProcessCostsService, processModel);
     }
@@ -62,18 +53,30 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const isHeatmapInspectorOpen = searchParams.get('heatmapInspector');
-    if (isHeatmapInspectorOpen === 'true') {
-      setIsHeatmapInspectorOpen(true);
+
+    if (searchParams.get('heatmapInspector') === 'true') setIsHeatmapInspectorOpen(true);
+
+    const timeRangeParam = searchParams.get('timeRange');
+    let initialTimeRange: TimeRange = 'today';
+
+    if (timeRangeParam === 'custom') {
+      const start = searchParams.get('startDate') || undefined;
+      const end = searchParams.get('endDate') || undefined;
+      initialTimeRange = { custom: { startDate: start, endDate: end } };
+    } else if (timeRangeParam) {
+      initialTimeRange = timeRangeParam as Exclude<TimeRange, object>;
     }
 
-    const loadInitialData = async () => {
-      if (!props.getInstancesFromDatabase) return;
+    setTimeRange(initialTimeRange);
+    setFilters({ timeRange: initialTimeRange });
+
+    const loadData = async () => {
+      if (!props.getInstancesFromDatabase || !props.processModel?.processModelId || !props.processModel?.hash) return;
 
       const instances = await props.getInstancesFromDatabase(
         props.processModel.processModelId,
         props.processModel.hash,
-        { timeRange: 'today' },
+        { timeRange: initialTimeRange },
       );
 
       if (instances.length > 0) {
@@ -82,17 +85,25 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
       }
     };
 
-    loadInitialData();
-  }, []);
+    loadData();
+  }, [props.getInstancesFromDatabase, props.processModel]);
 
   useEffect(() => {
+    if (
+      !filters?.timeRange ||
+      !props.getInstancesFromDatabase ||
+      !props.processModel?.processModelId ||
+      !props.processModel?.hash
+    )
+      return;
+
     const fetchFilteredData = async () => {
-      if (!filters || !props.getInstancesFromDatabase) return;
+      if (!props.getInstancesFromDatabase) return;
 
       const instances = await props.getInstancesFromDatabase(
         props.processModel.processModelId,
         props.processModel.hash,
-        filters,
+        { timeRange: filters.timeRange },
       );
 
       if (instances.length > 0) {
@@ -106,7 +117,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
     };
 
     fetchFilteredData();
-  }, [filters]);
+  }, [filters, props.getInstancesFromDatabase, props.processModel]);
 
   const toggleInspector = () => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -127,6 +138,28 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
     );
   };
 
+  const handleTimeRangeChange = (newTimeRange: TimeRange) => {
+    setTimeRange(newTimeRange);
+    setFilters({ timeRange: newTimeRange });
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (typeof newTimeRange === 'string') {
+      params.set('timeRange', newTimeRange);
+      params.delete('startDate');
+      params.delete('endDate');
+    } else {
+      params.set('timeRange', 'custom');
+      if (newTimeRange.custom.startDate) params.set('startDate', newTimeRange.custom.startDate);
+      else params.delete('startDate');
+
+      if (newTimeRange.custom.endDate) params.set('endDate', newTimeRange.custom.endDate);
+      else params.delete('endDate');
+    }
+
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+  };
+
   return (
     <div className="app-sdk-relative app-sdk-w-full app-sdk-h-full">
       {props.getInstancesFromDatabase && (
@@ -134,6 +167,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
           <ProcessButtonsContainer>
             <TokenInspectorButton isOpen={isHeatmapInspectorOpen} open={toggleInspector} close={toggleInspector} />
           </ProcessButtonsContainer>
+
           <Transition show={isHeatmapInspectorOpen}>
             <div className="app-sdk-transition app-sdk-duration-200 data-[closed]:app-sdk-opacity-0 app-sdk-w-1/4 app-sdk-min-w-64 app-sdk-absolute app-sdk-top-0 app-sdk-right-0 app-sdk-z-40 app-sdk-pt-2 app-sdk-pr-2">
               <HeatmapInspector
@@ -141,18 +175,19 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
                 processCostsService={processCostsService}
                 runtimeService={runtimeService}
                 heatmapService={heatmapService}
-                onChange={setFilters}
                 heatmapType={heatmapType}
                 setHeatmapType={setHeatmapType}
+                timeRange={timeRange}
+                setTimeRange={handleTimeRangeChange}
               />
             </div>
           </Transition>
         </>
       )}
+
       <DiagramDocumentationInspector
-        xml={props.processModel.xml}
+        xml={props.processModel?.xml}
         processModel={props.processModel}
-        runtimeService={runtimeService}
         heatmapService={heatmapService}
         showHeatmap={showHeatmap}
         heatmapType={heatmapType}
@@ -163,4 +198,4 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
 export const ProcessModelInspectorNextJS = dynamic(() => Promise.resolve(ProcessModelInspector), {
   ssr: false,
-}) as unknown as (props: ProcessModelInspectorProps) => React.JSX.Element;
+});

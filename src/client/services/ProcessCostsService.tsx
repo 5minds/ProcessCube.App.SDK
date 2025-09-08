@@ -49,13 +49,38 @@ export class ProcessCostsService {
     );
 
     this.processCostsExpressionParams = {
-      correlationMetadata: '',
-      processInstanceMetadata: {
-        id: '',
-      },
+      correlationMetadata: {},
+      processInstanceMetadata: {},
     };
 
     this.precalculateCosts(flowNodeDefinitions);
+  }
+
+  public getInstanceCount(flowNodeId: string): number | undefined {
+    return this.instanceCounter[flowNodeId];
+  }
+
+  public getCostsForFlowNodeId(flowNodeId: string): Record<string, CostCalculationResult> | undefined {
+    return this.costResultsByFlowNodeId[flowNodeId];
+  }
+
+  public getAllProcessCosts() {
+    return this.costResultsByFlowNodeId;
+  }
+
+  public getFlowNodeExecutionCount(flowNodeId: string, flowNodeInstanceId: string): number {
+    let count = 0;
+    for (const fni of this.flowNodeInstances) {
+      if (fni.id === flowNodeId && fni.flowNodeExitedAt) {
+        count++;
+        if (fni.flowNodeInstanceId === flowNodeInstanceId) break;
+      }
+    }
+    return count;
+  }
+
+  public getProcessInstanceCount(): number {
+    return this.instances.length;
   }
 
   private splitCostProperties(customProps: Record<string, string>): {
@@ -65,25 +90,26 @@ export class ProcessCostsService {
     const costExpressions: Record<string, string> = {};
     const thresholds: Record<string, { target?: number; warning?: number; critical?: number }> = {};
 
-    for (const [key, expression] of Object.entries(customProps)) {
-      if (!key.startsWith('cost_')) continue;
+    for (const [key, value] of Object.entries(customProps)) {
+      const match = key.match(/^pilot\.setProcessCosts\.([^.]+)\.(value|target|warning|critical)$/);
 
-      const suffixMatch = key.match(/_(target|warning|critical)$/);
-      const suffix = suffixMatch?.[1];
+      if (match) {
+        const costId = match[1];
+        const costType = match[2];
 
-      if (!suffix) {
-        costExpressions[key] = expression;
-      } else {
-        const baseKey = key.replace(/_(target|warning|critical)$/, '');
-        const numeric = parseFloat(expression);
+        if (costType === 'value') {
+          costExpressions[costId] = value;
+        } else {
+          const numericValue = parseFloat(value);
 
-        if (!thresholds[baseKey]) thresholds[baseKey] = {};
+          if (!thresholds[costId]) thresholds[costId] = {};
 
-        if (!isNaN(numeric)) {
-          if (suffix === 'target') {
-            thresholds[baseKey].target = numeric;
-          } else {
-            thresholds[baseKey][suffix as 'warning' | 'critical'] = numeric / 100;
+          if (!isNaN(numericValue)) {
+            if (costType === 'target') {
+              thresholds[costId].target = numericValue;
+            } else {
+              thresholds[costId][costType as 'warning' | 'critical'] = numericValue / 100;
+            }
           }
         }
       }
@@ -153,67 +179,34 @@ export class ProcessCostsService {
     }
   }
 
-  public getInstanceCount(flowNodeId: string): number | undefined {
-    return this.instanceCounter[flowNodeId];
-  }
-
-  public getCostsForFlowNodeId(flowNodeId: string): Record<string, CostCalculationResult> | undefined {
-    return this.costResultsByFlowNodeId[flowNodeId];
-  }
-
-  public getAllProcessCosts() {
-    return this.costResultsByFlowNodeId;
-  }
-
-  public checkAndExtractCostSyntax(customProps: Record<string, string>): Record<string, string> {
-    const filteredProps: Record<string, string> = {};
-    for (const key in customProps) {
-      if (key.startsWith('cost_')) {
-        filteredProps[key] = customProps[key];
-      }
-    }
-    return filteredProps;
-  }
-
-  public getProcessCosts(customProps: Record<string, string>): Record<string, string> {
+  private getProcessCosts(customProps: Record<string, string>): Record<string, string> {
     const evaluatedProcessCosts: Record<string, string> = {};
 
     for (const [key, expression] of Object.entries(customProps)) {
       if (!expression) continue;
 
       let isError = false;
-      let errorPath = '';
-      let errorType = '';
 
       const resolvedExpression = expression.replace(/\$\{(.+?)\}/g, (_, path) => {
         const value = path
           .split('.')
           .reduce((acc: any, key: string) => acc && acc[key], this.processCostsExpressionParams);
 
-        if (value === undefined) {
+        if (value === undefined || isNaN(value)) {
           isError = true;
-          errorPath = path;
-          errorType = 'undefined';
-          return 'undefined';
-        }
-
-        if (isNaN(value)) {
-          isError = true;
-          errorPath = path;
-          errorType = 'NaN';
-          return 'NaN';
+          return 'invalid';
         }
 
         return value.toString();
       });
 
-      if (isError) {
-        evaluatedProcessCosts[key] = `{ Error: '${errorPath}' is ${errorType}. }`;
-        continue;
-      }
-
-      if (resolvedExpression.includes('$') || resolvedExpression.includes('{') || resolvedExpression.includes('}')) {
-        evaluatedProcessCosts[key] = `{ Error: Expression '${expression}' is invalid. }`;
+      if (
+        isError ||
+        resolvedExpression.includes('$') ||
+        resolvedExpression.includes('{') ||
+        resolvedExpression.includes('}')
+      ) {
+        evaluatedProcessCosts[key] = `{ Error: Invalid expression. }`;
         continue;
       }
 
@@ -221,14 +214,14 @@ export class ProcessCostsService {
         const resultValue = new Function('Math', `return ${resolvedExpression}`)(Math);
         evaluatedProcessCosts[key] = resultValue.toString();
       } catch {
-        evaluatedProcessCosts[key] = `{ Error: Could not evaluate expression '${expression}'. }`;
+        evaluatedProcessCosts[key] = `{ Error: Invalid expression. }`;
       }
     }
 
     return evaluatedProcessCosts;
   }
 
-  public setProcessCostExpressionParamsForInstance(flowNodeInstance: any): void {
+  private setProcessCostExpressionParamsForInstance(flowNodeInstance: any): void {
     this.processCostsExpressionParams.currentFlowNode = this.getCurrentFlowNode(flowNodeInstance.flowNodeInstanceId);
     this.processCostsExpressionParams.token = this.buildTokenHistoryForFlowNodeInstance(
       flowNodeInstance.flowNodeInstanceId,
@@ -242,11 +235,11 @@ export class ProcessCostsService {
     );
   }
 
-  public getCurrentFlowNode(flowNodeInstanceId: string): any {
+  private getCurrentFlowNode(flowNodeInstanceId: string): any {
     return this.flowNodeInstances.find((fni) => fni.flowNodeInstanceId === flowNodeInstanceId);
   }
 
-  public buildTokenHistoryForFlowNodeInstance(flowNodeInstanceId: string): {
+  private buildTokenHistoryForFlowNodeInstance(flowNodeInstanceId: string): {
     current: any;
     history: Record<string, any>;
   } {
@@ -269,7 +262,7 @@ export class ProcessCostsService {
     return { current, history };
   }
 
-  public buildDataObjectsForFlowNodeInstance(flowNodeInstanceId: string): Record<string, any> {
+  private buildDataObjectsForFlowNodeInstance(flowNodeInstanceId: string): Record<string, any> {
     const dataObjectValues: Record<string, any> = {};
     for (const fni of this.flowNodeInstances) {
       if (fni.flowNodeInstanceId === flowNodeInstanceId && fni.flowNodeExitedAt) break;
@@ -278,20 +271,5 @@ export class ProcessCostsService {
       }
     }
     return dataObjectValues;
-  }
-
-  public getFlowNodeExecutionCount(flowNodeId: string, flowNodeInstanceId: string): number {
-    let count = 0;
-    for (const fni of this.flowNodeInstances) {
-      if (fni.id === flowNodeId && fni.flowNodeExitedAt) {
-        count++;
-        if (fni.flowNodeInstanceId === flowNodeInstanceId) break;
-      }
-    }
-    return count;
-  }
-
-  public getProcessInstanceCount(): number {
-    return this.instances.length;
   }
 }

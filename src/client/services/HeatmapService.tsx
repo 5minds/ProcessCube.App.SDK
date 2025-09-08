@@ -5,17 +5,17 @@ type HeatmapLevel = 'Critical' | 'Warning' | 'Stable';
 
 export interface ProcessModel {
   customProperties: {
-    runtime_warning?: string;
-    runtime_critical?: string;
-    cost_critical?: string;
-    cost_warning?: string;
+    'pilot.setRuntime.warning'?: string;
+    'pilot.setRuntime.critical'?: string;
+    'pilot.setProcessCosts.warning'?: string;
+    'pilot.setProcessCosts.critical'?: string;
   };
   flowNodes: Array<{
     id: string;
     customProperties: {
-      runtime_target?: string;
-      runtime_warning?: string;
-      runtime_critical?: string;
+      'pilot.setRuntime.target'?: string;
+      'pilot.setRuntime.warning'?: string;
+      'pilot.setRuntime.critical'?: string;
     };
   }>;
 }
@@ -78,7 +78,9 @@ export class HeatmapService {
   }
 
   public hasCostEntry(): boolean {
-    return Object.values(this.heatmapInfo).some((entry) => Object.keys(entry).some((key) => key.startsWith('cost_')));
+    return Object.values(this.heatmapInfo).some((entry) =>
+      Object.keys(entry).some((key) => !key.startsWith('runtime')),
+    );
   }
 
   public getActiveCostKey(nodeId: string): string | undefined {
@@ -89,8 +91,66 @@ export class HeatmapService {
     const entry = this.heatmapInfo[flowNodeId];
     if (!entry) return false;
 
-    const costKeys = Object.keys(entry).filter((key) => key.startsWith('cost_'));
+    const costKeys = Object.keys(entry).filter((key) => !key.startsWith('runtime'));
     return costKeys.length >= 2;
+  }
+
+  public applyHeatmap(showHeatmap: boolean, type: string, options: { viewer?: BpmnViewer; flowNodeId?: string }): void {
+    const viewer = options.viewer;
+    const flowNodeId = options.flowNodeId;
+
+    if (!viewer && !flowNodeId) return;
+
+    if (!showHeatmap && viewer) {
+      viewer.clearHeatmap(Object.keys(this.heatmapInfo));
+    }
+
+    if (!this.bpmnViewer && viewer) {
+      this.bpmnViewer = viewer;
+    }
+
+    if (!viewer && flowNodeId) {
+      const status = this.heatmapInfo[flowNodeId]?.[type]?.status;
+      if (!status) return;
+
+      this.activeCostKeyPerNode[flowNodeId] = type;
+      this.bpmnViewer?.showHeatmap({ [flowNodeId]: status });
+      return;
+    }
+
+    if (!viewer) return;
+
+    const runtimeData: Record<string, HeatmapLevel> = {};
+    const costData: Record<string, HeatmapLevel> = {};
+
+    for (const [id, info] of Object.entries(this.nodeInfoMap)) {
+      runtimeData[id] = info.status;
+    }
+
+    for (const [id, data] of Object.entries(this.heatmapInfo)) {
+      const activeKey = this.activeCostKeyPerNode?.[id];
+      if (activeKey && data[activeKey]?.status) {
+        costData[id] = data[activeKey]!.status;
+        continue;
+      }
+
+      for (const [key, entry] of Object.entries(data)) {
+        if (!key.startsWith('runtime') && entry?.status) {
+          costData[id] = entry.status;
+          this.activeCostKeyPerNode = this.activeCostKeyPerNode;
+          this.activeCostKeyPerNode[id] = key;
+          break;
+        }
+      }
+    }
+
+    if (type === 'runtime') {
+      viewer.clearHeatmap(Object.keys(costData));
+      viewer.showHeatmap(runtimeData);
+    } else {
+      viewer.clearHeatmap(Object.keys(runtimeData));
+      viewer.showHeatmap(costData);
+    }
   }
 
   private computeCostHeatmap(processModel: ProcessModel): void {
@@ -102,8 +162,10 @@ export class HeatmapService {
         const average = costValue.average;
         if (average === undefined) continue;
 
-        const criticalFactor = costValue.critical ?? parseValidPercent(processModel.customProperties.cost_critical);
-        const warningFactor = costValue.warning ?? parseValidPercent(processModel.customProperties.cost_warning);
+        const criticalFactor =
+          costValue.critical ?? parseValidPercent(processModel.customProperties['pilot.setProcessCosts.critical']);
+        const warningFactor =
+          costValue.warning ?? parseValidPercent(processModel.customProperties['pilot.setProcessCosts.warning']);
 
         const target = costValue.target;
 
@@ -130,8 +192,14 @@ export class HeatmapService {
           targetRuntime: target,
           warningThreshold,
           criticalThreshold,
-          warningSource: this.getHeatmapSource(costValue.warning, processModel.customProperties.cost_warning),
-          criticalSource: this.getHeatmapSource(costValue.critical, processModel.customProperties.cost_critical),
+          warningSource: this.getHeatmapSource(
+            costValue.warning,
+            processModel.customProperties['pilot.setProcessCosts.warning'],
+          ),
+          criticalSource: this.getHeatmapSource(
+            costValue.critical,
+            processModel.customProperties['pilot.setProcessCosts.critical'],
+          ),
         };
 
         if (!this.heatmapInfo[nodeId]) {
@@ -144,19 +212,19 @@ export class HeatmapService {
   }
 
   private computeRuntimeHeatmap(processModel: ProcessModel): void {
-    const processWarning = parseValidPercent(processModel.customProperties.runtime_warning);
-    const processCritical = parseValidPercent(processModel.customProperties.runtime_critical);
+    const processWarning = parseValidPercent(processModel.customProperties['pilot.setRuntime.warning']);
+    const processCritical = parseValidPercent(processModel.customProperties['pilot.setRuntime.critical']);
 
     processModel.flowNodes.forEach((node) => {
       const stats = this.runtimeService.getStats(node.id);
       const averageRuntime = stats?.average;
 
-      const targetRaw = node.customProperties.runtime_target;
+      const targetRaw = node.customProperties['pilot.setRuntime.target'];
       const targetRuntime = targetRaw ? Number(targetRaw) : undefined;
       if (!targetRuntime || isNaN(targetRuntime)) return;
 
-      const nodeWarning = parseValidPercent(node.customProperties.runtime_warning);
-      const nodeCritical = parseValidPercent(node.customProperties.runtime_critical);
+      const nodeWarning = parseValidPercent(node.customProperties['pilot.setRuntime.warning']);
+      const nodeCritical = parseValidPercent(node.customProperties['pilot.setRuntime.critical']);
       const warningFactor = nodeWarning ?? processWarning;
       const criticalFactor = nodeCritical ?? processCritical;
 
@@ -197,78 +265,5 @@ export class HeatmapService {
 
   private getHeatmapSource(flowNodeStatus?: number, processStatus?: number | string) {
     return flowNodeStatus !== undefined ? 'Flow Node' : processStatus !== undefined ? 'Process' : undefined;
-  }
-
-  public applyHeatmap(showHeatmap: boolean, type: string, options: { viewer?: BpmnViewer; flowNodeId?: string }): void {
-    const viewer = options.viewer;
-    const flowNodeId = options.flowNodeId;
-
-    if (!showHeatmap && viewer) {
-      viewer.clearHeatmap(Object.keys(this.heatmapInfo));
-    }
-
-    if (!this.bpmnViewer && viewer) {
-      this.bpmnViewer = viewer;
-    }
-
-    if (!viewer && flowNodeId) {
-      const heatmapEntry = this.heatmapInfo[flowNodeId]?.[type];
-      if (!heatmapEntry) return;
-      const status = heatmapEntry.status;
-
-      this.activeCostKeyPerNode[flowNodeId] = type;
-
-      if (this.bpmnViewer) {
-        this.bpmnViewer.showHeatmap({ [flowNodeId]: status });
-      }
-    }
-
-    if (viewer) {
-      const runtimeData = Object.entries(this.nodeInfoMap).reduce(
-        (acc, [id, info]) => {
-          acc[id] = info.status;
-          return acc;
-        },
-        {} as Record<string, HeatmapLevel>,
-      );
-
-      const costData = Object.entries(this.heatmapInfo).reduce(
-        (acc, [id, data]) => {
-          const activeKey = this.activeCostKeyPerNode?.[id];
-
-          if (activeKey && data[activeKey]?.status) {
-            acc[id] = data[activeKey].status;
-          } else {
-            for (const [key, entry] of Object.entries(data)) {
-              if (key.startsWith('cost_') && entry?.status) {
-                acc[id] = entry.status;
-
-                if (!this.activeCostKeyPerNode) {
-                  this.activeCostKeyPerNode = {};
-                }
-                this.activeCostKeyPerNode[id] = key;
-
-                break;
-              }
-            }
-          }
-
-          return acc;
-        },
-        {} as Record<string, HeatmapLevel>,
-      );
-
-      if (!showHeatmap) return;
-
-      if (type !== 'runtime') {
-        viewer.clearHeatmap(Object.keys(runtimeData));
-        viewer.showHeatmap(costData);
-      }
-
-      if (type === 'runtime') {
-        viewer.clearHeatmap(Object.keys(costData));
-        viewer.showHeatmap(runtimeData);
-      }
-    }
   }
 }

@@ -111,19 +111,17 @@ export class RuntimeService {
       });
     });
 
-    return Array.from(instanceMap.entries()).map(([flowNodeId, instanceMap]) => {
+    const results: RuntimeResults[] = [];
+    instanceMap.forEach((flowNodeMap, flowNodeId) => {
       const instances: Record<string, number> = {};
-
-      instanceMap.forEach((timing, instanceId) => {
+      flowNodeMap.forEach((timing, instanceId) => {
         if (timing.enteredAt !== undefined && timing.exitedAt !== undefined) {
           instances[instanceId] = timing.exitedAt - timing.enteredAt;
         }
       });
-
-      return {
-        id: flowNodeId,
-        instances,
-      };
+      results.push({ id: flowNodeId, instances });
     });
+
+    return results;
   }
 }

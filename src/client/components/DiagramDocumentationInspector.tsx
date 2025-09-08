@@ -7,7 +7,6 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 
 import { HeatmapService } from '../services';
-import { RuntimeService } from '../services';
 import { BPMNViewer, BPMNViewerFunctions } from './BPMNViewer';
 import { DocumentationViewer } from './DocumentationViewer';
 import { SplitterLayout } from './SplitterLayout';
@@ -24,7 +23,6 @@ type DiagramDocumentationInspectorProps = {
   xml: string;
   setSelectedElementIds?: (elementIds: string[]) => void;
   showHeatmap?: boolean;
-  runtimeService?: RuntimeService;
   heatmapService?: HeatmapService;
   processModel?: any;
   heatmapType?: string;
@@ -41,6 +39,7 @@ function DiagramDocumentationInspectorFunction(
   const [bpmnRendered, setBpmnRendered] = useState(false);
   const [preselectedElementIds, setPreselectedElementIds] = useState<string[]>([]);
   const [splitterSize, setSplitterSize] = useState(DEFAULT_SPLITTER_SIZE);
+  const initialRenderRef = useRef(true);
 
   useEffect(() => {
     if (!window) {
@@ -106,22 +105,23 @@ function DiagramDocumentationInspectorFunction(
     documentatedElements?.forEach((element) => {
       overlays?.add(element.id, getOverlay(element));
     });
-
-    if (!props.processModel || !props.heatmapService || !bpmnViewerRef.current || !props.heatmapType) return;
-
-    const showHeatmap = props.showHeatmap === true;
-
-    props.heatmapService.applyHeatmap(showHeatmap, props.heatmapType, { viewer: bpmnViewerRef.current });
   }, [bpmnRendered, props.showHeatmap, props.heatmapService, props.heatmapType]);
 
   useEffect(() => {
-    if (!props.processModel || !props.heatmapService || !bpmnViewerRef.current || !bpmnRendered) return;
+    if (!props.heatmapService || !bpmnViewerRef.current || !bpmnRendered || !props.heatmapType) return;
 
     const showHeatmap = props.showHeatmap === true;
 
-    if (props.heatmapType === 'runtime' || props.heatmapType === 'processcosts') {
-      props.heatmapService.applyHeatmap(showHeatmap, props.heatmapType ?? 'runtime', { viewer: bpmnViewerRef.current });
+    let heatmapType;
+
+    if (initialRenderRef.current) {
+      heatmapType = props.heatmapService.hasRuntimeEntry() ? 'runtime' : 'processcosts';
+      initialRenderRef.current = false;
+    } else {
+      heatmapType = props.heatmapType;
     }
+
+    props.heatmapService.applyHeatmap(showHeatmap, heatmapType, { viewer: bpmnViewerRef.current });
   }, [bpmnRendered, props.showHeatmap, props.heatmapService, props.heatmapType]);
 
   useEffect(() => {

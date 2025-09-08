@@ -57,6 +57,7 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
       ...DEFAULT_VIEWER_OPTIONS,
     }),
   );
+  const originalColors = useRef<Record<string, string>>({});
 
   useImperativeHandle(ref, () => {
     return {
@@ -163,11 +164,8 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
                 visual.classList.remove(cls);
               }
             });
-          }
 
-          const textVisual = gfx.querySelector('.djs-visual > :nth-child(2)') as SVGElement | null;
-          if (textVisual) {
-            textVisual.style.fill = '#cdcdcd';
+            visual.style.fill = originalColors.current[elementId] || '';
           }
 
           const svg = gfx.ownerSVGElement;
@@ -211,12 +209,22 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
         props.onImportDone?.();
         viewer.on('selection.changed', onSelectionChange);
 
+        const registry = viewer.get<ElementRegistry>('elementRegistry');
+        registry.forEach((element) => {
+          const gfx = registry.getGraphics(element) as SVGGElement | undefined;
+          if (!gfx) return;
+
+          const visual = gfx.querySelector('.djs-visual > :first-child') as SVGElement | null;
+          if (!visual) return;
+
+          originalColors.current[element.id] = visual.style.fill || visual.getAttribute('fill') || '';
+        });
+
         const { preselectedElementIds } = props;
         if (!preselectedElementIds || preselectedElementIds.length === 0) {
           return;
         }
 
-        const registry = viewer.get<ElementRegistry>('elementRegistry');
         const preselectedElements = registry
           .filter((element) => preselectedElementIds.includes(element.id))
           .sort((a, b) => preselectedElementIds.indexOf(a.id) - preselectedElementIds.indexOf(b.id));
