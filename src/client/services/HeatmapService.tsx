@@ -13,7 +13,7 @@ export interface ProcessModel {
   flowNodes: Array<{
     id: string;
     customProperties: {
-      'pilot.setRuntime.target'?: string;
+      'pilot.setRuntime.reference'?: string;
       'pilot.setRuntime.warning'?: string;
       'pilot.setRuntime.critical'?: string;
     };
@@ -29,7 +29,7 @@ export interface BpmnViewer {
 
 export interface NodeHeatmapInfo {
   status: HeatmapLevel;
-  targetRuntime: number;
+  referenceRuntime: number;
   warningThreshold?: number;
   criticalThreshold?: number;
   warningSource?: 'Flow Node' | 'Process';
@@ -38,8 +38,10 @@ export interface NodeHeatmapInfo {
 
 function parseValidPercent(raw?: string): number | undefined {
   if (!raw) return undefined;
-  const parsed = parseFloat(raw.replace('%', ''));
+
+  const parsed = parseFloat(raw);
   if (isNaN(parsed)) return undefined;
+
   return parsed / 100;
 }
 
@@ -167,12 +169,12 @@ export class HeatmapService {
         const warningFactor =
           costValue.warning ?? parseValidPercent(processModel.customProperties['pilot.setProcessCosts.warning']);
 
-        const target = costValue.target;
+        const reference = costValue.reference;
 
-        if (!target) continue;
+        if (!reference) continue;
 
-        const warningThreshold = warningFactor ? target * warningFactor : undefined;
-        const criticalThreshold = criticalFactor ? target * criticalFactor : undefined;
+        const warningThreshold = warningFactor ? reference * warningFactor : undefined;
+        const criticalThreshold = criticalFactor ? reference * criticalFactor : undefined;
 
         if (warningThreshold && criticalThreshold && criticalThreshold < warningThreshold) continue;
 
@@ -189,7 +191,7 @@ export class HeatmapService {
 
         const info: NodeHeatmapInfo = {
           status,
-          targetRuntime: target,
+          referenceRuntime: reference,
           warningThreshold,
           criticalThreshold,
           warningSource: this.getHeatmapSource(
@@ -219,22 +221,22 @@ export class HeatmapService {
       const stats = this.runtimeService.getStats(node.id);
       const averageRuntime = stats?.average;
 
-      const targetRaw = node.customProperties['pilot.setRuntime.target'];
-      const targetRuntime = targetRaw ? Number(targetRaw) : undefined;
-      if (!targetRuntime || isNaN(targetRuntime)) return;
+      const referenceRaw = node.customProperties['pilot.setRuntime.reference'];
+      const referenceRuntime = referenceRaw ? Number(referenceRaw) : undefined;
+      if (!referenceRuntime || isNaN(referenceRuntime)) return;
 
       const nodeWarning = parseValidPercent(node.customProperties['pilot.setRuntime.warning']);
       const nodeCritical = parseValidPercent(node.customProperties['pilot.setRuntime.critical']);
       const warningFactor = nodeWarning ?? processWarning;
       const criticalFactor = nodeCritical ?? processCritical;
 
-      const warningThreshold = warningFactor ? targetRuntime * warningFactor : undefined;
-      const criticalThreshold = criticalFactor ? targetRuntime * criticalFactor : undefined;
+      const warningThreshold = warningFactor ? referenceRuntime * warningFactor : undefined;
+      const criticalThreshold = criticalFactor ? referenceRuntime * criticalFactor : undefined;
 
       if (criticalThreshold && warningThreshold && criticalThreshold < warningThreshold) return;
 
       const runtimeInfo: Partial<NodeHeatmapInfo> = {
-        targetRuntime,
+        referenceRuntime,
         warningThreshold,
         criticalThreshold,
         warningSource: this.getHeatmapSource(nodeWarning, processWarning),

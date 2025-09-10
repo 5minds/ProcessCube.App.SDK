@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 
@@ -186,17 +188,17 @@ export function HeatmapInspector({
                 <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {heatmapStatsMap.runtime.status}</p>
               )}
               <p className="app-sdk-ml-2 app-sdk-text-sm">
-                Target: {formatDuration(heatmapStatsMap.runtime.targetRuntime)}
+                Reference Value: {formatDuration(heatmapStatsMap.runtime.referenceRuntime)}
               </p>
               {heatmapStatsMap.runtime.warningThreshold && (
                 <p className="app-sdk-ml-2 app-sdk-text-sm">
-                  Warning: {formatDuration(heatmapStatsMap.runtime.warningThreshold)} (
+                  Warning Threshold: {formatDuration(heatmapStatsMap.runtime.warningThreshold)} (
                   {heatmapStatsMap.runtime.warningSource})
                 </p>
               )}
               {heatmapStatsMap.runtime.criticalThreshold && (
                 <p className="app-sdk-ml-2 app-sdk-text-sm">
-                  Critical: {formatDuration(heatmapStatsMap.runtime.criticalThreshold)} (
+                  Critical Threshold: {formatDuration(heatmapStatsMap.runtime.criticalThreshold)} (
                   {heatmapStatsMap.runtime.criticalSource})
                 </p>
               )}
@@ -241,15 +243,15 @@ export function HeatmapInspector({
                 {info && (
                   <>
                     <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {info.status}</p>
-                    <p className="app-sdk-ml-2 app-sdk-text-sm">Target: {info.targetRuntime}</p>
+                    <p className="app-sdk-ml-2 app-sdk-text-sm">Reference Value: {info.referenceRuntime}</p>
                     {info.warningThreshold && (
                       <p className="app-sdk-ml-2 app-sdk-text-sm">
-                        Warning: {info.warningThreshold.toFixed(2)} ({info.warningSource})
+                        Warning Threshold: {info.warningThreshold.toFixed(2)} ({info.warningSource})
                       </p>
                     )}
                     {info.criticalThreshold && (
                       <p className="app-sdk-ml-2 app-sdk-text-sm">
-                        Critical: {info.criticalThreshold.toFixed(2)} ({info.criticalSource})
+                        Critical Threshold: {info.criticalThreshold.toFixed(2)} ({info.criticalSource})
                       </p>
                     )}
                   </>

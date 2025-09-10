@@ -1,6 +1,8 @@
+'use client';
+
 import { Transition } from '@headlessui/react';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { FilterOptions, TimeRange } from '../../common/types';
 import { HeatmapService } from '../services';

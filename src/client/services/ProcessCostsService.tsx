@@ -19,7 +19,7 @@ type CostCalculationResult = {
   total: number;
   errors: number;
   average: number;
-  target?: number;
+  reference?: number;
   critical?: number;
   warning?: number;
 };
@@ -35,7 +35,7 @@ export class ProcessCostsService {
     Record<
       string,
       {
-        target?: number;
+        reference?: number;
         warning?: number;
         critical?: number;
       }
@@ -85,13 +85,13 @@ export class ProcessCostsService {
 
   private splitCostProperties(customProps: Record<string, string>): {
     costExpressions: Record<string, string>;
-    thresholds: Record<string, { target?: number; warning?: number; critical?: number }>;
+    thresholds: Record<string, { reference?: number; warning?: number; critical?: number }>;
   } {
     const costExpressions: Record<string, string> = {};
-    const thresholds: Record<string, { target?: number; warning?: number; critical?: number }> = {};
+    const thresholds: Record<string, { reference?: number; warning?: number; critical?: number }> = {};
 
     for (const [key, value] of Object.entries(customProps)) {
-      const match = key.match(/^pilot\.setProcessCosts\.([^.]+)\.(value|target|warning|critical)$/);
+      const match = key.match(/^pilot\.setProcessCosts\.([^.]+)\.(value|reference|warning|critical)$/);
 
       if (match) {
         const costId = match[1];
@@ -105,8 +105,8 @@ export class ProcessCostsService {
           if (!thresholds[costId]) thresholds[costId] = {};
 
           if (!isNaN(numericValue)) {
-            if (costType === 'target') {
-              thresholds[costId].target = numericValue;
+            if (costType === 'reference') {
+              thresholds[costId].reference = numericValue;
             } else {
               thresholds[costId][costType as 'warning' | 'critical'] = numericValue / 100;
             }
