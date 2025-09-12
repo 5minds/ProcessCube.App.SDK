@@ -3,7 +3,7 @@ import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
 import { ForwardedRef, Ref, forwardRef } from 'react';
-import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 
 import { HeatmapService } from '../services';

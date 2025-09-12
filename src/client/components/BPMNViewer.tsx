@@ -10,7 +10,7 @@ import type { ElementLike } from 'diagram-js/lib/model/Types';
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 import dynamic from 'next/dynamic';
-import { ForwardedRef, Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { ForwardedRef, Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 import './BPMNHeatmap.css';
 
