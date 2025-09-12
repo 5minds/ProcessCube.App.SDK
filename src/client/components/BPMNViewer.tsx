@@ -11,7 +11,6 @@ import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
 import dynamic from 'next/dynamic';
 import { ForwardedRef, Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import React from 'react';
 
 import './BPMNHeatmap.css';
 
@@ -158,12 +157,19 @@ function BPMNViewerFunction(props: BPMNViewerProps, ref: Ref<BPMNViewerFunctions
           if (!gfx) continue;
 
           const visual = gfx.querySelector('.djs-visual > :first-child') as SVGElement | null;
+          const textVisual = gfx.querySelector('.djs-visual > :nth-child(2)') as SVGElement | null;
+
           if (visual) {
             visual.classList.forEach((cls) => {
               if (cls.startsWith('heatmap-')) {
                 visual.classList.remove(cls);
               }
             });
+
+            if (textVisual && visual) {
+              const strokeColor = visual.style.stroke;
+              textVisual.style.fill = strokeColor;
+            }
 
             visual.style.fill = originalColors.current[elementId] || '';
           }

@@ -91,13 +91,13 @@ export class ProcessCostsService {
     const thresholds: Record<string, { reference?: number; warning?: number; critical?: number }> = {};
 
     for (const [key, value] of Object.entries(customProps)) {
-      const match = key.match(/^pilot\.setProcessCosts\.([^.]+)\.(value|reference|warning|critical)$/);
+      const match = key.match(/^pilot\.setProcessCosts\.([^.]+)\.(formula|reference|warning|critical)$/);
 
       if (match) {
         const costId = match[1];
         const costType = match[2];
 
-        if (costType === 'value') {
+        if (costType === 'formula') {
           costExpressions[costId] = value;
         } else {
           const numericValue = parseFloat(value);

@@ -105,6 +105,7 @@ export class HeatmapService {
 
     if (!showHeatmap && viewer) {
       viewer.clearHeatmap(Object.keys(this.heatmapInfo));
+      return;
     }
 
     if (!this.bpmnViewer && viewer) {

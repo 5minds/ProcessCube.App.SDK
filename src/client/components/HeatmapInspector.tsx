@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 
@@ -91,7 +89,7 @@ export function HeatmapInspector({
   }, [selectedInstance, processCostsService]);
 
   const instanceCount = useMemo((): number | undefined => {
-    if (!processCostsService) return 0;
+    if (!processCostsService) return undefined;
     if (!selectedInstance) return processCostsService.getProcessInstanceCount();
     return processCostsService.getInstanceCount(selectedInstance) ?? processCostsService.getProcessInstanceCount();
   }, [selectedInstance, processCostsService]);
@@ -116,80 +114,109 @@ export function HeatmapInspector({
     heatmapService?.applyHeatmap(true, value, { flowNodeId: selectedInstance });
   };
 
+  function toDatetimeLocal(date: Date) {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+      date.getHours(),
+    )}:${pad(date.getMinutes())}`;
+  }
+
   return (
     <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-p-4 app-sdk-gap-1 app-sdk-bg-white/95 dark:app-sdk-bg-black/85 dark:app-sdk-text-white app-sdk-border app-sdk-border-solid dark:app-sdk-border-none">
       <label>{selectedNodeTitle}</label>
       <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-pb-3 app-sdk-gap-1">
-        <label>Zeitraum:</label>
+        <label>Time Period:</label>
         <select value={typeof timeRange === 'string' ? timeRange : 'custom'} onChange={handleTimeRangeChange}>
-          <option value="today">Heute</option>
-          <option value="yesterday">Gestern</option>
-          <option value="this_week">Diese Woche</option>
-          <option value="last_7_days">Letzte 7 Tage</option>
-          <option value="this_month">Dieser Monat</option>
-          <option value="last_30_days">Letzte 30 Tage</option>
-          <option value="this_year">Dieses Jahr</option>
-          <option value="all">Alle Instanzen</option>
-          <option value="custom">Benutzerdefiniert</option>
+          <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="this_week">This Week</option>
+          <option value="last_7_days">Last 7 Days</option>
+          <option value="this_month">Last Month</option>
+          <option value="last_30_days">Last 30 Days</option>
+          <option value="this_year">This Year</option>
+          <option value="all">All Instances</option>
+          <option value="custom">Custom</option>
         </select>
 
         {typeof timeRange !== 'string' && (
           <>
-            <label>Startdatum:</label>
-            <input
-              type="datetime-local"
-              value={customStartDate ?? ''}
-              onChange={(e) =>
-                setTimeRange({
-                  custom: { startDate: e.target.value || undefined, endDate: customEndDate },
-                })
-              }
-            />
+            <label className="app-sdk-w-full app-sdk-flex app-sdk-items-center app-sdk-gap-2">
+              Start Date:
+              <input
+                className="app-sdk-px-2 app-sdk-flex-1 app-sdk-box-border"
+                type="datetime-local"
+                value={customStartDate ?? ''}
+                onChange={(e) =>
+                  setTimeRange({
+                    custom: { startDate: e.target.value || undefined, endDate: customEndDate },
+                  })
+                }
+              />
+            </label>
 
-            <label>Enddatum:</label>
-            <input
-              type="datetime-local"
-              value={customEndDate ?? ''}
-              onChange={(e) =>
-                setTimeRange({
-                  custom: { startDate: customStartDate, endDate: e.target.value || undefined },
-                })
-              }
-            />
+            <label className="app-sdk-w-full app-sdk-flex app-sdk-items-center app-sdk-gap-2">
+              End Date:
+              <input
+                className="app-sdk-px-2 app-sdk-flex-1"
+                type="datetime-local"
+                value={customEndDate ?? ''}
+                onChange={(e) =>
+                  setTimeRange({
+                    custom: { startDate: customStartDate, endDate: e.target.value || undefined },
+                  })
+                }
+              />
+            </label>
           </>
         )}
       </div>
 
-      {(hasRuntimeEntry || hasCostEntry) && (
-        <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-pb-3 app-sdk-gap-1">
-          <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">Heatmap Typ:</label>
-          <select value={mainHeatmapType} onChange={(e) => setHeatmapType(e.target.value)}>
-            {hasRuntimeEntry && <option value="runtime">Laufzeiten</option>}
-            {hasCostEntry && <option value="processcosts">Prozesskosten</option>}
-          </select>
-        </div>
-      )}
-
       <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-pb-3 app-sdk-gap-1">
         <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">
-          <span>Gelaufene Instanzen: {instanceCount}</span>
+          <span>Executed Instances: {instanceCount ?? 0}</span>
         </label>
       </div>
+
+      {(hasRuntimeEntry || hasCostEntry) && instanceCount && instanceCount > 0 && (
+        <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-pb-3 app-sdk-gap-1">
+          {hasRuntimeEntry && hasCostEntry ? (
+            <>
+              <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">Heatmap Type:</label>
+              <select value={mainHeatmapType} onChange={(e) => setHeatmapType(e.target.value)}>
+                <option value="runtime">Runtimes</option>
+                <option value="processcosts">Costs</option>
+              </select>
+            </>
+          ) : (
+            <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">
+              Heatmap Type: {hasRuntimeEntry ? 'Runtimes' : 'Costs'}
+            </label>
+          )}
+        </div>
+      )}
 
       {runtimeService && (runtimeStats || heatmapStatsMap?.runtime) && (
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-pb-3 app-sdk-gap-1">
           <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">
-            <span>Laufzeiten</span>
+            <span>Runtimes</span>
           </label>
+
+          {runtimeStats && (
+            <>
+              <p className="app-sdk-ml-2 app-sdk-text-sm">Shortest Runtime: {formatDuration(runtimeStats.shortest)}</p>
+              <p className="app-sdk-ml-2 app-sdk-text-sm">Longest Runtime: {formatDuration(runtimeStats.longest)}</p>
+              <p className="app-sdk-ml-2 app-sdk-text-sm">Average Runtime: {formatDuration(runtimeStats.average)}</p>
+            </>
+          )}
 
           {heatmapStatsMap && heatmapStatsMap.runtime && (
             <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
-              {heatmapStatsMap.runtime.status && (
-                <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {heatmapStatsMap.runtime.status}</p>
-              )}
               <p className="app-sdk-ml-2 app-sdk-text-sm">
                 Reference Value: {formatDuration(heatmapStatsMap.runtime.referenceRuntime)}
               </p>
+              {heatmapStatsMap.runtime.status && (
+                <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {heatmapStatsMap.runtime.status}</p>
+              )}
               {heatmapStatsMap.runtime.warningThreshold && (
                 <p className="app-sdk-ml-2 app-sdk-text-sm">
                   Warning Threshold: {formatDuration(heatmapStatsMap.runtime.warningThreshold)} (
@@ -204,22 +231,12 @@ export function HeatmapInspector({
               )}
             </div>
           )}
-
-          {runtimeStats && (
-            <>
-              <p className="app-sdk-ml-2 app-sdk-text-sm">
-                Durchschnittliche Laufzeit: {formatDuration(runtimeStats.average)}
-              </p>
-              <p className="app-sdk-ml-2 app-sdk-text-sm">Kürzeste Laufzeit: {formatDuration(runtimeStats.shortest)}</p>
-              <p className="app-sdk-ml-2 app-sdk-text-sm">Längste Laufzeit: {formatDuration(runtimeStats.longest)}</p>
-            </>
-          )}
         </div>
       )}
 
       {processCosts && Object.entries(processCosts).length !== 0 && (
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-gap-1">
-          <label>Prozesskosten</label>
+          <label>Costs</label>
 
           {heatmapType !== 'runtime' && hasMultipleCostEntries && (
             <select value={activeCostType} onChange={(e) => setAndApplyHeatmap(e.target.value)}>
@@ -237,13 +254,13 @@ export function HeatmapInspector({
             return (
               <div className="app-sdk-flex app-sdk-flex-col app-sdk-mb-2 app-sdk-ml-2" key={key}>
                 <p className="app-sdk-text-sm">{key}</p>
-                <p className="app-sdk-ml-2 app-sdk-text-sm">Gesamt: {value.total}</p>
-                <p className="app-sdk-ml-2 app-sdk-text-sm">Durchschnitt: {value.average.toFixed(2)}</p>
+                <p className="app-sdk-ml-2 app-sdk-text-sm">Total: {value.total}</p>
                 {value.errors > 0 && <p className="app-sdk-ml-2 app-sdk-text-sm">Errors: {value.errors}</p>}
+                <p className="app-sdk-ml-2 app-sdk-text-sm">Average Cost: {value.average.toFixed(2)}</p>
                 {info && (
                   <>
-                    <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {info.status}</p>
                     <p className="app-sdk-ml-2 app-sdk-text-sm">Reference Value: {info.referenceRuntime}</p>
+                    <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {info.status}</p>
                     {info.warningThreshold && (
                       <p className="app-sdk-ml-2 app-sdk-text-sm">
                         Warning Threshold: {info.warningThreshold.toFixed(2)} ({info.warningSource})
