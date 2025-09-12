@@ -1,5 +1,4 @@
-import React, { useMemo, useState } from 'react';
-import { useEffect } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 
 import { TimeRange } from '../../common/types';
 import { HeatmapService } from '../services/HeatmapService';
@@ -45,7 +44,7 @@ export function HeatmapInspector({
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateSelectedInstance = () => {
       const params = new URLSearchParams(window.location.search);
       setSelectedInstance(params.get('selected') || undefined);
@@ -113,13 +112,6 @@ export function HeatmapInspector({
     if (selectedInstance) setHeatmapType(value);
     heatmapService?.applyHeatmap(true, value, { flowNodeId: selectedInstance });
   };
-
-  function toDatetimeLocal(date: Date) {
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
-      date.getHours(),
-    )}:${pad(date.getMinutes())}`;
-  }
 
   return (
     <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-p-4 app-sdk-gap-1 app-sdk-bg-white/95 dark:app-sdk-bg-black/85 dark:app-sdk-text-white app-sdk-border app-sdk-border-solid dark:app-sdk-border-none">
