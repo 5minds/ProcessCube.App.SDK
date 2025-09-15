@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { TimeRange } from '../../common/types';
 import { HeatmapService } from '../services/HeatmapService';
@@ -15,6 +15,7 @@ type HeatmapInspectorProps = {
   setHeatmapType: (type: string) => void;
   timeRange: TimeRange;
   setTimeRange: (value: TimeRange) => void;
+  selectedInstance?: string;
 };
 
 export function HeatmapInspector({
@@ -26,14 +27,10 @@ export function HeatmapInspector({
   setHeatmapType,
   timeRange,
   setTimeRange,
+  selectedInstance,
 }: HeatmapInspectorProps) {
   const customStartDate = typeof timeRange !== 'string' ? timeRange.custom.startDate : undefined;
   const customEndDate = typeof timeRange !== 'string' ? timeRange.custom.endDate : undefined;
-
-  const [selectedInstance, setSelectedInstance] = useState<string | undefined>(() => {
-    if (typeof window === 'undefined') return undefined;
-    return new URLSearchParams(window.location.search).get('selected') || undefined;
-  });
 
   const handleTimeRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as TimeRange | 'custom';
@@ -43,34 +40,6 @@ export function HeatmapInspector({
       setTimeRange(value);
     }
   };
-
-  useLayoutEffect(() => {
-    const updateSelectedInstance = () => {
-      const params = new URLSearchParams(window.location.search);
-      setSelectedInstance(params.get('selected') || undefined);
-    };
-
-    updateSelectedInstance();
-
-    window.addEventListener('popstate', updateSelectedInstance);
-
-    const origPushState = history.pushState;
-    history.pushState = function (...args) {
-      origPushState.apply(this, args);
-      updateSelectedInstance();
-    };
-    const origReplaceState = history.replaceState;
-    history.replaceState = function (...args) {
-      origReplaceState.apply(this, args);
-      updateSelectedInstance();
-    };
-
-    return () => {
-      window.removeEventListener('popstate', updateSelectedInstance);
-      history.pushState = origPushState;
-      history.replaceState = origReplaceState;
-    };
-  }, []);
 
   const heatmapStatsMap = useMemo(() => {
     if (!heatmapService || !selectedInstance) return undefined;

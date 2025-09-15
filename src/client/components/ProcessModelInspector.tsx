@@ -29,6 +29,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
   const [filters, setFilters] = useState<FilterOptions | undefined>(undefined);
   const [heatmapType, setHeatmapType] = useState<string>('runtime');
   const [timeRange, setTimeRange] = useState<TimeRange>('today');
+  const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
 
   const setServices = (instances: any) => {
     const { processModel } = props;
@@ -179,6 +180,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
                 setHeatmapType={setHeatmapType}
                 timeRange={timeRange}
                 setTimeRange={handleTimeRangeChange}
+                selectedInstance={selectedElementIds[0]}
               />
             </div>
           </Transition>
@@ -191,6 +193,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
         heatmapService={heatmapService}
         showHeatmap={showHeatmap}
         heatmapType={heatmapType}
+        setSelectedElementIds={setSelectedElementIds}
       />
     </div>
   );
