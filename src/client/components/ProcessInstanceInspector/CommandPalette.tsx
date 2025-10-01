@@ -53,7 +53,7 @@ export function CommandPalette<T extends CommandPaletteEntry>(props: CommandPale
           className="app-sdk-mx-auto app-sdk-max-w-xl app-sdk-transform app-sdk-rounded-xl app-sdk-bg-[color:var(--asdk-cmdp-background-color)] app-sdk-p-2 app-sdk-shadow-2xl app-sdk-ring-1 app-sdk-ring-black app-sdk-ring-opacity-5 app-sdk-transition-all data-[closed]:app-sdk-scale-95 data-[closed]:app-sdk-opacity-0 data-[enter]:app-sdk-duration-300 data-[leave]:app-sdk-duration-150 data-[enter]:app-sdk-ease-out data-[leave]:app-sdk-ease-in"
         >
           <Combobox
-            onChange={(entry: T) => {
+            onChange={(entry: T | null) => {
               if (entry) {
                 props.onConfirm(entry);
               }
