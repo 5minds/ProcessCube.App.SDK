@@ -5,8 +5,10 @@
   "prHourlyLimit": 5,
   "prConcurrentLimit": 10,
   "reviewers": ["alexanderkasten"],
-  "updateLockFiles": true,
-  "ignoreDeps": ["@5minds/processcube_engine_sdk", "@5minds/processcube_engine_client"],
+  "ignoreDeps": [
+    "@5minds/processcube_engine_sdk",
+    "@5minds/processcube_engine_client"
+  ],
   "packageRules": [
     {
       "groupName": "Minor and Patch Type Updates",
@@ -19,7 +21,11 @@
       "groupName": "Prettier",
       "groupSlug": "prettier",
       "automerge": true,
-      "matchPackageNames": ["/prettier/", "/@trivago/prettier-plugin-sort-imports/", "/prettier-plugin-tailwindcss/"]
+      "matchPackageNames": [
+        "/prettier/",
+        "/@trivago/prettier-plugin-sort-imports/",
+        "/prettier-plugin-tailwindcss/"
+      ]
     },
     {
       "groupName": "Typescript",
