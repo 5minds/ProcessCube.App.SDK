@@ -155,12 +155,6 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
   return (
     <div className="app-sdk-relative app-sdk-w-full app-sdk-h-full">
-      {!instancesLoaded && (
-        <div className="app-sdk-absolute app-sdk-inset-0 app-sdk-flex app-sdk-items-center app-sdk-justify-center app-sdk-bg-white/70">
-          <div className="app-sdk-animate-spin app-sdk-h-10 app-sdk-w-10 app-sdk-border-4 app-sdk-border-blue-400 app-sdk-border-t-transparent rounded-full"></div>
-        </div>
-      )}
-
       {instancesLoaded && (
         <>
           <ProcessButtonsContainer>
