@@ -26,6 +26,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
   const [runtimeService, setRuntimeService] = useState<RuntimeService | undefined>();
   const [heatmapService, setHeatmapService] = useState<HeatmapService | undefined>();
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [instancesLoaded, setInstancesLoaded] = useState(false);
   const [filters, setFilters] = useState<FilterOptions | undefined>(undefined);
   const [heatmapType, setHeatmapType] = useState<string>('runtime');
   const [timeRange, setTimeRange] = useState<TimeRange>('today');
@@ -54,12 +55,10 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-
     if (searchParams.get('heatmapInspector') === 'true') setIsHeatmapInspectorOpen(true);
 
     const timeRangeParam = searchParams.get('timeRange');
     let initialTimeRange: TimeRange = 'today';
-
     if (timeRangeParam === 'custom') {
       const start = searchParams.get('startDate') || undefined;
       const end = searchParams.get('endDate') || undefined;
@@ -83,6 +82,7 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
       if (instances.length > 0) {
         setShowHeatmap(true);
         setServices(instances);
+        setInstancesLoaded(true);
       }
     };
 
@@ -99,22 +99,14 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
       return;
 
     const fetchFilteredData = async () => {
-      if (!props.getInstancesFromDatabase) return;
+      const instances =
+        (await props.getInstancesFromDatabase?.(props.processModel.processModelId, props.processModel.hash, {
+          timeRange: filters.timeRange,
+        })) ?? [];
 
-      const instances = await props.getInstancesFromDatabase(
-        props.processModel.processModelId,
-        props.processModel.hash,
-        { timeRange: filters.timeRange },
-      );
-
-      if (instances.length > 0) {
-        setShowHeatmap(true);
-        setServices(instances);
-      } else {
-        setShowHeatmap(false);
-        setProcessCostsService(undefined);
-        setRuntimeService(undefined);
-      }
+      setShowHeatmap(instances.length > 0);
+      setServices(instances);
+      setInstancesLoaded(true);
     };
 
     fetchFilteredData();
@@ -163,7 +155,13 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
 
   return (
     <div className="app-sdk-relative app-sdk-w-full app-sdk-h-full">
-      {props.getInstancesFromDatabase && (
+      {!instancesLoaded && (
+        <div className="app-sdk-absolute app-sdk-inset-0 app-sdk-flex app-sdk-items-center app-sdk-justify-center app-sdk-bg-white/70">
+          <div className="app-sdk-animate-spin app-sdk-h-10 app-sdk-w-10 app-sdk-border-4 app-sdk-border-blue-400 app-sdk-border-t-transparent rounded-full"></div>
+        </div>
+      )}
+
+      {instancesLoaded && (
         <>
           <ProcessButtonsContainer>
             <TokenInspectorButton isOpen={isHeatmapInspectorOpen} open={toggleInspector} close={toggleInspector} />
@@ -184,21 +182,19 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
               />
             </div>
           </Transition>
+
+          <DiagramDocumentationInspector
+            xml={props.processModel?.xml}
+            processModel={props.processModel}
+            heatmapService={heatmapService}
+            showHeatmap={showHeatmap}
+            heatmapType={heatmapType}
+            setSelectedElementIds={setSelectedElementIds}
+          />
         </>
       )}
-
-      <DiagramDocumentationInspector
-        xml={props.processModel?.xml}
-        processModel={props.processModel}
-        heatmapService={heatmapService}
-        showHeatmap={showHeatmap}
-        heatmapType={heatmapType}
-        setSelectedElementIds={setSelectedElementIds}
-      />
     </div>
   );
 }
 
-export const ProcessModelInspectorNextJS = dynamic(() => Promise.resolve(ProcessModelInspector), {
-  ssr: false,
-});
+export const ProcessModelInspectorNextJS = dynamic(() => Promise.resolve(ProcessModelInspector), { ssr: false });

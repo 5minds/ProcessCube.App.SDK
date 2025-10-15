@@ -92,7 +92,7 @@ export function HeatmapInspector({
           <option value="yesterday">Yesterday</option>
           <option value="this_week">This Week</option>
           <option value="last_7_days">Last 7 Days</option>
-          <option value="this_month">Last Month</option>
+          <option value="this_month">This Month</option>
           <option value="last_30_days">Last 30 Days</option>
           <option value="this_year">This Year</option>
           <option value="all">All Instances</option>
@@ -138,7 +138,7 @@ export function HeatmapInspector({
         </label>
       </div>
 
-      {(hasRuntimeEntry || hasCostEntry) && instanceCount && instanceCount > 0 && (
+      {(hasRuntimeEntry || hasCostEntry) && (instanceCount ?? 0) > 0 && (
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-pb-3 app-sdk-gap-1">
           {hasRuntimeEntry && hasCostEntry ? (
             <>
@@ -156,7 +156,7 @@ export function HeatmapInspector({
         </div>
       )}
 
-      {runtimeService && (runtimeStats || heatmapStatsMap?.runtime) && (
+      {runtimeService && (runtimeStats || heatmapStatsMap?.runtime) && (instanceCount ?? 0) > 0 && (
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-h-full app-sdk-rounded-3xl app-sdk-pb-3 app-sdk-gap-1">
           <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">
             <span>Runtimes</span>
