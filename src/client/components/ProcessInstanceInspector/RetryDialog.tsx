@@ -63,12 +63,12 @@ export function RetryDialog(props: RetryDialogProps) {
                   const newStartToken = JSON.parse(startToken);
                   const serverActions = await import('../../../server/actions');
 
-                  await serverActions.retryProcess(
+                  (await serverActions.retryProcess(
                     props.processInstance.processInstanceId,
                     props.flowNodeInstance?.flowNodeInstanceId,
                     newStartToken,
                   ),
-                    props.onClose();
+                    props.onClose());
                 }}
               >
                 Retry

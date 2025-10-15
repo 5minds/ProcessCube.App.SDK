@@ -5,7 +5,6 @@
   "prHourlyLimit": 5,
   "prConcurrentLimit": 10,
   "reviewers": ["alexanderkasten"],
-  "updateLockFiles": true,
   "ignoreDeps": ["@5minds/processcube_engine_sdk", "@5minds/processcube_engine_client"],
   "packageRules": [
     {
