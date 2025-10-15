@@ -10,4 +10,5 @@ export * from './components/DynamicLink';
 export * from './components/bpmnViewerComponent';
 export * from './components/DynamicUi';
 export * from './components/ProcessInstanceInspector';
+export * from './components/ProcessModelInspector';
 export * from './components/SplitterLayout';

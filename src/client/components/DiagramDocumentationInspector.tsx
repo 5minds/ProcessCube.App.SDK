@@ -2,10 +2,11 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
-import React, { ForwardedRef, Ref, forwardRef } from 'react';
-import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { ForwardedRef, Ref, forwardRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 
+import { HeatmapService } from '../services';
 import { BPMNViewer, BPMNViewerFunctions } from './BPMNViewer';
 import { DocumentationViewer } from './DocumentationViewer';
 import { SplitterLayout } from './SplitterLayout';
@@ -21,6 +22,10 @@ export type DiagramDocumentationInspectorRef = {
 type DiagramDocumentationInspectorProps = {
   xml: string;
   setSelectedElementIds?: (elementIds: string[]) => void;
+  showHeatmap?: boolean;
+  heatmapService?: HeatmapService;
+  processModel?: any;
+  heatmapType?: string;
 };
 
 function DiagramDocumentationInspectorFunction(
@@ -34,6 +39,7 @@ function DiagramDocumentationInspectorFunction(
   const [bpmnRendered, setBpmnRendered] = useState(false);
   const [preselectedElementIds, setPreselectedElementIds] = useState<string[]>([]);
   const [splitterSize, setSplitterSize] = useState(DEFAULT_SPLITTER_SIZE);
+  const initialRenderRef = useRef(true);
 
   useEffect(() => {
     if (!window) {
@@ -99,7 +105,24 @@ function DiagramDocumentationInspectorFunction(
     documentatedElements?.forEach((element) => {
       overlays?.add(element.id, getOverlay(element));
     });
-  }, [bpmnRendered]);
+  }, [bpmnRendered, props.showHeatmap, props.heatmapService, props.heatmapType]);
+
+  useEffect(() => {
+    if (!props.heatmapService || !bpmnViewerRef.current || !bpmnRendered || !props.heatmapType) return;
+
+    const showHeatmap = props.showHeatmap === true;
+
+    let heatmapType;
+
+    if (initialRenderRef.current) {
+      heatmapType = props.heatmapService.hasRuntimeEntry() ? 'runtime' : 'processcosts';
+      initialRenderRef.current = false;
+    } else {
+      heatmapType = props.heatmapType;
+    }
+
+    props.heatmapService.applyHeatmap(showHeatmap, heatmapType, { viewer: bpmnViewerRef.current });
+  }, [bpmnRendered, props.showHeatmap, props.heatmapService, props.heatmapType]);
 
   useEffect(() => {
     props.setSelectedElementIds?.(selectedElements.map((element) => element.id));
@@ -123,6 +146,12 @@ function DiagramDocumentationInspectorFunction(
         },
         hasMarker(elementId: string, className: string) {
           return bpmnViewerRef.current?.hasMarker(elementId, className);
+        },
+        showHeatmap(data: Record<string, string>) {
+          bpmnViewerRef.current?.showHeatmap(data);
+        },
+        clearHeatmap(data: string[]) {
+          bpmnViewerRef.current?.clearHeatmap(data);
         },
         onImportDone(callback: () => void) {
           if (bpmnRendered) {
