@@ -1,5 +1,5 @@
 import { getToken } from 'next-auth/jwt';
-import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
+import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies/index.js';
 import { cookies, headers } from 'next/headers';
 
 import type { DataModels } from '@5minds/processcube_engine_sdk';
