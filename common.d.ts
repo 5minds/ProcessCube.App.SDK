@@ -16,8 +16,8 @@ declare module 'next-auth' {
       /** The user's identity claims. */
       claims?: Record<string, unknown>;
     } & DefaultSession['user'] & {
-      [profile_property: string]: any;
-    };
+        [profile_property: string]: any;
+      };
     error?: 'RefreshAccessTokenError';
   }
 }
