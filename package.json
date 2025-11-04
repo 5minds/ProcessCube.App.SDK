@@ -37,7 +37,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "npm run build:prod",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No tests specified\"",
     "watch": "NODE_ENV=development tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently --kill-others -n=esbuild,tsc:server,tsc:common,tsc:client,build:css \"node build.js --watch\" \"tsc -p tsconfig.server.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"NODE_ENV=development node build-css.cjs --watch\""
   },
   "repository": {
