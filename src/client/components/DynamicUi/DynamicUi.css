@@ -6,18 +6,9 @@
     --asdk-dui-shadow-color: var(--app-sdk-dynamic-ui-shadow-color, theme('colors.app-sdk-gray.300'));
     --asdk-dui-border-color: var(--app-sdk-dynamic-ui-border-color, transparent);
 
-    --asdk-dui-formfield-hint-text-color: var(
-      --app-sdk-dynamic-ui-formfield-hint-text-color,
-      theme('colors.app-sdk-gray.200')
-    );
-    --asdk-dui-formfield-background-color: var(
-      --app-sdk-dynamic-ui-formfield-background-color,
-      theme('colors.app-sdk-gray.350')
-    );
-    --asdk-dui-formfield-placeholder-text-color: var(
-      --app-sdk-dynamic-ui-formfield-placeholder-text-color,
-      theme('colors.gray.400')
-    );
+    --asdk-dui-formfield-hint-text-color: var(--app-sdk-dynamic-ui-formfield-hint-text-color, theme('colors.app-sdk-gray.200'));
+    --asdk-dui-formfield-background-color: var(--app-sdk-dynamic-ui-formfield-background-color, theme('colors.app-sdk-gray.350'));
+    --asdk-dui-formfield-placeholder-text-color: var(--app-sdk-dynamic-ui-formfield-placeholder-text-color, theme('colors.gray.400'));
     --asdk-dui-formfield-invalid-color: var(--app-sdk-dynamic-ui-formfield-invalid-color, #dc35467f);
     --asdk-dui-formfield-checkbox-text-color: var(--app-sdk-dynamic-ui-formfield-checkbox-text-color, #007bff74);
 
@@ -25,35 +16,14 @@
     --asdk-dui-header-text-color: var(--app-sdk-dynamic-ui-header-text-color, theme('colors.app-sdk-gray.150'));
 
     /* FOOTER */
-    --asdk-dui-footer-background-color: var(
-      --app-sdk-dynamic-ui-footer-background-color,
-      theme('colors.app-sdk-gray.600')
-    );
-    --asdk-dui-footer-continue-button-background-color: var(
-      --app-sdk-dynamic-ui-footer-continue-button-background-color,
-      #33609a
-    );
-    --asdk-dui-footer-continue-button-background-hover-color: var(
-      --app-sdk-dynamic-ui-footer-continue-button-background-hover-color,
-      #3666a5
-    );
-    --asdk-dui-footer-continue-button-focus-outline-color: var(
-      --app-sdk-dynamic-ui-footer-continue-button-focus-outline-color,
-      #3666a5
-    );
+    --asdk-dui-footer-background-color: var(--app-sdk-dynamic-ui-footer-background-color, theme('colors.app-sdk-gray.600'));
+    --asdk-dui-footer-continue-button-background-color: var(--app-sdk-dynamic-ui-footer-continue-button-background-color, #33609a);
+    --asdk-dui-footer-continue-button-background-hover-color: var(--app-sdk-dynamic-ui-footer-continue-button-background-hover-color, #3666a5);
+    --asdk-dui-footer-continue-button-focus-outline-color: var(--app-sdk-dynamic-ui-footer-continue-button-focus-outline-color, #3666a5);
 
-    --asdk-dui-footer-decline-button-background-color: var(
-      --app-sdk-dynamic-ui-footer-decline-button-background-color,
-      theme('colors.app-sdk-gray.350')
-    );
-    --asdk-dui-footer-decline-button-background-hover-color: var(
-      --app-sdk-dynamic-ui-footer-decline-button-background-hover-color,
-      theme('colors.app-sdk-gray.300')
-    );
-    --asdk-dui-footer-decline-button-focus-outline-color: var(
-      --app-sdk-dynamic-ui-footer-decline-button-focus-outline-color,
-      theme('colors.app-sdk-gray.300')
-    );
+    --asdk-dui-footer-decline-button-background-color: var(--app-sdk-dynamic-ui-footer-decline-button-background-color, theme('colors.app-sdk-gray.350'));
+    --asdk-dui-footer-decline-button-background-hover-color: var(--app-sdk-dynamic-ui-footer-decline-button-background-hover-color, theme('colors.app-sdk-gray.300'));
+    --asdk-dui-footer-decline-button-focus-outline-color: var(--app-sdk-dynamic-ui-footer-decline-button-focus-outline-color, theme('colors.app-sdk-gray.300'));
   }
 
   *,
@@ -69,15 +39,9 @@
 
     --asdk-dui-formfield-hint-text-color: var(--app-sdk-dynamic-ui-formfield-hint-text-color, theme('colors.gray.500'));
     --asdk-dui-formfield-background-color: var(--app-sdk-dynamic-ui-formfield-background-color, theme('colors.white'));
-    --asdk-dui-formfield-placeholder-text-color: var(
-      --app-sdk-dynamic-ui-formfield-placeholder-text-color,
-      theme('colors.gray.500')
-    );
+    --asdk-dui-formfield-placeholder-text-color: var(--app-sdk-dynamic-ui-formfield-placeholder-text-color, theme('colors.gray.500'));
     --asdk-dui-formfield-invalid-color: var(--app-sdk-dynamic-ui-formfield-invalid-color, theme('colors.red.500'));
-    --asdk-dui-formfield-checkbox-text-color: var(
-      --app-sdk-dynamic-ui-formfield-checkbox-text-color,
-      theme('colors.sky.600')
-    );
+    --asdk-dui-formfield-checkbox-text-color: var(--app-sdk-dynamic-ui-formfield-checkbox-text-color, theme('colors.sky.600'));
 
     /* HEADER */
     --asdk-dui-header-text-color: var(--app-sdk-dynamic-ui-header-text-color, theme('colors.gray.900'));
@@ -85,38 +49,14 @@
     /* FOOTER */
     --asdk-dui-footer-background-color: var(--app-sdk-dynamic-ui-footer-background-color, theme('colors.gray.50'));
 
-    --asdk-dui-footer-continue-button-text-color: var(
-      --app-sdk-dynamic-ui-footer-continue-button-text-color,
-      theme('colors.white')
-    );
-    --asdk-dui-footer-continue-button-background-color: var(
-      --app-sdk-dynamic-ui-footer-continue-button-background-color,
-      theme('colors.sky.600')
-    );
-    --asdk-dui-footer-continue-button-background-hover-color: var(
-      --app-sdk-dynamic-ui-footer-continue-button-background-hover-color,
-      theme('colors.sky.700')
-    );
-    --asdk-dui-footer-continue-button-focus-outline-color: var(
-      --app-sdk-dynamic-ui-footer-continue-button-focus-outline-color,
-      theme('colors.sky.500')
-    );
+    --asdk-dui-footer-continue-button-text-color: var(--app-sdk-dynamic-ui-footer-continue-button-text-color, theme('colors.white'));
+    --asdk-dui-footer-continue-button-background-color: var(--app-sdk-dynamic-ui-footer-continue-button-background-color, theme('colors.sky.600'));
+    --asdk-dui-footer-continue-button-background-hover-color: var(--app-sdk-dynamic-ui-footer-continue-button-background-hover-color, theme('colors.sky.700'));
+    --asdk-dui-footer-continue-button-focus-outline-color: var(--app-sdk-dynamic-ui-footer-continue-button-focus-outline-color, theme('colors.sky.500'));
 
-    --asdk-dui-footer-decline-button-text-color: var(
-      --app-sdk-dynamic-ui-footer-decline-button-text-color,
-      var(--asdk-text-color)
-    );
-    --asdk-dui-footer-decline-button-background-color: var(
-      --app-sdk-dynamic-ui-footer-decline-button-background-color,
-      theme('colors.white')
-    );
-    --asdk-dui-footer-decline-button-background-hover-color: var(
-      --app-sdk-dynamic-ui-footer-decline-button-background-hover-color,
-      theme('colors.gray.50')
-    );
-    --asdk-dui-footer-decline-button-focus-outline-color: var(
-      --app-sdk-dynamic-ui-footer-decline-button-focus-outline-color,
-      theme('colors.gray.300')
-    );
+    --asdk-dui-footer-decline-button-text-color: var(--app-sdk-dynamic-ui-footer-decline-button-text-color, var(--asdk-text-color));
+    --asdk-dui-footer-decline-button-background-color: var(--app-sdk-dynamic-ui-footer-decline-button-background-color, theme('colors.white'));
+    --asdk-dui-footer-decline-button-background-hover-color: var(--app-sdk-dynamic-ui-footer-decline-button-background-hover-color, theme('colors.gray.50'));
+    --asdk-dui-footer-decline-button-focus-outline-color: var(--app-sdk-dynamic-ui-footer-decline-button-focus-outline-color, theme('colors.gray.300'));
   }
 }

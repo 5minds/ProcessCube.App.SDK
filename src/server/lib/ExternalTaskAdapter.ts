@@ -1,10 +1,9 @@
-import { ChildProcess, fork } from 'node:child_process';
-import { existsSync, promises as fsp } from 'node:fs';
-import { basename, dirname, join, relative } from 'node:path';
-
 import { watch } from 'chokidar';
 import { build as esBuild } from 'esbuild';
 import { jwtDecode } from 'jwt-decode';
+import { ChildProcess, fork } from 'node:child_process';
+import { existsSync, promises as fsp } from 'node:fs';
+import { basename, dirname, join, relative } from 'node:path';
 import { Issuer, TokenSet, custom } from 'openid-client';
 
 import { IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
@@ -76,9 +75,7 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
   const workerDirectoryContent = await fsp.readdir(workerDirectory);
   const workerFilesFound = workerDirectoryContent.filter((file) => EXTERNAL_TASK_FILE_NAMES.includes(file)).length;
   if (workerFilesFound > 1) {
-    logger.error(
-      `Multiple external task files found in directory ${workerDirectory}. Stopping all external task workers for this directory.`,
-    );
+    logger.error(`Multiple external task files found in directory ${workerDirectory}. Stopping all external task workers for this directory.`);
     if (etwProcesses[workerDirectory]) {
       stopExternalTaskWorker(workerPath);
     }
@@ -161,20 +158,14 @@ async function getFreshTokenSet(): Promise<TokenSet | null> {
     return null;
   }
 
-  if (
-    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID ||
-    !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET
-  ) {
+  if (!process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID || !process.env.PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET) {
     const error = new Error(
       'Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing. For help, please refer to our documentation on environment variables at: https://processcube.io/docs/app-sdk/samples/nextjs/external-task-adapter-with-nextjs#authority',
     );
 
-    logger.error(
-      `Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing`,
-      {
-        err: error,
-      },
-    );
+    logger.error(`Required environment variables PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID and PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET are missing`, {
+      err: error,
+    });
     throw error;
   }
 
@@ -240,10 +231,7 @@ async function startRefreshingIdentityCycle(tokenSet: TokenSet | null): Promise<
       setTimeout(refresh, delay);
     } catch (error) {
       if (retries === 0) {
-        logger.error(
-          'Could not refresh identity for external task worker processes. Stopping all external task workers.',
-          { error },
-        );
+        logger.error('Could not refresh identity for external task worker processes. Stopping all external task workers.', { error });
         for (const externalTaskWorkerProcess of Object.values(etwProcesses)) {
           externalTaskWorkerProcess.kill();
         }

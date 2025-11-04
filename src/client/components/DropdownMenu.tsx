@@ -1,5 +1,6 @@
-import { Menu, Transition } from '@headlessui/react';
 import React, { Fragment } from 'react';
+
+import { Menu, Transition } from '@headlessui/react';
 
 import { classNames } from '../utils/classNames';
 
@@ -10,13 +11,7 @@ export function DropdownMenu(props: { children: React.ReactNode; collapsedIcon?:
         <Menu.Button className="app-sdk-cursor-pointer app-sdk-bg-transparent app-sdk-p-0 app-sdk-text-[100%] app-sdk-flex app-sdk-items-center app-sdk-rounded-full app-sdk-text-[color:var(--asdk-ddm-icon-text-color)] hover:app-sdk-text-[color:var(--asdk-ddm-icon-text-hover-color)] focus:app-sdk-outline-none focus:app-sdk-ring-2 focus:app-sdk-ring-[color:var(--asdk-ddm-focus-color)]  ">
           <span className="app-sdk-sr-only">Open options</span>
           {props.collapsedIcon || (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-              className="app-sdk-h-5 app-sdk-w-5"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="app-sdk-h-5 app-sdk-w-5">
               <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
             </svg>
           )}
@@ -40,12 +35,7 @@ export function DropdownMenu(props: { children: React.ReactNode; collapsedIcon?:
   );
 }
 
-export function DropdownMenuItem(props: {
-  title: string | React.JSX.Element;
-  onClick: () => void | Promise<void>;
-  isDanger?: boolean;
-  className?: string;
-}): React.JSX.Element {
+export function DropdownMenuItem(props: { title: string | React.JSX.Element; onClick: () => void | Promise<void>; isDanger?: boolean; className?: string }): React.JSX.Element {
   return (
     <Menu.Item>
       {({ active }) => {

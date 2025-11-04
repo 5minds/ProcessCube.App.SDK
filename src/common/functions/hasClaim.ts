@@ -58,10 +58,7 @@ export async function authConfigJwtCallback(args: Parameters<CallbacksOptions['j
     token.user = user;
   }
 
-  const necessaryEnvsGiven =
-    process.env.PROCESSCUBE_AUTHORITY_URL != null &&
-    process.env.NEXTAUTH_CLIENT_ID != null &&
-    process.env.NEXTAUTH_SECRET != null;
+  const necessaryEnvsGiven = process.env.PROCESSCUBE_AUTHORITY_URL != null && process.env.NEXTAUTH_CLIENT_ID != null && process.env.NEXTAUTH_SECRET != null;
 
   if (!necessaryEnvsGiven) {
     logger.warn(

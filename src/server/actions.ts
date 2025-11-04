@@ -20,10 +20,7 @@ async function tryGetIdentity(): Promise<Identity | undefined> {
   }
 }
 
-export const finishTask = async (
-  flowNodeInstanceId: string,
-  flowNodeType: 'bpmn:UserTask' | 'bpmn:ManualTask' | 'bpmn:Task',
-) => {
+export const finishTask = async (flowNodeInstanceId: string, flowNodeType: 'bpmn:UserTask' | 'bpmn:ManualTask' | 'bpmn:Task') => {
   const identity = await tryGetIdentity();
   if (flowNodeType === 'bpmn:UserTask') {
     await finishUserTask(flowNodeInstanceId, {}, identity);

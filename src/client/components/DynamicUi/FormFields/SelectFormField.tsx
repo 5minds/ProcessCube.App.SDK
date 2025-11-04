@@ -34,10 +34,7 @@ export function SelectFormField({ formField, state }: DynamicUiComponentProps<st
         })}
       </select>
       {parsedCustomFormConfig?.hint && (
-        <p
-          className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
-          id={hintId}
-        >
+        <p className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]" id={hintId}>
           {parsedCustomFormConfig?.hint}
         </p>
       )}
