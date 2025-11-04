@@ -21,6 +21,44 @@ env:
   BOX_RELEASE_TAG: 2025-2
 
 jobs:
+  verify:
+    name: 'Verify and format code'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+        with:
+          npm-token: ${{ secrets.NPM_TOKEN }}
+
+      - name: Format code
+        run: npm run format
+
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          # Exclude workflow files from git status check
+          if [ -n "$(git status --porcelain | grep -v '^.* \.github/workflows/')" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git config --local user.name "process-engine-ci"
+          git config --local user.email "process-engine-ci@5minds.de"
+          # Exclude workflow files from git add
+          git add . ':(exclude).github/workflows/*'
+          git commit -m "style: apply prettier formatting [skip ci]"
+          git push origin HEAD:${{ github.head_ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build_and_publish:
     name: 'Build and publish sources'
     runs-on: ubuntu-latest
