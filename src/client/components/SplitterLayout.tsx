@@ -153,12 +153,7 @@ export class SplitterLayout extends React.Component<SplitterLayoutProps, Splitte
     }
   }
 
-  private getSecondaryPaneSize(
-    containerRect: Rectange,
-    splitterRect: Rectange,
-    clientPosition: Position,
-    offsetMouse: boolean,
-  ): number {
+  private getSecondaryPaneSize(containerRect: Rectange, splitterRect: Rectange, clientPosition: Position, offsetMouse: boolean): number {
     let totalSize = 0;
     let splitterSize = 0;
     let offset = 0;

@@ -5,11 +5,9 @@ var packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
 const additionalPackages = ['fsevents'];
 const packagesBlacklist = ['chokidar'];
 const bundlePackages = ['bpmn-js', 'diagram-js', 'diagram-js-direct-editing', 'bpmn-moddle'];
-const externalPackages = [
-  ...Object.keys(packageJSON.dependencies),
-  ...Object.keys(packageJSON.peerDependencies),
-  ...additionalPackages,
-].filter((dep) => !packagesBlacklist.includes(dep) && !bundlePackages.includes(dep));
+const externalPackages = [...Object.keys(packageJSON.dependencies), ...Object.keys(packageJSON.peerDependencies), ...additionalPackages].filter(
+  (dep) => !packagesBlacklist.includes(dep) && !bundlePackages.includes(dep),
+);
 
 const watchMode = process.argv.includes('--watch');
 const productionBuild = process.env.NODE_ENV === 'production';

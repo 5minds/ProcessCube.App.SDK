@@ -2,6 +2,7 @@ import BpmnViewer from 'bpmn-js/lib/Viewer';
 import OutlineModule from 'bpmn-js/lib/features/outline';
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
+
 import React from 'react';
 
 import { DataModels } from '@5minds/processcube_engine_client';
