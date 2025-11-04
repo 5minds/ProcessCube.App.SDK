@@ -1,10 +1,15 @@
-name: Build and Publish
-
+name: Verify Build and Publish
 on:
   push:
     branches:
-      - '*'
-      - '*/*'
+      - main
+      - next
+      - develop
+      - 'release/**'
+    tags:
+      - 'v*.*.*'
+  pull_request:
+  workflow_dispatch:
 
 env:
   CI_TOOLS_VERSION: '^5.0.0'
