@@ -27,15 +27,23 @@ export default function FlowNodeButtonArea(props: FlowNodeButtonAreaProps) {
 
   const isOnRetryClickDefined = !!props.onRetryClick;
 
-  const showRetryButton = !flowNode.IsGateway && flowNode.ProcessInstanceState !== 'running' && flowNode.ProcessInstanceState !== 'finished' && isOnRetryClickDefined;
+  const showRetryButton =
+    !flowNode.IsGateway &&
+    flowNode.ProcessInstanceState !== 'running' &&
+    flowNode.ProcessInstanceState !== 'finished' &&
+    isOnRetryClickDefined;
 
   const isOnGotoClickDefined = !!props.onGotoClick;
 
-  const showGotoButton = (flowNode.IsCallActivity || ((flowNode.IsEventReceiver || flowNode.IsEventSender) && flowNode.LinkedProcessInstanceId)) && isOnGotoClickDefined;
+  const showGotoButton =
+    (flowNode.IsCallActivity ||
+      ((flowNode.IsEventReceiver || flowNode.IsEventSender) && flowNode.LinkedProcessInstanceId)) &&
+    isOnGotoClickDefined;
 
   const isOnPlayClickDefined = !!props.onPlayClick;
 
-  const showPlayButton = (flowNode.IsUserTask || flowNode.IsManualTask) && flowNode.State === 'suspended' && isOnPlayClickDefined;
+  const showPlayButton =
+    (flowNode.IsUserTask || flowNode.IsManualTask) && flowNode.State === 'suspended' && isOnPlayClickDefined;
 
   return (
     <div className="flownode-overlay" style={style}>

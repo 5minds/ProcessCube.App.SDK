@@ -3,7 +3,10 @@ import React, { forwardRef } from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export const DateFormField = forwardRef(function DateFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
+export const DateFormField = forwardRef(function DateFormField(
+  props: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
@@ -31,7 +34,10 @@ export const DateFormField = forwardRef(function DateFormField(props: DynamicUiC
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]" id={hintId}>
+        <p
+          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+          id={hintId}
+        >
           {parsedCustomFormConfig?.hint}
         </p>
       )}

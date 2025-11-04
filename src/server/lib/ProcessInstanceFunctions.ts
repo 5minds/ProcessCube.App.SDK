@@ -18,10 +18,15 @@ async function tryGetIdentity(): Promise<Identity | undefined> {
  * @param processInstanceId The ID of the ProcessInstance
  * @returns {Promise<DataModels.ProcessInstances.ProcessInstance>} The {@link DataModels.ProcessInstances.ProcessInstance}
  */
-export async function getProcessInstanceById(processInstanceId: string): Promise<DataModels.ProcessInstances.ProcessInstance> {
+export async function getProcessInstanceById(
+  processInstanceId: string,
+): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const identity = await tryGetIdentity();
 
-  const result = await Client.processInstances.query({ processInstanceId: processInstanceId }, { identity: identity, includeXml: true });
+  const result = await Client.processInstances.query(
+    { processInstanceId: processInstanceId },
+    { identity: identity, includeXml: true },
+  );
 
   return result.processInstances[0];
 }
@@ -56,7 +61,9 @@ export async function getFlowNodeInstancesByProcessInstanceId(
  * @param flowNodeInstanceIds The IDs of the FlowNodeInstances
  * @returns {Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]>} The list of {@link DataModels.FlowNodeInstances.FlowNodeInstance}
  */
-export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(flowNodeInstanceIds: string[]): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
+export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(
+  flowNodeInstanceIds: string[],
+): Promise<DataModels.FlowNodeInstances.FlowNodeInstance[]> {
   const identity = await tryGetIdentity();
 
   const queryResult = await Client.flowNodeInstances.query(
@@ -78,7 +85,11 @@ export async function getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(flowNod
  * @param flowNodeInstanceId The ID of the FlowNodeInstance
  * @param newStartToken The new StartToken
  */
-export async function retryProcessInstance(processInstanceId: string, flowNodeInstanceId?: string, newStartToken?: any) {
+export async function retryProcessInstance(
+  processInstanceId: string,
+  flowNodeInstanceId?: string,
+  newStartToken?: any,
+) {
   const identity = await tryGetIdentity();
 
   await Client.processInstances.retryProcessInstance(processInstanceId, {
@@ -155,19 +166,24 @@ export async function waitForProcessEnd(
   identity: Identity | boolean = true,
 ): Promise<DataModels.ProcessInstances.ProcessInstance> {
   const { processInstanceId } = filterBy;
-  const resolvedIdentity = typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
+  const resolvedIdentity =
+    typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
 
   return new Promise<DataModels.ProcessInstances.ProcessInstance>(async (resolve, reject) => {
     const subscriptions: Array<Subscription> = [];
 
     const handleSubscription = async (event: EventMessage) => {
-      const processInstanceIdGivenButNotMatching = processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
+      const processInstanceIdGivenButNotMatching =
+        processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
 
       if (processInstanceIdGivenButNotMatching) {
         return;
       }
 
-      const processInstance = await Client.processInstances.query({ processInstanceId: event.processInstanceId }, { identity: resolvedIdentity });
+      const processInstance = await Client.processInstances.query(
+        { processInstanceId: event.processInstanceId },
+        { identity: resolvedIdentity },
+      );
       for (const sub of subscriptions) {
         Client.notification.removeSubscription(sub, resolvedIdentity);
       }
@@ -181,7 +197,9 @@ export async function waitForProcessEnd(
 
     subscriptions.push(await Client.notification.onProcessEnded(handleSubscription, { identity: resolvedIdentity }));
     subscriptions.push(await Client.notification.onProcessError(handleSubscription, { identity: resolvedIdentity }));
-    subscriptions.push(await Client.notification.onProcessTerminated(handleSubscription, { identity: resolvedIdentity }));
+    subscriptions.push(
+      await Client.notification.onProcessTerminated(handleSubscription, { identity: resolvedIdentity }),
+    );
 
     if (processInstanceId) {
       const finishedProcessInstance = await Client.processInstances.query(

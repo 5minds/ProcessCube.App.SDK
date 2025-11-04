@@ -14,7 +14,14 @@ export default function GotoButton(props: GotoButtonProps) {
   return (
     <div onClick={props.onClick} className="bpmn-element-overlay__below-item bpmn-element-overlay__below-item--action">
       <div className="action-icon">
-        <svg width="14px" height="14px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+        <svg
+          width="14px"
+          height="14px"
+          viewBox="0 0 512 512"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="#000000"
+        >
           <g id="SVGRepo_bgCarrier" strokeWidth="0" />
 
           <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
@@ -38,7 +45,14 @@ export default function GotoButton(props: GotoButtonProps) {
         </svg>
       </div>
       <div className="action-icon-hovered">
-        <svg width="14px" height="14px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+        <svg
+          width="14px"
+          height="14px"
+          viewBox="0 0 512 512"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="#000000"
+        >
           <g id="SVGRepo_bgCarrier" strokeWidth="0" />
 
           <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />

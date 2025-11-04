@@ -4,8 +4,14 @@
   .dark * {
     --asdk-sl-background-color: var(--app-sdk-splitter-layout-background-color, theme('colors.app-sdk-gray.700'));
     --asdk-sl-splitter-color: var(--app-sdk-splitter-layout-splitter-color, theme('colors.app-sdk-gray.300'));
-    --asdk-sl-splitter-hover-color: var(--app-sdk-splitter-layout-splitter-hover-color, theme('colors.app-sdk-gray.100'));
-    --asdk-sl-splitter-changing-color: var(--app-sdk-splitter-layout-splitter-changing-color, theme('colors.app-sdk-gray.200'));
+    --asdk-sl-splitter-hover-color: var(
+      --app-sdk-splitter-layout-splitter-hover-color,
+      theme('colors.app-sdk-gray.100')
+    );
+    --asdk-sl-splitter-changing-color: var(
+      --app-sdk-splitter-layout-splitter-changing-color,
+      theme('colors.app-sdk-gray.200')
+    );
   }
 
   *,
@@ -13,8 +19,14 @@
   ::after {
     --asdk-sl-background-color: var(--app-sdk-splitter-layout-background-color, theme(colors.white));
     --asdk-sl-splitter-color: var(--app-sdk-splitter-layout-splitter-color, theme('colors.app-sdk-gray.700'));
-    --asdk-sl-splitter-hover-color: var(--app-sdk-splitter-layout-splitter-hover-color, theme('colors.app-sdk-gray.200'));
-    --asdk-sl-splitter-changing-color: var(--app-sdk-splitter-layout-splitter-changing-color, theme('colors.app-sdk-gray.400'));
+    --asdk-sl-splitter-hover-color: var(
+      --app-sdk-splitter-layout-splitter-hover-color,
+      theme('colors.app-sdk-gray.200')
+    );
+    --asdk-sl-splitter-changing-color: var(
+      --app-sdk-splitter-layout-splitter-changing-color,
+      theme('colors.app-sdk-gray.400')
+    );
   }
 
   .app-sdk-splitter-layout {
@@ -79,7 +91,9 @@
     height: 2px;
   }
 
-  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical > .app-sdk-layout-splitter > .app-sdk-layout-splitter__inner {
+  .app-sdk-splitter-layout.app-sdk-splitter-layout-vertical
+    > .app-sdk-layout-splitter
+    > .app-sdk-layout-splitter__inner {
     position: absolute;
     height: 4px;
     width: 100%;

@@ -14,7 +14,14 @@ export default function PlayButton(props: PlayButtonProps) {
   return (
     <div onClick={props.onClick} className="bpmn-element-overlay__below-item bpmn-element-overlay__below-item--action">
       <div className="action-icon">
-        <svg width="14px" height="14px" viewBox="0 0 24 24" color="white" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          width="14px"
+          height="14px"
+          viewBox="0 0 24 24"
+          color="white"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <g id="Media / Play" color="white">
             <path
               id="Vector"
@@ -28,7 +35,14 @@ export default function PlayButton(props: PlayButtonProps) {
         </svg>
       </div>
       <div className="action-icon-hovered">
-        <svg width="14px" height="14px" viewBox="0 0 24 24" color="white" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          width="14px"
+          height="14px"
+          viewBox="0 0 24 24"
+          color="white"
+          fill="white"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <g id="Media / Play" color="white">
             <path
               id="Vector"

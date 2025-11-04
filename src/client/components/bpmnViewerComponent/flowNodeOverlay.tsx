@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react';
+import {
+  Button,
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from '@heroui/react';
 import Editor from '@monaco-editor/react';
+import React, { useState } from 'react';
 
 import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import { FlowNode } from './bpmnViewerOverlayCreator';
@@ -43,8 +51,16 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         <FlowNodeColorArea onClick={flowNodeInfoModal.onOpen} {...props}></FlowNodeColorArea>
         <FlowNodeButtonArea
           onRetryClick={props.retryAction ? retryModal.onOpen : undefined}
-          onGotoClick={props.gotoProcessAction ? () => props.gotoProcessAction!(props.flowNode.LinkedProcessInstanceId ?? '') : undefined}
-          onPlayClick={props.gotoManualOrUserTaskAction ? () => props.gotoManualOrUserTaskAction!(props.flowNode.ProcessInstanceId, props.flowNode.Id) : undefined}
+          onGotoClick={
+            props.gotoProcessAction
+              ? () => props.gotoProcessAction!(props.flowNode.LinkedProcessInstanceId ?? '')
+              : undefined
+          }
+          onPlayClick={
+            props.gotoManualOrUserTaskAction
+              ? () => props.gotoManualOrUserTaskAction!(props.flowNode.ProcessInstanceId, props.flowNode.Id)
+              : undefined
+          }
           flowNode={props.flowNode}
         ></FlowNodeButtonArea>
       </div>
@@ -80,7 +96,11 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
                 <Button
                   color="primary"
                   onPress={() => {
-                    props.retryAction?.(props.flowNode.ProcessInstanceId, props.flowNode.CurrentFlowNodeInstanceId, JSON.parse(newToken));
+                    props.retryAction?.(
+                      props.flowNode.ProcessInstanceId,
+                      props.flowNode.CurrentFlowNodeInstanceId,
+                      JSON.parse(newToken),
+                    );
                     onClose();
                   }}
                 >
@@ -95,7 +115,9 @@ export default function FlowNodeOverlay(props: FlowNodeOverlayProps) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">FlowNode: {props.flowNode.Name ?? props.flowNode.Id}</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                FlowNode: {props.flowNode.Name ?? props.flowNode.Id}
+              </ModalHeader>
               <ModalBody>
                 <FlowNodeInfoComponent flowNode={props.flowNode}></FlowNodeInfoComponent>
               </ModalBody>

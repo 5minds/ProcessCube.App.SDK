@@ -43,7 +43,10 @@ export function CheckboxFormField({ formField, state }: DynamicUiComponentProps<
                 />
               </div>
               <div className="app-sdk-ml-3 app-sdk-text-sm">
-                <label htmlFor={option.key} className="app-sdk-font-medium app-sdk-text-[color:var(--asdk-dui-text-color)]">
+                <label
+                  htmlFor={option.key}
+                  className="app-sdk-font-medium app-sdk-text-[color:var(--asdk-dui-text-color)]"
+                >
                   {option.value}
                 </label>
               </div>
@@ -52,7 +55,10 @@ export function CheckboxFormField({ formField, state }: DynamicUiComponentProps<
         })}
       </fieldset>
       {parsedCustomFormConfig?.hint && (
-        <p className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]" id={hintId}>
+        <p
+          className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+          id={hintId}
+        >
           {parsedCustomFormConfig?.hint}
         </p>
       )}

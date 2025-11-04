@@ -3,7 +3,10 @@ import React, { forwardRef } from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export const EnumFormField = forwardRef(function EnumFormField({ formField, state }: DynamicUiComponentProps<string | Array<string> | null>, ref: DynamicUiFormFieldRef) {
+export const EnumFormField = forwardRef(function EnumFormField(
+  { formField, state }: DynamicUiComponentProps<string | Array<string> | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   const label = formField.label;
@@ -17,7 +20,8 @@ export const EnumFormField = forwardRef(function EnumFormField({ formField, stat
       if (Array.isArray(state) && state.length) {
         multipleStateOrDefaultValue = state;
       } else {
-        multipleStateOrDefaultValue = ((state as string | null) || formField.defaultValue?.toString())?.split(',') ?? [];
+        multipleStateOrDefaultValue =
+          ((state as string | null) || formField.defaultValue?.toString())?.split(',') ?? [];
       }
 
       enumInput = (
@@ -45,7 +49,10 @@ export const EnumFormField = forwardRef(function EnumFormField({ formField, stat
                   />
                 </div>
                 <div className="app-sdk-ml-3 app-sdk-text-sm">
-                  <label htmlFor={option.id} className="app-sdk-font-medium app-sdk-text-[color:var(--asdk-dui-text-color)]">
+                  <label
+                    htmlFor={option.id}
+                    className="app-sdk-font-medium app-sdk-text-[color:var(--asdk-dui-text-color)]"
+                  >
                     {option.name}
                   </label>
                 </div>
@@ -78,7 +85,10 @@ export const EnumFormField = forwardRef(function EnumFormField({ formField, stat
                   />
                 </div>
                 <div className="app-sdk-ml-3 app-sdk-text-sm">
-                  <label htmlFor={option.id} className="app-sdk-font-medium app-sdk-text-[color:var(--asdk-dui-text-color)]">
+                  <label
+                    htmlFor={option.id}
+                    className="app-sdk-font-medium app-sdk-text-[color:var(--asdk-dui-text-color)]"
+                  >
                     {option.name}
                   </label>
                 </div>
@@ -116,7 +126,10 @@ export const EnumFormField = forwardRef(function EnumFormField({ formField, stat
   }
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]">
+    <p
+      id={`${formField.id}-hint`}
+      className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+    >
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;

@@ -4,7 +4,10 @@ import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 import { TextareaFormField } from './TextareaFormField';
 
-export const StringFormField = forwardRef(function StringFormField({ formField, state }: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
+export const StringFormField = forwardRef(function StringFormField(
+  { formField, state }: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
   const isMultiline = parsedCustomFormConfig?.multiline === 'true';
 
@@ -33,7 +36,10 @@ export const StringFormField = forwardRef(function StringFormField({ formField, 
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]" id={hintId}>
+        <p
+          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+          id={hintId}
+        >
           {parsedCustomFormConfig?.hint}
         </p>
       )}

@@ -1,8 +1,7 @@
 import BpmnViewer from 'bpmn-js/lib/Viewer';
+import React from 'react';
 import { Root, createRoot } from 'react-dom/client';
 import { v4 as uuidv4 } from 'uuid';
-
-import React from 'react';
 
 import { DataModels } from '@5minds/processcube_engine_client';
 
@@ -98,11 +97,18 @@ export class FlowNode {
   }
 
   get IsEventReceiver(): boolean {
-    return this.type === 'bpmn:StartEvent' || this.type === 'bpmn:IntermediateCatchEvent' || this.type === 'bpmn:BoundaryEvent' || this.type === 'bpmn:ReceiveTask';
+    return (
+      this.type === 'bpmn:StartEvent' ||
+      this.type === 'bpmn:IntermediateCatchEvent' ||
+      this.type === 'bpmn:BoundaryEvent' ||
+      this.type === 'bpmn:ReceiveTask'
+    );
   }
 
   get IsEventSender(): boolean {
-    return this.type === 'bpmn:EndEvent' || this.type === 'bpmn:IntermediateThrowEvent' || this.type === 'bpmn:SendTask';
+    return (
+      this.type === 'bpmn:EndEvent' || this.type === 'bpmn:IntermediateThrowEvent' || this.type === 'bpmn:SendTask'
+    );
   }
 
   get IsCallActivity(): boolean {
@@ -127,7 +133,12 @@ export class FlowNode {
     return lastFlowNodeInstance?.processInstanceId ?? '';
   }
 
-  constructor(id: string, processInstanceState: string, documentation: string, triggeredFlowNodeInstance?: DataModels.FlowNodeInstances.FlowNodeInstance) {
+  constructor(
+    id: string,
+    processInstanceState: string,
+    documentation: string,
+    triggeredFlowNodeInstance?: DataModels.FlowNodeInstances.FlowNodeInstance,
+  ) {
     this.id = id;
     this.flowNodeInstances = [];
     this.processInstanceState = processInstanceState;
@@ -169,7 +180,11 @@ export default class BpmnViewerOverlayCreator {
     gotoProcessAction?: (processInstanceId: string) => void,
     gotoManualOrUserTaskAction?: (processInstanceId: string, flowNodeId: string) => void,
   ): void {
-    const executedFlowNodes: FlowNode[] = this.getExecutedFlowNodes(flowNodeInstances, processInstanceState, flowNodeInstancesTriggeredByThisProcessInstance);
+    const executedFlowNodes: FlowNode[] = this.getExecutedFlowNodes(
+      flowNodeInstances,
+      processInstanceState,
+      flowNodeInstancesTriggeredByThisProcessInstance,
+    );
 
     this.overlayIds = [];
 
@@ -252,7 +267,9 @@ export default class BpmnViewerOverlayCreator {
 
     for (const triggeredFlowNodeInstance of flowNodeInstancesTriggeredByThisProcessInstance) {
       if (triggeredFlowNodeInstance.triggeredByFlowNodeInstance) {
-        triggeredFlowNodeInstancesByFlowNodeInstanceId[triggeredFlowNodeInstance.triggeredByFlowNodeInstance?.flowNodeInstanceId] = triggeredFlowNodeInstance;
+        triggeredFlowNodeInstancesByFlowNodeInstanceId[
+          triggeredFlowNodeInstance.triggeredByFlowNodeInstance?.flowNodeInstanceId
+        ] = triggeredFlowNodeInstance;
       }
     }
 
@@ -261,7 +278,9 @@ export default class BpmnViewerOverlayCreator {
 
       if (!executedFlowNode) {
         const flowNodeShape = this.elementRegistry.get(flowNodeInstance.flowNodeId);
-        const documentation = flowNodeShape.businessObject.documentation ? flowNodeShape.businessObject.documentation[0].text : '';
+        const documentation = flowNodeShape.businessObject.documentation
+          ? flowNodeShape.businessObject.documentation[0].text
+          : '';
 
         executedFlowNode = new FlowNode(
           flowNodeInstance.flowNodeId,

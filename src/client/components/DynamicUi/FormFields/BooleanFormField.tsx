@@ -3,7 +3,10 @@ import React, { forwardRef } from 'react';
 import { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export const BooleanFormField = forwardRef(function BooleanFormField(props: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef): React.JSX.Element {
+export const BooleanFormField = forwardRef(function BooleanFormField(
+  props: DynamicUiComponentProps<string | null>,
+  ref: DynamicUiFormFieldRef,
+): React.JSX.Element {
   const { formField } = props;
   const hintId = `${formField.id}-hint`;
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);

@@ -39,7 +39,10 @@ export function RangeFormField({ formField, state }: DynamicUiComponentProps<num
   );
 
   const hint = parsedCustomFormConfig?.hint ? (
-    <p id={`${formField.id}-hint`} className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]">
+    <p
+      id={`${formField.id}-hint`}
+      className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+    >
       {parsedCustomFormConfig.hint}
     </p>
   ) : null;
@@ -57,7 +60,9 @@ export function RangeFormField({ formField, state }: DynamicUiComponentProps<num
         {/* <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
           {defaultMax}
         </span> */}
-        <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">{currentValue}</span>
+        <span className="app-sdk-mt-2 app-sdk-ml-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
+          {currentValue}
+        </span>
       </div>
       {/* <div className="app-sdk-mt-1 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-text-color)]">
         Aktueller Wert: {currentValue}

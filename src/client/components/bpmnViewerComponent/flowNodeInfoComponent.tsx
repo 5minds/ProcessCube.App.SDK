@@ -1,13 +1,11 @@
 'use client';
 
+import { Divider } from '@heroui/react';
+import Editor from '@monaco-editor/react';
+import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-
-import React, { useEffect } from 'react';
-
-import { Divider } from '@heroui/react';
-import Editor from '@monaco-editor/react';
 
 import { warnOnceForDeprecation } from '../../utils/warnOnceForDeprecation';
 import { FlowNode } from './bpmnViewerOverlayCreator';

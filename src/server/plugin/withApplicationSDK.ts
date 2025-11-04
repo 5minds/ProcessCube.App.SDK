@@ -1,5 +1,9 @@
 import type { NextConfig } from 'next';
-import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } from 'next/dist/shared/lib/constants';
+import {
+  PHASE_DEVELOPMENT_SERVER,
+  PHASE_PRODUCTION_BUILD,
+  PHASE_PRODUCTION_SERVER,
+} from 'next/dist/shared/lib/constants';
 
 import { subscribeToExternalTasks } from '../lib/ExternalTaskAdapter';
 
@@ -23,7 +27,8 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
   return async (phase, context) => {
     isProductionBuild = isProductionBuild || phase === PHASE_PRODUCTION_BUILD;
     const isStartingServer = phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_SERVER;
-    const shouldSubscribeToExternalTasks = applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks && !isProductionBuild;
+    const shouldSubscribeToExternalTasks =
+      applicationSdkConfig?.useExternalTasks && isStartingServer && !isSubscribedToExternalTasks && !isProductionBuild;
 
     if (shouldSubscribeToExternalTasks) {
       isSubscribedToExternalTasks = true;
@@ -34,7 +39,10 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
       ...nextConfig,
       experimental: {
         ...nextConfig.experimental,
-        serverComponentsExternalPackages: [...(nextConfig.experimental?.serverComponentsExternalPackages || []), 'esbuild'],
+        serverComponentsExternalPackages: [
+          ...(nextConfig.experimental?.serverComponentsExternalPackages || []),
+          'esbuild',
+        ],
       },
     };
   };

@@ -24,7 +24,11 @@ export function CustomFormField({ formField, state }: DynamicUiComponentProps<st
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p id={`${formField.id}-hint`} data-hint className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]">
+        <p
+          id={`${formField.id}-hint`}
+          data-hint
+          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+        >
           {parsedCustomFormConfig.hint}
         </p>
       )}

@@ -1,15 +1,19 @@
+import { Transition } from '@headlessui/react';
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { Overlay, OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import { isEqual } from 'lodash';
 import dynamic from 'next/dynamic';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-
-import { Transition } from '@headlessui/react';
-
-import { BpmnType, FlowNodeInstance, FlowNodeInstanceState, ProcessInstance, ProcessInstanceState } from '@5minds/processcube_engine_sdk';
+import {
+  BpmnType,
+  FlowNodeInstance,
+  FlowNodeInstanceState,
+  ProcessInstance,
+  ProcessInstanceState,
+} from '@5minds/processcube_engine_sdk';
 
 import { DiagramDocumentationInspector, DiagramDocumentationInspectorRef } from '../DiagramDocumentationInspector';
 import { CommandPalette, CommandPaletteEntry, CommandPaletteProps } from './CommandPalette';
@@ -31,7 +35,12 @@ import { TokenInspectorButton } from './TokenInspectorButton';
 const RETRYABLE_STATES = [ProcessInstanceState.error, ProcessInstanceState.terminated];
 const PLAYABLE_TYPES = [BpmnType.manualTask, BpmnType.userTask, BpmnType.untypedTask];
 const SENDER_TYPES = [BpmnType.endEvent, BpmnType.intermediateThrowEvent, BpmnType.sendTask];
-const RECEIVER_TYPES = [BpmnType.startEvent, BpmnType.intermediateCatchEvent, BpmnType.boundaryEvent, BpmnType.receiveTask];
+const RECEIVER_TYPES = [
+  BpmnType.startEvent,
+  BpmnType.intermediateCatchEvent,
+  BpmnType.boundaryEvent,
+  BpmnType.receiveTask,
+];
 
 const EMPTY_COMMAND_PALETTE_PROPS: CommandPaletteProps<FlowNodeInstance & CommandPaletteEntry> = {
   isOpen: false,
@@ -93,7 +102,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
     const [processInstance, flowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
 
-    const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(flowNodeInstances.map((fni) => fni.flowNodeInstanceId));
+    const triggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
+      flowNodeInstances.map((fni) => fni.flowNodeInstanceId),
+    );
 
     setProcessInstance(processInstance);
     setFlowNodeInstances(flowNodeInstances);
@@ -107,7 +118,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     }
 
     const preselectedInstanceIds = searchParams.getAll('instance');
-    const preselectedFlowNodeInstances = flowNodeInstances.filter((fni) => preselectedInstanceIds.includes(fni.flowNodeInstanceId));
+    const preselectedFlowNodeInstances = flowNodeInstances.filter((fni) =>
+      preselectedInstanceIds.includes(fni.flowNodeInstanceId),
+    );
 
     if (preselectedFlowNodeInstances.length !== preselectedInstanceIds.length) {
       searchParams.delete('instance');
@@ -130,7 +143,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     (element: ElementLike) => {
       const businessObject = getBusinessObject(element);
       const targetInstanceExists = flowNodeInstances.some((fni) => fni.flowNodeId === businessObject.targetRef.id);
-      const finishedSourceInstanceExists = flowNodeInstances.some((fni) => fni.flowNodeId === businessObject.sourceRef.id && fni.state === FlowNodeInstanceState.finished);
+      const finishedSourceInstanceExists = flowNodeInstances.some(
+        (fni) => fni.flowNodeId === businessObject.sourceRef.id && fni.state === FlowNodeInstanceState.finished,
+      );
 
       return targetInstanceExists && finishedSourceInstanceExists;
     },
@@ -147,11 +162,20 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     const serverActions = await import('../../../server/actions');
     const processInstancePromise = serverActions.getProcessInstance(processInstanceId);
     const flowNodeInstancesPromise = serverActions.getFlowNodeInstances(processInstanceId);
-    const [newProcessInstance, newFlowNodeInstances] = await Promise.all([processInstancePromise, flowNodeInstancesPromise]);
+    const [newProcessInstance, newFlowNodeInstances] = await Promise.all([
+      processInstancePromise,
+      flowNodeInstancesPromise,
+    ]);
 
-    const newTriggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(newFlowNodeInstances.map((fni) => fni.flowNodeInstanceId));
+    const newTriggeredFlowNodeInstances = await serverActions.getTriggeredFlowNodeInstances(
+      newFlowNodeInstances.map((fni) => fni.flowNodeInstanceId),
+    );
 
-    if (isEqual(newProcessInstance, processInstance) && isEqual(newFlowNodeInstances, flowNodeInstances) && isEqual(newTriggeredFlowNodeInstances, triggeredFlowNodeInstances)) {
+    if (
+      isEqual(newProcessInstance, processInstance) &&
+      isEqual(newFlowNodeInstances, flowNodeInstances) &&
+      isEqual(newTriggeredFlowNodeInstances, triggeredFlowNodeInstances)
+    ) {
       return;
     }
 
@@ -183,7 +207,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     const searchParams = new URLSearchParams(window.location.search);
     const preselectedInstanceIds = searchParams.getAll('instance');
 
-    const preselectedFlowNodeInstances = newFlowNodeInstances.filter((fni) => preselectedInstanceIds.includes(fni.flowNodeInstanceId));
+    const preselectedFlowNodeInstances = newFlowNodeInstances.filter((fni) =>
+      preselectedInstanceIds.includes(fni.flowNodeInstanceId),
+    );
 
     if (preselectedFlowNodeInstances.length !== preselectedInstanceIds.length) {
       searchParams.delete('instance');
@@ -200,7 +226,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
     preselectedFlowNodeInstances.forEach((fni) => newShownInstancesMap.set(fni.flowNodeId, fni.flowNodeInstanceId));
     setShownInstancesMap(newShownInstancesMap);
-  }, [diagramDocumentationInspectorRef.current, processInstance, shownInstancesMap, flowNodeInstances, processInstanceId]);
+  }, [
+    diagramDocumentationInspectorRef.current,
+    processInstance,
+    shownInstancesMap,
+    flowNodeInstances,
+    processInstanceId,
+  ]);
 
   const renderFlowNodeButtons = useCallback(
     (element: ElementLike, instances: FlowNodeInstance[]) => {
@@ -222,9 +254,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
 
       const showExecutionCount = props.showFlowNodeExecutionCount && instances.length > 1;
       const showFlowNodeInstancesListButton = props.showFlowNodeInstancesListButton && instances.length > 1;
-      const showPlayButton = props.showFinishTaskButton && PLAYABLE_TYPES.includes(element.type) && shownInstance.state === FlowNodeInstanceState.suspended;
+      const showPlayButton =
+        props.showFinishTaskButton &&
+        PLAYABLE_TYPES.includes(element.type) &&
+        shownInstance.state === FlowNodeInstanceState.suspended;
 
-      const showRetryButton = props.showRetryFlowNodeInstanceButton && processInstance && RETRYABLE_STATES.includes(processInstance.state);
+      const showRetryButton =
+        props.showRetryFlowNodeInstanceButton && processInstance && RETRYABLE_STATES.includes(processInstance.state);
 
       let showGoToButton = false;
       let targetInstances: FlowNodeInstance[] = [];
@@ -233,7 +269,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         showGoToButton = triggeredByFlowNodeInstance !== undefined;
         targetInstances = triggeredByFlowNodeInstance ? [triggeredByFlowNodeInstance] : [];
       } else if (props.showGoToFlowNodeButton && SENDER_TYPES.includes(element.type)) {
-        const matchingTriggeredInstances = triggeredFlowNodeInstances.filter((fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId);
+        const matchingTriggeredInstances = triggeredFlowNodeInstances.filter(
+          (fni) => fni.triggeredByFlowNodeInstance?.flowNodeInstanceId === shownInstance.flowNodeInstanceId,
+        );
         showGoToButton = matchingTriggeredInstances.length > 0;
         targetInstances = matchingTriggeredInstances;
       }
@@ -282,7 +320,10 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
                     return;
                   }
 
-                  bpmnViewer.removeMarker(shownInstance.flowNodeId, `asdk-pii-flow-node-instance-state--${shownInstance.state}`);
+                  bpmnViewer.removeMarker(
+                    shownInstance.flowNodeId,
+                    `asdk-pii-flow-node-instance-state--${shownInstance.state}`,
+                  );
                   overlays.remove({
                     element: element.id,
                     type: SDK_OVERLAY_BUTTONS_TYPE,
@@ -300,7 +341,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
                   }
 
                   // Not using the useRouter hook, because the component should be able to run in non-Next.js environments
-                  window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+                  window.history.replaceState(
+                    {},
+                    '',
+                    `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+                  );
 
                   setShownInstancesMap((prev) => new Map(prev).set(element.id, entry.flowNodeInstanceId));
                   setCommandPaletteProps(EMPTY_COMMAND_PALETTE_PROPS);
@@ -371,7 +416,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         </FlowNodeButtonsContainer>,
       );
     },
-    [diagramDocumentationInspectorRef.current, processInstance, flowNodeInstances, triggeredFlowNodeInstances, shownInstancesMap],
+    [
+      diagramDocumentationInspectorRef.current,
+      processInstance,
+      flowNodeInstances,
+      triggeredFlowNodeInstances,
+      shownInstancesMap,
+    ],
   );
 
   useEffect(() => {
@@ -403,7 +454,11 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     if (selectedInstances.length === 0) {
       const searchParams = new URLSearchParams(window.location.search);
       searchParams.delete('tokenInspectorFocus');
-      window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+      window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+      );
     }
 
     setSelectedInstances(selectedInstances);
@@ -438,7 +493,9 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         }
 
         const matchingInstances = flowNodeInstances.filter((fni) => fni.flowNodeId === element.id);
-        const shownInstance = matchingInstances.find((fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId));
+        const shownInstance = matchingInstances.find(
+          (fni) => fni.flowNodeInstanceId === shownInstancesMap.get(fni.flowNodeId),
+        );
 
         if (!shownInstance) {
           return;
@@ -455,7 +512,13 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         renderFlowNodeButtons(element, matchingInstances);
       });
     });
-  }, [diagramDocumentationInspectorRef.current, processInstance, flowNodeInstances, triggeredFlowNodeInstances, shownInstancesMap]);
+  }, [
+    diagramDocumentationInspectorRef.current,
+    processInstance,
+    flowNodeInstances,
+    triggeredFlowNodeInstances,
+    shownInstancesMap,
+  ]);
 
   if (!processInstance?.xml) {
     if (props.loadingComponent) {
@@ -469,9 +532,15 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
     );
   }
 
-  const showProcessButtonsContainer = props.showProcessRefreshButton || props.showProcessRetryButton || props.showProcessTerminateButton || props.showTokenInspectorButton;
+  const showProcessButtonsContainer =
+    props.showProcessRefreshButton ||
+    props.showProcessRetryButton ||
+    props.showProcessTerminateButton ||
+    props.showTokenInspectorButton;
 
-  const showProcessButtonSeparator = props.showTokenInspectorButton && (props.showProcessRefreshButton || props.showProcessRetryButton || props.showProcessTerminateButton);
+  const showProcessButtonSeparator =
+    props.showTokenInspectorButton &&
+    (props.showProcessRefreshButton || props.showProcessRetryButton || props.showProcessTerminateButton);
 
   return (
     <div className="app-sdk-relative app-sdk-w-full app-sdk-h-full">
@@ -491,9 +560,17 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
         <ProcessButtonsContainer>
           {props.showProcessRefreshButton && <RefreshProcessButton onClick={refresh} />}
           {props.showProcessRetryButton && (
-            <RetryProcessButton onClick={() => setRetryDialogProps({ isOpen: true })} disabled={!RETRYABLE_STATES.includes(processInstance.state)} />
+            <RetryProcessButton
+              onClick={() => setRetryDialogProps({ isOpen: true })}
+              disabled={!RETRYABLE_STATES.includes(processInstance.state)}
+            />
           )}
-          {props.showProcessTerminateButton && <TerminateProcessButton processInstanceId={processInstanceId} disabled={processInstance.state !== ProcessInstanceState.running} />}
+          {props.showProcessTerminateButton && (
+            <TerminateProcessButton
+              processInstanceId={processInstanceId}
+              disabled={processInstance.state !== ProcessInstanceState.running}
+            />
+          )}
           {showProcessButtonSeparator && <ProcessButtonSeparator />}
           {props.showTokenInspectorButton && (
             <TokenInspectorButton
@@ -501,13 +578,21 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
               open={() => {
                 const searchParams = new URLSearchParams(window.location.search);
                 searchParams.set('tokenInspector', 'true');
-                window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+                window.history.replaceState(
+                  {},
+                  '',
+                  `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+                );
                 setIsTokenInspectorOpen(true);
               }}
               close={() => {
                 const searchParams = new URLSearchParams(window.location.search);
                 searchParams.delete('tokenInspector');
-                window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+                window.history.replaceState(
+                  {},
+                  '',
+                  `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+                );
                 setIsTokenInspectorOpen(false);
               }}
             />
@@ -522,13 +607,21 @@ export function ProcessInstanceInspector(props: ProcessInstanceInspectorProps) {
             close={() => {
               const searchParams = new URLSearchParams(window.location.search);
               searchParams.delete('tokenInspector');
-              window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+              window.history.replaceState(
+                {},
+                '',
+                `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+              );
               setIsTokenInspectorOpen(false);
             }}
           />
         </div>
       </Transition>
-      <DiagramDocumentationInspector xml={processInstance.xml} ref={diagramDocumentationInspectorRef} setSelectedElementIds={setSelectedElementIds} />
+      <DiagramDocumentationInspector
+        xml={processInstance.xml}
+        ref={diagramDocumentationInspectorRef}
+        setSelectedElementIds={setSelectedElementIds}
+      />
     </div>
   );
 }

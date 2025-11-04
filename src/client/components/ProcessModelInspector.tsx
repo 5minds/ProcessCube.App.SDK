@@ -1,8 +1,6 @@
-import dynamic from 'next/dynamic';
-
-import React, { useEffect, useState } from 'react';
-
 import { Transition } from '@headlessui/react';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
 
 import { FilterOptions, TimeRange } from '../../common/types';
 import { HeatmapService } from '../services';
@@ -15,7 +13,11 @@ import { TokenInspectorButton } from './ProcessInstanceInspector/TokenInspectorB
 
 type ProcessModelInspectorProps = {
   processModel?: any;
-  getInstancesFromDatabase?: (processModelId: string, hash: string, options?: { timeRange: TimeRange }) => Promise<any[]>;
+  getInstancesFromDatabase?: (
+    processModelId: string,
+    hash: string,
+    options?: { timeRange: TimeRange },
+  ) => Promise<any[]>;
 };
 
 function ProcessModelInspector(props: ProcessModelInspectorProps) {
@@ -71,7 +73,11 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
     const loadData = async () => {
       if (!props.getInstancesFromDatabase || !props.processModel?.processModelId || !props.processModel?.hash) return;
 
-      const instances = await props.getInstancesFromDatabase(props.processModel.processModelId, props.processModel.hash, { timeRange: initialTimeRange });
+      const instances = await props.getInstancesFromDatabase(
+        props.processModel.processModelId,
+        props.processModel.hash,
+        { timeRange: initialTimeRange },
+      );
 
       if (instances.length > 0) {
         setShowHeatmap(true);
@@ -84,7 +90,13 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
   }, [props.getInstancesFromDatabase, props.processModel]);
 
   useEffect(() => {
-    if (!filters?.timeRange || !props.getInstancesFromDatabase || !props.processModel?.processModelId || !props.processModel?.hash) return;
+    if (
+      !filters?.timeRange ||
+      !props.getInstancesFromDatabase ||
+      !props.processModel?.processModelId ||
+      !props.processModel?.hash
+    )
+      return;
 
     const fetchFilteredData = async () => {
       const instances =
@@ -112,7 +124,11 @@ function ProcessModelInspector(props: ProcessModelInspectorProps) {
       setIsHeatmapInspectorOpen(true);
     }
 
-    window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+    window.history.replaceState(
+      {},
+      '',
+      `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+    );
   };
 
   const handleTimeRangeChange = (newTimeRange: TimeRange) => {

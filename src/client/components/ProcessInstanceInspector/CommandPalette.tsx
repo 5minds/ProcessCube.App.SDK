@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-
-import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+} from '@headlessui/react';
 import { UsersIcon } from '@heroicons/react/24/outline';
+import React, { useState } from 'react';
 
 import { classNames } from '../../utils/classNames';
 
@@ -22,7 +29,10 @@ export type CommandPaletteProps<T extends CommandPaletteEntry> = {
 export function CommandPalette<T extends CommandPaletteEntry>(props: CommandPaletteProps<T>) {
   const [query, setQuery] = useState('');
 
-  const filteredEntries = query === '' ? props.entries : props.entries.filter((entry) => entry.name.toLowerCase().includes(query.toLowerCase()));
+  const filteredEntries =
+    query === ''
+      ? props.entries
+      : props.entries.filter((entry) => entry.name.toLowerCase().includes(query.toLowerCase()));
 
   return (
     <Dialog
@@ -81,8 +91,13 @@ export function CommandPalette<T extends CommandPaletteEntry>(props: CommandPale
 
             {query !== '' && filteredEntries.length === 0 && (
               <div className="app-sdk-px-4 app-sdk-py-14 app-sdk-text-center sm:app-sdk-px-14">
-                <UsersIcon className="app-sdk-mx-auto app-sdk-h-6 app-sdk-w-6 app-sdk-text-gray-400" aria-hidden="true" />
-                <p className="app-sdk-mt-4 app-sdk-text-sm app-sdk-text-[color:var(--asdk-cmdp-text-color)]">{props.noResultsText || 'No entries found using that search term.'}</p>
+                <UsersIcon
+                  className="app-sdk-mx-auto app-sdk-h-6 app-sdk-w-6 app-sdk-text-gray-400"
+                  aria-hidden="true"
+                />
+                <p className="app-sdk-mt-4 app-sdk-text-sm app-sdk-text-[color:var(--asdk-cmdp-text-color)]">
+                  {props.noResultsText || 'No entries found using that search term.'}
+                </p>
               </div>
             )}
           </Combobox>

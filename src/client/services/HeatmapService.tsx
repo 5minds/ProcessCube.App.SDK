@@ -60,7 +60,11 @@ export class HeatmapService {
     this.computeCostHeatmap(processModel);
   }
 
-  public updateHeatmapService(runtimeService: RuntimeService, processCostsService: ProcessCostsService, processModel: ProcessModel) {
+  public updateHeatmapService(
+    runtimeService: RuntimeService,
+    processCostsService: ProcessCostsService,
+    processModel: ProcessModel,
+  ) {
     this.runtimeService = runtimeService;
     this.processCostsService = processCostsService;
     this.computeRuntimeHeatmap(processModel);
@@ -76,7 +80,9 @@ export class HeatmapService {
   }
 
   public hasCostEntry(): boolean {
-    return Object.values(this.heatmapInfo).some((entry) => Object.keys(entry).some((key) => !key.startsWith('runtime')));
+    return Object.values(this.heatmapInfo).some((entry) =>
+      Object.keys(entry).some((key) => !key.startsWith('runtime')),
+    );
   }
 
   public getActiveCostKey(nodeId: string): string | undefined {
@@ -159,8 +165,10 @@ export class HeatmapService {
         const average = costValue.average;
         if (average === undefined) continue;
 
-        const criticalFactor = costValue.critical ?? parseValidPercent(processModel.customProperties['pilot.setProcessCosts.critical']);
-        const warningFactor = costValue.warning ?? parseValidPercent(processModel.customProperties['pilot.setProcessCosts.warning']);
+        const criticalFactor =
+          costValue.critical ?? parseValidPercent(processModel.customProperties['pilot.setProcessCosts.critical']);
+        const warningFactor =
+          costValue.warning ?? parseValidPercent(processModel.customProperties['pilot.setProcessCosts.warning']);
 
         const reference = costValue.reference;
 
@@ -174,7 +182,11 @@ export class HeatmapService {
         let status: HeatmapLevel = 'Stable';
         if (criticalThreshold !== undefined && average >= criticalThreshold) {
           status = 'Critical';
-        } else if (warningThreshold !== undefined && (criticalThreshold === undefined || warningThreshold < criticalThreshold) && average >= warningThreshold) {
+        } else if (
+          warningThreshold !== undefined &&
+          (criticalThreshold === undefined || warningThreshold < criticalThreshold) &&
+          average >= warningThreshold
+        ) {
           status = 'Warning';
         }
 
@@ -183,8 +195,14 @@ export class HeatmapService {
           referenceRuntime: reference,
           warningThreshold,
           criticalThreshold,
-          warningSource: this.getHeatmapSource(costValue.warning, processModel.customProperties['pilot.setProcessCosts.warning']),
-          criticalSource: this.getHeatmapSource(costValue.critical, processModel.customProperties['pilot.setProcessCosts.critical']),
+          warningSource: this.getHeatmapSource(
+            costValue.warning,
+            processModel.customProperties['pilot.setProcessCosts.warning'],
+          ),
+          criticalSource: this.getHeatmapSource(
+            costValue.critical,
+            processModel.customProperties['pilot.setProcessCosts.critical'],
+          ),
         };
 
         if (!this.heatmapInfo[nodeId]) {
@@ -230,7 +248,11 @@ export class HeatmapService {
         let status: HeatmapLevel = 'Stable';
         if (criticalThreshold !== undefined && averageRuntime >= criticalThreshold) {
           status = 'Critical';
-        } else if (warningThreshold !== undefined && (criticalThreshold === undefined || warningThreshold < criticalThreshold) && averageRuntime >= warningThreshold) {
+        } else if (
+          warningThreshold !== undefined &&
+          (criticalThreshold === undefined || warningThreshold < criticalThreshold) &&
+          averageRuntime >= warningThreshold
+        ) {
           status = 'Warning';
         }
         runtimeInfo.status = status;

@@ -44,7 +44,9 @@ export class ProcessCostsService {
 
   constructor(databaseProcessInstance: any, flowNodeDefinitions: FlowNodeDefinition[]) {
     this.instances = databaseProcessInstance;
-    this.flowNodeInstances = databaseProcessInstance.flatMap((instance: any) => instance.process_instance.flowNodeInstances || []);
+    this.flowNodeInstances = databaseProcessInstance.flatMap(
+      (instance: any) => instance.process_instance.flowNodeInstances || [],
+    );
 
     this.processCostsExpressionParams = {
       correlationMetadata: {},
@@ -186,7 +188,9 @@ export class ProcessCostsService {
       let isError = false;
 
       const resolvedExpression = expression.replace(/\$\{(.+?)\}/g, (_, path) => {
-        const value = path.split('.').reduce((acc: any, key: string) => acc && acc[key], this.processCostsExpressionParams);
+        const value = path
+          .split('.')
+          .reduce((acc: any, key: string) => acc && acc[key], this.processCostsExpressionParams);
 
         if (value === undefined || isNaN(value)) {
           isError = true;
@@ -196,7 +200,12 @@ export class ProcessCostsService {
         return value.toString();
       });
 
-      if (isError || resolvedExpression.includes('$') || resolvedExpression.includes('{') || resolvedExpression.includes('}')) {
+      if (
+        isError ||
+        resolvedExpression.includes('$') ||
+        resolvedExpression.includes('{') ||
+        resolvedExpression.includes('}')
+      ) {
         evaluatedProcessCosts[key] = `{ Error: Invalid expression. }`;
         continue;
       }
@@ -214,9 +223,16 @@ export class ProcessCostsService {
 
   private setProcessCostExpressionParamsForInstance(flowNodeInstance: any): void {
     this.processCostsExpressionParams.currentFlowNode = this.getCurrentFlowNode(flowNodeInstance.flowNodeInstanceId);
-    this.processCostsExpressionParams.token = this.buildTokenHistoryForFlowNodeInstance(flowNodeInstance.flowNodeInstanceId);
-    this.processCostsExpressionParams.dataObjects = this.buildDataObjectsForFlowNodeInstance(flowNodeInstance.flowNodeInstanceId);
-    this.processCostsExpressionParams.flowNodeExecutionCount = this.getFlowNodeExecutionCount(flowNodeInstance.id, flowNodeInstance.flowNodeInstanceId);
+    this.processCostsExpressionParams.token = this.buildTokenHistoryForFlowNodeInstance(
+      flowNodeInstance.flowNodeInstanceId,
+    );
+    this.processCostsExpressionParams.dataObjects = this.buildDataObjectsForFlowNodeInstance(
+      flowNodeInstance.flowNodeInstanceId,
+    );
+    this.processCostsExpressionParams.flowNodeExecutionCount = this.getFlowNodeExecutionCount(
+      flowNodeInstance.id,
+      flowNodeInstance.flowNodeInstanceId,
+    );
   }
 
   private getCurrentFlowNode(flowNodeInstanceId: string): any {
@@ -227,7 +243,9 @@ export class ProcessCostsService {
     current: any;
     history: Record<string, any>;
   } {
-    const targetIndex = this.flowNodeInstances.findIndex((fni: any) => fni.flowNodeInstanceId === flowNodeInstanceId && fni.flowNodeExitedAt);
+    const targetIndex = this.flowNodeInstances.findIndex(
+      (fni: any) => fni.flowNodeInstanceId === flowNodeInstanceId && fni.flowNodeExitedAt,
+    );
 
     if (targetIndex === -1) return { current: {}, history: {} };
 

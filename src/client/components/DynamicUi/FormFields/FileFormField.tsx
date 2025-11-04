@@ -23,7 +23,10 @@ export function FileFormField(props: DynamicUiComponentProps<File | null>) {
         multiple={parsedCustomFormConfig?.multiple}
       ></input>
       {parsedCustomFormConfig?.hint && (
-        <p className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]" id={hintId}>
+        <p
+          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
+          id={hintId}
+        >
           {parsedCustomFormConfig?.hint}
         </p>
       )}

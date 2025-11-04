@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
 import { ArrowsPointingInIcon, ArrowsPointingOutIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Editor } from '@monaco-editor/react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { FlowNodeInstance, ProcessInstance } from '@5minds/processcube_engine_sdk';
 
@@ -32,7 +31,11 @@ export function TokenInspector(props: TokenInspectorProps) {
 
       const searchParams = new URLSearchParams(window.location.search);
       searchParams.delete('tokenInspectorFocus');
-      window.history.replaceState(null, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+      );
     };
   }, [initialRender, props.flowNodeInstances]);
 
@@ -70,7 +73,11 @@ export function TokenInspector(props: TokenInspectorProps) {
       searchParams.set('tokenInspectorFocus', selectedInstance.flowNodeId);
     }
 
-    window.history.replaceState(null, '', `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`);
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+    );
   }, [selectedInstance, initialRender]);
 
   const startToken = useMemo(() => {
@@ -120,7 +127,9 @@ export function TokenInspector(props: TokenInspectorProps) {
             <label>Select Flow Node:</label>
             <select
               className="app-sdk-max-w-full app-sdk-bg-transparent app-sdk-border app-sdk-rounded-md app-sdk-py-2 app-sdk-px-1 app-sdk-text-ellipsis"
-              onChange={(event) => setSelectedInstance(props.flowNodeInstances.find((fni) => fni.flowNodeId === event.target.value)!)}
+              onChange={(event) =>
+                setSelectedInstance(props.flowNodeInstances.find((fni) => fni.flowNodeId === event.target.value)!)
+              }
               value={selectedInstance?.flowNodeId ?? props.flowNodeInstances[0].flowNodeId}
             >
               {props.flowNodeInstances.map((instance) => (
@@ -133,7 +142,9 @@ export function TokenInspector(props: TokenInspectorProps) {
         )}
 
         <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-3">
-          {fullscreenToken && <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-black/30 app-sdk-backdrop-blur-md app-sdk-z-40"></div>}
+          {fullscreenToken && (
+            <div className="app-sdk-fixed app-sdk-inset-0 app-sdk-bg-black/30 app-sdk-backdrop-blur-md app-sdk-z-40"></div>
+          )}
 
           <div
             className={`app-sdk-flex app-sdk-flex-col app-sdk-gap-1
@@ -150,7 +161,11 @@ export function TokenInspector(props: TokenInspectorProps) {
                 onClick={() => toggleFullscreen('start')}
                 title={fullscreenToken === 'start' ? 'Minimize' : 'Maximize'}
               >
-                {fullscreenToken === 'start' ? <ArrowsPointingInIcon className="app-sdk-w-6 app-sdk-h-6" /> : <ArrowsPointingOutIcon className="app-sdk-w-6 app-sdk-h-6" />}
+                {fullscreenToken === 'start' ? (
+                  <ArrowsPointingInIcon className="app-sdk-w-6 app-sdk-h-6" />
+                ) : (
+                  <ArrowsPointingOutIcon className="app-sdk-w-6 app-sdk-h-6" />
+                )}
               </button>
             </div>
             <Editor
@@ -176,7 +191,11 @@ export function TokenInspector(props: TokenInspectorProps) {
                 onClick={() => toggleFullscreen('end')}
                 title={fullscreenToken === 'end' ? 'Minimize' : 'Maximize'}
               >
-                {fullscreenToken === 'end' ? <ArrowsPointingInIcon className="app-sdk-w-6 app-sdk-h-6" /> : <ArrowsPointingOutIcon className="app-sdk-w-6 app-sdk-h-6" />}
+                {fullscreenToken === 'end' ? (
+                  <ArrowsPointingInIcon className="app-sdk-w-6 app-sdk-h-6" />
+                ) : (
+                  <ArrowsPointingOutIcon className="app-sdk-w-6 app-sdk-h-6" />
+                )}
               </button>
             </div>
             <Editor
