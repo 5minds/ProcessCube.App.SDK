@@ -64,18 +64,14 @@ export function HeatmapInspector({
 
   const selectedNodeTitle = useMemo(() => {
     const flowNode = processModel.flowNodes.find((flowNode: any) => flowNode.id === selectedInstance);
-    return flowNode
-      ? `Flow Node: ${flowNode.id} (${flowNode.name})`
-      : `Process: ${processModel.processModelId} (${processModel.processModelName})`;
+    return flowNode ? `Flow Node: ${flowNode.id} (${flowNode.name})` : `Process: ${processModel.processModelId} (${processModel.processModelName})`;
   }, [selectedInstance, processModel]);
 
   const hasCostEntry = heatmapService?.hasCostEntry?.() ?? false;
   const hasRuntimeEntry = heatmapService?.hasRuntimeEntry?.() ?? false;
-  const hasMultipleCostEntries =
-    heatmapService && selectedInstance ? heatmapService.hasMultipleCostEntries(selectedInstance) : false;
+  const hasMultipleCostEntries = heatmapService && selectedInstance ? heatmapService.hasMultipleCostEntries(selectedInstance) : false;
   const mainHeatmapType = heatmapType === 'runtime' ? 'runtime' : 'processcosts';
-  const activeCostType =
-    heatmapService && selectedInstance ? heatmapService.getActiveCostKey(selectedInstance) : 'processcosts';
+  const activeCostType = heatmapService && selectedInstance ? heatmapService.getActiveCostKey(selectedInstance) : 'processcosts';
 
   const setAndApplyHeatmap = (value: string) => {
     if (selectedInstance) setHeatmapType(value);
@@ -149,9 +145,7 @@ export function HeatmapInspector({
               </select>
             </>
           ) : (
-            <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">
-              Heatmap Type: {hasRuntimeEntry ? 'Runtimes' : 'Costs'}
-            </label>
+            <label className="app-sdk-flex app-sdk-items-center app-sdk-gap-2 app-sdk-text-sm">Heatmap Type: {hasRuntimeEntry ? 'Runtimes' : 'Costs'}</label>
           )}
         </div>
       )}
@@ -172,22 +166,16 @@ export function HeatmapInspector({
 
           {heatmapStatsMap && heatmapStatsMap.runtime && (
             <div className="app-sdk-flex app-sdk-flex-col app-sdk-gap-1">
-              <p className="app-sdk-ml-2 app-sdk-text-sm">
-                Reference Value: {formatDuration(heatmapStatsMap.runtime.referenceRuntime)}
-              </p>
-              {heatmapStatsMap.runtime.status && (
-                <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {heatmapStatsMap.runtime.status}</p>
-              )}
+              <p className="app-sdk-ml-2 app-sdk-text-sm">Reference Value: {formatDuration(heatmapStatsMap.runtime.referenceRuntime)}</p>
+              {heatmapStatsMap.runtime.status && <p className="app-sdk-ml-2 app-sdk-text-sm">Status: {heatmapStatsMap.runtime.status}</p>}
               {heatmapStatsMap.runtime.warningThreshold && (
                 <p className="app-sdk-ml-2 app-sdk-text-sm">
-                  Warning Threshold: {formatDuration(heatmapStatsMap.runtime.warningThreshold)} (
-                  {heatmapStatsMap.runtime.warningSource})
+                  Warning Threshold: {formatDuration(heatmapStatsMap.runtime.warningThreshold)} ({heatmapStatsMap.runtime.warningSource})
                 </p>
               )}
               {heatmapStatsMap.runtime.criticalThreshold && (
                 <p className="app-sdk-ml-2 app-sdk-text-sm">
-                  Critical Threshold: {formatDuration(heatmapStatsMap.runtime.criticalThreshold)} (
-                  {heatmapStatsMap.runtime.criticalSource})
+                  Critical Threshold: {formatDuration(heatmapStatsMap.runtime.criticalThreshold)} ({heatmapStatsMap.runtime.criticalSource})
                 </p>
               )}
             </div>

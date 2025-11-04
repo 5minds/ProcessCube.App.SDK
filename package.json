@@ -33,8 +33,9 @@
     "build": "concurrently -n=build:code,build:types,build:css \"NODE_ENV=development node build.js\" \"npm run build:types\" \"NODE_ENV=development node build-css.cjs\"",
     "build:types": "tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently -n=build:types:server,build:types:client \"tsc -p tsconfig.server.json --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --emitDeclarationOnly\"",
     "build:prod": "npm run clean && concurrently -n=build:prod:code,build:types,build:css \"NODE_ENV=production node build.js\" \"npm run build:types\" \"NODE_ENV=production node build-css.cjs\"",
-    "clean": "rm -rf build",
-    "lint": "prettier --write --config ./.prettierrc.json ./src && tsc --noEmit",
+    "clean": "rm -rf build && rm -f *.d.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepare": "npm run build:prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "NODE_ENV=development tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently --kill-others -n=esbuild,tsc:server,tsc:common,tsc:client,build:css \"node build.js --watch\" \"tsc -p tsconfig.server.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.common.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --watch --preserveWatchOutput --emitDeclarationOnly\" \"NODE_ENV=development node build-css.cjs --watch\""
@@ -86,7 +87,8 @@
     "concurrently": "^9.1.2",
     "esbuild-style-plugin": "^1.6.3",
     "postcss-import": "^16.1.0",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.8",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.8.3"

@@ -1,5 +1,28 @@
 {
   "singleQuote": true,
-  "printWidth": 120,
-  "arrowParens": "always"
+  "printWidth": 180,
+  "arrowParens": "always",
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": "*.{ts,js}",
+      "options": {
+        "plugins": ["@trivago/prettier-plugin-sort-imports"],
+        "importOrder": ["^react$", "^@(?!atlas|5minds).+", "^@5minds(.+)", "^@atlas(.+)", "^[./]"],
+        "importOrderParserPlugins": ["typescript", "decorators-legacy"],
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true
+      }
+    },
+    {
+      "files": "*.{tsx,jsx}",
+      "options": {
+        "plugins": ["@trivago/prettier-plugin-sort-imports"],
+        "importOrder": ["^react$", "^@(?!atlas|5minds).+", "^@5minds(.+)", "^@atlas(.+)", "^[./]"],
+        "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true
+      }
+    }
+  ]
 }

@@ -1,16 +1,13 @@
 .heatmap-flow-shadow {
-  filter: drop-shadow(0 0 10px rgb(128, 171, 188)) drop-shadow(0 0 10px rgb(128, 171, 188))
-    drop-shadow(0 0 10px rgb(128, 171, 188));
+  filter: drop-shadow(0 0 10px rgb(128, 171, 188)) drop-shadow(0 0 10px rgb(128, 171, 188)) drop-shadow(0 0 10px rgb(128, 171, 188));
 }
 
 .heatmap-critical {
-  filter: drop-shadow(0 0 2px rgb(255, 0, 0)) drop-shadow(0 0 4px rgb(255, 0, 0)) drop-shadow(0 0 6px rgb(255, 0, 0))
-    drop-shadow(0 0 14px rgb(255, 0, 0));
+  filter: drop-shadow(0 0 2px rgb(255, 0, 0)) drop-shadow(0 0 4px rgb(255, 0, 0)) drop-shadow(0 0 6px rgb(255, 0, 0)) drop-shadow(0 0 14px rgb(255, 0, 0));
 }
 
 .heatmap-warning {
-  filter: drop-shadow(0 0 2px rgb(255, 220, 0)) drop-shadow(0 0 4px rgb(255, 220, 0))
-    drop-shadow(0 0 6px rgb(255, 220, 0)) drop-shadow(0 0 10px rgb(255, 220, 0));
+  filter: drop-shadow(0 0 2px rgb(255, 220, 0)) drop-shadow(0 0 4px rgb(255, 220, 0)) drop-shadow(0 0 6px rgb(255, 220, 0)) drop-shadow(0 0 10px rgb(255, 220, 0));
 }
 
 .heatmap-stable {
