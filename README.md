@@ -6,7 +6,7 @@ Das SDK beinhaltet Komponenten und Funktionen für Frontend und Backend (Client/
 
 ### Voraussetzungen
 
-- NodeJS `>= v18`
+- NodeJS `>= v24`
 
 ```shell
 npm i @5minds/processcube_app_sdk
