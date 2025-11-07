@@ -2,9 +2,10 @@ import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 import type { OverlayAttrs } from 'diagram-js/lib/features/overlays/Overlays';
 import type { ElementLike } from 'diagram-js/lib/model/Types';
 import dynamic from 'next/dynamic';
+import { renderToString } from 'react-dom/server';
+
 import { ForwardedRef, Ref, forwardRef } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { renderToString } from 'react-dom/server';
 
 import { HeatmapService } from '../services';
 import { BPMNViewer, BPMNViewerFunctions } from './BPMNViewer';
@@ -28,10 +29,7 @@ type DiagramDocumentationInspectorProps = {
   heatmapType?: string;
 };
 
-function DiagramDocumentationInspectorFunction(
-  props: DiagramDocumentationInspectorProps,
-  ref: Ref<DiagramDocumentationInspectorRef>,
-) {
+function DiagramDocumentationInspectorFunction(props: DiagramDocumentationInspectorProps, ref: Ref<DiagramDocumentationInspectorRef>) {
   const [onImportDoneCallbacks, setOnImportDoneCallbacks] = useState<(() => void)[]>([]);
   const bpmnViewerRef = useRef<BPMNViewerFunctions>(null);
   const splitterRef = useRef<SplitterLayout>(null);
@@ -204,21 +202,13 @@ function DocumentationText({ elements }: { elements: Array<ElementLike> }) {
     return <DocumentationViewer documentation={text} />;
   }
 
-  return (
-    <DocumentationViewer
-      documentation={elementsWithDocumentation
-        .map((element) => getBusinessObject(element)?.documentation?.[0]?.text)
-        .join('\n\n<hr />\n\n')}
-    />
-  );
+  return <DocumentationViewer documentation={elementsWithDocumentation.map((element) => getBusinessObject(element)?.documentation?.[0]?.text).join('\n\n<hr />\n\n')} />;
 }
 
 const DocumentationOverlayIcon = ({ showBackground }: { showBackground?: boolean }) => (
   <div title="This element has documentation">
     <svg
-      className={`${
-        showBackground ? 'app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-p-[2px] app-sdk-rounded' : ''
-      }`}
+      className={`${showBackground ? 'app-sdk-bg-[color:var(--asdk-ddi-background-color)] app-sdk-p-[2px] app-sdk-rounded' : ''}`}
       xmlns="http://www.w3.org/2000/svg"
       height="16"
       viewBox="0 0 448 512"
@@ -229,12 +219,7 @@ const DocumentationOverlayIcon = ({ showBackground }: { showBackground?: boolean
   </div>
 );
 
-const HIDE_DOCUMENTATION_OVERLAY_FOR_BPMN_TYPES: string[] = [
-  'bpmn:DataInputAssociation',
-  'bpmn:DataOutputAssociation',
-  'bpmn:SequenceFlow',
-  'label',
-];
+const HIDE_DOCUMENTATION_OVERLAY_FOR_BPMN_TYPES: string[] = ['bpmn:DataInputAssociation', 'bpmn:DataOutputAssociation', 'bpmn:SequenceFlow', 'label'];
 
 const DOCUMENTATION_OVERLAYS_POSITION: Record<string, OverlayAttrs['position']> = {
   DEFAULT: {
@@ -319,9 +304,6 @@ function ForwardedDiagramDocumentationInspector(props: DiagramDocumentationInspe
   return <DiagramDocumentationInspector {...props} ref={props.viewerRef} />;
 }
 
-export const DiagramDocumentationInspectorNextJS = dynamic(
-  () => Promise.resolve(ForwardedDiagramDocumentationInspector),
-  {
-    ssr: false,
-  },
-);
+export const DiagramDocumentationInspectorNextJS = dynamic(() => Promise.resolve(ForwardedDiagramDocumentationInspector), {
+  ssr: false,
+});

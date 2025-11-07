@@ -2,7 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./build/client",
-    "lib": ["DOM", "DOM.Iterable"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "tsBuildInfoFile": "./build/client.tsbuildinfo",
     "declarationDir": "./build/"
   },
