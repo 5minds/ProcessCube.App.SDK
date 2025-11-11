@@ -1,6 +1,7 @@
+import React, { useEffect, useState } from 'react';
+
 import { Description, Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import Editor from '@monaco-editor/react';
-import React, { useEffect, useState } from 'react';
 
 import { FlowNodeInstance, ProcessInstance } from '@5minds/processcube_engine_sdk';
 
@@ -15,9 +16,7 @@ export function RetryDialog(props: RetryDialogProps) {
   const [startToken, setStartToken] = useState<string>('');
 
   useEffect(() => {
-    setStartToken(
-      JSON.stringify(props.flowNodeInstance?.startToken ?? props.processInstance.startToken ?? {}, null, 2),
-    );
+    setStartToken(JSON.stringify(props.flowNodeInstance?.startToken ?? props.processInstance.startToken ?? {}, null, 2));
   }, [props.flowNodeInstance, props.processInstance]);
 
   return (
@@ -63,12 +62,7 @@ export function RetryDialog(props: RetryDialogProps) {
                   const newStartToken = JSON.parse(startToken);
                   const serverActions = await import('../../../server/actions');
 
-                  (await serverActions.retryProcess(
-                    props.processInstance.processInstanceId,
-                    props.flowNodeInstance?.flowNodeInstanceId,
-                    newStartToken,
-                  ),
-                    props.onClose());
+                  (await serverActions.retryProcess(props.processInstance.processInstanceId, props.flowNodeInstance?.flowNodeInstanceId, newStartToken), props.onClose());
                 }}
               >
                 Retry

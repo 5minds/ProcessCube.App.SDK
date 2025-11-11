@@ -1,15 +1,13 @@
 import DOMPurify from 'isomorphic-dompurify';
 import { type Tokens, marked } from 'marked';
+
 import React, { forwardRef } from 'react';
 import { useEffect, useState } from 'react';
 
 import { classNames } from '../../../utils/classNames';
 import type { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicUi';
 
-export const ParagraphFormField = forwardRef(function ParagraphFormField(
-  { formField: { defaultValue, label } }: DynamicUiComponentProps,
-  ref: DynamicUiFormFieldRef,
-) {
+export const ParagraphFormField = forwardRef(function ParagraphFormField({ formField: { defaultValue, label } }: DynamicUiComponentProps, ref: DynamicUiFormFieldRef) {
   const [generatedHtml, setGeneratedHtml] = useState('');
   useEffect(() => {
     const html = marked.parse(defaultValue?.toString() ?? label?.toString() ?? '', {

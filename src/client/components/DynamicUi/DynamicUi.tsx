@@ -1,44 +1,31 @@
-import React, { Fragment, PropsWithChildren, createElement, useRef } from 'react';
 import * as ReactIs from 'react-is';
 import semverGt from 'semver/functions/gt';
 import semverPrerelease from 'semver/functions/prerelease';
 import semverSatisfies from 'semver/functions/satisfies';
 
+import React, { Fragment, PropsWithChildren, createElement, useRef } from 'react';
+
 import { DataModels } from '@5minds/processcube_engine_sdk';
 
 import { UserTaskInstance, mapUserTask } from '../../../common/types';
 import { classNames } from '../../utils/classNames';
-import {
-  type DynamicUiFormFieldComponentMap,
-  FormFieldComponentMap,
-  type GenericFormFieldTypeComponentMap,
-} from './FormFields';
+import { type DynamicUiFormFieldComponentMap, FormFieldComponentMap, type GenericFormFieldTypeComponentMap } from './FormFields';
 import { parseCustomFormConfig } from './utils/parseCustomFormConfig';
 
 const REACT_VERSION_IS_SUPPORTED = semverSatisfies(React.version, '>=19.0.0 <20', { includePrerelease: true });
 const REACT_IS_STABLE = semverPrerelease(React.version) == null;
-const REACT_IS_CANARY_AND_GREATER_THAN_STABLE =
-  !REACT_IS_STABLE && semverGt(React.version, '19.0.0') && React.version.includes('canary');
+const REACT_IS_CANARY_AND_GREATER_THAN_STABLE = !REACT_IS_STABLE && semverGt(React.version, '19.0.0') && React.version.includes('canary');
 
-interface DynamicUiForwardedRefRenderFunction
-  extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
+interface DynamicUiForwardedRefRenderFunction extends React.ForwardRefRenderFunction<DynamicUiRefFunctions, DynamicUiComponentProps> {
   (props: DynamicUiComponentProps, ref: DynamicUiFormFieldRef): React.ReactNode;
 }
-type DynamicUiForwardedRefExoticComponent = React.ForwardRefExoticComponent<
-  DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>
->;
+type DynamicUiForwardedRefExoticComponent = React.ForwardRefExoticComponent<DynamicUiComponentProps & React.RefAttributes<DynamicUiRefFunctions>>;
 
 type DynamicUiComponentType = React.ComponentClass<DynamicUiComponentProps>;
-export type DynamicUiFormFieldComponent =
-  | DynamicUiForwardedRefExoticComponent
-  | DynamicUiForwardedRefRenderFunction
-  | typeof DynamicUiComponent<DynamicUiComponentProps, {}>;
+export type DynamicUiFormFieldComponent = DynamicUiForwardedRefExoticComponent | DynamicUiForwardedRefRenderFunction | typeof DynamicUiComponent<DynamicUiComponentProps, {}>;
 
 type DynamicUiRefFunctions = Omit<DynamicUiComponent, keyof React.Component>;
-type FormFieldRenderer =
-  | DynamicUiForwardedRefExoticComponent
-  | DynamicUiForwardedRefRenderFunction
-  | DynamicUiComponentType;
+type FormFieldRenderer = DynamicUiForwardedRefExoticComponent | DynamicUiForwardedRefRenderFunction | DynamicUiComponentType;
 type FormFieldRefsMapObj = {
   ref: React.MutableRefObject<DynamicUiRefFunctions | null>;
 };
@@ -47,11 +34,7 @@ export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 export type JSONObject = { [member: string]: JSONValue };
 export interface JSONArray extends Array<JSONValue> {}
 
-export abstract class DynamicUiComponent<
-  P extends DynamicUiComponentProps = DynamicUiComponentProps,
-  S = {},
-  SS = any,
-> extends React.Component<P, S, SS> {
+export abstract class DynamicUiComponent<P extends DynamicUiComponentProps = DynamicUiComponentProps, S = {}, SS = any> extends React.Component<P, S, SS> {
   getValue?(): JSONValue | void;
   getState?(): JSONValue | void;
 }
@@ -90,18 +73,14 @@ export function DynamicUi(
   }>,
 ) {
   if (!REACT_VERSION_IS_SUPPORTED) {
-    console.warn(
-      `[@5minds/processcube_app_sdk:DynamicUi]\t\tThe React version is not supported!\nVersion: ${React.version}`,
-    );
+    console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tThe React version is not supported!\nVersion: ${React.version}`);
   }
 
   const { userTaskConfig: config } = props.task;
   const { formFields } = config;
   const timeoutRef = useRef<number>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const formFieldRefs = new Map<string, FormFieldRefsMapObj>(
-    formFields.map((field) => [field.id, { ref: React.createRef<DynamicUiRefFunctions>() }]),
-  );
+  const formFieldRefs = new Map<string, FormFieldRefsMapObj>(formFields.map((field) => [field.id, { ref: React.createRef<DynamicUiRefFunctions>() }]));
 
   const confirmFormFields = formFields.filter((field) => field.type === 'confirm');
   if (confirmFormFields.length > 1) {
@@ -168,11 +147,7 @@ export function DynamicUi(
   };
   return (
     <div
-      className={
-        withDarkMode
-          ? `dark app-sdk-dark ${rootClassNames}`
-          : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'app-sdk-dark'))
-      }
+      className={withDarkMode ? `dark app-sdk-dark ${rootClassNames}` : classNames(...rootClassNames.split(' ').filter((c) => c !== 'dark' && c !== 'app-sdk-dark'))}
       data-dynamic-ui
     >
       <form
@@ -186,28 +161,14 @@ export function DynamicUi(
         onChange={onFormDataChange}
         {...submitAndActionAttributes}
       >
-        <header
-          className={classNames(
-            'app-sdk-px-4 app-sdk-pb-3 app-sdk-pt-4 sm:app-sdk-px-6',
-            props.classNames?.header ? props.classNames.header : '',
-          )}
-        >
-          <Headline
-            title={props.title ?? props.task.flowNodeName ?? 'User Task'}
-            headerComponent={props.headerComponent}
-          />
+        <header className={classNames('app-sdk-px-4 app-sdk-pb-3 app-sdk-pt-4 sm:app-sdk-px-6', props.classNames?.header ? props.classNames.header : '')}>
+          <Headline title={props.title ?? props.task.flowNodeName ?? 'User Task'} headerComponent={props.headerComponent} />
         </header>
-        <section
-          className={classNames(
-            'app-sdk-overflow-y-auto app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6',
-            props.classNames?.body ?? '',
-          )}
-        >
+        <section className={classNames('app-sdk-overflow-y-auto app-sdk-px-4 app-sdk-py-3 sm:app-sdk-px-6', props.classNames?.body ?? '')}>
           <div className="app-sdk-flex app-sdk-flex-col app-sdk-space-y-6 dark:[color-scheme:dark]">
             {formFields.map((field) => {
               const DynamicUiFormFieldComponent =
-                (formFieldComponentMap as GenericFormFieldTypeComponentMap)?.[field.type] ||
-                (formFieldComponentMap as GenericFormFieldTypeComponentMap).custom;
+                (formFieldComponentMap as GenericFormFieldTypeComponentMap)?.[field.type] || (formFieldComponentMap as GenericFormFieldTypeComponentMap).custom;
 
               if (!DynamicUiFormFieldComponent) {
                 return null;
@@ -245,11 +206,7 @@ export function DynamicUi(
               return (
                 <Fragment key={field.id}>
                   {createElement(DynamicUiFormFieldComponent as React.ElementType, {
-                    ref:
-                      isReactClassComponent(DynamicUiFormFieldComponent) ||
-                      isForwardedExoticComponent(DynamicUiFormFieldComponent)
-                        ? ref
-                        : undefined,
+                    ref: isReactClassComponent(DynamicUiFormFieldComponent) || isForwardedExoticComponent(DynamicUiFormFieldComponent) ? ref : undefined,
                     formField: field,
                     state: props.state?.[field.id],
                   })}
@@ -308,21 +265,14 @@ function FormButtons(props: { confirmFormField: DataModels.FlowNodeInstances.Use
       </Fragment>
     );
   }
-  return (
-    <div className="app-sdk-space-y-2 sm:app-sdk-flex sm:app-sdk-flex-row-reverse sm:-app-sdk-space-x-2 sm:app-sdk-space-y-0">
-      {buttons}
-    </div>
-  );
+  return <div className="app-sdk-space-y-2 sm:app-sdk-flex sm:app-sdk-flex-row-reverse sm:-app-sdk-space-x-2 sm:app-sdk-space-y-0">{buttons}</div>;
 }
 
 function Headline(props: { title?: React.ReactNode; headerComponent?: React.JSX.Element }) {
   return (
     <div className="app-sdk-flex app-sdk-space-x-3">
       <div className="app-sdk-flex-1">
-        <h3
-          id="headline-title"
-          className="app-sdk-text-lg app-sdk-font-medium app-sdk-leading-6 app-sdk-text-[color:var(--asdk-dui-header-text-color)]"
-        >
+        <h3 id="headline-title" className="app-sdk-text-lg app-sdk-font-medium app-sdk-leading-6 app-sdk-text-[color:var(--asdk-dui-header-text-color)]">
           {props.title}
         </h3>
       </div>
@@ -335,9 +285,7 @@ function isReactClassComponent(element: DynamicUiFormFieldComponent): boolean {
   return element?.prototype?.isReactComponent != null;
 }
 
-function assertElementIsReactComponent(
-  element: DynamicUiFormFieldComponent,
-): asserts element is DynamicUiComponentType {
+function assertElementIsReactComponent(element: DynamicUiFormFieldComponent): asserts element is DynamicUiComponentType {
   if (ReactIs.isValidElementType(element) && isReactClassComponent(element)) {
     return;
   }
@@ -346,16 +294,10 @@ function assertElementIsReactComponent(
 }
 
 function isForwardedExoticComponent(element: DynamicUiFormFieldComponent): boolean {
-  return (
-    ReactIs.isValidElementType(element) &&
-    (element as React.ExoticComponent).$$typeof === ReactIs.ForwardRef &&
-    !isReactClassComponent(element)
-  );
+  return ReactIs.isValidElementType(element) && (element as React.ExoticComponent).$$typeof === ReactIs.ForwardRef && !isReactClassComponent(element);
 }
 
-function assertElementIsForwardedExoticComponent(
-  element: DynamicUiFormFieldComponent,
-): asserts element is DynamicUiForwardedRefExoticComponent {
+function assertElementIsForwardedExoticComponent(element: DynamicUiFormFieldComponent): asserts element is DynamicUiForwardedRefExoticComponent {
   if (isForwardedExoticComponent(element)) {
     return;
   }
@@ -363,9 +305,7 @@ function assertElementIsForwardedExoticComponent(
   throw new Error(`Expected Element to be a functional Component wrapped with React.forwardRef`);
 }
 
-function assertElementIsRenderFunction(
-  element: DynamicUiFormFieldComponent,
-): asserts element is DynamicUiForwardedRefRenderFunction {
+function assertElementIsRenderFunction(element: DynamicUiFormFieldComponent): asserts element is DynamicUiForwardedRefRenderFunction {
   if (ReactIs.isValidElementType(element) && !isReactClassComponent(element)) {
     return;
   }

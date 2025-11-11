@@ -6,10 +6,7 @@
   .dark,
   .dark * {
     --asdk-pii-text-color: var(--app-sdk-process-instance-inspector-text-color, theme('colors.app-sdk-gray.50'));
-    --asdk-pii-background-color: var(
-      --app-sdk-process-instance-inspector-background-color,
-      theme('colors.app-sdk-gray.700')
-    );
+    --asdk-pii-background-color: var(--app-sdk-process-instance-inspector-background-color, theme('colors.app-sdk-gray.700'));
 
     .monaco-editor,
     .monaco-editor * {
@@ -27,22 +24,10 @@
   ::after {
     --asdk-pii-text-color: var(--app-sdk-process-instance-inspector-text-color, theme('colors.app-sdk-gray.700'));
     --asdk-pii-background-color: var(--app-sdk-process-instance-inspector-background-color, theme(colors.white));
-    --asdk-pii-state-finished-color: var(
-      --app-sdk-process-instance-inspector-state-finished-color,
-      theme(colors.green.500)
-    );
-    --asdk-pii-state-running-color: var(
-      --app-sdk-process-instance-inspector-state-running-color,
-      theme(colors.sky.500)
-    );
-    --asdk-pii-state-suspended-color: var(
-      --app-sdk-process-instance-inspector-state-suspended-color,
-      theme(colors.sky.500)
-    );
-    --asdk-pii-state-terminated-color: var(
-      --app-sdk-process-instance-inspector-state-terminated-color,
-      theme(colors.orange.500)
-    );
+    --asdk-pii-state-finished-color: var(--app-sdk-process-instance-inspector-state-finished-color, theme(colors.green.500));
+    --asdk-pii-state-running-color: var(--app-sdk-process-instance-inspector-state-running-color, theme(colors.sky.500));
+    --asdk-pii-state-suspended-color: var(--app-sdk-process-instance-inspector-state-suspended-color, theme(colors.sky.500));
+    --asdk-pii-state-terminated-color: var(--app-sdk-process-instance-inspector-state-terminated-color, theme(colors.orange.500));
     --asdk-pii-state-error-color: var(--app-sdk-process-instance-inspector-state-error-color, theme(colors.red.500));
   }
 

@@ -29,24 +29,17 @@ export async function waitForUserTask(
   identity: Identity | boolean = true,
 ): Promise<UserTaskInstance> {
   const { correlationId, processInstanceId, flowNodeId } = filterBy;
-  const resolvedIdentity =
-    typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
+  const resolvedIdentity = typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
 
   return new Promise<UserTaskInstance>(async (resolve, reject) => {
     const sub = await Client.userTasks.onUserTaskWaiting(
       async (event) => {
         const correlationIdGivenButNotMatching = correlationId !== undefined && event.correlationId !== correlationId;
         const flowNodeInstanceIdIsUndefined = event.flowNodeInstanceId === undefined;
-        const processInstanceIdGivenButNotMatching =
-          processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
+        const processInstanceIdGivenButNotMatching = processInstanceId !== undefined && event.processInstanceId !== processInstanceId;
         const flowNodeIdGivenButNotMatching = flowNodeId !== undefined && event.flowNodeId !== flowNodeId;
 
-        if (
-          correlationIdGivenButNotMatching ||
-          flowNodeInstanceIdIsUndefined ||
-          processInstanceIdGivenButNotMatching ||
-          flowNodeIdGivenButNotMatching
-        ) {
+        if (correlationIdGivenButNotMatching || flowNodeInstanceIdIsUndefined || processInstanceIdGivenButNotMatching || flowNodeIdGivenButNotMatching) {
           return;
         }
 
@@ -111,8 +104,7 @@ export async function finishUserTaskAndGetNext(
   result: UserTaskResult = {},
   identity: Identity | boolean = true,
 ): Promise<UserTaskInstance | null> {
-  const resolvedIdentity =
-    typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
+  const resolvedIdentity = typeof identity === 'boolean' ? (identity == true ? await getIdentity() : undefined) : identity;
 
   await Client.userTasks.finishUserTask(flowNodeInstanceId, result, resolvedIdentity);
 
@@ -129,10 +121,7 @@ export async function finishUserTaskAndGetNext(
   return mapUserTask(userTasks.userTasks[0]);
 }
 
-export async function getUserTasks(
-  query: DataModels.FlowNodeInstances.UserTaskQuery,
-  options: OptionsWithBoolIdentity = { identity: true },
-): Promise<UserTaskList> {
+export async function getUserTasks(query: DataModels.FlowNodeInstances.UserTaskQuery, options: OptionsWithBoolIdentity = { identity: true }): Promise<UserTaskList> {
   switch (options?.identity) {
     case true:
       options.identity = await getIdentity();
@@ -154,9 +143,7 @@ export async function getUserTasks(
  * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<UserTaskList>}
  */
-export async function getWaitingUserTasks(
-  options: OptionsWithBoolIdentity = { identity: true },
-): Promise<UserTaskList> {
+export async function getWaitingUserTasks(options: OptionsWithBoolIdentity = { identity: true }): Promise<UserTaskList> {
   switch (options?.identity) {
     case true:
       options.identity = await getIdentity();
@@ -219,10 +206,7 @@ export async function getWaitingUserTasksByProcessInstanceId(
  * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity} or {@link DataModels.FlowNodeInstances.FlowNodeInstanceSortSettings}
  * @returns {Promise<UserTaskList>}
  */
-export async function getWaitingUserTasksByFlowNodeId(
-  flowNodeId: string | string[],
-  options: OptionsWithBoolIdentity = { identity: true },
-): Promise<UserTaskList> {
+export async function getWaitingUserTasksByFlowNodeId(flowNodeId: string | string[], options: OptionsWithBoolIdentity = { identity: true }): Promise<UserTaskList> {
   switch (options?.identity) {
     case true:
       options.identity = await getIdentity();
@@ -251,10 +235,7 @@ export async function getWaitingUserTasksByFlowNodeId(
  * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity}
  * @returns {Promise<UserTaskInstance | null>}
  */
-export async function getWaitingUserTaskByFlowNodeInstanceId(
-  flowNodeInstanceId: string,
-  options: OptionsWithBoolIdentity = { identity: true },
-): Promise<UserTaskInstance | null> {
+export async function getWaitingUserTaskByFlowNodeInstanceId(flowNodeInstanceId: string, options: OptionsWithBoolIdentity = { identity: true }): Promise<UserTaskInstance | null> {
   switch (options?.identity) {
     case true:
       options.identity = await getIdentity();
@@ -289,10 +270,7 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(
  * @param options Additional options for the query e.g. {@link DataModels.Iam.Identity}
  * @returns {Promise<UserTaskList>}
  */
-export async function getWaitingUserTasksByCorrelationId(
-  correlationId: string,
-  options: OptionsWithBoolIdentity = { identity: true },
-): Promise<UserTaskList> {
+export async function getWaitingUserTasksByCorrelationId(correlationId: string, options: OptionsWithBoolIdentity = { identity: true }): Promise<UserTaskList> {
   switch (options?.identity) {
     case true:
       options.identity = await getIdentity();
@@ -352,18 +330,11 @@ export async function getReservedUserTasksByIdentity(
  * @param actualOwnerId The user id of the process instance owner
  * @returns {Promise<void>}
  */
-export async function reserveUserTask(
-  identity: DataModels.Iam.Identity,
-  flowNodeInstanceId: string,
-  actualOwnerId?: string,
-): Promise<void> {
+export async function reserveUserTask(identity: DataModels.Iam.Identity, flowNodeInstanceId: string, actualOwnerId?: string): Promise<void> {
   await Client.userTasks.reserveUserTaskInstance(identity, flowNodeInstanceId, actualOwnerId || identity.userId);
 }
 
-export async function cancelReservedUserTask(
-  identity: DataModels.Iam.Identity,
-  flowNodeInstanceId: string,
-): Promise<void> {
+export async function cancelReservedUserTask(identity: DataModels.Iam.Identity, flowNodeInstanceId: string): Promise<void> {
   await Client.userTasks.cancelUserTaskInstanceReservation(identity, flowNodeInstanceId);
 }
 /**
@@ -391,9 +362,7 @@ export async function getAssignedUserTasksByIdentity(
     },
   );
 
-  const assignedUserTasks = result.userTasks.filter((userTask) =>
-    userTask.assignedUserIds?.includes(resolvedIdentity.userId),
-  );
+  const assignedUserTasks = result.userTasks.filter((userTask) => userTask.assignedUserIds?.includes(resolvedIdentity.userId));
   result.userTasks = assignedUserTasks;
 
   return mapUserTaskList(result);
