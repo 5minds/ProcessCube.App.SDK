@@ -88,7 +88,6 @@
     "esbuild-style-plugin": "^1.6.3",
     "postcss-import": "^16.1.0",
     "prettier": "^3.6.2",
-    "turbo": "^2.5.8",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.8.3"
