@@ -11,18 +11,28 @@ const EngineURL = process.env.PROCESSCUBE_ENGINE_URL ?? null;
 let externalTaskWorker: ExternalTaskWorker<unknown, any> | null = null;
 let workerTopic: string;
 
-process.on('message', async (message: IPCMessageType) => {
-  switch (message.action) {
-    case 'create':
-      await create(message.payload);
-      break;
-    case 'restart':
-      restart(message.payload);
-      break;
-    case 'updateIdentity':
-      updateIdentity(message.payload);
-      break;
-  }
+process.on('message', (message: IPCMessageType) => {
+  (async () => {
+    try {
+      switch (message.action) {
+        case 'create':
+          await create(message.payload);
+          break;
+        case 'restart':
+          await restart(message.payload);
+          break;
+        case 'updateIdentity':
+          updateIdentity(message.payload);
+          break;
+      }
+    } catch (error) {
+      logger.error('Error handling IPC message', {
+        action: message.action,
+        error,
+        pid,
+      });
+    }
+  })();
 });
 
 process.once('SIGTERM', () => {
@@ -39,6 +49,21 @@ process.once('SIGHUP', () => {
 
 process.once('disconnect', () => {
   quit('External Task Worker Process received disconnect signal');
+});
+
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled Promise Rejection in External Task Worker Process', {
+    reason,
+    pid,
+  });
+});
+
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception in External Task Worker Process', {
+    error,
+    pid,
+  });
+  process.exit(4);
 });
 
 async function create({
@@ -74,10 +99,17 @@ async function create({
   const handler = module.default;
   assertNotNull(EngineURL, 'EngineURL');
   externalTaskWorker = new ExternalTaskWorker<unknown, any>(EngineURL, topic, handler, config);
-  externalTaskWorker.onWorkerError((error) => {
+  externalTaskWorker.onWorkerError((errorType, error, externalTask) => {
     assertNotNull(externalTaskWorker, 'externalTaskWorker');
     logger.error(`External task worker ${externalTaskWorker.workerId} for topic ${topic} ran into an error`, {
-      error,
+      errorType,
+      error: error instanceof Error ? {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        ...(error as any).code && { code: (error as any).code },
+      } : error,
+      externalTaskId: externalTask?.id,
       workerId: externalTaskWorker.workerId,
       topic,
       pid,
@@ -95,7 +127,7 @@ async function create({
   });
 }
 
-function restart({ topic, identity, moduleString, workerPath }: StartPayload) {
+async function restart({ topic, identity, moduleString, workerPath }: StartPayload) {
   const workerId = externalTaskWorker?.workerId;
 
   logger.info(`Restarting external task worker ${workerId ?? ''} for topic ${topic}`, {
@@ -106,7 +138,7 @@ function restart({ topic, identity, moduleString, workerPath }: StartPayload) {
   });
 
   shutdownExternalTaskWorker('External Task Worker restarting');
-  create({
+  await create({
     topic,
     identity,
     moduleString,

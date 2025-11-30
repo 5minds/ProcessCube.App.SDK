@@ -98,6 +98,24 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
     delete etwProcesses[workerDirectory];
   });
 
+  workerProcess.on('error', (error) => {
+    logger.error(`External Task Worker process error for ${topic}`, {
+      error,
+      topic,
+      workerDirectory,
+    });
+  });
+
+  workerProcess.on('exit', (code, signal) => {
+    logger.info(`External Task Worker process exited for ${topic}`, {
+      code,
+      signal,
+      topic,
+      workerDirectory,
+    });
+    delete etwProcesses[workerDirectory];
+  });
+
   workerProcess.send({
     action: 'create',
     payload: {
