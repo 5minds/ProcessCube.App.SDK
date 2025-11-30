@@ -103,12 +103,15 @@ async function create({
     assertNotNull(externalTaskWorker, 'externalTaskWorker');
     logger.error(`External task worker ${externalTaskWorker.workerId} for topic ${topic} ran into an error`, {
       errorType,
-      error: error instanceof Error ? {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        ...(error as any).code && { code: (error as any).code },
-      } : error,
+      error:
+        error instanceof Error
+          ? {
+              message: error.message,
+              name: error.name,
+              stack: error.stack,
+              ...((error as any).code && { code: (error as any).code }),
+            }
+          : error,
       externalTaskId: externalTask?.id,
       workerId: externalTaskWorker.workerId,
       topic,
