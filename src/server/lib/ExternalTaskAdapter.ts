@@ -24,7 +24,11 @@ const authorityIsConfigured = process.env.PROCESSCUBE_AUTHORITY_URL !== undefine
 const logger = new Logger('processcube_app_sdk:external_task_adapter');
 
 const etwProcesses: Record<string, ChildProcess> = {};
+const etwProcessRestarts: Record<string, { count: number; timestamp: number }> = {};
 let freshIdentity: Identity;
+
+const MAX_RESTART_ATTEMPTS = 3;
+const RESTART_WINDOW_MS = 60000; // 1 minute
 
 /**
  * Subscribe to external tasks.
@@ -114,6 +118,32 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
       workerDirectory,
     });
     delete etwProcesses[workerDirectory];
+
+    // Restart on error exit codes (3 = worker error, 4 = uncaught exception)
+    if (code === 3 || code === 4) {
+      if (shouldRestartProcess(workerDirectory)) {
+        logger.info(`Restarting External Task Worker process for ${topic} after error`, {
+          exitCode: code,
+          topic,
+          workerDirectory,
+        });
+        setTimeout(() => {
+          startExternalTaskWorker(workerPath, etwRootDirectory).catch((error) => {
+            logger.error(`Failed to restart External Task Worker process for ${topic}`, {
+              error,
+              topic,
+              workerDirectory,
+            });
+          });
+        }, 1000);
+      } else {
+        logger.error(`External Task Worker process for ${topic} reached maximum restart attempts`, {
+          exitCode: code,
+          topic,
+          workerDirectory,
+        });
+      }
+    }
   });
 
   workerProcess.send({
@@ -345,4 +375,31 @@ function getExternalTasksDirPath(customExternalTasksDirPath?: string): string {
   }
 
   return externalTasksDirPath;
+}
+
+/**
+ * Checks if a process should be restarted based on the restart history.
+ * Prevents restart loops by limiting restarts within a time window.
+ *
+ * @param workerDirectory - The directory of the worker process.
+ * @returns True if the process should be restarted, false otherwise.
+ */
+function shouldRestartProcess(workerDirectory: string): boolean {
+  const now = Date.now();
+  const restartInfo = etwProcessRestarts[workerDirectory];
+
+  if (!restartInfo || now - restartInfo.timestamp > RESTART_WINDOW_MS) {
+    // First restart or outside the time window - reset counter
+    etwProcessRestarts[workerDirectory] = { count: 1, timestamp: now };
+    return true;
+  }
+
+  if (restartInfo.count >= MAX_RESTART_ATTEMPTS) {
+    // Max attempts reached within time window
+    return false;
+  }
+
+  // Increment restart counter
+  restartInfo.count++;
+  return true;
 }
