@@ -108,9 +108,3 @@ jobs:
 
       - name: Publish Version
         run: ci_tools publish-npm-package --create-tag-from-branch-name
-
-      - name: Add Box-Release Tag
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next' }}
-        run: |
-          VERSION="$(ci_tools get-version)"
-          npm dist-tag add @5minds/processcube_app_sdk@$VERSION ${{ env.BOX_RELEASE_TAG }} --provenance
