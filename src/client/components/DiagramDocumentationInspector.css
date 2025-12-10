@@ -6,10 +6,7 @@
 @layer base {
   .dark,
   .dark * {
-    --asdk-ddi-background-color: var(
-      --app-sdk-diagram-documentation-inspector-background-color,
-      theme('colors.app-sdk-gray.700')
-    );
+    --asdk-ddi-background-color: var(--app-sdk-diagram-documentation-inspector-background-color, theme('colors.app-sdk-gray.700'));
   }
 
   *,

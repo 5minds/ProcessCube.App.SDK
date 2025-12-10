@@ -4,11 +4,10 @@ import fs from 'fs';
 var packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
 const additionalPackages = ['fsevents'];
 const packagesBlacklist = ['chokidar'];
-const externalPackages = [
-  ...Object.keys(packageJSON.dependencies),
-  ...Object.keys(packageJSON.peerDependencies),
-  ...additionalPackages,
-].filter((dep) => !packagesBlacklist.includes(dep));
+const bundlePackages = ['bpmn-js', 'diagram-js', 'diagram-js-direct-editing', 'bpmn-moddle'];
+const externalPackages = [...Object.keys(packageJSON.dependencies), ...Object.keys(packageJSON.peerDependencies), ...additionalPackages].filter(
+  (dep) => !packagesBlacklist.includes(dep) && !bundlePackages.includes(dep),
+);
 
 const watchMode = process.argv.includes('--watch');
 const productionBuild = process.env.NODE_ENV === 'production';
@@ -82,7 +81,7 @@ const esmoduleBuildPromises = [
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
     plugins: [getMarkCommonAsExternal(commonOutputFile)],
-    packages: 'external',
+    external: externalPackages,
     splitting: true,
   }),
 ];

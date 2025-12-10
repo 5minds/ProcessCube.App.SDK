@@ -4,16 +4,11 @@ import type { DynamicUiComponentProps, DynamicUiFormFieldRef } from '../DynamicU
 import { isNumber } from '../utils/isNumber';
 import { parseCustomFormConfig } from '../utils/parseCustomFormConfig';
 
-export const IntegerFormField = forwardRef(function IntegerFormField(
-  { formField, state }: DynamicUiComponentProps<string | null>,
-  ref: DynamicUiFormFieldRef,
-) {
+export const IntegerFormField = forwardRef(function IntegerFormField({ formField, state }: DynamicUiComponentProps<string | null>, ref: DynamicUiFormFieldRef) {
   const parsedCustomFormConfig = parseCustomFormConfig(formField.customForm);
 
   if (!isNumber(formField.defaultValue)) {
-    console.warn(
-      `[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for integer field "${formField.id}"`,
-    );
+    console.warn(`[@5minds/processcube_app_sdk:DynamicUi]\t\tInvalid default value for integer field "${formField.id}"`);
   }
 
   return (
@@ -35,11 +30,7 @@ export const IntegerFormField = forwardRef(function IntegerFormField(
         />
       </div>
       {parsedCustomFormConfig?.hint && (
-        <p
-          id={`${formField.id}-hint`}
-          data-hint
-          className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]"
-        >
+        <p id={`${formField.id}-hint`} data-hint className="app-sdk-mt-2 app-sdk-text-sm app-sdk-text-[color:var(--asdk-dui-formfield-hint-text-color)]">
           {parsedCustomFormConfig.hint}
         </p>
       )}
