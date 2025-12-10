@@ -39,8 +39,6 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Format code
         run: npm run format
@@ -109,14 +107,10 @@ jobs:
         run: npm run test
 
       - name: Publish Version
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: ci_tools publish-npm-package --create-tag-from-branch-name
 
       - name: Add Box-Release Tag
         if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next' }}
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VERSION="$(ci_tools get-version)"
           npm dist-tag add @5minds/processcube_app_sdk@$VERSION ${{ env.BOX_RELEASE_TAG }}
