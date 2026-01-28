@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write  # Required for OIDC
-  
+  id-token: write # Required for OIDC
+
 env:
   CI_TOOLS_VERSION: '^5.0.0'
   # NOTE: Um die Entwicklungsphase von Alpha nach Beta zu ändern, einfach die nachfolgend deklarierten Env Variablen switchen.

@@ -1,7 +1,7 @@
-export * from './build/common/index';
-
 import { DefaultSession, User } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
+
+export * from './build/common/index';
 
 /**
  * Module augmentations for next-auth
