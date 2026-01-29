@@ -33,7 +33,7 @@
     "build": "concurrently -n=build:code,build:types,build:css \"NODE_ENV=development node build.js\" \"npm run build:types\" \"NODE_ENV=development node build-css.cjs\"",
     "build:types": "tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently -n=build:types:server,build:types:client \"tsc -p tsconfig.server.json --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --emitDeclarationOnly\"",
     "build:prod": "npm run clean && concurrently -n=build:prod:code,build:types,build:css \"NODE_ENV=production node build.js\" \"npm run build:types\" \"NODE_ENV=production node build-css.cjs\"",
-    "clean": "rm -rf build && rm -f *.d.ts",
+    "clean": "rm -rf build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "npm run build:prod",
