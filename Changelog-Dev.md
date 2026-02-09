@@ -4,16 +4,19 @@
 
 ## 🔮 In Entwicklung
 
-*Commits seit v8.0.2*
+_Commits seit v8.0.2_
 
 ### Neue Funktionen
+
 - `4a7cff6` CLAUDE.md mit Projektdokumentation und Entwicklungsregeln hinzugefügt
 
 ### Fehlerbehebungen
+
 - `48accc6` Fehlende TypeScript-Deklarationsdateien für 8.x-Kompatibilität wiederhergestellt (#408)
 - `31af543` Code-Änderungen und Zusammenfassung
 
 ### Technische Änderungen
+
 - `af22b9d` Code formatiert
 - `195a4ee` Version auf 8.0.5 angehoben
 - `813f993` Box-Release entfernt
@@ -27,13 +30,15 @@
 
 ## ✅ Stable v8.0.2 (10.12.2025)
 
-*Enthält alle Änderungen seit v7.0.0*
+_Enthält alle Änderungen seit v7.0.0_
 
 ### Fehlerbehebungen
+
 - `8f4295b` Error-Handling für externe Tasks verbessert (#399)
 - `397e959` ExternalTaskWorkerProcess bei Fehler neu starten
 
 ### Technische Änderungen
+
 - `3444578` Release v8.0.2
 - `9d66a91` Stable-Build (#401)
 - `e160d26` Renovate entfernt
@@ -44,6 +49,7 @@
 - `d8429f6` Fehlende next-Änderungen auf develop nachgezogen (#388)
 
 ### Commits
+
 ```
 3444578 2025-12-10 Release v8.0.2
 9d66a91 2025-12-10 Build stable (#401)
@@ -70,15 +76,17 @@ c59751f 2025-11-03 Bundle package that use CommonJS to Work with ES modules
 
 ## ✅ Stable v7.0.0 (11.11.2025)
 
-*Enthält alle Änderungen seit v6.2.1 — Major-Release*
+_Enthält alle Änderungen seit v6.2.1 — Major-Release_
 
 ### Breaking Changes
+
 - Node.js 24 erforderlich
 - Paketversionierung auf v8.x
 - CommonJS-Bundling für ES-Module-Kompatibilität umgestellt
 - Next.js 15 als Mindestversion (Peer Dependency)
 
 ### Neue Funktionen
+
 - `4856c14` Heatmap-Visualisierung (#351)
 - `8ef9462` Next.js 15 Migration (#336)
 - `2cf8b91` Next.js 15 Migration (#353)
@@ -93,6 +101,7 @@ c59751f 2025-11-03 Bundle package that use CommonJS to Work with ES modules
 - `43fd0e8` Initiale Server Actions hinzugefügt
 
 ### Fehlerbehebungen
+
 - `bff5429` useInsertion-Bug behoben
 - `256e39d` CommonJS/ES-Module-Kompatibilität (#386)
 - `5852b80` RedirectType-Import korrigiert
@@ -102,6 +111,7 @@ c59751f 2025-11-03 Bundle package that use CommonJS to Work with ES modules
 - `a314e12` Typ-Fehler behoben
 
 ### Technische Änderungen
+
 - `d21af7e` Release v7.0.0
 - `8a8c88d` Node.js 24 Update (#385)
 - `38c6f37` Version auf 8 aktualisiert
@@ -114,6 +124,7 @@ c59751f 2025-11-03 Bundle package that use CommonJS to Work with ES modules
 ## ✅ Stable v6.2.1 (19.05.2025)
 
 ### Commits
+
 ```
 deddace 2025-05-19 Release v6.2.1
 10c15ff 2025-05-19 Use stable versions for engine packages
@@ -123,9 +134,10 @@ deddace 2025-05-19 Release v6.2.1
 
 ## ✅ Stable v6.2.0 (17.05.2025)
 
-*Enthält alle Änderungen seit v6.1.0 — Feature-Release*
+_Enthält alle Änderungen seit v6.1.0 — Feature-Release_
 
 ### Neue Funktionen
+
 - `9025fa1` Identity-System in SDK-Funktionen (#140)
 - `32452d4` ProcessInstanceInspector mit Token-Inspektion (#149)
 - `52463bf` @heroui/react ersetzt @nextui-org/react (#294)
@@ -142,6 +154,7 @@ deddace 2025-05-19 Release v6.2.1
 - `0cf3637` "Keine Ergebnisse"-Meldung anpassbar
 
 ### Fehlerbehebungen
+
 - `88f7e35` SVG Refresh und Retry korrigiert (#308)
 - `2e1893b` SVGs von Refresh und Retry getauscht
 - `9110a78` Beabsichtigtes Verhalten von bpmn-js v17 wiederhergestellt
@@ -150,6 +163,7 @@ deddace 2025-05-19 Release v6.2.1
 - `12afd8e` Aktualisierung der Marker bei nicht mehr existierenden Instanzen
 
 ### Technische Änderungen
+
 - `3222fec` CI Tools auf v5 aktualisiert
 - `d75c305` Beta-Phase für 2025.1 gestartet
 - Security-Fixes: next v14.2.25/v14.2.26, esbuild v0.25.0, cookie/next-auth
@@ -159,4 +173,4 @@ deddace 2025-05-19 Release v6.2.1
 
 ## ✅ Stable v6.1.0 (07.10.2024)
 
-*Basis für den 2025.1 Release-Zyklus.*
+_Basis für den 2025.1 Release-Zyklus._

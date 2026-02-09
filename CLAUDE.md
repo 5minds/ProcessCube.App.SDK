@@ -19,6 +19,7 @@ src/
 ```
 
 **Einstiegspunkte** (aus `package.json` exports):
+
 - `@5minds/processcube_app_sdk` → common (gemeinsam)
 - `@5minds/processcube_app_sdk/server` → nur Server
 - `@5minds/processcube_app_sdk/client` → nur Client
@@ -55,18 +56,21 @@ Es gibt **keine Tests** in diesem Projekt (`npm test` ist ein No-Op).
 ## Code-Konventionen
 
 ### Formatierung (Prettier)
+
 - Einfache Anführungszeichen, Zeilenbreite 120, immer Klammern bei Arrow-Functions
 - Import-Reihenfolge: `node:*` → Drittanbieter → `@5minds/*` → relativ (mit Leerzeilen zwischen Gruppen)
 - Tailwind-Klassen werden automatisch durch prettier-plugin-tailwindcss sortiert
 - CI formatiert automatisch und committet bei Bedarf über `process-engine-ci`
 
 ### Benennung
+
 - **PascalCase** für React-Komponenten und Komponentendateien (`ProcessInstanceInspector.tsx`)
 - **camelCase** für Funktionen, Variablen und Utility-Dateien (`getIdentity.ts`)
 - **kebab-case** für CSS-Dateien neben Komponenten
 - Barrel-Exports über `index.ts`-Dateien
 
 ### Dateiorganisation
+
 - Komponenten liegen zusammen mit ihrem CSS (`Component.tsx` + `Component.css` im selben Verzeichnis)
 - Typen gehören in `types/`-Unterverzeichnisse
 - Utilities gehören in `utils/`-Unterverzeichnisse
@@ -74,6 +78,7 @@ Es gibt **keine Tests** in diesem Projekt (`npm test` ist ein No-Op).
 - Server-Code importiert den `'only-server'`-Guard
 
 ### Tailwind
+
 - Alle Klassen haben den Prefix `app-sdk-` (konfiguriert in `tailwind.config.js`)
 - Eigene Farben: `5minds-orange`, `app-sdk-gray`-Skala
 - Dark Mode über Class-Strategie (`[class~='dark']`)
@@ -92,23 +97,28 @@ Der Build verwendet **esbuild** (nicht tsc) für JavaScript/TypeScript-Kompilier
 ## Git-Workflow
 
 ### Branches
+
 - `develop` — primärer Entwicklungsbranch (aktueller Default)
 - `next` — Alpha/Pre-Release-Kanal (npm-Tag: `next`)
 - `main` — stabile Releases
 - `release/**` — Release-Branches
 
 ### CI/CD (GitHub Actions)
+
 1. **Verify-Job:** Installieren, formatieren, Formatierungsänderungen automatisch committen
 2. **Build & Publish-Job:** Versionsvorbereitung über `@5minds/product_ci_tools`, Build, Veröffentlichung auf npm mit branchbasierten Tags
+
 - Versionen werden automatisch durch CI-Tools verwaltet (`ci_tools prepare-version`)
 - Versionen in `package.json` **nicht** manuell hochsetzen
 
 ### PR-Template
+
 PRs verwenden ein deutschsprachiges Template mit Abschnitten für Beschreibung, verwandte Issues, Tests und Dokumentation.
 
 ## Wichtige Komponenten
 
 ### Client (`src/client/`)
+
 - **ProcessInstanceInspector** — Hauptansicht für Prozessinstanzen mit Token-Inspektion, Retry, Kommandopalette
 - **BPMNViewer / bpmnViewerComponent** — BPMN-Diagramm-Rendering und -Interaktion
 - **DynamicUi** — Dynamischer Formular-Builder aus Prozess-Engine-Schemas
@@ -118,6 +128,7 @@ PRs verwenden ein deutschsprachiges Template mit Abschnitten für Beschreibung, 
 - **SplitterLayout** — Größenveränderbare Panel-Layouts
 
 ### Server (`src/server/`)
+
 - **Server Actions** — Next.js Server Actions für UserTask, ProcessInstance, ManualTask, Navigation, UntypedTask
 - **EngineClient** — Interner ProcessCube-Engine-Client-Wrapper
 - **ExternalTaskAdapter / ExternalTaskWorkerProcess** — Integration externer Task-Worker
@@ -125,6 +136,7 @@ PRs verwenden ein deutschsprachiges Template mit Abschnitten für Beschreibung, 
 - **getIdentity / getEngineClient** — Auth- und Engine-Client-Hilfsfunktionen
 
 ### Common (`src/common/`)
+
 - **Types** — UserTaskInstance, HeatmapTypes, IPCMessageType
 - **RemoteUserTask** — Gemeinsame Komponente für Remote-UserTask-Rendering
 - **hasClaim** — Autorisierungs-Hilfsfunktion
@@ -135,7 +147,6 @@ PRs verwenden ein deutschsprachiges Template mit Abschnitten für Beschreibung, 
 - Für lokale Entwicklung `npm link` zum Testen in Consumer-Apps verwenden (siehe README.md)
 - Das `prepare`-Script führt `build:prod` bei `npm install` aus, daher erfolgt der Build automatisch
 - CSS-Dateien werden separat bereitgestellt und müssen von Consumern importiert werden: `@5minds/processcube_app_sdk/client/components/*.css`
-
 
 ## Claude Regeln
 
