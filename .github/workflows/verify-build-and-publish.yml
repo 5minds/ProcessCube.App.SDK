@@ -14,6 +14,8 @@ on:
 
 permissions:
   id-token: write # Required for OIDC
+  contents: write # Required for creating releases and tags
+  packages: write # Required for publishing to GitHub Packages
 
 env:
   CI_TOOLS_VERSION: '^5.0.0'
@@ -31,14 +33,23 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           ref: ${{ github.head_ref }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
+
+      - name: Configure @5minds registry
+        run: |
+          echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
+          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
+
+      - name: Install Dependencies
+        env:
+          NODE_AUTH_TOKEN_PROCESSCUBE_IO: ${{ secrets.NODE_AUTH_TOKEN_PROCESSCUBE_IO }}
+        run: npm ci
 
       - name: Format code
         run: npm run format
@@ -59,9 +70,9 @@ jobs:
           git config --local user.email "process-engine-ci@5minds.de"
           git add . ':(exclude).github/workflows/*'
           git commit -m "style: apply prettier formatting [skip ci]"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   build_and_publish:
     name: 'Build and publish sources'
@@ -75,20 +86,26 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Use Node.js 22
+      - name: Use Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Configure @5minds registry
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc 
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
+          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
+
       - name: Install CI Tools
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
 
-      - name: 'Install Dependencies'
+      - name: Install Dependencies
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN_PROCESSCUBE_IO: ${{ secrets.NODE_AUTH_TOKEN_PROCESSCUBE_IO }}
+          NPM_TOKEN:  ${{ secrets.NPM_TOKEN }}
         run: npm ci
 
       - name: Prepare version
@@ -106,5 +123,61 @@ jobs:
       - name: Run tests
         run: npm run test
 
-      - name: Publish Version
-        run: ci_tools publish-npm-package --create-tag-from-branch-name
+      - name: Determine npm tag
+        id: npm-tag
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/next" ]; then
+            echo "tag=next" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            echo "tag=develop" >> $GITHUB_OUTPUT
+          else
+            TAG=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9.-]/-/g')
+            echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Debug npmrc
+        run: |
+          echo "=== Project .npmrc ==="
+          cat .npmrc 2>/dev/null || echo "(not found)"
+          echo "=== User .npmrc (~/.npmrc) ==="
+          cat ~/.npmrc 2>/dev/null || echo "(not found)"
+          echo "=== NPM_CONFIG_USERCONFIG ==="
+          echo "NPM_CONFIG_USERCONFIG=${NPM_CONFIG_USERCONFIG:-not set}"
+          [ -n "$NPM_CONFIG_USERCONFIG" ] && cat "$NPM_CONFIG_USERCONFIG" 2>/dev/null || echo "(not found or not set)"
+          echo "=== npm config list ==="
+          npm config list
+          echo "=== Environment ==="
+          echo "NODE_AUTH_TOKEN is ${NODE_AUTH_TOKEN}"
+          echo "OIDC URL: ${ACTIONS_ID_TOKEN_REQUEST_URL}"
+          echo "OIDC Token: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
+
+      - name: Publish to npmjs.org
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc 
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to GitHub Packages
+        run: |
+          echo "@5minds:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN_GITHUB}" >> .npmrc
+          npm publish --tag ${{ steps.npm-tag.outputs.tag }}
+        env:
+          NODE_AUTH_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          if [ "${{ github.ref }}" = "refs/heads/next" ]; then
+            gh release create "${TAG}" --title "${TAG}" --generate-notes --prerelease
+          else
+            gh release create "${TAG}" --title "${TAG}" --generate-notes
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
