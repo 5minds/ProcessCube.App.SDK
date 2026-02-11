@@ -3,6 +3,7 @@
 ## Ist-Zustand
 
 Die aktuelle CI-Pipeline (`verify-build-and-publish.yml`) macht folgendes:
+
 1. **Verify-Job**: Prettier formatieren, ggf. committen
 2. **Build & Publish-Job**:
    - `ci_tools prepare-version` → setzt Version in `package.json`
@@ -11,6 +12,7 @@ Die aktuelle CI-Pipeline (`verify-build-and-publish.yml`) macht folgendes:
    - `ci_tools publish-npm-package --create-tag-from-branch-name` → publiziert auf npm (via `marketplace.processcube.io/npm/`)
 
 **Was fehlt:**
+
 - Kein Publish nach GitHub Packages (`npm.pkg.github.com`)
 - Kein GitHub Release wird erstellt
 - Tags werden zwar von `ci_tools` erstellt, aber es gibt kein explizites Release-Objekt bei GitHub
@@ -18,6 +20,7 @@ Die aktuelle CI-Pipeline (`verify-build-and-publish.yml`) macht folgendes:
 ## Soll-Zustand
 
 Auf `main` und `next` soll zusätzlich:
+
 1. Das npm-Paket auch auf **GitHub Packages** publiziert werden
 2. Ein **GitHub Release** erstellt werden (mit der Version als Titel)
 3. Die **Git-Tags** sollen korrekt bei GitHub vorhanden sein (wird bereits durch `ci_tools` gemacht)
@@ -55,6 +58,7 @@ Auf `main` und `next` soll zusätzlich:
 ## Technische Details
 
 ### GitHub Packages Publish
+
 ```yaml
 - name: Publish to GitHub Packages
   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
@@ -67,6 +71,7 @@ Auf `main` und `next` soll zusätzlich:
 ```
 
 ### GitHub Release
+
 ```yaml
 - name: Create GitHub Release
   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
@@ -85,6 +90,7 @@ Auf `main` und `next` soll zusätzlich:
 ## Review
 
 ### Änderungen
+
 Nur eine Datei geändert: `.github/workflows/verify-build-and-publish.yml`
 
 1. **Permissions** (Zeile 17-18): `contents: write` und `packages: write` hinzugefügt
@@ -92,6 +98,7 @@ Nur eine Datei geändert: `.github/workflows/verify-build-and-publish.yml`
 3. **GitHub Release** (Zeile 123-134): Neuer Step, der die Version aus `package.json` liest und `gh release create` aufruft. Auf `next` mit `--prerelease`, auf `main` ohne.
 
 ### Hinweise
+
 - Der `GITHUB_TOKEN` reicht für GitHub Packages und Release-Erstellung — kein zusätzliches Secret nötig
 - Die `.npmrc` wird nur temporär im Workflow überschrieben, das hat keinen Einfluss auf den vorherigen npm-Publish-Step (der über `ci_tools` läuft)
 - Falls der Tag nicht existiert, erstellt `gh release create` ihn automatisch
