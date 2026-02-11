@@ -9,10 +9,12 @@ _Diese Features sind nach v8.0.2 hinzugekommen und werden im nächsten Release e
 ### Fehlerbehebungen
 
 - Fehlende TypeScript-Deklarationsdateien für 8.x-Kompatibilität wiederhergestellt (#408)
+- 7 Sicherheitslücken in Abhängigkeiten behoben (#410)
 
 ### Technische Änderungen
 
 - CLAUDE.md mit Projektdokumentation und Entwicklungsregeln hinzugefügt
+- Prettier-Formatierung auf Markdown-Dateien angewendet
 
 ---
 

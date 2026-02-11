@@ -14,6 +14,7 @@ _Commits seit v8.0.2_
 
 - `48accc6` Fehlende TypeScript-Deklarationsdateien für 8.x-Kompatibilität wiederhergestellt (#408)
 - `31af543` Code-Änderungen und Zusammenfassung
+- `b6af5a7` 7 Sicherheitslücken via npm audit fix behoben (#410)
 
 ### Technische Änderungen
 
@@ -25,6 +26,8 @@ _Commits seit v8.0.2_
 - `6477278` Version auf 8.0.3 angehoben
 - `3bb74f4` CI-Build-Fix
 - `72c270b` npm-Publish-Fix
+- `d459ba0` Prettier-Formatierung auf Markdown-Dateien angewendet
+- `c11400b` Changelog und Changelog-Dev für Versionshistorie hinzugefügt
 
 ---
 
