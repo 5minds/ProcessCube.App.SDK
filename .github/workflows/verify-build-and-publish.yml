@@ -94,6 +94,8 @@ jobs:
 
       - name: Configure @5minds registry
         run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc 
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
           echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
 
