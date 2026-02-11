@@ -8,4 +8,5 @@ build
 !src/common
 
 # Files
+.npmrc
 .npmrc-bck

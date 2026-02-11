@@ -70,7 +70,7 @@ jobs:
           git config --local user.email "process-engine-ci@5minds.de"
           git add . ':(exclude).github/workflows/*'
           git commit -m "style: apply prettier formatting [skip ci]"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
