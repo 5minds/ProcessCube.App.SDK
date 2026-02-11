@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           ref: ${{ github.head_ref }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
@@ -72,7 +72,7 @@ jobs:
           git commit -m "style: apply prettier formatting [skip ci]"
           git push origin HEAD:${{ github.head_ref || github.ref_name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   build_and_publish:
     name: 'Build and publish sources'
