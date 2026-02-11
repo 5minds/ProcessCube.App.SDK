@@ -44,11 +44,11 @@ jobs:
       - name: Configure @5minds registry
         run: |
           echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
-          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN}" >> .npmrc
+          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
 
       - name: Install Dependencies
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          NODE_AUTH_TOKEN_PROCESSCUBE_IO: ${{ secrets.NODE_AUTH_TOKEN_PROCESSCUBE_IO }}
         run: npm ci
 
       - name: Format code
@@ -95,7 +95,7 @@ jobs:
       - name: Configure @5minds registry
         run: |
           echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
-          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN}" >> .npmrc
+          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
 
       - name: Install CI Tools
         env:
@@ -104,7 +104,7 @@ jobs:
 
       - name: Install Dependencies
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          NODE_AUTH_TOKEN_PROCESSCUBE_IO: ${{ secrets.NODE_AUTH_TOKEN_PROCESSCUBE_IO }}
         run: npm ci
 
       - name: Prepare version
