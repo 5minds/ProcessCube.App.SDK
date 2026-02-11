@@ -98,8 +98,6 @@ jobs:
           echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
 
       - name: Install CI Tools
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
         run: npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
 
       - name: Install Dependencies
@@ -148,9 +146,9 @@ jobs:
           echo "=== npm config list ==="
           npm config list
           echo "=== Environment ==="
-          echo "NODE_AUTH_TOKEN is ${NODE_AUTH_TOKEN+SET}${NODE_AUTH_TOKEN-UNSET}"
-          echo "OIDC URL: ${ACTIONS_ID_TOKEN_REQUEST_URL:+present}"
-          echo "OIDC Token: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+present}"
+          echo "NODE_AUTH_TOKEN is ${NODE_AUTH_TOKEN}"
+          echo "OIDC URL: ${ACTIONS_ID_TOKEN_REQUEST_URL}"
+          echo "OIDC Token: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
 
       - name: Publish to npmjs.org
         run: |
@@ -160,10 +158,10 @@ jobs:
       - name: Publish to GitHub Packages
         run: |
           echo "@5minds:registry=https://npm.pkg.github.com" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN_GITHUB}" >> .npmrc
           npm publish --tag ${{ steps.npm-tag.outputs.tag }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
