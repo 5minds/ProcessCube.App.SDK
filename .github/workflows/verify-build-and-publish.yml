@@ -122,15 +122,28 @@ jobs:
       - name: Run tests
         run: npm run test
 
-      - name: Publish Version
-        run: ci_tools publish-npm-package --create-tag-from-branch-name
+      - name: Determine npm tag
+        id: npm-tag
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/next" ]; then
+            echo "tag=next" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            echo "tag=develop" >> $GITHUB_OUTPUT
+          else
+            TAG=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9.-]/-/g')
+            echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to npmjs.org
+        run: npm publish --provenance --tag ${{ steps.npm-tag.outputs.tag }}
 
       - name: Publish to GitHub Packages
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
         run: |
           echo "@5minds:registry=https://npm.pkg.github.com" > .npmrc
           echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
-          npm publish
+          npm publish --tag ${{ steps.npm-tag.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

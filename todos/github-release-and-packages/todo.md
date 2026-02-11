@@ -1,104 +1,71 @@
-# GitHub Packages + Release + Tags
+# GitHub Packages + npmjs.org + Release — Überarbeiteter Plan
 
-## Ist-Zustand
+## Ziel
 
-Die aktuelle CI-Pipeline (`verify-build-and-publish.yml`) macht folgendes:
+Das npm-Paket soll auf **allen Branches** sowohl auf **npmjs.org** als auch auf **GitHub Packages** publiziert werden. `ci_tools publish-npm-package` wird durch dedizierte `npm publish`-Steps ersetzt. Auf main/next wird zusätzlich ein GitHub Release erstellt.
 
-1. **Verify-Job**: Prettier formatieren, ggf. committen
-2. **Build & Publish-Job**:
-   - `ci_tools prepare-version` → setzt Version in `package.json`
-   - `ci_tools commit-and-tag-version --only-on-primary-branches` → committet Version & erstellt Git-Tag (nur main/next)
-   - `npm run build` + `npm run test`
-   - `ci_tools publish-npm-package --create-tag-from-branch-name` → publiziert auf npm (via `marketplace.processcube.io/npm/`)
+## Ist-Zustand (vorher)
 
-**Was fehlt:**
-
-- Kein Publish nach GitHub Packages (`npm.pkg.github.com`)
-- Kein GitHub Release wird erstellt
-- Tags werden zwar von `ci_tools` erstellt, aber es gibt kein explizites Release-Objekt bei GitHub
+```
+Publish Version          → ci_tools publish-npm-package (Marketplace, alle Branches)
+Publish to GitHub Packages → npm publish (GitHub Packages, nur main/next)
+Create GitHub Release      → gh release create (nur main/next)
+```
 
 ## Soll-Zustand
 
-Auf `main` und `next` soll zusätzlich:
-
-1. Das npm-Paket auch auf **GitHub Packages** publiziert werden
-2. Ein **GitHub Release** erstellt werden (mit der Version als Titel)
-3. Die **Git-Tags** sollen korrekt bei GitHub vorhanden sein (wird bereits durch `ci_tools` gemacht)
+```
+Determine npm tag          → Branch → npm dist-tag Mapping
+Publish to npmjs.org       → npm publish --tag <tag> (alle Branches)
+Publish to GitHub Packages → npm publish --tag <tag> (alle Branches)
+Create GitHub Release      → gh release create (nur main/next)
+```
 
 ## Plan
 
 ### Änderungen an `verify-build-and-publish.yml`
 
-- [x] **1. Permissions erweitern**
-  - `contents: write` hinzufügen (für Release-Erstellung und Tag-Push)
-  - `packages: write` hinzufügen (für GitHub Packages)
+- [x] **1. npm dist-tag Step erstellen**
+  - Branch → Tag Mapping:
+    - `main` → `latest`
+    - `next` → `next`
+    - `develop` → `develop`
+    - `release/**` → Branch-Name sanitized (z.B. `release-1.0`)
+    - Sonstige → Branch-Name sanitized
+  - Output: `npm-tag` für nachfolgende Steps
 
-- [x] **2. GitHub Packages Publish-Step hinzufügen** (nur main/next)
-  - Neuer Step nach dem bestehenden npm-Publish
-  - Bedingung: `if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'`
-  - Temporäre `.npmrc` für `npm.pkg.github.com` erstellen
-  - `npm publish` mit `GITHUB_TOKEN` als Auth
-  - Der Scope `@5minds` muss auf die GitHub-Registry gemappt werden
+- [x] **2. "Publish Version" (ci_tools) ersetzen durch "Publish to npmjs.org"**
+  - `npm publish --provenance --tag <tag>` mit `registry.npmjs.org`
+  - Auf allen Branches
+  - Auth via OIDC Trusted Publisher (`--provenance`, kein Token nötig)
+  - `id-token: write` Permission war bereits gesetzt
 
-- [x] **3. GitHub Release erstellen** (nur main/next)
-  - Neuer Step nach dem Publish
-  - Version aus `package.json` auslesen
-  - `gh release create` mit dem Tag verwenden
-  - Auf `next` als Pre-Release markieren (`--prerelease`)
-  - Auf `main` als reguläres Release
-  - Release Notes automatisch generiert (`--generate-notes`)
-  - Keine Build-Artefakte angehängt
+- [x] **3. "Publish to GitHub Packages" auf alle Branches erweitern**
+  - `if:`-Bedingung entfernen
+  - Temporäre `.npmrc` für `npm.pkg.github.com` schreiben
+  - `npm publish --tag <tag>` mit `GITHUB_TOKEN`
 
-## Offene Fragen
-
-1. **Release Notes**: Sollen die Release Notes automatisch generiert werden (`--generate-notes`) oder aus dem Changelog kommen?
-2. **Build-Artefakte**: Sollen Build-Artefakte (z.B. ein tarball) an das Release angehängt werden?
-3. **next-Branch**: Soll das Release auf `next` als Pre-Release markiert werden (empfohlen)?
-
-## Technische Details
-
-### GitHub Packages Publish
-
-```yaml
-- name: Publish to GitHub Packages
-  if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
-  run: |
-    echo "@5minds:registry=https://npm.pkg.github.com" > .npmrc
-    echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
-    npm publish
-  env:
-    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-### GitHub Release
-
-```yaml
-- name: Create GitHub Release
-  if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
-  run: |
-    VERSION=$(node -p "require('./package.json').version")
-    TAG="v${VERSION}"
-    if [ "${{ github.ref }}" = "refs/heads/next" ]; then
-      gh release create "${TAG}" --title "${TAG}" --generate-notes --prerelease
-    else
-      gh release create "${TAG}" --title "${TAG}" --generate-notes
-    fi
-  env:
-    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
+- [x] **4. GitHub Release bleibt nur auf main/next**
+  - Keine Änderung an der Logik
+  - `next` → Pre-Release, `main` → Stable Release
 
 ## Review
 
-### Änderungen
+### Umgesetzte Änderungen
 
-Nur eine Datei geändert: `.github/workflows/verify-build-and-publish.yml`
+Datei: `.github/workflows/verify-build-and-publish.yml` (Zeile 125-161)
 
-1. **Permissions** (Zeile 17-18): `contents: write` und `packages: write` hinzugefügt
-2. **GitHub Packages Publish** (Zeile 114-121): Neuer Step, der nach dem npm-Publish eine temporäre `.npmrc` für `npm.pkg.github.com` schreibt und `npm publish` ausführt. Nur auf `main` und `next`.
-3. **GitHub Release** (Zeile 123-134): Neuer Step, der die Version aus `package.json` liest und `gh release create` aufruft. Auf `next` mit `--prerelease`, auf `main` ohne.
+**Entfernt:**
+- `ci_tools publish-npm-package --create-tag-from-branch-name`
+
+**Neu:**
+1. **Determine npm tag** (Zeile 125-137) — Branch → dist-tag Mapping
+2. **Publish to npmjs.org** (Zeile 139-140) — `npm publish --provenance --tag <tag>`, Auth via OIDC Trusted Publisher
+3. **Publish to GitHub Packages** (Zeile 142-148) — Temporäre `.npmrc` für `npm.pkg.github.com`, Auth via `GITHUB_TOKEN`
+4. **Create GitHub Release** (Zeile 150-161) — Unverändert, nur main/next
 
 ### Hinweise
-
-- Der `GITHUB_TOKEN` reicht für GitHub Packages und Release-Erstellung — kein zusätzliches Secret nötig
-- Die `.npmrc` wird nur temporär im Workflow überschrieben, das hat keinen Einfluss auf den vorherigen npm-Publish-Step (der über `ci_tools` läuft)
-- Falls der Tag nicht existiert, erstellt `gh release create` ihn automatisch
+- npmjs.org braucht kein Token, OIDC via `--provenance` + `id-token: write`
+- GitHub Packages nutzt `GITHUB_TOKEN` mit `packages: write`
+- `ci_tools` werden weiterhin für `prepare-version` und `commit-and-tag-version` genutzt
+- Nur `publish-npm-package` wurde ersetzt
