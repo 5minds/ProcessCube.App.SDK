@@ -56,15 +56,18 @@ Create GitHub Release      → gh release create (nur main/next)
 Datei: `.github/workflows/verify-build-and-publish.yml` (Zeile 125-161)
 
 **Entfernt:**
+
 - `ci_tools publish-npm-package --create-tag-from-branch-name`
 
 **Neu:**
+
 1. **Determine npm tag** (Zeile 125-137) — Branch → dist-tag Mapping
 2. **Publish to npmjs.org** (Zeile 139-140) — `npm publish --provenance --tag <tag>`, Auth via OIDC Trusted Publisher
 3. **Publish to GitHub Packages** (Zeile 142-148) — Temporäre `.npmrc` für `npm.pkg.github.com`, Auth via `GITHUB_TOKEN`
 4. **Create GitHub Release** (Zeile 150-161) — Unverändert, nur main/next
 
 ### Hinweise
+
 - npmjs.org braucht kein Token, OIDC via `--provenance` + `id-token: write`
 - GitHub Packages nutzt `GITHUB_TOKEN` mit `packages: write`
 - `ci_tools` werden weiterhin für `prepare-version` und `commit-and-tag-version` genutzt
