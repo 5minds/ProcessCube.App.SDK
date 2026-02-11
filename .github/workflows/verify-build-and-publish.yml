@@ -136,6 +136,22 @@ jobs:
             echo "tag=${TAG}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Debug npmrc
+        run: |
+          echo "=== Project .npmrc ==="
+          cat .npmrc 2>/dev/null || echo "(not found)"
+          echo "=== User .npmrc (~/.npmrc) ==="
+          cat ~/.npmrc 2>/dev/null || echo "(not found)"
+          echo "=== NPM_CONFIG_USERCONFIG ==="
+          echo "NPM_CONFIG_USERCONFIG=${NPM_CONFIG_USERCONFIG:-not set}"
+          [ -n "$NPM_CONFIG_USERCONFIG" ] && cat "$NPM_CONFIG_USERCONFIG" 2>/dev/null || echo "(not found or not set)"
+          echo "=== npm config list ==="
+          npm config list
+          echo "=== Environment ==="
+          echo "NODE_AUTH_TOKEN is ${NODE_AUTH_TOKEN+SET}${NODE_AUTH_TOKEN-UNSET}"
+          echo "OIDC URL: ${ACTIONS_ID_TOKEN_REQUEST_URL:+present}"
+          echo "OIDC Token: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+present}"
+
       - name: Publish to npmjs.org
         run: |
           sed -i '/@5minds:registry/d' .npmrc
