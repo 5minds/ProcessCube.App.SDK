@@ -138,7 +138,7 @@ jobs:
 
       - name: Publish to npmjs.org
         run: |
-          rm -f .npmrc
+          sed -i '/@5minds:registry/d' .npmrc
           npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }}
 
       - name: Publish to GitHub Packages
