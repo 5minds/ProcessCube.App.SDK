@@ -137,7 +137,7 @@ jobs:
           fi
 
       - name: Publish to npmjs.org
-        run: npm publish --provenance --tag ${{ steps.npm-tag.outputs.tag }}
+        run: npm publish --provenance --access public --tag ${{ steps.npm-tag.outputs.tag }}
 
       - name: Publish to GitHub Packages
         run: |
