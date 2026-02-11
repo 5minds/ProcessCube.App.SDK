@@ -1,6 +1,6 @@
 {
   "name": "@5minds/processcube_app_sdk",
-  "version": "8.0.5",
+  "version": "8.1.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
   "main": "build/common/index.cjs",
@@ -33,7 +33,7 @@
     "build": "concurrently -n=build:code,build:types,build:css \"NODE_ENV=development node build.js\" \"npm run build:types\" \"NODE_ENV=development node build-css.cjs\"",
     "build:types": "tsc -p tsconfig.common.json --emitDeclarationOnly && concurrently -n=build:types:server,build:types:client \"tsc -p tsconfig.server.json --emitDeclarationOnly\" \"tsc -p tsconfig.client.json --emitDeclarationOnly\"",
     "build:prod": "npm run clean && concurrently -n=build:prod:code,build:types,build:css \"NODE_ENV=production node build.js\" \"npm run build:types\" \"NODE_ENV=production node build-css.cjs\"",
-    "clean": "rm -rf build && rm -f *.d.ts",
+    "clean": "rm -rf build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "npm run build:prod",
@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/5minds/ProcessCube.App.SDK.git"
+    "url": "git+https://github.com/5minds/ProcessCube.App.SDK.git"
   },
   "files": [
     "build/client",
@@ -61,11 +61,11 @@
     "React",
     "5Minds"
   ],
-  "author": "Alexander Kasten",
+  "author": "ProcessCube UG",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/5minds/ProcessCube.App.SDK/issues",
-    "email": "product@5minds.de"
+    "email": "info@processcube.io"
   },
   "homepage": "https://processcube.io/docs/app-sdk",
   "engines": {
@@ -98,7 +98,7 @@
     "react": "^19.1.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "^6.2.1-develop-a87db3-mihdf4ie",
+    "@5minds/processcube_engine_client": "6.2.1-develop-5ee5c8-mlf0gcna",
     "@5minds/processcube_engine_sdk": "7.1.2",
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",
