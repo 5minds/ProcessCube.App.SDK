@@ -27,11 +27,11 @@ jobs:
 
       - name: Install CI Tools
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
         run: npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
 
       - name: Delete npm tag
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
           GIT_BRANCH: ${{ github.event.ref }}
         run: ci_tools delete-npm-tag --except-on-primary-branches
