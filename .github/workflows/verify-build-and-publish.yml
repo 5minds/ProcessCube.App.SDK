@@ -155,7 +155,8 @@ jobs:
 
       - name: Publish to npmjs.org
         run: |
-          sed -i '/@5minds:registry/d' .npmrc
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc 
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
           npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
