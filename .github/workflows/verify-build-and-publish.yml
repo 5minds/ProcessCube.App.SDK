@@ -90,7 +90,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Configure @5minds registry
         run: |
@@ -139,15 +138,7 @@ jobs:
       - name: Publish to npmjs.org
         run: |
           rm -f .npmrc
-          echo "registry=https://registry.npmjs.org/" > "$NPM_CONFIG_USERCONFIG"
-          unset NODE_AUTH_TOKEN
-          echo "--- Debug ---"
-          echo "npm version: $(npm --version)"
-          echo "node version: $(node --version)"
-          echo "OIDC URL set: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
-          echo "OIDC Token set: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+yes}"
-          npm config list
-          echo "--- End Debug ---"
+          echo "registry=https://registry.npmjs.org/" > ~/.npmrc
           npm publish --provenance --access public --tag ${{ steps.npm-tag.outputs.tag }}
 
       - name: Publish to GitHub Packages

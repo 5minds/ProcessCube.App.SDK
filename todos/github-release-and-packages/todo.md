@@ -72,3 +72,12 @@ Datei: `.github/workflows/verify-build-and-publish.yml` (Zeile 125-161)
 - GitHub Packages nutzt `GITHUB_TOKEN` mit `packages: write`
 - `ci_tools` werden weiterhin für `prepare-version` und `commit-and-tag-version` genutzt
 - Nur `publish-npm-package` wurde ersetzt
+
+### OIDC-Debugging (ENEEDAUTH)
+
+Das Problem war: `setup-node` mit `registry-url` erzeugt eine `~/.npmrc` mit `_authToken=${NODE_AUTH_TOKEN}`. Selbst wenn `NODE_AUTH_TOKEN` leer oder ungesetzt ist, versucht npm Token-basierte Auth **statt** OIDC. npm fällt nur auf OIDC zurück wenn **kein** `_authToken`-Eintrag existiert.
+
+**Fixes:**
+1. `registry-url` aus `setup-node@v6` im `build_and_publish`-Job entfernt
+2. Publish-Step schreibt `~/.npmrc` explizit nur mit `registry=` (ohne `_authToken`)
+3. Repository-URL in `package.json` von `git+ssh://` auf `git+https://` geändert (für Provenance)

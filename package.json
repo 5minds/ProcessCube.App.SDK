@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/5minds/ProcessCube.App.SDK.git"
+    "url": "git+https://github.com/5minds/ProcessCube.App.SDK.git"
   },
   "files": [
     "build/client",
