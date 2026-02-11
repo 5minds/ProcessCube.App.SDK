@@ -14,6 +14,8 @@ on:
 
 permissions:
   id-token: write # Required for OIDC
+  contents: write # Required for creating releases and tags
+  packages: write # Required for publishing to GitHub Packages
 
 env:
   CI_TOOLS_VERSION: '^5.0.0'
@@ -108,3 +110,25 @@ jobs:
 
       - name: Publish Version
         run: ci_tools publish-npm-package --create-tag-from-branch-name
+
+      - name: Publish to GitHub Packages
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
+        run: |
+          echo "@5minds:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          if [ "${{ github.ref }}" = "refs/heads/next" ]; then
+            gh release create "${TAG}" --title "${TAG}" --generate-notes --prerelease
+          else
+            gh release create "${TAG}" --title "${TAG}" --generate-notes
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
