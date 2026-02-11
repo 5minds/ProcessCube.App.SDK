@@ -40,7 +40,16 @@ jobs:
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
+
+      - name: Configure @5minds registry
+        run: |
+          echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
+          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN}" >> .npmrc
+
+      - name: Install Dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm ci
 
       - name: Format code
         run: npm run format
@@ -77,18 +86,23 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Use Node.js 22
+      - name: Use Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure @5minds registry
+        run: |
+          echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
+          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN}" >> .npmrc
 
       - name: Install CI Tools
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm i -g @5minds/product_ci_tools@${{ env.CI_TOOLS_VERSION }}
 
-      - name: 'Install Dependencies'
+      - name: Install Dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm ci
