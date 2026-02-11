@@ -8,16 +8,27 @@ _Commits seit v8.0.2_
 
 ### Neue Funktionen
 
+- `992c386` GitHub Packages Publishing und GitHub Release-Erstellung hinzugefügt
+- `a1aab28` ci_tools publish durch dedizierte npm publish Steps ersetzt
 - `4a7cff6` CLAUDE.md mit Projektdokumentation und Entwicklungsregeln hinzugefügt
 
 ### Fehlerbehebungen
 
+- `99811ec` Verbindung Engine <-> App SDK für externe Tasks korrigiert
 - `48accc6` Fehlende TypeScript-Deklarationsdateien für 8.x-Kompatibilität wiederhergestellt (#408)
 - `31af543` Code-Änderungen und Zusammenfassung
 - `b6af5a7` 7 Sicherheitslücken via npm audit fix behoben (#410)
 
 ### Technische Änderungen
 
+- `896b5d9` NPM_TOKEN für npmjs.org Auth verwendet
+- `876b387` NODE_AUTH_TOKEN zu NODE_AUTH_TOKEN_PROCESSCUBE_IO umbenannt
+- `597ae09` Repository-URL in package.json auf HTTPS geändert
+- `cfa1eb5` .npmrc zu .gitignore hinzugefügt, Push-Refspec korrigiert
+- `1388fe5` GH_TOKEN PAT für Verify-Job (Branch Protection)
+- `b5f72f2` Korrektes Org-Secret NODE_AUTH_TOKEN verwendet
+- `20a35ac` @5minds Registry zur Laufzeit konfiguriert
+- `c55f6d7` .npmrc aus Repository entfernt
 - `af22b9d` Code formatiert
 - `195a4ee` Version auf 8.0.5 angehoben
 - `813f993` Box-Release entfernt

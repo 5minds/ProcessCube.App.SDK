@@ -6,13 +6,21 @@
 
 _Diese Features sind nach v8.0.2 hinzugekommen und werden im nächsten Release enthalten sein._
 
+### Neue Funktionen
+
+- npm-Paket wird jetzt auf **npmjs.org** und **GitHub Packages** veröffentlicht
+- **GitHub Releases** werden automatisch bei Stable- und Pre-Releases erstellt
+
 ### Fehlerbehebungen
 
+- Verbindung zwischen Engine und App SDK für externe Tasks korrigiert
 - Fehlende TypeScript-Deklarationsdateien für 8.x-Kompatibilität wiederhergestellt (#408)
 - 7 Sicherheitslücken in Abhängigkeiten behoben (#410)
 
 ### Technische Änderungen
 
+- CI/CD-Pipeline überarbeitet: Dual-Publishing auf npmjs.org und GitHub Packages
+- Repository-URL auf HTTPS-Format umgestellt
 - CLAUDE.md mit Projektdokumentation und Entwicklungsregeln hinzugefügt
 - Prettier-Formatierung auf Markdown-Dateien angewendet
 
