@@ -27,8 +27,9 @@ const etwProcesses: Record<string, ChildProcess> = {};
 const etwProcessRestarts: Record<string, { count: number; timestamp: number }> = {};
 let freshIdentity: Identity;
 
-const MAX_RESTART_ATTEMPTS = 3;
-const RESTART_WINDOW_MS = 60000; // 1 minute
+const MAX_RESTART_ATTEMPTS = 6;
+const RESTART_WINDOW_MS = 300000; // 5 minutes
+const MAX_RESTART_DELAY_MS = 30000;
 
 /**
  * Subscribe to external tasks.
@@ -122,7 +123,11 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
     // Restart on error exit codes (3 = worker error, 4 = uncaught exception)
     if (code === 3 || code === 4) {
       if (shouldRestartProcess(workerDirectory)) {
-        logger.info(`Restarting External Task Worker process for ${topic} after error`, {
+        const restartCount = etwProcessRestarts[workerDirectory]?.count ?? 1;
+        const delay = Math.min(1000 * Math.pow(2, restartCount - 1), MAX_RESTART_DELAY_MS);
+        logger.info(`Scheduling restart for ${topic} in ${delay}ms (attempt ${restartCount}/${MAX_RESTART_ATTEMPTS})`, {
+          delay,
+          restartCount,
           exitCode: code,
           topic,
           workerDirectory,
@@ -135,7 +140,7 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
               workerDirectory,
             });
           });
-        }, 1000);
+        }, delay);
       } else {
         logger.error(`External Task Worker process for ${topic} reached maximum restart attempts`, {
           exitCode: code,

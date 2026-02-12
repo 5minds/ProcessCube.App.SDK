@@ -4,9 +4,24 @@
 
 ## 🔮 In Entwicklung (Ausblick auf nächstes Release)
 
-_Diese Features sind nach v8.0.2 hinzugekommen und werden im nächsten Release enthalten sein._
+_Diese Features sind nach v8.1.1 hinzugekommen und werden im nächsten Release enthalten sein._
 
 ### Neue Funktionen
+
+- **External Task Worker Reconnect** — Bei Verbindungsabbrüchen zur Engine versuchen Worker automatisch mit exponentiellem Backoff die Verbindung wiederherzustellen, statt sofort abzustürzen
+- Konfigurierbar über Umgebungsvariable `PROCESSCUBE_APP_SDK_ETW_RETRY` (Standard: 6 Versuche)
+
+### Technische Änderungen
+
+- @5minds/processcube_engine_client auf 6.2.1-develop aktualisiert
+
+---
+
+## ✅ Stable v8.1.1 (11.02.2026)
+
+_Stabile Version — CI/CD-Überarbeitung, Security-Fixes und Bugfixes._
+
+### Neue Funktionen (gegenüber v8.0.2)
 
 - npm-Paket wird jetzt auf **npmjs.org** und **GitHub Packages** veröffentlicht
 - **GitHub Releases** werden automatisch bei Stable- und Pre-Releases erstellt

@@ -11,6 +11,27 @@ const EngineURL = process.env.PROCESSCUBE_ENGINE_URL ?? null;
 let externalTaskWorker: ExternalTaskWorker<unknown, any> | null = null;
 let workerTopic: string;
 
+// Reconnect state
+let connectionRetryCount = 0;
+const DEFAULT_MAX_CONNECTION_RETRIES = 6;
+const MAX_CONNECTION_RETRIES =
+  parseInt(process.env.PROCESSCUBE_APP_SDK_ETW_RETRY ?? '', 10) || DEFAULT_MAX_CONNECTION_RETRIES;
+const MAX_BACKOFF_MS = 30_000;
+
+let currentIdentity: Identity;
+let currentModuleString: string;
+let currentWorkerPath: string;
+
+function isConnectionError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const code = (error as any).code;
+  return (
+    ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'EAI_AGAIN'].includes(code) ||
+    error.message?.includes('socket hang up') ||
+    error.message?.includes('fetch failed')
+  );
+}
+
 process.on('message', (message: IPCMessageType) => {
   (async () => {
     try {
@@ -76,6 +97,10 @@ async function create({
   workerId?: string;
 }) {
   workerTopic = topic;
+  currentIdentity = identity;
+  currentModuleString = moduleString;
+  currentWorkerPath = workerPath;
+
   const module = await requireFromString(moduleString, workerPath);
   if (module === null) {
     process.exit(1);
@@ -119,10 +144,26 @@ async function create({
     });
     externalTaskWorker.stop();
     externalTaskWorker.dispose();
+    externalTaskWorker = null;
+
+    if (isConnectionError(error) && connectionRetryCount < MAX_CONNECTION_RETRIES) {
+      connectionRetryCount++;
+      const delay = Math.min(1000 * Math.pow(2, connectionRetryCount - 1), MAX_BACKOFF_MS);
+      logger.info(
+        `Connection error for topic ${topic}, retrying in ${delay}ms (attempt ${connectionRetryCount}/${MAX_CONNECTION_RETRIES})`,
+        { topic, pid, delay, attempt: connectionRetryCount },
+      );
+      setTimeout(() => {
+        create({ topic, identity: currentIdentity, moduleString: currentModuleString, workerPath: currentWorkerPath });
+      }, delay);
+      return;
+    }
+
     process.exit(3);
   });
 
   externalTaskWorker.start();
+  connectionRetryCount = 0;
   logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
     workerId: externalTaskWorker.workerId,
     topic,
