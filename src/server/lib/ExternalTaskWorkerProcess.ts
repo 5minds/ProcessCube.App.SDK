@@ -14,8 +14,7 @@ let workerTopic: string;
 // Reconnect state
 let connectionRetryCount = 0;
 const DEFAULT_MAX_CONNECTION_RETRIES = 6;
-const MAX_CONNECTION_RETRIES =
-  parseInt(process.env.PROCESSCUBE_APP_SDK_ETW_RETRY ?? '', 10) || DEFAULT_MAX_CONNECTION_RETRIES;
+const MAX_CONNECTION_RETRIES = parseInt(process.env.PROCESSCUBE_APP_SDK_ETW_RETRY ?? '', 10) || DEFAULT_MAX_CONNECTION_RETRIES;
 const MAX_BACKOFF_MS = 30_000;
 
 let currentIdentity: Identity;
@@ -26,9 +25,7 @@ function isConnectionError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const code = (error as any).code;
   return (
-    ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'EAI_AGAIN'].includes(code) ||
-    error.message?.includes('socket hang up') ||
-    error.message?.includes('fetch failed')
+    ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'EAI_AGAIN'].includes(code) || error.message?.includes('socket hang up') || error.message?.includes('fetch failed')
   );
 }
 
@@ -149,10 +146,12 @@ async function create({
     if (isConnectionError(error) && connectionRetryCount < MAX_CONNECTION_RETRIES) {
       connectionRetryCount++;
       const delay = Math.min(1000 * Math.pow(2, connectionRetryCount - 1), MAX_BACKOFF_MS);
-      logger.info(
-        `Connection error for topic ${topic}, retrying in ${delay}ms (attempt ${connectionRetryCount}/${MAX_CONNECTION_RETRIES})`,
-        { topic, pid, delay, attempt: connectionRetryCount },
-      );
+      logger.info(`Connection error for topic ${topic}, retrying in ${delay}ms (attempt ${connectionRetryCount}/${MAX_CONNECTION_RETRIES})`, {
+        topic,
+        pid,
+        delay,
+        attempt: connectionRetryCount,
+      });
       setTimeout(() => {
         create({ topic, identity: currentIdentity, moduleString: currentModuleString, workerPath: currentWorkerPath });
       }, delay);

@@ -1,6 +1,7 @@
 # External Task Worker Reconnect mit Backoff
 
 ## Kontext
+
 Worker beenden sich sofort bei Connection-Fehlern (`process.exit(3)`), Adapter startet nach 1s neu, nach 3 Fehlschlägen in 60s permanent gestoppt. Worker erholen sich nie.
 
 ## Aufgaben
@@ -20,6 +21,7 @@ Worker beenden sich sofort bei Connection-Fehlern (`process.exit(3)`), Adapter s
 ## Review
 
 ### Geänderte Dateien
+
 1. **`src/server/lib/ExternalTaskWorkerProcess.ts`**
    - `isConnectionError()` erkennt ECONNREFUSED, ECONNRESET, ETIMEDOUT, ENOTFOUND, EAI_AGAIN, socket hang up, fetch failed
    - Bei Connection-Fehlern: Worker bleibt im Prozess, retried mit exponentiellem Backoff (1s, 2s, 4s, 8s, 16s, 30s max)
@@ -35,6 +37,7 @@ Worker beenden sich sofort bei Connection-Fehlern (`process.exit(3)`), Adapter s
    - Restart-Delay: exponentielles Backoff (1s, 2s, 4s, ..., max 30s) statt festes 1s
 
 ### Was sich nicht geändert hat
+
 - Exit-Codes 1, 2, 4 — unverändert
 - SIGTERM/SIGINT/SIGHUP-Handling — unverändert
 - Identity-Refresh-Zyklus — unverändert
