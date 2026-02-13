@@ -13,6 +13,7 @@ let workerTopic: string;
 
 // Reconnect state
 let connectionRetryCount = 0;
+let isReconnecting = false;
 const DEFAULT_MAX_CONNECTION_RETRIES = 6;
 const MAX_CONNECTION_RETRIES = parseInt(process.env.PROCESSCUBE_APP_SDK_ETW_RETRY ?? '', 10) || DEFAULT_MAX_CONNECTION_RETRIES;
 const MAX_BACKOFF_MS = 30_000;
@@ -143,31 +144,49 @@ async function create({
     externalTaskWorker.dispose();
     externalTaskWorker = null;
 
-    if (isConnectionError(error) && connectionRetryCount < MAX_CONNECTION_RETRIES) {
-      connectionRetryCount++;
-      const delay = Math.min(1000 * Math.pow(2, connectionRetryCount - 1), MAX_BACKOFF_MS);
-      logger.info(`Connection error for topic ${topic}, retrying in ${delay}ms (attempt ${connectionRetryCount}/${MAX_CONNECTION_RETRIES})`, {
-        topic,
-        pid,
-        delay,
-        attempt: connectionRetryCount,
-      });
-      setTimeout(() => {
-        create({ topic, identity: currentIdentity, moduleString: currentModuleString, workerPath: currentWorkerPath });
-      }, delay);
-      return;
-    }
-
-    process.exit(3);
+    scheduleReconnectOrExit(error, topic);
   });
 
-  externalTaskWorker.start();
-  connectionRetryCount = 0;
+  try {
+    externalTaskWorker.start();
+  } catch (error) {
+    logger.error(`Failed to start external task worker for topic ${topic}`, { error, pid });
+    externalTaskWorker.stop();
+    externalTaskWorker.dispose();
+    externalTaskWorker = null;
+    scheduleReconnectOrExit(error, topic);
+    return;
+  }
+
+  if (!isReconnecting) {
+    connectionRetryCount = 0;
+  }
+  isReconnecting = false;
   logger.info(`Started external task worker ${externalTaskWorker.workerId} for topic ${topic}`, {
     workerId: externalTaskWorker.workerId,
     topic,
     pid,
   });
+}
+
+function scheduleReconnectOrExit(error: unknown, topic: string) {
+  if (isConnectionError(error) && connectionRetryCount < MAX_CONNECTION_RETRIES) {
+    connectionRetryCount++;
+    isReconnecting = true;
+    const delay = Math.min(1000 * Math.pow(2, connectionRetryCount - 1), MAX_BACKOFF_MS);
+    logger.info(`Connection error for topic ${topic}, retrying in ${delay}ms (attempt ${connectionRetryCount}/${MAX_CONNECTION_RETRIES})`, {
+      topic,
+      pid,
+      delay,
+      attempt: connectionRetryCount,
+    });
+    setTimeout(() => {
+      create({ topic, identity: currentIdentity, moduleString: currentModuleString, workerPath: currentWorkerPath });
+    }, delay);
+    return;
+  }
+
+  process.exit(3);
 }
 
 async function restart({ topic, identity, moduleString, workerPath }: StartPayload) {

@@ -6,70 +6,98 @@ Der ExternalTask-Worker-Mechanismus hat mehrere Schwachstellen, die dazu führen
 
 ### Identifizierte Probleme
 
-#### 1. Token-Refresh-Zyklus stirbt permanent (kritisch)
+#### 1. connectionRetryCount wird sofort zurückgesetzt (kritisch)
+
+**Datei:** `ExternalTaskWorkerProcess.ts`, Zeile 164-165
+
+- `connectionRetryCount = 0` wird synchron nach `start()` ausgeführt, bevor der Error-Callback feuert
+- Der Counter erreicht nie 6/6, Backoff ist immer 1s statt exponentiell
+- Worker retried endlos mit 1s Delay (kein echtes Backoff)
+
+#### 2. Token-Refresh-Zyklus stirbt permanent (kritisch)
+
 **Datei:** `ExternalTaskAdapter.ts`, Zeilen 259-305
 
 - Bei Fehler im Token-Refresh: nur 5 Retries mit 2s Delay (= max 10 Sekunden Toleranz)
 - Nach 5 Fehlversuchen: **alle Worker werden gekillt und der Refresh-Zyklus stoppt für immer**
-- Wenn die Authority nur kurz nicht erreichbar ist (z.B. Neustart, Netzwerk-Glitch > 10s), gibt es keine Wiederherstellung
 - Der Adapter-Restart-Mechanismus startet zwar Worker neu, aber **nicht den Token-Refresh-Zyklus**
-- Folge: Worker laufen mit abgelaufenem Token und scheitern erneut
 
-#### 2. IPC send kann den Refresh-Zyklus crashen (kritisch)
+#### 3. IPC send kann den Refresh-Zyklus crashen (kritisch)
+
 **Datei:** `ExternalTaskAdapter.ts`, Zeilen 274-281
 
 - `externalTaskWorkerProcess.send()` kann eine Exception werfen, wenn der Worker-Prozess gerade disconnected/beendet wird
 - Diese Exception wird im catch-Block gefangen und als Token-Refresh-Fehler gezählt
-- Kann den Refresh-Zyklus vorzeitig killen, obwohl das Token-Holen selbst erfolgreich war
-
-#### 3. Token-Refresh Retries zu wenig tolerant (hoch)
-**Datei:** `ExternalTaskAdapter.ts`, Zeilen 260, 297-300
-
-- 5 Retries × 2s Delay = max 10 Sekunden Toleranz
-- Kein exponentielles Backoff beim Token-Refresh
-- Authority-Neustart oder Netzwerk-Problem > 10s = permanenter Ausfall
 
 #### 4. Kein Retry beim initialen Start (mittel)
+
 **Datei:** `ExternalTaskAdapter.ts`, Zeile 47
 
 - `getFreshTokenSet()` beim Start hat keinen Retry-Mechanismus
-- Wenn Authority beim App-Start nicht erreichbar → Adapter startet gar nicht
-- Kein Recovery möglich ohne App-Neustart
+- Wenn Authority beim App-Start nicht erreichbar -> Adapter startet gar nicht
 
 #### 5. start() Exception im Worker nicht als Connection Error behandelt (mittel)
+
 **Datei:** `ExternalTaskWorkerProcess.ts`, Zeile 164
 
-- Wenn `externalTaskWorker.start()` synchron eine Exception wirft, wird sie vom IPC Message Handler gefangen (Zeile 46-52)
-- Dort wird nur geloggt, kein Reconnect ausgelöst
-- Worker-Prozess bleibt am Leben, tut aber nichts
+- Wenn `externalTaskWorker.start()` synchron eine Exception wirft, wird kein Reconnect ausgelöst
 
 ---
 
 ## Plan
 
-### [ ] 1. Token-Refresh robuster machen
-- Exponentielles Backoff statt festes 2s-Delay (1s, 2s, 4s, 8s, 16s, 30s)
-- Mehr Retries: 10 statt 5 (→ mehrere Minuten Toleranz)
-- Nach Ausschöpfen der Retries: **nicht aufgeben**, sondern weiter mit maximalem Delay retrien
-- Worker nicht sofort killen, sondern erst nach deutlich längerer Wartezeit
+### [x] 1. connectionRetryCount-Bug fixen (ExternalTaskWorkerProcess.ts)
 
-### [ ] 2. IPC send absichern
+- `isReconnecting`-Flag eingeführt, Counter wird nur bei nicht-Retry zurückgesetzt
+- Reconnect-Logik in `scheduleReconnectOrExit()` extrahiert
+
+### [x] 2. start() im Worker-Prozess absichern
+
+- `try/catch` um `externalTaskWorker.start()`
+- Bei Fehler: `scheduleReconnectOrExit()` aufrufen
+
+### [x] 3. Token-Refresh robuster machen (ExternalTaskAdapter.ts)
+
+- Exponentielles Backoff statt festes 2s-Delay (1s, 2s, 4s, 8s ... bis 60s)
+- 10 Retries mit Logging, danach weiter retrien (gibt nie auf)
+- Worker werden nicht mehr gekillt bei Token-Refresh-Fehler
+- `refreshCycleActive`-Flag zum Tracking
+
+### [x] 4. IPC send absichern
+
 - `try/catch` um jeden `send()`-Aufruf im Token-Refresh
-- Fehler beim send nicht als Token-Refresh-Fehler zählen
+- Fehler beim send wird als Warning geloggt, nicht als Refresh-Fehler gezählt
 
-### [ ] 3. Initialen Token-Fetch mit Retry versehen
-- `getFreshTokenSet()` in `subscribeToExternalTasks` mit Retry-Logik umgeben
-- Exponentielles Backoff, damit der Adapter auch startet wenn die Authority kurz verzögert hochfährt
+### [x] 5. Initialen Token-Fetch mit Retry versehen
 
-### [ ] 4. start() im Worker-Prozess absichern
-- `try/catch` um `externalTaskWorker.start()` in der `create`-Funktion
-- Bei Connection Error: Reconnect mit Backoff auslösen (gleiche Logik wie bei onWorkerError)
+- `getFreshTokenSetWithRetry()` mit 10 Versuchen und exponentiellem Backoff (bis 30s)
+- App startet auch wenn Authority kurz verzögert hochfährt
 
-### [ ] 5. Token-Refresh-Zyklus bei Worker-Restart wiederherstellen
-- Tracking ob der Refresh-Zyklus noch aktiv ist
-- Wenn Worker neugestartet werden und kein Refresh-Zyklus läuft: neuen starten
+### [x] 6. Token-Refresh-Zyklus bei Worker-Restart wiederherstellen
+
+- Im Adapter-Restart-Handler: Prüfung ob `refreshCycleActive`
+- Wenn nicht: neuen Token holen und Refresh-Zyklus starten
 
 ---
 
 ## Review
-(wird nach Umsetzung ausgefüllt)
+
+### Geänderte Dateien
+
+- `src/server/lib/ExternalTaskWorkerProcess.ts` — Backoff-Bug gefixt, start() abgesichert, Reconnect-Logik extrahiert
+- `src/server/lib/ExternalTaskAdapter.ts` — Token-Refresh robuster, IPC abgesichert, initialer Retry, Refresh-Zyklus-Recovery
+
+### Testergebnisse
+
+| Test | Ergebnis |
+|------|----------|
+| Engine-Ausfall (ohne Last) | Backoff 1s->2s->4s->8s->16s->30s korrekt, Recovery nach Engine-Neustart |
+| Engine-Ausfall (unter Last, zyklische Tasks) | Worker erholt sich, pollt wieder normal |
+| Authority beim Start nicht da | Token-Retry 1s->2s->4s->8s->16s (10 Versuche), Recovery nach Authority-Start |
+
+### Konfigurierbare Parameter
+
+- `PROCESSCUBE_APP_SDK_ETW_RETRY` — Anzahl Worker-Reconnect-Versuche (Default: 6)
+- Adapter-Restart: max 6 Restarts in 5 Minuten pro Worker
+- Token-Refresh: retried unbegrenzt mit max 60s Backoff
+- Initialer Token-Fetch: 10 Versuche mit max 30s Backoff

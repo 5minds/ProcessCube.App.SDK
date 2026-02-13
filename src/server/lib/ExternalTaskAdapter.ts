@@ -26,10 +26,15 @@ const logger = new Logger('processcube_app_sdk:external_task_adapter');
 const etwProcesses: Record<string, ChildProcess> = {};
 const etwProcessRestarts: Record<string, { count: number; timestamp: number }> = {};
 let freshIdentity: Identity;
+let refreshCycleActive = false;
 
 const MAX_RESTART_ATTEMPTS = 6;
 const RESTART_WINDOW_MS = 300000; // 5 minutes
 const MAX_RESTART_DELAY_MS = 30000;
+const INITIAL_TOKEN_MAX_RETRIES = 10;
+const INITIAL_TOKEN_MAX_BACKOFF_MS = 30_000;
+const REFRESH_TOKEN_MAX_RETRIES = 10;
+const REFRESH_TOKEN_MAX_BACKOFF_MS = 60_000;
 
 /**
  * Subscribe to external tasks.
@@ -44,8 +49,8 @@ export async function subscribeToExternalTasks(customEtwRootDirectory?: string):
     timeout: 100000,
   });
 
-  const tokenSet = await getFreshTokenSet();
-  freshIdentity = await getIdentityForExternalTaskWorkers(tokenSet);
+  const tokenSet = await getFreshTokenSetWithRetry();
+  freshIdentity = getIdentityForExternalTaskWorkers(tokenSet);
   await startRefreshingIdentityCycle(tokenSet);
 
   const etwRootDirectory = getExternalTasksDirPath(customEtwRootDirectory);
@@ -132,14 +137,22 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
           topic,
           workerDirectory,
         });
-        setTimeout(() => {
-          startExternalTaskWorker(workerPath, etwRootDirectory).catch((error) => {
+        setTimeout(async () => {
+          try {
+            if (authorityIsConfigured && !refreshCycleActive) {
+              logger.info('Token refresh cycle is not active, restarting it before worker restart');
+              const tokenSet = await getFreshTokenSetWithRetry();
+              freshIdentity = getIdentityForExternalTaskWorkers(tokenSet);
+              await startRefreshingIdentityCycle(tokenSet);
+            }
+            await startExternalTaskWorker(workerPath, etwRootDirectory);
+          } catch (error) {
             logger.error(`Failed to restart External Task Worker process for ${topic}`, {
               error,
               topic,
               workerDirectory,
             });
-          });
+          }
         }, delay);
       } else {
         logger.error(`External Task Worker process for ${topic} reached maximum restart attempts`, {
@@ -237,6 +250,33 @@ async function getFreshTokenSet(): Promise<TokenSet | null> {
   return tokenSet;
 }
 
+async function getFreshTokenSetWithRetry(): Promise<TokenSet | null> {
+  if (!authorityIsConfigured) {
+    return null;
+  }
+
+  for (let attempt = 1; attempt <= INITIAL_TOKEN_MAX_RETRIES; attempt++) {
+    try {
+      return await getFreshTokenSet();
+    } catch (error) {
+      const delay = Math.min(1000 * Math.pow(2, attempt - 1), INITIAL_TOKEN_MAX_BACKOFF_MS);
+      logger.error(`Failed to fetch initial token set (attempt ${attempt}/${INITIAL_TOKEN_MAX_RETRIES}), retrying in ${delay}ms`, {
+        error,
+        attempt,
+        delay,
+      });
+
+      if (attempt === INITIAL_TOKEN_MAX_RETRIES) {
+        throw error;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  return null;
+}
+
 function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Identity {
   if (!authorityIsConfigured || tokenSet === null) {
     return DUMMY_IDENTITY;
@@ -257,51 +297,63 @@ function getIdentityForExternalTaskWorkers(tokenSet: TokenSet | null): Identity 
  * @returns {Promise<void>} A promise that resolves when the timer for refreshing the identity is initialized
  * */
 async function startRefreshingIdentityCycle(tokenSet: TokenSet | null): Promise<void> {
-  let retries = 5;
-
   if (!authorityIsConfigured || tokenSet === null) {
     return;
   }
 
+  if (refreshCycleActive) {
+    return;
+  }
+  refreshCycleActive = true;
+
+  let retryCount = 0;
+
   const expiresIn = await getExpiresInForExternalTaskWorkers(tokenSet);
-  const delay = expiresIn * DELAY_FACTOR * 1000;
+  const refreshDelay = expiresIn * DELAY_FACTOR * 1000;
 
   const refresh = async () => {
     try {
       const newTokenSet = await getFreshTokenSet();
       freshIdentity = getIdentityForExternalTaskWorkers(newTokenSet);
 
-      for (const externalTaskWorkerProcess of Object.values(etwProcesses)) {
-        externalTaskWorkerProcess.send({
-          action: 'updateIdentity',
-          payload: {
-            identity: freshIdentity,
-          },
-        } satisfies IPCMessageType);
-      }
-
-      retries = 5;
-      setTimeout(refresh, delay);
-    } catch (error) {
-      if (retries === 0) {
-        logger.error('Could not refresh identity for external task worker processes. Stopping all external task workers.', { error });
-        for (const externalTaskWorkerProcess of Object.values(etwProcesses)) {
-          externalTaskWorkerProcess.kill();
+      for (const [workerDir, workerProcess] of Object.entries(etwProcesses)) {
+        try {
+          workerProcess.send({
+            action: 'updateIdentity',
+            payload: {
+              identity: freshIdentity,
+            },
+          } satisfies IPCMessageType);
+        } catch (sendError) {
+          logger.warn(`Failed to send identity update to worker process ${workerDir}`, { sendError });
         }
-        return;
       }
-      logger.error('Could not refresh identity for external task worker processes.', {
-        error,
-        retryCount: retries,
-      });
-      retries--;
 
-      const delay = 2 * 1000;
-      setTimeout(refresh, delay);
+      retryCount = 0;
+      setTimeout(refresh, refreshDelay);
+    } catch (error) {
+      retryCount++;
+      const backoffDelay = Math.min(1000 * Math.pow(2, retryCount - 1), REFRESH_TOKEN_MAX_BACKOFF_MS);
+
+      if (retryCount <= REFRESH_TOKEN_MAX_RETRIES) {
+        logger.error(`Could not refresh identity (attempt ${retryCount}/${REFRESH_TOKEN_MAX_RETRIES}), retrying in ${backoffDelay}ms`, {
+          error,
+          attempt: retryCount,
+          delay: backoffDelay,
+        });
+      } else {
+        logger.error(`Could not refresh identity (attempt ${retryCount}), continuing to retry every ${backoffDelay}ms`, {
+          error,
+          attempt: retryCount,
+          delay: backoffDelay,
+        });
+      }
+
+      setTimeout(refresh, backoffDelay);
     }
   };
 
-  setTimeout(refresh, delay);
+  setTimeout(refresh, refreshDelay);
 }
 
 /**
