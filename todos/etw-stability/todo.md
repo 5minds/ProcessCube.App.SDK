@@ -89,11 +89,11 @@ Der ExternalTask-Worker-Mechanismus hat mehrere Schwachstellen, die dazu führen
 
 ### Testergebnisse
 
-| Test | Ergebnis |
-|------|----------|
-| Engine-Ausfall (ohne Last) | Backoff 1s->2s->4s->8s->16s->30s korrekt, Recovery nach Engine-Neustart |
-| Engine-Ausfall (unter Last, zyklische Tasks) | Worker erholt sich, pollt wieder normal |
-| Authority beim Start nicht da | Token-Retry 1s->2s->4s->8s->16s (10 Versuche), Recovery nach Authority-Start |
+| Test                                         | Ergebnis                                                                     |
+| -------------------------------------------- | ---------------------------------------------------------------------------- |
+| Engine-Ausfall (ohne Last)                   | Backoff 1s->2s->4s->8s->16s->30s korrekt, Recovery nach Engine-Neustart      |
+| Engine-Ausfall (unter Last, zyklische Tasks) | Worker erholt sich, pollt wieder normal                                      |
+| Authority beim Start nicht da                | Token-Retry 1s->2s->4s->8s->16s (10 Versuche), Recovery nach Authority-Start |
 
 ### Konfigurierbare Parameter
 
