@@ -64,10 +64,10 @@
   "author": "ProcessCube UG",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/5minds/ProcessCube.App.SDK/issues",
+    "url": "https://www.processcube.io/support-1",
     "email": "info@processcube.io"
   },
-  "homepage": "https://processcube.io/docs/app-sdk",
+  "homepage": "https://docs.processcube.io/app-sdk",
   "engines": {
     "node": ">=24"
   },
