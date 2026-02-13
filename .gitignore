@@ -10,3 +10,4 @@ build
 # Files
 .npmrc
 .npmrc-bck
+test-app/.env
