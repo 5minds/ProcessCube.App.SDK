@@ -4,11 +4,19 @@
 
 ## 🔮 In Entwicklung
 
-_Commits seit v8.1.1_
+_Commits seit v8.2.1_
+
+_Keine neuen Änderungen._
+
+---
+
+## ✅ Stable v8.2.1 (13.02.2026)
+
+_Enthält alle Änderungen seit v8.1.1 — ETW Stabilität bei Verbindungsverlust._
 
 ### Neue Funktionen
 
-- External Task Worker Reconnect mit exponentiellem Backoff bei Connection-Fehlern (ECONNREFUSED, ECONNRESET, ETIMEDOUT etc.)
+- `4b9243c` External Task Worker Reconnect mit exponentiellem Backoff bei Connection-Fehlern (ECONNREFUSED, ECONNRESET, ETIMEDOUT etc.)
 - Worker-intern: max 6 Retries mit Backoff 1s→2s→4s→...→30s (konfigurierbar via `PROCESSCUBE_APP_SDK_ETW_RETRY`)
 - Adapter: Restart-Backoff 1s→2s→4s→...→30s, max 6 Versuche in 5 Min statt 3 in 1 Min
 
@@ -20,10 +28,29 @@ _Commits seit v8.1.1_
 - `6eab310` Initialer Token-Fetch (`getFreshTokenSetWithRetry`) mit 10 Versuchen und exponentiellem Backoff (bis 30s)
 - `6eab310` `externalTaskWorker.start()` mit try/catch umgeben — synchrone Fehler triggern jetzt Reconnect
 - `6eab310` Token-Refresh-Zyklus wird bei Adapter-Restart wiederhergestellt falls inaktiv (`refreshCycleActive`-Flag)
+- `05a526e` Nachbesserung ETW Stabilität
 
 ### Technische Änderungen
 
 - `588ad7a` @5minds/processcube_engine_client auf 6.2.1-develop-ca239b aktualisiert
+- `a5222fb` Version auf 8.2.1 angehoben
+- `a1c1d71` test-app/.env zu .gitignore hinzugefügt, Workflow-Formatierung korrigiert
+
+### Commits
+
+```
+dfba71e 2026-02-13 Release v8.2.1
+391dffc 2026-02-13 Fix readme
+05a526e 2026-02-13 Fix ETW stability
+a1c1d71 2026-02-13 Add test-app/.env to gitignore, fix workflow formatting
+a5222fb 2026-02-13 Bump version to 8.2.1, update Changelogs
+6eab310 2026-02-13 Fix ETW reconnect: backoff counter bug, token refresh resilience
+94814cf 2026-02-13 Add analysis and plan for ETW stability improvements
+97e5a9a 2026-02-13 add demo app
+1888b8b 2026-02-12 Bump version to 8.2.0
+4b9243c 2026-02-12 Add ETW reconnect with exponential backoff on connection errors
+588ad7a 2026-02-12 Update @5minds/processcube_engine_client to 6.2.1-develop-ca239b-mlju3ron
+```
 
 ---
 

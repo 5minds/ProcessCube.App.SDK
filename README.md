@@ -83,10 +83,3 @@ Bei Problemen mit React muss ggf. noch die React Dependency des Zielprojekts zur
 ```shell
 npm link <path-to-project>/node_modules/react
 ```
-
-## Wen kann ich auf das Projekt ansprechen?
-
-1. [Alexander Kasten](mailto:alexander.kasten@5minds.de)
-2. [Matthias Danne](mailto:matthias.danne@5minds.de)
-3. [Jeremy Hill](mailto:jeremy.hill@5minds.de)
-4. [Marius Jahn](mailto:marius.jahn@5minds.de)

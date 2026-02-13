@@ -4,9 +4,17 @@
 
 ## 🔮 In Entwicklung (Ausblick auf nächstes Release)
 
-_Diese Features sind nach v8.1.1 hinzugekommen und werden im nächsten Release enthalten sein._
+_Diese Features sind nach v8.2.1 hinzugekommen und werden im nächsten Release enthalten sein._
 
-### Neue Funktionen
+_Keine neuen Änderungen._
+
+---
+
+## ✅ Stable v8.2.1 (13.02.2026)
+
+_Stabile Version — External Task Worker Stabilität bei Verbindungsverlust deutlich verbessert._
+
+### Neue Funktionen (gegenüber v8.1.1)
 
 - **External Task Worker Reconnect** — Bei Verbindungsabbrüchen zur Engine versuchen Worker automatisch mit exponentiellem Backoff die Verbindung wiederherzustellen, statt sofort abzustürzen
 - Konfigurierbar über Umgebungsvariable `PROCESSCUBE_APP_SDK_ETW_RETRY` (Standard: 6 Versuche)
