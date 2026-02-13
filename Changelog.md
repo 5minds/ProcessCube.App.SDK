@@ -6,7 +6,14 @@
 
 _Diese Features sind nach v8.2.1 hinzugekommen und werden im nächsten Release enthalten sein._
 
-_Keine neuen Änderungen._
+### Neue Funktionen
+
+- **Console-Ausgaben in External Task Handlern sichtbar** — `console.log`-Ausgaben aus External Task Worker Handlern werden jetzt an den Parent-Prozess weitergeleitet und sind in den Anwendungs-Logs sichtbar
+- **Verbessertes Logging für External-Task-Clients** — Detailliertere Log-Ausgaben für die Diagnose von External Task Worker Problemen
+
+### Technische Änderungen
+
+- Kontakt-URL und Homepage in Paketinformationen aktualisiert
 
 ---
 

@@ -6,7 +6,28 @@
 
 _Commits seit v8.2.1_
 
-_Keine neuen Änderungen._
+### Neue Funktionen
+
+- `15627ff` stdio inherit für ETW-Child-Prozesse — `console.log` aus External Task Handlern wird an den Parent-Prozess weitergeleitet
+- `65d7976` Besseres Logging für die External-Task-Clients
+
+### Technische Änderungen
+
+- `d520d1c` bugs URL und homepage in package.json aktualisiert
+- `391dffc` Fix readme
+- `15627ff` Testprozess (BoundaryEvent.bpmn) und Testbericht für Abort bei Timer Boundary Events hinzugefügt
+
+### Commits
+
+```
+3b2b8c8 2026-02-13 Merge branch 'develop'
+65d7976 2026-02-13 Besseres Logging für die External-Task-Clients
+15627ff 2026-02-13 Add stdio inherit for ETW child processes and boundary event abort test
+7169ad2 2026-02-13 Fix package-lock.json
+d520d1c 2026-02-13 Update bugs URL and homepage in package.json
+695c778 2026-02-13 Inc Version
+391dffc 2026-02-13 Fix readme
+```
 
 ---
 
