@@ -67,12 +67,12 @@ In Version 8.2.0 des ProcessCube App SDK wurden mehrere kritische Probleme im Ex
 
 ### 3.1 Infrastruktur
 
-| Komponente       | Version/Image                                          | Port  |
-| ---------------- | ------------------------------------------------------ | ----- |
-| ProcessCube Engine | `5minds/processcube_engine:16.2.0-hotfix-develop`    | 8000  |
-| Authority        | `5minds/processcube_authority:7.1.1`                   | 11560 |
-| PostgreSQL       | `postgres:15.2`                                        | 5432  |
-| Next.js Test-App | Lokale Testanwendung mit npm-linked SDK v8.2.1         |       |
+| Komponente         | Version/Image                                     | Port  |
+| ------------------ | ------------------------------------------------- | ----- |
+| ProcessCube Engine | `5minds/processcube_engine:16.2.0-hotfix-develop` | 8000  |
+| Authority          | `5minds/processcube_authority:7.1.1`              | 11560 |
+| PostgreSQL         | `postgres:15.2`                                   | 5432  |
+| Next.js Test-App   | Lokale Testanwendung mit npm-linked SDK v8.2.1    |       |
 
 ### 3.2 Konfiguration
 
@@ -96,6 +96,7 @@ Ein External Task Worker (`test-task/external_task.ts`) mit Topic `test-task`, d
 **Szenario:** Engine wird bei laufenden Workern gestoppt und nach ca. 60 Sekunden wieder gestartet.
 
 **Durchführung:**
+
 1. Testanwendung mit External Task Worker starten
 2. Worker registriert sich erfolgreich bei der Engine
 3. Engine-Container stoppen (`docker stop`)
@@ -104,6 +105,7 @@ Ein External Task Worker (`test-task/external_task.ts`) mit Topic `test-task`, d
 6. Recovery-Verhalten im Log beobachten
 
 **Erwartetes Verhalten:**
+
 - Worker erkennt Verbindungsfehler
 - Exponentielles Backoff: 1s → 2s → 4s → 8s → 16s → 30s
 - Nach Engine-Neustart: Automatische Wiederverbindung
@@ -111,6 +113,7 @@ Ein External Task Worker (`test-task/external_task.ts`) mit Topic `test-task`, d
 **Ergebnis: BESTANDEN**
 
 **Beobachtetes Verhalten:**
+
 ```
 Connection error for topic test-task, retrying in 1000ms (attempt 1/6)
 Connection error for topic test-task, retrying in 2000ms (attempt 2/6)
@@ -120,6 +123,7 @@ Connection error for topic test-task, retrying in 16000ms (attempt 5/6)
 ```
 
 Nach dem Neustart der Engine:
+
 ```
 Started external task worker [...] for topic test-task
 ```
@@ -133,6 +137,7 @@ Der Worker erholte sich vollständig und nahm das Polling wieder auf.
 **Szenario:** Testanwendung wird gestartet, während die Authority noch nicht erreichbar ist.
 
 **Durchführung:**
+
 1. Authority-Container stoppen
 2. Testanwendung starten
 3. Verhalten des initialen Token-Fetch im Log beobachten
@@ -140,6 +145,7 @@ Der Worker erholte sich vollständig und nahm das Polling wieder auf.
 5. Recovery-Verhalten im Log beobachten
 
 **Erwartetes Verhalten:**
+
 - Initialer Token-Fetch schlägt fehl
 - Exponentielles Backoff: 1s → 2s → 4s → 8s → ... (bis max. 30s, 10 Versuche)
 - Nach Authority-Start: Token-Fetch erfolgreich, Worker starten normal
@@ -147,6 +153,7 @@ Der Worker erholte sich vollständig und nahm das Polling wieder auf.
 **Ergebnis: BESTANDEN**
 
 **Beobachtetes Verhalten:**
+
 ```
 Failed to fetch initial token set (attempt 1/10), retrying in 1000ms
 Failed to fetch initial token set (attempt 2/10), retrying in 2000ms
@@ -154,6 +161,7 @@ Failed to fetch initial token set (attempt 3/10), retrying in 4000ms
 ```
 
 Nach dem Start der Authority:
+
 ```
 Started external task worker [...] for topic test-task
 ```
@@ -167,6 +175,7 @@ Die Worker starteten erfolgreich, sobald die Authority erreichbar war.
 **Szenario:** Ein Prozessmodell wird so konfiguriert, dass es den External Task zyklisch aufruft. Während aktiver Verarbeitung wird die Engine gestoppt und wieder gestartet.
 
 **Durchführung:**
+
 1. Testanwendung mit External Task Worker starten
 2. Prozessinstanz starten, die den External Task zyklisch aufruft
 3. Verarbeitung im Log bestätigen
@@ -176,6 +185,7 @@ Die Worker starteten erfolgreich, sobald die Authority erreichbar war.
 7. Recovery-Verhalten im Log beobachten
 
 **Erwartetes Verhalten:**
+
 - Worker erkennt Verbindungsfehler trotz laufender Verarbeitung
 - Exponentielles Backoff greift korrekt
 - Nach Engine-Neustart: Worker verbindet sich und nimmt Verarbeitung wieder auf
@@ -189,24 +199,24 @@ Der Worker erkannte den Verbindungsverlust, durchlief das exponentielle Backoff 
 
 ## 5. Konfigurierbare Parameter
 
-| Parameter | Umgebungsvariable | Standard | Beschreibung |
-| --------- | ----------------- | -------- | ------------ |
-| Worker-Reconnect-Versuche | `PROCESSCUBE_APP_SDK_ETW_RETRY` | 6 | Maximale Anzahl Verbindungsversuche pro Worker bei Engine-Ausfall |
-| Worker-Backoff (max) | — | 30s | Maximale Wartezeit zwischen Worker-Reconnect-Versuchen |
-| Adapter-Restarts | — | 6 in 5 Min | Maximale Worker-Neustarts durch den Adapter pro Zeitfenster |
-| Token-Refresh-Retries | — | unbegrenzt | Token-Refresh gibt nie auf, retried mit Backoff |
-| Token-Refresh-Backoff (max) | — | 60s | Maximale Wartezeit zwischen Token-Refresh-Versuchen |
-| Initialer Token-Fetch | — | 10 Versuche | Versuche beim App-Start, ein Token von der Authority zu holen |
-| Initialer Token-Backoff (max) | — | 30s | Maximale Wartezeit zwischen initialen Token-Fetch-Versuchen |
+| Parameter                     | Umgebungsvariable               | Standard    | Beschreibung                                                      |
+| ----------------------------- | ------------------------------- | ----------- | ----------------------------------------------------------------- |
+| Worker-Reconnect-Versuche     | `PROCESSCUBE_APP_SDK_ETW_RETRY` | 6           | Maximale Anzahl Verbindungsversuche pro Worker bei Engine-Ausfall |
+| Worker-Backoff (max)          | —                               | 30s         | Maximale Wartezeit zwischen Worker-Reconnect-Versuchen            |
+| Adapter-Restarts              | —                               | 6 in 5 Min  | Maximale Worker-Neustarts durch den Adapter pro Zeitfenster       |
+| Token-Refresh-Retries         | —                               | unbegrenzt  | Token-Refresh gibt nie auf, retried mit Backoff                   |
+| Token-Refresh-Backoff (max)   | —                               | 60s         | Maximale Wartezeit zwischen Token-Refresh-Versuchen               |
+| Initialer Token-Fetch         | —                               | 10 Versuche | Versuche beim App-Start, ein Token von der Authority zu holen     |
+| Initialer Token-Backoff (max) | —                               | 30s         | Maximale Wartezeit zwischen initialen Token-Fetch-Versuchen       |
 
 ---
 
 ## 6. Geänderte Dateien
 
-| Datei | Änderungen |
-| ----- | ---------- |
-| `src/server/lib/ExternalTaskWorkerProcess.ts` | Backoff-Counter-Bug behoben, `start()` abgesichert, Reconnect-Logik in wiederverwendbare Funktion extrahiert |
-| `src/server/lib/ExternalTaskAdapter.ts` | Token-Refresh robust gemacht (gibt nie auf), IPC-Kommunikation abgesichert, initialen Token-Fetch mit Retry versehen, Refresh-Zyklus-Recovery bei Worker-Restart |
+| Datei                                         | Änderungen                                                                                                                                                       |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/server/lib/ExternalTaskWorkerProcess.ts` | Backoff-Counter-Bug behoben, `start()` abgesichert, Reconnect-Logik in wiederverwendbare Funktion extrahiert                                                     |
+| `src/server/lib/ExternalTaskAdapter.ts`       | Token-Refresh robust gemacht (gibt nie auf), IPC-Kommunikation abgesichert, initialen Token-Fetch mit Retry versehen, Refresh-Zyklus-Recovery bei Worker-Restart |
 
 ---
 
