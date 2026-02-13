@@ -1,0 +1,135 @@
+{
+  "issuerUrl": "http://authority:11560",
+  "applicationPort": 11560,
+  "development": {
+    "builtInReactDevServer": false,
+    "detailedErrors": true,
+    "disableHttpsEnforcement": true,
+    "enableLocalhostImplicit": true,
+    "fixWrongHostnames": true
+  },
+  "studio": true,
+  "engines": [
+    {
+      "clientId": "5minds_engine",
+      "clientSecret": "5minds_engine"
+    }
+  ],
+  "scopes": {
+    "additionalScopes": {
+      "flow_manager": {
+        "description": "some claims for the flow manager",
+        "claims": ["flows.read"]
+      },
+      "nodered": {
+        "description": "some claims for nodered",
+        "claims": ["nodered_admin"]
+      },
+      "lanes": {
+        "description": "lane claims of processes",
+        "claims": ["Zentraldisposition", "Personal", "Betrieb", "Serviceline", "Verwaltung", "Ticket-Erfasser"]
+      }
+    }
+  },
+  "claims": {
+    "flows.read": {
+      "type": "boolean",
+      "description": "Read access to flows"
+    },
+    "nodered_admin": {
+      "type": "boolean",
+      "description": "admin"
+    },
+    "Zentraldisposition": {
+      "type": "boolean",
+      "description": "Claim for Zentraldisposition"
+    },
+    "Personal": {
+      "type": "boolean",
+      "description": "Claim for Personal"
+    },
+    "Betrieb": {
+      "type": "boolean",
+      "description": "Claim for Betrieb"
+    },
+    "Serviceline": {
+      "type": "boolean",
+      "description": "Claim for Serviceline"
+    },
+    "Verwaltung": {
+      "type": "boolean",
+      "description": "Claim for Verwaltung"
+    },
+    "Ticket-Erfasser": {
+      "type": "boolean",
+      "description": "Claim for Ticket-Ersteller"
+    }
+  },
+  "otherClients": [
+    {
+      "clientId": "NodeRedEditorClient",
+      "clientSecret": "NodeRedEditorSecret",
+      "scope": "openid email profile nodered lanes engine_read engine_write",
+      "grant_types": ["authorization_code", "refresh_token"],
+      "response_types": ["code"],
+      "redirect_uris": ["http://localhost:1880/auth/strategy/callback"],
+      "post_logout_redirect_uris": ["http://localhost:1880/"],
+      "corsOrigins": ["http://localhost:1880"]
+    },
+    {
+      "clientId": "NodeRedDashboardClient",
+      "clientSecret": "NodeRedDashboardSecret",
+      "scope": "openid email profile lanes engine_read engine_write",
+      "grant_types": ["authorization_code", "refresh_token"],
+      "response_types": ["code"],
+      "redirect_uris": ["http://localhost:1880/auth/dashboard/callback"],
+      "post_logout_redirect_uris": ["http://localhost:1880/dashboard"],
+      "corsOrigins": ["http://localhost:1880"]
+    },
+    {
+      "clientId": "Lowcode",
+      "clientSecret": "LowcodeSecret",
+      "scope": "openid email profile nodered lanes engine_read engine_write",
+      "grant_types": ["authorization_code", "refresh_token"],
+      "response_types": ["code"],
+      "redirect_uris": ["http://localhost:1881/auth/strategy/callback"],
+      "post_logout_redirect_uris": ["http://localhost:1881/"],
+      "corsOrigins": ["http://localhost:1881"]
+    },
+    {
+      "clientId": "nodered_app_deployment",
+      "clientSecret": "nodered_app_secret_deployment",
+      "scope": "openid email profile engine_read engine_write",
+      "grant_types": ["client_credentials", "authorization_code"]
+    }
+  ],
+  "database": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "authority",
+    "host": "postgres",
+    "port": 5432,
+    "dialect": "postgres",
+    "supportBigNumbers": true,
+    "resetPasswordRequestTimeToLive": 12,
+    "logging": false
+  },
+  "extensions": {
+    "path": "/app/extensions",
+    "configs": {
+      "username_password": {
+        "skipConsentPageForClientIds": ["upe_client", "portal", "atlas_studio", "swagger_client"],
+        "customization": {
+          "title": "Stölting Ticketsystem Authority"
+        }
+      }
+    }
+  },
+  "externalTaskWorkers": [
+    {
+      "clientId": "external_task_worker",
+      "clientSecret": "external_task_worker_secret",
+      "scope": "engine_etw engine_read engine_write engine_admin"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "@5minds/processcube_app_sdk",
-  "version": "8.1.1-alpha.1",
+  "version": "8.2.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
   "main": "build/common/index.cjs",
@@ -98,7 +98,7 @@
     "react": "^19.1.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "6.2.1-develop-5ee5c8-mlf0gcna",
+    "@5minds/processcube_engine_client": "6.2.1-develop-ca239b-mlju3ron",
     "@5minds/processcube_engine_sdk": "7.1.2",
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",

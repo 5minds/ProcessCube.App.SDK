@@ -4,15 +4,46 @@
 
 ## 🔮 In Entwicklung (Ausblick auf nächstes Release)
 
-_Diese Features sind nach v8.0.2 hinzugekommen und werden im nächsten Release enthalten sein._
+_Diese Features sind nach v8.1.1 hinzugekommen und werden im nächsten Release enthalten sein._
+
+### Neue Funktionen
+
+- **External Task Worker Reconnect** — Bei Verbindungsabbrüchen zur Engine versuchen Worker automatisch mit exponentiellem Backoff die Verbindung wiederherzustellen, statt sofort abzustürzen
+- Konfigurierbar über Umgebungsvariable `PROCESSCUBE_APP_SDK_ETW_RETRY` (Standard: 6 Versuche)
 
 ### Fehlerbehebungen
 
+- **ETW Backoff-Counter korrigiert** — Der Retry-Zähler wurde bei jedem Versuch zurückgesetzt, sodass das exponentielle Backoff nie griff (immer 1s statt 1s→2s→4s→8s→16s→30s)
+- **Token-Refresh gibt nicht mehr auf** — Bei Ausfall der Authority retried der Token-Refresh-Zyklus jetzt unbegrenzt mit exponentiellem Backoff, statt nach 10 Sekunden alle Worker zu beenden
+- **IPC-Fehler crashen Token-Refresh nicht mehr** — Fehler beim Senden von Identity-Updates an beendete Worker-Prozesse werden jetzt abgefangen
+- **App startet auch bei verzögerter Authority** — Initialer Token-Fetch hat jetzt 10 Retry-Versuche mit exponentiellem Backoff
+- **Token-Refresh-Zyklus wird bei Worker-Restart wiederhergestellt** — War der Zyklus zuvor gestorben, wird er beim nächsten Adapter-Restart automatisch neu gestartet
+
+### Technische Änderungen
+
+- @5minds/processcube_engine_client auf 6.2.1-develop aktualisiert
+
+---
+
+## ✅ Stable v8.1.1 (11.02.2026)
+
+_Stabile Version — CI/CD-Überarbeitung, Security-Fixes und Bugfixes._
+
+### Neue Funktionen (gegenüber v8.0.2)
+
+- npm-Paket wird jetzt auf **npmjs.org** und **GitHub Packages** veröffentlicht
+- **GitHub Releases** werden automatisch bei Stable- und Pre-Releases erstellt
+
+### Fehlerbehebungen
+
+- Verbindung zwischen Engine und App SDK für externe Tasks korrigiert
 - Fehlende TypeScript-Deklarationsdateien für 8.x-Kompatibilität wiederhergestellt (#408)
 - 7 Sicherheitslücken in Abhängigkeiten behoben (#410)
 
 ### Technische Änderungen
 
+- CI/CD-Pipeline überarbeitet: Dual-Publishing auf npmjs.org und GitHub Packages
+- Repository-URL auf HTTPS-Format umgestellt
 - CLAUDE.md mit Projektdokumentation und Entwicklungsregeln hinzugefügt
 - Prettier-Formatierung auf Markdown-Dateien angewendet
 
