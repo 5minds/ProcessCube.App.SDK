@@ -105,7 +105,7 @@ jobs:
       - name: Install Dependencies
         env:
           NODE_AUTH_TOKEN_PROCESSCUBE_IO: ${{ secrets.NODE_AUTH_TOKEN_PROCESSCUBE_IO }}
-          NPM_TOKEN:  ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm ci
 
       - name: Prepare version

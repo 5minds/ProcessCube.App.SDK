@@ -4,20 +4,56 @@
 
 ## 🔮 In Entwicklung
 
-_Commits seit v8.0.2_
+_Commits seit v8.1.1_
 
 ### Neue Funktionen
 
+- External Task Worker Reconnect mit exponentiellem Backoff bei Connection-Fehlern (ECONNREFUSED, ECONNRESET, ETIMEDOUT etc.)
+- Worker-intern: max 6 Retries mit Backoff 1s→2s→4s→...→30s (konfigurierbar via `PROCESSCUBE_APP_SDK_ETW_RETRY`)
+- Adapter: Restart-Backoff 1s→2s→4s→...→30s, max 6 Versuche in 5 Min statt 3 in 1 Min
+
+### Fehlerbehebungen
+
+- `6eab310` Fix connectionRetryCount-Bug: Counter wurde bei jedem `create()`-Aufruf synchron auf 0 zurückgesetzt, bevor der Error-Callback feuerte — Backoff war immer 1s statt exponentiell
+- `6eab310` Token-Refresh-Zyklus retried jetzt unbegrenzt mit exponentiellem Backoff (bis 60s) statt nach 5×2s alle Worker zu killen
+- `6eab310` IPC `send()` im Token-Refresh mit try/catch umgeben — disconnected Worker crashen den Zyklus nicht mehr
+- `6eab310` Initialer Token-Fetch (`getFreshTokenSetWithRetry`) mit 10 Versuchen und exponentiellem Backoff (bis 30s)
+- `6eab310` `externalTaskWorker.start()` mit try/catch umgeben — synchrone Fehler triggern jetzt Reconnect
+- `6eab310` Token-Refresh-Zyklus wird bei Adapter-Restart wiederhergestellt falls inaktiv (`refreshCycleActive`-Flag)
+
+### Technische Änderungen
+
+- `588ad7a` @5minds/processcube_engine_client auf 6.2.1-develop-ca239b aktualisiert
+
+---
+
+## ✅ Stable v8.1.1 (11.02.2026)
+
+_Enthält alle Änderungen seit v8.0.2 — CI/CD-Überarbeitung, Security-Fixes und Bugfixes._
+
+### Neue Funktionen
+
+- `992c386` GitHub Packages Publishing und GitHub Release-Erstellung hinzugefügt
+- `a1aab28` ci_tools publish durch dedizierte npm publish Steps ersetzt
 - `4a7cff6` CLAUDE.md mit Projektdokumentation und Entwicklungsregeln hinzugefügt
 
 ### Fehlerbehebungen
 
+- `99811ec` Verbindung Engine <-> App SDK für externe Tasks korrigiert
 - `48accc6` Fehlende TypeScript-Deklarationsdateien für 8.x-Kompatibilität wiederhergestellt (#408)
 - `31af543` Code-Änderungen und Zusammenfassung
 - `b6af5a7` 7 Sicherheitslücken via npm audit fix behoben (#410)
 
 ### Technische Änderungen
 
+- `896b5d9` NPM_TOKEN für npmjs.org Auth verwendet
+- `876b387` NODE_AUTH_TOKEN zu NODE_AUTH_TOKEN_PROCESSCUBE_IO umbenannt
+- `597ae09` Repository-URL in package.json auf HTTPS geändert
+- `cfa1eb5` .npmrc zu .gitignore hinzugefügt, Push-Refspec korrigiert
+- `1388fe5` GH_TOKEN PAT für Verify-Job (Branch Protection)
+- `b5f72f2` Korrektes Org-Secret NODE_AUTH_TOKEN verwendet
+- `20a35ac` @5minds Registry zur Laufzeit konfiguriert
+- `c55f6d7` .npmrc aus Repository entfernt
 - `af22b9d` Code formatiert
 - `195a4ee` Version auf 8.0.5 angehoben
 - `813f993` Box-Release entfernt
@@ -28,6 +64,42 @@ _Commits seit v8.0.2_
 - `72c270b` npm-Publish-Fix
 - `d459ba0` Prettier-Formatierung auf Markdown-Dateien angewendet
 - `c11400b` Changelog und Changelog-Dev für Versionshistorie hinzugefügt
+
+### Commits
+
+```
+ca78cbd 2026-02-11 Release v8.1.1
+43a8cca 2026-02-11 Update Changelog and Changelog-Dev with CI/CD publishing changes
+2f89987 2026-02-11 fix publish to npmjs.orf
+896b5d9 2026-02-11 Use NPM_TOKEN for npmjs.org auth instead of OIDC
+4590ba3 2026-02-11 Add npmjs.org registry and auth token to project .npmrc
+c5902db 2026-02-11 Fix: remove NODE_AUTH_TOKEN from CI tools, rename GitHub Packages token
+876b387 2026-02-11 Rename NODE_AUTH_TOKEN to NODE_AUTH_TOKEN_PROCESSCUBE_IO for marketplace
+597ae09 2026-02-11 Fix OIDC Trusted Publisher: remove registry-url from setup-node
+a1aab28 2026-02-11 Replace ci_tools publish with dedicated npm publish steps
+1388fe5 2026-02-11 Fix CI: use GH_TOKEN PAT for verify job to bypass branch protection
+cfa1eb5 2026-02-11 Fix CI: add .npmrc to .gitignore and fix push refspec
+b5f72f2 2026-02-11 Fix CI: use correct org secret name NODE_AUTH_TOKEN
+20a35ac 2026-02-11 Fix CI: configure @5minds registry at runtime in both jobs
+c55f6d7 2026-02-11 Remove .npmrc
+992c386 2026-02-11 Add GitHub Packages publishing and GitHub Release creation
+99811ec 2026-02-11 Fix connection engine <-> app sdk for external tasks
+b6af5a7 2026-02-09 Fix 7 security vulnerabilities via npm audit fix (#410)
+d459ba0 2026-02-06 style: apply prettier formatting to markdown files
+7556719 2026-02-06 Fix 7 security vulnerabilities via npm audit fix
+c11400b 2026-02-06 Add Changelog and Changelog-Dev for version history
+4a7cff6 2026-02-06 Add CLAUDE.md with project documentation and development rules
+48accc6 2026-01-29 Restore missing TypeScript declaration files for 8.x compatibility (#408)
+af22b9d 2026-01-28 format code
+31af543 2026-01-28 Die Änderungen sind fertig
+195a4ee 2025-12-10 bump version to 8.0.5
+813f993 2025-12-10 remove box relase
+5b79927 2025-12-10 bump version to 8.0.4
+cbe3815 2025-12-10 fix build
+6477278 2025-12-10 bump version to 8.0.3
+3bb74f4 2025-12-10 fix ci build
+72c270b 2025-12-10 fix npm publish
+```
 
 ---
 
