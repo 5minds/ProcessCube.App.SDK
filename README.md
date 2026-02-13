@@ -83,4 +83,3 @@ Bei Problemen mit React muss ggf. noch die React Dependency des Zielprojekts zur
 ```shell
 npm link <path-to-project>/node_modules/react
 ```
-
