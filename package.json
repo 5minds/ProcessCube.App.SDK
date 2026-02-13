@@ -1,6 +1,6 @@
 {
   "name": "@5minds/processcube_app_sdk",
-  "version": "8.2.0",
+  "version": "8.2.1",
   "description": "The SDK for ProcessCube Apps",
   "type": "module",
   "main": "build/common/index.cjs",

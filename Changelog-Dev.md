@@ -12,6 +12,15 @@ _Commits seit v8.1.1_
 - Worker-intern: max 6 Retries mit Backoff 1s→2s→4s→...→30s (konfigurierbar via `PROCESSCUBE_APP_SDK_ETW_RETRY`)
 - Adapter: Restart-Backoff 1s→2s→4s→...→30s, max 6 Versuche in 5 Min statt 3 in 1 Min
 
+### Fehlerbehebungen
+
+- `6eab310` Fix connectionRetryCount-Bug: Counter wurde bei jedem `create()`-Aufruf synchron auf 0 zurückgesetzt, bevor der Error-Callback feuerte — Backoff war immer 1s statt exponentiell
+- `6eab310` Token-Refresh-Zyklus retried jetzt unbegrenzt mit exponentiellem Backoff (bis 60s) statt nach 5×2s alle Worker zu killen
+- `6eab310` IPC `send()` im Token-Refresh mit try/catch umgeben — disconnected Worker crashen den Zyklus nicht mehr
+- `6eab310` Initialer Token-Fetch (`getFreshTokenSetWithRetry`) mit 10 Versuchen und exponentiellem Backoff (bis 30s)
+- `6eab310` `externalTaskWorker.start()` mit try/catch umgeben — synchrone Fehler triggern jetzt Reconnect
+- `6eab310` Token-Refresh-Zyklus wird bei Adapter-Restart wiederhergestellt falls inaktiv (`refreshCycleActive`-Flag)
+
 ### Technische Änderungen
 
 - `588ad7a` @5minds/processcube_engine_client auf 6.2.1-develop-ca239b aktualisiert
