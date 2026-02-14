@@ -46,6 +46,94 @@ Es können nur Komponenten und Funktionen importiert werden, die im Browser funk
 import { DynamicLink } from '@5minds/processcube_app_sdk/client';
 ```
 
+### External Tasks
+
+External Tasks ermöglichen es, Logik in einer Next.js App auszuführen, die von der ProcessCube Engine als Aufgabe vergeben wird. Dazu wird eine Datei `external_task.ts` (oder `.js`) im `app/`-Verzeichnis der Next.js App angelegt. Der Verzeichnispfad bestimmt das Topic, unter dem die Engine den Task erkennt — z.B. wird `app/order/process/external_task.ts` zum Topic `order/process`.
+
+Die External Tasks werden automatisch erkannt und als eigene Worker-Prozesse gestartet, wenn `useExternalTasks: true` in der SDK-Konfiguration gesetzt ist:
+
+```javascript
+// next.config.js
+const { withApplicationSdk } = require('@5minds/processcube_app_sdk/server');
+
+module.exports = withApplicationSdk({
+  applicationSdk: {
+    useExternalTasks: true,
+  },
+});
+```
+
+#### Handler-Signatur
+
+Der Handler wird als `default export` exportiert und erhält bis zu drei Parameter:
+
+```typescript
+export default async function handleExternalTask(
+  payload: any, // Prozess-Variablen
+  task: ExternalTask<any>, // Task-Metadaten (optional)
+  signal: AbortSignal, // Abort-Signal (optional)
+) {
+  // Aufgabe bearbeiten
+  return { result: 'done' };
+}
+```
+
+Der Rückgabewert wird als Ergebnis an die Engine zurückgegeben und steht im Prozess als Variable zur Verfügung.
+
+#### Konfiguration
+
+Über einen benannten `config`-Export können Worker-Einstellungen angepasst werden:
+
+```typescript
+import { ExternalTaskConfig } from '@5minds/processcube_app_sdk/server';
+
+export const config: ExternalTaskConfig = {
+  lockDuration: 5000, // Lock-Dauer in ms (default: 30000)
+  maxTasks: 5, // Gleichzeitige Tasks (default: 10)
+};
+```
+
+Die `lockDuration` bestimmt, wie oft der Worker der Engine signalisiert, dass er noch aktiv ist. Der Standardwert ist 30 Sekunden.
+
+#### Abort-Handling bei Boundary Events
+
+Wenn ein Boundary Event (z.B. ein Timer) einen External Task abbricht, wird das `AbortSignal` ausgelöst. Damit der Worker schnell auf den Abbruch reagiert, sollte die `lockDuration` reduziert werden — die Engine kann den Abbruch erst beim nächsten Lock-Renewal mitteilen.
+
+| lockDuration    | Max. Verzögerung bis Abort |
+| --------------- | -------------------------- |
+| 30000 (default) | bis zu 30 Sekunden         |
+| 5000            | bis zu 5 Sekunden          |
+| 1000            | bis zu 1 Sekunde           |
+
+Vollständiges Beispiel mit Abort-Handling:
+
+```typescript
+import { ExternalTaskConfig } from '@5minds/processcube_app_sdk/server';
+
+export const config: ExternalTaskConfig = {
+  lockDuration: 5000,
+};
+
+export default async function handleExternalTask(payload: any, _task: any, signal: AbortSignal) {
+  signal.addEventListener(
+    'abort',
+    () => {
+      console.log('Task wurde durch Boundary Event abgebrochen');
+    },
+    { once: true },
+  );
+
+  // Signal vor und nach asynchronen Operationen prüfen
+  if (signal.aborted) return;
+
+  const result = await doWork(payload);
+
+  if (signal.aborted) return;
+
+  return result;
+}
+```
+
 ## Wie kann ich das Projekt aufsetzen?
 
 ### Setup/Installation
