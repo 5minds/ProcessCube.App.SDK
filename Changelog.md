@@ -2,21 +2,11 @@
 
 ---
 
-## [8.3.0-develop.2] - 2026-04-03
+## [8.3.0] - 2026-04-03
 
-**Development Build** - Nur für Tests
+_Stabile Version — Umfassende External Task Dokumentation, Engine Client/SDK Update und Dependency-Aktualisierungen._
 
-### Technische Änderungen
-
-- Dependencies auf aktuelle kompatible Versionen aktualisiert (bpmn-js 18.14.0, isomorphic-dompurify 2.36.0, @heroui/react 2.8.10, prettier 3.8.1, esbuild 0.25.12 u.a.)
-
----
-
-## [8.3.0-develop.1] - 2026-04-03
-
-**Development Build** - Nur für Tests
-
-### Implementiert
+### Neue Features
 
 - **Detaillierte External Task Dokumentation** — Umfassende Dokumentation mit Mermaid-Diagrammen (Architektur, Lebenszyklus, IPC-Kommunikation, Fehlerbehandlung) für docs.processcube.io
 - **Console-Ausgaben in External Task Handlern sichtbar** — `console.log`-Ausgaben aus External Task Worker Handlern werden an den Parent-Prozess weitergeleitet
@@ -26,7 +16,7 @@
 
 - Engine Client aktualisiert: `6.2.1-develop` → `6.3.0-develop.2` (behebt socket.io-parser Vulnerability)
 - Engine SDK aktualisiert: `7.1.2` → `7.3.0-develop.2`
-- Kontakt-URL und Homepage in Paketinformationen aktualisiert
+- Dependencies auf aktuelle kompatible Versionen aktualisiert (bpmn-js 18.14.0, isomorphic-dompurify 2.36.0, @heroui/react 2.8.10, prettier 3.8.1, esbuild 0.25.12 u.a.)
 
 ---
 

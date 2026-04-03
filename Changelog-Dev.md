@@ -2,13 +2,14 @@
 
 ---
 
-## [8.3.0-develop.2] - 2026-04-03
+## ✅ Stable v8.3.0 (03.04.2026)
 
-_Development Build — Commits seit v8.3.0-develop.1_
+_Enthält alle Änderungen seit v8.2.3 — Dokumentation, Engine Client/SDK Update, Dependency-Updates._
 
-### Technische Änderungen
+### Enthaltene Develop-Versionen
 
-- `31e1123` Dependency-Updates auf kompatible Versionen (bpmn-js, isomorphic-dompurify, @heroui/react, prettier, esbuild, autoprefixer, Type-Packages u.a.)
+- `v8.3.0-develop.1` — Dokumentation, Engine Client/SDK Update
+- `v8.3.0-develop.2` — Dependency-Updates
 
 ---
 
