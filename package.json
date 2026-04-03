@@ -98,8 +98,8 @@
     "react": "^19.1.0"
   },
   "dependencies": {
-    "@5minds/processcube_engine_client": "6.2.1-develop-ca239b-mlju3ron",
-    "@5minds/processcube_engine_sdk": "7.1.2",
+    "@5minds/processcube_engine_client": "^6.3.0-develop.2",
+    "@5minds/processcube_engine_sdk": "^7.3.0-develop.2",
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^2.7.6",
