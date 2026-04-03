@@ -33,12 +33,14 @@ Dokumentation (~300 Zeilen) ersetzt. Der Rest der README (Installation, Setup, l
 ### Neue Inhalte
 
 **4 Mermaid-Diagramme:**
+
 1. **Architektur-Diagramm** (graph LR) — Zeigt Engine ↔ Adapter ↔ Worker Prozesse mit IPC und HTTP
 2. **Task-Lebenszyklus** (sequenceDiagram) — Fetch & Lock → Processing → Extend Lock → Finish/Error
 3. **Worker-Startup & IPC** (sequenceDiagram) — File Watch → Transpile → Fork → create/restart/updateIdentity
 4. **Error-Handling Flowchart** (flowchart TD) — Zweistufige Retry-Strategie (Worker + Adapter Level)
 
 **Dokumentierte Abschnitte:**
+
 - Überblick und Architektur mit Komponenten-Tabelle
 - Detaillierter Ablauf (5 Schritte) des Task-Lebenszyklus
 - IPC-Nachrichten-Referenz (create, restart, updateIdentity)

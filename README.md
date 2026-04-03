@@ -85,11 +85,11 @@ graph LR
 
 **Hauptkomponenten:**
 
-| Komponente | Aufgabe |
-|---|---|
-| **ExternalTaskAdapter** | Läuft im Hauptprozess der Next.js App. Überwacht das Dateisystem, startet Worker-Prozesse, verwaltet Tokens und koordiniert Restarts. |
+| Komponente                    | Aufgabe                                                                                                                                                           |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ExternalTaskAdapter**       | Läuft im Hauptprozess der Next.js App. Überwacht das Dateisystem, startet Worker-Prozesse, verwaltet Tokens und koordiniert Restarts.                             |
 | **ExternalTaskWorkerProcess** | Eigenständiger Node.js-Kindprozess (einer pro Topic). Lädt den transpilierten Handler, verbindet sich per HTTP-Long-Polling mit der Engine und verarbeitet Tasks. |
-| **ProcessCube Engine** | Verwaltet BPMN-Prozesse und vergibt External Tasks an Worker über das Fetch-and-Lock-Protokoll. |
+| **ProcessCube Engine**        | Verwaltet BPMN-Prozesse und vergibt External Tasks an Worker über das Fetch-and-Lock-Protokoll.                                                                   |
 
 #### Lebenszyklus eines External Tasks
 
@@ -173,11 +173,11 @@ sequenceDiagram
 
 **IPC-Nachrichten:**
 
-| Action | Richtung | Beschreibung |
-|---|---|---|
-| `create` | Adapter → Worker | Initialer Start: Übergibt Topic, Identity und transpilierten Handler-Code |
-| `restart` | Adapter → Worker | Hot-Reload: Stoppt den alten Worker und startet mit neuem Code (gleiche Worker-ID) |
-| `updateIdentity` | Adapter → Worker | Aktualisiert den Auth-Token auf dem laufenden Worker |
+| Action           | Richtung         | Beschreibung                                                                       |
+| ---------------- | ---------------- | ---------------------------------------------------------------------------------- |
+| `create`         | Adapter → Worker | Initialer Start: Übergibt Topic, Identity und transpilierten Handler-Code          |
+| `restart`        | Adapter → Worker | Hot-Reload: Stoppt den alten Worker und startet mit neuem Code (gleiche Worker-ID) |
+| `updateIdentity` | Adapter → Worker | Aktualisiert den Auth-Token auf dem laufenden Worker                               |
 
 #### Fehlerbehandlung und Restart-Strategie
 
@@ -276,21 +276,17 @@ Das SDK sucht Handler-Dateien standardmäßig in `./app` oder `./src/app`. Ein e
 Der Handler wird als **Default-Export** der Datei definiert. Er erhält bis zu drei Parameter:
 
 ```typescript
-export default async function handleExternalTask(
-  payload: any,
-  task: ExternalTask<any>,
-  signal: AbortSignal,
-) {
+export default async function handleExternalTask(payload: any, task: ExternalTask<any>, signal: AbortSignal) {
   // Geschäftslogik hier
   return { result: 'done' };
 }
 ```
 
-| Parameter | Typ | Beschreibung |
-|---|---|---|
-| `payload` | `any` | Die Prozessvariablen, die der BPMN-Prozess dem External Task mitgibt. Enthält die im Prozessmodell definierte Payload-Expression. |
-| `task` | `ExternalTask<any>` | Metadaten des Tasks: `id`, `workerId`, `topic`, `correlationId`, `processInstanceId`, `processDefinitionId`, `flowNodeInstanceId`, `lockExpirationTime`, `state`, `createdAt`. Optional. |
-| `signal` | `AbortSignal` | Wird ausgelöst, wenn ein Boundary Event (z.B. Timer) den Task abbricht. Optional. |
+| Parameter | Typ                 | Beschreibung                                                                                                                                                                             |
+| --------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload` | `any`               | Die Prozessvariablen, die der BPMN-Prozess dem External Task mitgibt. Enthält die im Prozessmodell definierte Payload-Expression.                                                        |
+| `task`    | `ExternalTask<any>` | Metadaten des Tasks: `id`, `workerId`, `topic`, `correlationId`, `processInstanceId`, `processDefinitionId`, `flowNodeInstanceId`, `lockExpirationTime`, `state`, `createdAt`. Optional. |
+| `signal`  | `AbortSignal`       | Wird ausgelöst, wenn ein Boundary Event (z.B. Timer) den Task abbricht. Optional.                                                                                                        |
 
 **Rückgabewert:** Das zurückgegebene Objekt wird als Ergebnis an die Engine gemeldet und steht im BPMN-Prozess als Variable zur Verfügung.
 
@@ -302,15 +298,15 @@ export default async function handleExternalTask(
 import { ExternalTaskConfig } from '@5minds/processcube_app_sdk/server';
 
 export const config: ExternalTaskConfig = {
-  lockDuration: 5000,   // Lock-Dauer in ms (Standard: 30000)
-  maxTasks: 5,          // Gleichzeitige Tasks pro Polling-Zyklus (Standard: 10)
+  lockDuration: 5000, // Lock-Dauer in ms (Standard: 30000)
+  maxTasks: 5, // Gleichzeitige Tasks pro Polling-Zyklus (Standard: 10)
 };
 ```
 
-| Option | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `lockDuration` | `number` | `30000` | Dauer in Millisekunden, für die ein Task gesperrt wird. Bestimmt auch das Intervall der Lock-Verlängerung und die maximale Verzögerung bei Abort-Signalen. |
-| `maxTasks` | `number` | `10` | Maximale Anzahl gleichzeitig abgeholter Tasks pro Polling-Zyklus. |
+| Option         | Typ      | Standard | Beschreibung                                                                                                                                               |
+| -------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lockDuration` | `number` | `30000`  | Dauer in Millisekunden, für die ein Task gesperrt wird. Bestimmt auch das Intervall der Lock-Verlängerung und die maximale Verzögerung bei Abort-Signalen. |
+| `maxTasks`     | `number` | `10`     | Maximale Anzahl gleichzeitig abgeholter Tasks pro Polling-Zyklus.                                                                                          |
 
 #### Abort-Handling bei Boundary Events
 
@@ -318,11 +314,11 @@ Wenn ein BPMN Boundary Event (z.B. ein Timer oder Signal) einen External Task ab
 
 **Wichtig:** Die `lockDuration` bestimmt die maximale Verzögerung bis zum Abort, da die Engine den Abbruch erst beim nächsten Lock-Renewal mitteilen kann:
 
-| lockDuration | Max. Verzögerung bis Abort |
-|---|---|
-| `30000` (Standard) | bis zu 30 Sekunden |
-| `5000` | bis zu 5 Sekunden |
-| `1000` | bis zu 1 Sekunde |
+| lockDuration       | Max. Verzögerung bis Abort |
+| ------------------ | -------------------------- |
+| `30000` (Standard) | bis zu 30 Sekunden         |
+| `5000`             | bis zu 5 Sekunden          |
+| `1000`             | bis zu 1 Sekunde           |
 
 Für zeitkritische Abbrüche sollte die `lockDuration` entsprechend reduziert werden.
 
@@ -392,13 +388,13 @@ sequenceDiagram
 
 #### Umgebungsvariablen
 
-| Variable | Pflicht | Standard | Beschreibung |
-|---|---|---|---|
-| `PROCESSCUBE_ENGINE_URL` | Nein | `http://localhost:10560` | URL der ProcessCube Engine |
-| `PROCESSCUBE_AUTHORITY_URL` | Nein | — | URL des OpenID-Providers. Wenn gesetzt, wird Token-basierte Authentifizierung aktiviert. |
-| `PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID` | Wenn Authority | — | Client-ID für den OpenID Client Credentials Grant |
-| `PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET` | Wenn Authority | — | Client-Secret für den OpenID Client Credentials Grant |
-| `PROCESSCUBE_APP_SDK_ETW_RETRY` | Nein | `6` | Maximale Anzahl der Reconnect-Versuche im Worker-Prozess bei Verbindungsfehlern |
+| Variable                                         | Pflicht        | Standard                 | Beschreibung                                                                             |
+| ------------------------------------------------ | -------------- | ------------------------ | ---------------------------------------------------------------------------------------- |
+| `PROCESSCUBE_ENGINE_URL`                         | Nein           | `http://localhost:10560` | URL der ProcessCube Engine                                                               |
+| `PROCESSCUBE_AUTHORITY_URL`                      | Nein           | —                        | URL des OpenID-Providers. Wenn gesetzt, wird Token-basierte Authentifizierung aktiviert. |
+| `PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_ID`     | Wenn Authority | —                        | Client-ID für den OpenID Client Credentials Grant                                        |
+| `PROCESSCUBE_EXTERNAL_TASK_WORKER_CLIENT_SECRET` | Wenn Authority | —                        | Client-Secret für den OpenID Client Credentials Grant                                    |
+| `PROCESSCUBE_APP_SDK_ETW_RETRY`                  | Nein           | `6`                      | Maximale Anzahl der Reconnect-Versuche im Worker-Prozess bei Verbindungsfehlern          |
 
 #### Vollständiges Beispiel
 
@@ -409,8 +405,8 @@ import { ExternalTaskConfig } from '@5minds/processcube_app_sdk/server';
 
 // Worker-Konfiguration
 export const config: ExternalTaskConfig = {
-  lockDuration: 5000,  // 5s Lock für schnelle Abort-Reaktion
-  maxTasks: 3,         // Maximal 3 Tasks gleichzeitig
+  lockDuration: 5000, // 5s Lock für schnelle Abort-Reaktion
+  maxTasks: 3, // Maximal 3 Tasks gleichzeitig
 };
 
 // Typen für Payload und Ergebnis
@@ -425,11 +421,7 @@ interface OrderResult {
   processedAt: string;
 }
 
-export default async function handleExternalTask(
-  payload: OrderPayload,
-  task: any,
-  signal: AbortSignal,
-): Promise<OrderResult | undefined> {
+export default async function handleExternalTask(payload: OrderPayload, task: any, signal: AbortSignal): Promise<OrderResult | undefined> {
   console.log(`Verarbeite Bestellung ${payload.orderId} (Task: ${task.id})`);
 
   // Abort-Handler für Cleanup
