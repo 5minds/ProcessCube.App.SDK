@@ -110,6 +110,7 @@ Der Build verwendet **esbuild** (nicht tsc) für JavaScript/TypeScript-Kompilier
 
 - Versionen werden automatisch durch CI-Tools verwaltet (`ci_tools prepare-version`)
 - Versionen in `package.json` **nicht** manuell hochsetzen
+- **Dependabot** ist deaktiviert (Alerts und automatische Security-Update-PRs)
 
 ### PR-Template
 
@@ -140,6 +141,15 @@ PRs verwenden ein deutschsprachiges Template mit Abschnitten für Beschreibung, 
 - **Types** — UserTaskInstance, HeatmapTypes, IPCMessageType
 - **RemoteUserTask** — Gemeinsame Komponente für Remote-UserTask-Rendering
 - **hasClaim** — Autorisierungs-Hilfsfunktion
+
+## Test-App
+
+Im Verzeichnis `test-app/` liegt eine Next.js-Beispielanwendung zum Testen des SDK:
+
+- **Docker-Setup:** `docker compose up` startet Engine, Authority und PostgreSQL
+- **External Tasks:** Drei Handler (`test-task`, `doit`, `dothis`) mit unterschiedlicher Komplexität
+- **BPMN-Prozesse:** `ExternalTaskTest.bpmn` (einfach) und `BoundaryEvent.bpmn` (mit Timer-Abort)
+- **Lokale Entwicklung:** SDK per `npm link` einbinden, `authority` muss in `/etc/hosts` auf `127.0.0.1` zeigen
 
 ## Wichtige Hinweise
 
