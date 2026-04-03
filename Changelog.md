@@ -2,6 +2,16 @@
 
 ---
 
+## [8.3.0-develop.2] - 2026-04-03
+
+**Development Build** - Nur für Tests
+
+### Technische Änderungen
+
+- Dependencies auf aktuelle kompatible Versionen aktualisiert (bpmn-js 18.14.0, isomorphic-dompurify 2.36.0, @heroui/react 2.8.10, prettier 3.8.1, esbuild 0.25.12 u.a.)
+
+---
+
 ## [8.3.0-develop.1] - 2026-04-03
 
 **Development Build** - Nur für Tests

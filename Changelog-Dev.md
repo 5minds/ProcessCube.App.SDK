@@ -2,6 +2,16 @@
 
 ---
 
+## [8.3.0-develop.2] - 2026-04-03
+
+_Development Build — Commits seit v8.3.0-develop.1_
+
+### Technische Änderungen
+
+- `31e1123` Dependency-Updates auf kompatible Versionen (bpmn-js, isomorphic-dompurify, @heroui/react, prettier, esbuild, autoprefixer, Type-Packages u.a.)
+
+---
+
 ## [8.3.0-develop.1] - 2026-04-03
 
 _Development Build — Commits seit v8.2.3_
