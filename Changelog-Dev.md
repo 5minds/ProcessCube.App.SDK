@@ -2,11 +2,42 @@
 
 ---
 
-## 🔮 In Entwicklung
+## [8.3.0-develop.2] - 2026-04-03
 
-_Commits seit v8.2.1_
+_Development Build — Commits seit v8.3.0-develop.1_
 
-_Keine neuen Änderungen._
+### Technische Änderungen
+
+- `31e1123` Dependency-Updates auf kompatible Versionen (bpmn-js, isomorphic-dompurify, @heroui/react, prettier, esbuild, autoprefixer, Type-Packages u.a.)
+
+---
+
+## [8.3.0-develop.1] - 2026-04-03
+
+_Development Build — Commits seit v8.2.3_
+
+### Neue Funktionen
+
+- `d7a750f` Detaillierte External Task Dokumentation mit Mermaid-Diagrammen für docs.processcube.io
+- `17340ac` External Task Dokumentation in README.md hinzugefügt
+- `15627ff` stdio inherit für ETW-Child-Prozesse — `console.log` aus External Task Handlern wird an den Parent-Prozess weitergeleitet
+- `65d7976` Besseres Logging für die External-Task-Clients
+
+### Technische Änderungen
+
+- `3d0fa4a` Engine Client `6.2.1-develop` → `6.3.0-develop.2` (socket.io-parser Vulnerability behoben)
+- `3d0fa4a` Engine SDK `7.1.2` → `7.3.0-develop.2`
+- `f8520ff` Changelogs aktualisiert
+
+### Commits
+
+```
+3d0fa4a 2026-04-03 Update Engine Client und SDK auf neue Develop-Versionen
+e57cf61 2026-04-03 style: apply prettier formatting [skip ci]
+d7a750f 2026-04-03 Detaillierte External Task Dokumentation mit Mermaid-Diagrammen
+17340ac 2026-04-03 Add External Task Dokumentation in README.md
+f8520ff 2026-04-03 Update Changelogs: ETW stdio inherit und Logging-Verbesserungen
+```
 
 ---
 
