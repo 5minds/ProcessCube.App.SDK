@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - next
-      - develop
       - 'release/**'
     tags:
       - 'v*.*.*'
@@ -132,8 +131,6 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           elif [ "$REF" = "refs/heads/next" ]; then
             echo "tag=next" >> $GITHUB_OUTPUT
-          elif [ "$REF" = "refs/heads/develop" ]; then
-            echo "tag=develop" >> $GITHUB_OUTPUT
           elif [[ "$REF" == refs/tags/v* ]]; then
             # Tags: stable versions → latest, pre-release versions → develop
             if [[ "$REF_NAME" == *-develop* ]]; then

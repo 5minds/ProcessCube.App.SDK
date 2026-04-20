@@ -98,17 +98,16 @@ Der Build verwendet **esbuild** (nicht tsc) für JavaScript/TypeScript-Kompilier
 
 ### Branches
 
-- `develop` — primärer Entwicklungsbranch (aktueller Default)
+- `main` — einziger Entwicklungs- und Release-Branch (Single-Branch-Workflow)
 - `next` — Alpha/Pre-Release-Kanal (npm-Tag: `next`)
-- `main` — stabile Releases
-- `release/**` — Release-Branches
+- `release/**` — Release-Branches (bei Bedarf)
 
 ### CI/CD (GitHub Actions)
 
 1. **Verify-Job:** Installieren, formatieren, Formatierungsänderungen automatisch committen
 2. **Build & Publish-Job:** Versionsvorbereitung über `@5minds/product_ci_tools`, Build, Veröffentlichung auf npm mit branchbasierten Tags
 
-- Versionen werden automatisch durch CI-Tools verwaltet (`ci_tools prepare-version`)
+- Versionen werden über Git-Tags und den Release-Process-Skill erstellt
 - Versionen in `package.json` **nicht** manuell hochsetzen
 - **Dependabot** ist deaktiviert (Alerts und automatische Security-Update-PRs)
 
