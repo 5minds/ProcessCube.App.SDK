@@ -1,6 +1,7 @@
 import * as esbuild from 'esbuild';
 import fs from 'fs';
 import { createRequire } from 'module';
+
 const require = createRequire(import.meta.url);
 
 var packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
@@ -37,11 +38,42 @@ const build = watchMode ? esbuild.context : esbuild.build;
  *    when the target package does not ship an `exports` map.
  */
 const NODE_BUILTINS = new Set([
-  'assert', 'buffer', 'child_process', 'cluster', 'console', 'constants',
-  'crypto', 'dgram', 'dns', 'domain', 'events', 'fs', 'http', 'http2',
-  'https', 'module', 'net', 'os', 'path', 'perf_hooks', 'process',
-  'punycode', 'querystring', 'readline', 'repl', 'stream', 'string_decoder',
-  'timers', 'tls', 'tty', 'url', 'util', 'v8', 'vm', 'worker_threads', 'zlib',
+  'assert',
+  'buffer',
+  'child_process',
+  'cluster',
+  'console',
+  'constants',
+  'crypto',
+  'dgram',
+  'dns',
+  'domain',
+  'events',
+  'fs',
+  'http',
+  'http2',
+  'https',
+  'module',
+  'net',
+  'os',
+  'path',
+  'perf_hooks',
+  'process',
+  'punycode',
+  'querystring',
+  'readline',
+  'repl',
+  'stream',
+  'string_decoder',
+  'timers',
+  'tls',
+  'tty',
+  'url',
+  'util',
+  'v8',
+  'vm',
+  'worker_threads',
+  'zlib',
 ]);
 
 // Cache for package.json exports field lookups
