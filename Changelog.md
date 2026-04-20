@@ -2,6 +2,17 @@
 
 ---
 
+## [8.4.0-insiders.2] - 2026-04-20
+
+**Insiders-Vorschauversion** - Für Feedback und Early Testing
+
+### Verbesserungen
+
+- **Single-Branch-Workflow** — Entwicklung findet nur noch auf `main` statt, `develop` Branch wurde entfernt
+- **CI/CD verschlankt** — ci_tools entfernt, Version wird aus Git-Tag extrahiert (wie Cuby/Docs), Build+Publish nur noch auf Tag-Pushes
+
+---
+
 ## [8.4.0-insiders.1] - 2026-04-20
 
 **Insiders-Vorschauversion** - Für Feedback und Early Testing
