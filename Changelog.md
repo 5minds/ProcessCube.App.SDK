@@ -2,6 +2,17 @@
 
 ---
 
+## [8.3.1] - 2026-04-20
+
+_Patch Release — ESM-Kompatibilität für Node.js v24 und npm-Publish-Fix._
+
+### Behobene Fehler
+
+- **ESM-Imports für Node.js v24** — Bare Subpath-Imports (z.B. `next/headers`) werden im ESM-Build um `.js`-Extension ergänzt, damit Node.js v24 mit strikter ESM-Auflösung diese korrekt finden kann
+- **npm publish Tag-Handling** — Semver-gültige Tag-Namen werden bei npm publish korrekt behandelt
+
+---
+
 ## [8.3.0] - 2026-04-03
 
 _Stabile Version — Umfassende External Task Dokumentation, Engine Client/SDK Update und Dependency-Aktualisierungen._
