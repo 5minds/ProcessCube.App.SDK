@@ -16,7 +16,7 @@ _Stabile Version — Single-Branch-Workflow und CI-Modernisierung._
 - **ESM-Imports für Node.js v24** — Bare Subpath-Imports werden im ESM-Build mit `.js`-Extension ergänzt
 - **Node.js Built-in Imports** — Built-in Module werden mit `node:`-Prefix versehen
 - **exports-Map-Erkennung** — Packages mit `exports`-Map werden nicht fälschlich umgeschrieben
-- **ExternalTaskAdapter __dirname-Fix** — Fallback über `import.meta.url` für ESM-Kontext
+- **ExternalTaskAdapter \_\_dirname-Fix** — Fallback über `import.meta.url` für ESM-Kontext
 - **npm publish Tag-Handling** — Semver-gültige Tag-Namen werden korrekt behandelt
 
 ---
