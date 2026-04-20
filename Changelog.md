@@ -2,6 +2,25 @@
 
 ---
 
+## [8.4.0] - 2026-04-20
+
+_Stabile Version — Single-Branch-Workflow und CI-Modernisierung._
+
+### Verbesserungen
+
+- **Single-Branch-Workflow** — Entwicklung findet nur noch auf `main` statt, kein `develop` Branch mehr
+- **CI/CD verschlankt** — ci_tools entfernt, Version wird aus Git-Tag extrahiert, Build+Publish nur auf Tag-Pushes
+
+### Behobene Fehler
+
+- **ESM-Imports für Node.js v24** — Bare Subpath-Imports werden im ESM-Build mit `.js`-Extension ergänzt
+- **Node.js Built-in Imports** — Built-in Module werden mit `node:`-Prefix versehen
+- **exports-Map-Erkennung** — Packages mit `exports`-Map werden nicht fälschlich umgeschrieben
+- **ExternalTaskAdapter __dirname-Fix** — Fallback über `import.meta.url` für ESM-Kontext
+- **npm publish Tag-Handling** — Semver-gültige Tag-Namen werden korrekt behandelt
+
+---
+
 ## [8.4.0-insiders.2] - 2026-04-20
 
 **Insiders-Vorschauversion** - Für Feedback und Early Testing
