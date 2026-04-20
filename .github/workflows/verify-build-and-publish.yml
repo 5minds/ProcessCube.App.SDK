@@ -4,17 +4,14 @@ on:
   push:
     branches:
       - main
-      - next
-      - 'release/**'
     tags:
-      - 'v*.*.*'
+      - 'v*'
   pull_request:
   workflow_dispatch:
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: write # Required for creating releases and tags
-  packages: write # Required for publishing to GitHub Packages
+  contents: write
+  packages: write
 
 jobs:
   verify:
@@ -26,7 +23,8 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ github.head_ref }}
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
@@ -70,12 +68,43 @@ jobs:
     needs: verify
     if: startsWith(github.ref, 'refs/tags/v')
 
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is_prerelease: ${{ steps.version.outputs.is_prerelease }}
+
     steps:
       - uses: actions/checkout@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.ref }}
           fetch-depth: 0
+
+      - name: Extract version and prerelease flag
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          if [[ "$VERSION" == *"-develop"* ]] || [[ "$VERSION" == *"-insiders"* ]] || [[ "$VERSION" == *"-alpha"* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "Detected prerelease version: $VERSION"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "Detected stable version: $VERSION"
+          fi
+
+      - name: Determine npm tag
+        id: npm-tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ "$VERSION" == *-develop* ]]; then
+            echo "tag=develop" >> $GITHUB_OUTPUT
+          elif [[ "$VERSION" == *-insiders* ]]; then
+            echo "tag=insiders" >> $GITHUB_OUTPUT
+          elif [[ "$VERSION" == *-alpha* ]] || [[ "$VERSION" == *-next* ]]; then
+            echo "tag=next" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
 
       - name: Use Node.js
         uses: actions/setup-node@v6
@@ -83,38 +112,19 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Configure @5minds registry
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
-          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
-
       - name: Install Dependencies
         env:
           NODE_AUTH_TOKEN_PROCESSCUBE_IO: ${{ secrets.NODE_AUTH_TOKEN_PROCESSCUBE_IO }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm ci
+        run: |
+          echo "@5minds:registry=https://marketplace.processcube.io/npm/" >> .npmrc
+          echo "//marketplace.processcube.io/npm/:_authToken=\${NODE_AUTH_TOKEN_PROCESSCUBE_IO}" >> .npmrc
+          npm ci
 
       - name: Build Packages
         run: npm run build
 
       - name: Run tests
         run: npm run test
-
-      - name: Determine npm tag
-        id: npm-tag
-        run: |
-          REF_NAME="${{ github.ref_name }}"
-          if [[ "$REF_NAME" == *-develop* ]]; then
-            echo "tag=develop" >> $GITHUB_OUTPUT
-          elif [[ "$REF_NAME" == *-insiders* ]]; then
-            echo "tag=insiders" >> $GITHUB_OUTPUT
-          elif [[ "$REF_NAME" == *-alpha* ]] || [[ "$REF_NAME" == *-next* ]]; then
-            echo "tag=next" >> $GITHUB_OUTPUT
-          else
-            echo "tag=latest" >> $GITHUB_OUTPUT
-          fi
 
       - name: Publish to npmjs.org
         run: |
@@ -134,12 +144,11 @@ jobs:
 
       - name: Create GitHub Release
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="v${VERSION}"
+          VERSION="${GITHUB_REF_NAME#v}"
           if [[ "$VERSION" == *-* ]]; then
-            gh release create "${TAG}" --title "${TAG}" --generate-notes --prerelease
+            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes --prerelease
           else
-            gh release create "${TAG}" --title "${TAG}" --generate-notes
+            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
