@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import { ChildProcess, fork } from 'node:child_process';
 import { existsSync, promises as fsp } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Issuer, TokenSet, custom } from 'openid-client';
 
 import { IExternalTaskWorkerConfig } from '@5minds/processcube_engine_client';
@@ -96,7 +97,8 @@ async function startExternalTaskWorker(workerPath: string, etwRootDirectory: str
   const relativeWorkerPath = relative(etwRootDirectory, workerDirectory);
   const topic = getExternalTaskTopicByPath(relativeWorkerPath);
 
-  const etwProcessPath = join(__dirname, 'lib/ExternalTaskWorkerProcess.cjs');
+  const currentDir = typeof __dirname !== 'undefined' ? __dirname : dirname(fileURLToPath(import.meta.url));
+  const etwProcessPath = join(currentDir, 'lib/ExternalTaskWorkerProcess.cjs');
   const workerProcess = fork(etwProcessPath, {
     stdio: ['pipe', 'inherit', 'inherit', 'ipc'],
     env: {
