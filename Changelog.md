@@ -2,6 +2,17 @@
 
 ---
 
+## [8.4.0-insiders.1] - 2026-04-20
+
+**Insiders-Vorschauversion** - Für Feedback und Early Testing
+
+### Verbesserungen
+
+- **Single-Branch-Workflow** — Entwicklung findet nur noch auf `main` statt, `develop` Branch wurde entfernt
+- **CI/CD vereinfacht** — GitHub Actions und npm-Tag-Logik auf Single-Branch-Workflow angepasst
+
+---
+
 ## [8.3.2] - 2026-04-20
 
 _Patch Release — Vollständige ESM-Kompatibilität für Node.js v24._
