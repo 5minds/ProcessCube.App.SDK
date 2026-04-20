@@ -2,6 +2,18 @@
 
 ---
 
+## [8.3.2] - 2026-04-20
+
+_Patch Release — Vollständige ESM-Kompatibilität für Node.js v24._
+
+### Behobene Fehler
+
+- **Node.js Built-in Imports** — Built-in Module (`fs`, `path`, etc.) werden im ESM-Build mit `node:`-Prefix versehen, wie von Node.js v24 im ESM-Kontext vorausgesetzt
+- **exports-Map-Erkennung** — Packages mit `exports`-Map (z.B. React, heroicons) werden nicht mehr fälschlich mit `.js`-Extension umgeschrieben
+- **ExternalTaskAdapter __dirname-Fix** — `__dirname` ist in ESM-Modulen nicht verfügbar; Fallback über `import.meta.url` ergänzt
+
+---
+
 ## [8.3.1] - 2026-04-20
 
 _Patch Release — ESM-Kompatibilität für Node.js v24 und npm-Publish-Fix._
