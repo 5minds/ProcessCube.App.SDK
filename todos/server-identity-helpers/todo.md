@@ -105,15 +105,15 @@ export default async function (payload: any) {
 
 ### Neue Dateien
 
-| Datei | Beschreibung |
-|---|---|
-| `src/server/lib/getServerIdentity.ts` | Token-Cache + `getServerAccessToken()` + `getServerIdentity()` |
-| `src/server/lib/AuthorityClient.ts` | `AuthorityClient`-Klasse mit generischem `request()` + Convenience-Methoden |
+| Datei                                 | Beschreibung                                                                |
+| ------------------------------------- | --------------------------------------------------------------------------- |
+| `src/server/lib/getServerIdentity.ts` | Token-Cache + `getServerAccessToken()` + `getServerIdentity()`              |
+| `src/server/lib/AuthorityClient.ts`   | `AuthorityClient`-Klasse mit generischem `request()` + Convenience-Methoden |
 
 ### Geänderte Dateien
 
-| Datei | Änderung |
-|---|---|
+| Datei                     | Änderung                   |
+| ------------------------- | -------------------------- |
 | `src/server/lib/index.ts` | 2 neue Exports hinzugefügt |
 
 ### Architektur-Entscheidungen
@@ -126,9 +126,9 @@ export default async function (payload: any) {
 
 ### Neue Env-Variablen (für Consumer-Apps)
 
-| Variable | Beschreibung | Pflicht |
-|---|---|---|
-| `PROCESSCUBE_SERVER_CLIENT_ID` | OAuth2 Client ID für Server-to-Server | Ja |
-| `PROCESSCUBE_SERVER_CLIENT_SECRET` | OAuth2 Client Secret | Ja |
-| `PROCESSCUBE_AUTHORITY_URL` | Authority URL (bereits vorhanden) | Ja |
-| `PROCESSCUBE_SERVER_SCOPES` | Scopes überschreiben | Nein (Default: `upe_admin engine_read engine_write`) |
+| Variable                           | Beschreibung                          | Pflicht                                              |
+| ---------------------------------- | ------------------------------------- | ---------------------------------------------------- |
+| `PROCESSCUBE_SERVER_CLIENT_ID`     | OAuth2 Client ID für Server-to-Server | Ja                                                   |
+| `PROCESSCUBE_SERVER_CLIENT_SECRET` | OAuth2 Client Secret                  | Ja                                                   |
+| `PROCESSCUBE_AUTHORITY_URL`        | Authority URL (bereits vorhanden)     | Ja                                                   |
+| `PROCESSCUBE_SERVER_SCOPES`        | Scopes überschreiben                  | Nein (Default: `upe_admin engine_read engine_write`) |
