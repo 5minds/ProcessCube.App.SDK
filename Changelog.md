@@ -2,6 +2,75 @@
 
 ---
 
+## [8.6.2] - 2026-04-21
+
+_Patch — Fehlende Changelog-Einträge für v8.5.0–v8.6.1 nachgetragen, Dokumentation aktualisiert (CSS Auto-Import)._
+
+### Dokumentation
+
+- **Changelog nachgetragen** — Einträge für v8.5.0, v8.6.0 und v8.6.1 waren durch ein Dateisystem-Casing-Problem nicht committed
+- **CSS-Dokumentation aktualisiert** — Alle Komponenten-Beispiele in der README nutzen jetzt CSS Auto-Import (keine manuellen CSS-Imports mehr)
+
+---
+
+## [8.6.1] - 2026-04-21
+
+_Patch — CSS-Auto-Import funktioniert jetzt im Runtime-Bundle._
+
+### Behobene Fehler
+
+- **CSS-Auto-Import im Runtime-Bundle** — CSS-Imports in Client-Komponenten (`DynamicUi`, `BPMNViewer`, etc.) werden jetzt als externe Imports im JS-Bundle erhalten. Der Consumer-Bundler (webpack/turbopack) löst sie automatisch auf. Manuelles CSS-Importieren ist nicht mehr nötig.
+- **`./client/index.css` Export entfernt** — Die Datei wird nicht mehr generiert (CSS-Imports sind jetzt inline im JS-Bundle). `./client/styles` bleibt als optionaler Single-Import für Tailwind-Basisstyles.
+
+---
+
+## [8.6.0] - 2026-04-21
+
+_Stabile Version — DX-Verbesserungen aus Consumer-Feedback._
+
+### Neue Features
+
+- **CSS-Exports** — Neuer Import-Pfad `@5minds/processcube_app_sdk/client/styles` für alle SDK-Styles in einem Import. Zusätzlich `./client/index.css` exportiert.
+- **DynamicUi CSS Auto-Import** — Die `DynamicUi`-Komponente importiert ihr CSS jetzt automatisch. Ein manueller CSS-Import ist nicht mehr nötig.
+
+### Behobene Fehler
+
+- **`identity: false` bei UserTask/ProcessInstance-Funktionen** — Anonymer Zugriff funktioniert jetzt korrekt. Das Identity-Feld wird aus dem Options-Objekt entfernt statt auf `undefined` gesetzt.
+- **`withApplicationSdk` Next.js 15 Warning** — Nutzt jetzt `serverExternalPackages` statt des veralteten `experimental.serverComponentsExternalPackages`.
+
+### Dokumentation
+
+- **Blocking vs. Non-Blocking** — Tabelle in der User-Tasks-Dokumentation, die klar zeigt welche Funktionen blockieren (`waitForUserTask`, `waitForProcessEnd`) und welche nicht.
+- **Identity-Parameter** — Dokumentation erweitert mit Tabelle zu `true`/`false`/`Identity` und Hinweis auf `allowAnonymousRootAccess`.
+- **CSS-Import** — Dokumentation aktualisiert mit neuem `./client/styles` Single-Import.
+
+---
+
+## [8.5.0] - 2026-04-21
+
+_Stabile Version — Server Identity Helpers, Authority Client und umfassende Dokumentation._
+
+### Neue Features
+
+- **`getServerAccessToken()`** — Server-to-Server Access Token via OAuth2 Client Credentials Grant mit automatischem Token-Caching und konfigurierbaren Scopes
+- **`getServerIdentity()`** — Erzeugt ein `Identity`-Objekt aus dem Server-Token (JWT-Decode)
+- **`AuthorityClient`** — Zwei-Stufen-Client für die ProcessCube Authority API:
+  - Stufe 1: Generische `request()`-Methode für beliebige Authority-API-Aufrufe
+  - Stufe 2: Convenience-Methoden `updateClaim()`, `addScope()`, `addGroup()`, `deleteUser()`
+
+### Verbesserungen
+
+- **Export-Map korrigiert** — Explizite `import`-Condition für Node.js 22/24 ESM und Next.js 15/16 (Turbopack)
+- **`./package.json`-Export** — Ermöglicht Tooling-Zugriff auf die package.json
+- **README.md komplett überarbeitet** — Umfassende Dokumentation mit 11 Mermaid-Diagrammen:
+  - SDK-Architektur und Export-Map
+  - Authentifizierung (User-Identity vs. Server-Identity)
+  - Authority Client API
+  - Alle Server-Funktionen und Client-Komponenten
+  - Vollständige Umgebungsvariablen-Referenz
+
+---
+
 ## [8.4.0] - 2026-04-20
 
 _Stabile Version — Single-Branch-Workflow und CI-Modernisierung._
