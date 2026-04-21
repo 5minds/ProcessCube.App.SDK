@@ -121,7 +121,7 @@ export async function getActiveProcessInstances(
       query.options.identity = await getIdentity();
       break;
     case false:
-      query.options.identity = undefined;
+      delete query.options.identity;
       break;
     case undefined:
       query.options.identity = await getIdentity();

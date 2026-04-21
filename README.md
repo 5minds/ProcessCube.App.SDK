@@ -111,13 +111,21 @@ export default nextConfig;
 
 ### CSS einbinden
 
-Client-Komponenten bringen eigene Stylesheets mit, die im Layout oder auf der Seite importiert werden müssen:
+Der einfachste Weg: Importiere alle SDK-Styles auf einmal im Root-Layout:
 
 ```typescript
-// Beispiel: ProcessInstanceInspector CSS
+// app/layout.tsx
+import '@5minds/processcube_app_sdk/client/styles';
+```
+
+Alternativ können einzelne Komponenten-Stylesheets importiert werden:
+
+```typescript
 import '@5minds/processcube_app_sdk/client/components/ProcessInstanceInspector/ProcessInstanceInspector.css';
 import '@5minds/processcube_app_sdk/client/components/BPMNViewer.css';
 ```
+
+> **Hinweis:** Die `DynamicUi`-Komponente importiert ihr CSS automatisch. Ein separater CSS-Import ist dafür nicht nötig.
 
 ### Umgebungsvariablen
 
@@ -407,7 +415,7 @@ export default withApplicationSdk({
 | `useExternalTasks`           | `boolean` | `false`                  | External Task Worker aktivieren       |
 | `customExternalTasksDirPath` | `string`  | `./app` oder `./src/app` | Verzeichnis für External Task Handler |
 
-Das Plugin fügt automatisch `esbuild` zu `serverComponentsExternalPackages` hinzu und startet Worker nur im Server-Modus (nicht während `next build`).
+Das Plugin fügt automatisch `esbuild` zu `serverExternalPackages` hinzu und startet Worker nur im Server-Modus (nicht während `next build`).
 
 ### Umgebungsvariablen
 
@@ -549,6 +557,15 @@ const triggered = await getFlowNodeInstancesTriggeredByFlowNodeInstanceIds(['fni
 
 ### User Tasks
 
+> **Blocking vs. Non-Blocking:** Einige Funktionen blocken, bis ein Event eintritt. Das ist wichtig für die Wahl der richtigen Funktion:
+>
+> | Funktion                | Blockiert? | Use-Case                                           |
+> | ----------------------- | ---------- | -------------------------------------------------- |
+> | `waitForUserTask()`     | **Ja**     | Server-seitig auf nächsten Task warten (Event-Sub) |
+> | `getWaitingUserTasks()` | Nein       | Polling, UI-Abfragen, Server Components            |
+> | `getUserTasks()`        | Nein       | Allgemeine Abfrage mit vollem Query-Objekt         |
+> | `waitForProcessEnd()`   | **Ja**     | Warten bis Prozess beendet (Event-Sub)             |
+
 #### getWaitingUserTasks
 
 Gibt alle wartenden User Tasks zurück.
@@ -633,7 +650,13 @@ await cancelReservedUserTask(identity, 'flow-node-instance-id');
 | `getReservedUserTasksByIdentity(identity?, options?)`         | Vom aktuellen User reservierte Tasks       |
 | `getAssignedUserTasksByIdentity(identity?, options?)`         | Dem aktuellen User zugewiesene Tasks       |
 
-Alle Funktionen unterstützen einen `identity`-Parameter: `true` (Default) nutzt die implizite User-Identity, `false` deaktiviert Auth, oder ein explizites `Identity`-Objekt.
+Alle Funktionen unterstützen einen `identity`-Parameter:
+
+| Wert              | Verhalten                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------- |
+| `true` (Default)  | Nutzt die implizite User-Identity aus der NextAuth-Session                                              |
+| `false`           | Anonymer Zugriff — kein Auth-Header. Voraussetzung: Engine muss `allowAnonymousRootAccess: true` haben. |
+| `Identity`-Objekt | Explizite Identity (z.B. von `getServerIdentity()` oder `getIdentity()`)                                |
 
 ### Server Actions
 
@@ -810,11 +833,12 @@ export default function InspectorPage({ processInstanceId }: { processInstanceId
 
 Rendert dynamische Formulare basierend auf UserTask-FormField-Definitionen. Unterstützt 25+ Feldtypen und Custom Fields.
 
+Die Komponente importiert ihr CSS automatisch — ein separater CSS-Import ist nicht nötig.
+
 ```typescript
 'use client';
 
 import { DynamicUi } from '@5minds/processcube_app_sdk/client';
-import '@5minds/processcube_app_sdk/client/components/DynamicUi/DynamicUi.css';
 
 export default function TaskForm({ task }) {
   return (

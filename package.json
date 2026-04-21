@@ -26,6 +26,8 @@
       "require": "./build/client/index.cjs",
       "default": "./build/client/index.mjs"
     },
+    "./client/styles": "./build/client/root.css",
+    "./client/index.css": "./build/client/index.css",
     "./client/components/*.css": {
       "import": "./build/client/components/*.css",
       "require": "./build/client/components/*.css",

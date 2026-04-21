@@ -127,7 +127,7 @@ export async function getUserTasks(query: DataModels.FlowNodeInstances.UserTaskQ
       options.identity = await getIdentity();
       break;
     case false:
-      options.identity = undefined;
+      delete options.identity;
       break;
     case undefined:
       options.identity = await getIdentity();
@@ -149,7 +149,7 @@ export async function getWaitingUserTasks(options: OptionsWithBoolIdentity = { i
       options.identity = await getIdentity();
       break;
     case false:
-      options.identity = undefined;
+      delete options.identity;
       break;
     case undefined:
       options.identity = await getIdentity();
@@ -183,7 +183,7 @@ export async function getWaitingUserTasksByProcessInstanceId(
       options.identity = await getIdentity();
       break;
     case false:
-      options.identity = undefined;
+      delete options.identity;
       break;
     case undefined:
       options.identity = await getIdentity();
@@ -212,7 +212,7 @@ export async function getWaitingUserTasksByFlowNodeId(flowNodeId: string | strin
       options.identity = await getIdentity();
       break;
     case false:
-      options.identity = undefined;
+      delete options.identity;
       break;
     case undefined:
       options.identity = await getIdentity();
@@ -241,7 +241,7 @@ export async function getWaitingUserTaskByFlowNodeInstanceId(flowNodeInstanceId:
       options.identity = await getIdentity();
       break;
     case false:
-      options.identity = undefined;
+      delete options.identity;
       break;
     case undefined:
       options.identity = await getIdentity();
@@ -276,7 +276,7 @@ export async function getWaitingUserTasksByCorrelationId(correlationId: string, 
       options.identity = await getIdentity();
       break;
     case false:
-      options.identity = undefined;
+      delete options.identity;
       break;
     case undefined:
       options.identity = await getIdentity();

@@ -32,10 +32,7 @@ export function withApplicationSdk(config: NextConfigWithApplicationSdkConfig = 
 
     return {
       ...nextConfig,
-      experimental: {
-        ...nextConfig.experimental,
-        serverComponentsExternalPackages: [...(nextConfig.experimental?.serverComponentsExternalPackages || []), 'esbuild'],
-      },
+      serverExternalPackages: [...(nextConfig.serverExternalPackages || []), 'esbuild'],
     };
   };
 }
