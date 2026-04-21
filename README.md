@@ -43,7 +43,7 @@ graph TD
 
 ### Export-Map
 
-Das Paket hat drei Einstiegspunkte — jeder mit ESM- und CJS-Support:
+Das Paket hat drei Einstiegspunkte — jeder mit ESM- und CJS-Support. Komponenten-CSS wird beim Import automatisch vom Consumer-Bundler aufgelöst.
 
 ```mermaid
 graph LR
@@ -51,21 +51,19 @@ graph LR
     I1["import _ from<br/>'@5minds/processcube_app_sdk'"]
     I2["import _ from<br/>'@5minds/processcube_app_sdk/server'"]
     I3["import _ from<br/>'@5minds/processcube_app_sdk/client'"]
-    I4["import<br/>'…/client/components/*.css'"]
   end
 
   I1 --> Common["common/index.mjs<br/><small>.cjs</small>"]
   I2 --> Server["server/index.mjs<br/><small>.cjs</small>"]
-  I3 --> Client["client/index.mjs<br/><small>.cjs</small>"]
-  I4 --> CSS["components/*.css"]
+  I3 --> Client["client/index.mjs<br/><small>.cjs + CSS auto-import</small>"]
 ```
 
-| Import-Pfad                          | Inhalt                                                                    | Umgebung        |
-| ------------------------------------ | ------------------------------------------------------------------------- | --------------- |
-| `@5minds/processcube_app_sdk`        | Gemeinsame Typen, `RemoteUserTask`, `hasClaim`, Auth-Callbacks            | Client + Server |
-| `@5minds/processcube_app_sdk/server` | Engine-Funktionen, Server Actions, Auth, Authority Client, External Tasks | Nur Server      |
-| `@5minds/processcube_app_sdk/client` | React-Komponenten (BPMNViewer, DynamicUi, ProcessInstanceInspector, …)    | Nur Client      |
-| `…/client/components/*.css`          | Komponent-spezifische Stylesheets                                         | CSS-Import      |
+| Import-Pfad                          | Inhalt                                                                                                   | Umgebung        |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------- | --------------- |
+| `@5minds/processcube_app_sdk`        | Gemeinsame Typen, `RemoteUserTask`, `hasClaim`, Auth-Callbacks                                           | Client + Server |
+| `@5minds/processcube_app_sdk/server` | Engine-Funktionen, Server Actions, Auth, Authority Client, External Tasks                                | Nur Server      |
+| `@5minds/processcube_app_sdk/client` | React-Komponenten (BPMNViewer, DynamicUi, ProcessInstanceInspector, …). CSS wird automatisch mitgeladen. | Nur Client      |
+| `…/client/styles`                    | Tailwind-Basisstyles (optional, nur wenn separat benötigt)                                               | CSS-Import      |
 
 ## Installation
 
@@ -111,21 +109,14 @@ export default nextConfig;
 
 ### CSS einbinden
 
-Der einfachste Weg: Importiere alle SDK-Styles auf einmal im Root-Layout:
+Komponenten-CSS wird automatisch geladen — beim Import einer Client-Komponente wird das zugehörige Stylesheet vom Consumer-Bundler (webpack/turbopack) mit aufgelöst. Ein manueller CSS-Import ist in den meisten Fällen nicht nötig.
+
+Falls die Tailwind-Basisstyles (Resets, Utilities) separat benötigt werden:
 
 ```typescript
 // app/layout.tsx
 import '@5minds/processcube_app_sdk/client/styles';
 ```
-
-Alternativ können einzelne Komponenten-Stylesheets importiert werden:
-
-```typescript
-import '@5minds/processcube_app_sdk/client/components/ProcessInstanceInspector/ProcessInstanceInspector.css';
-import '@5minds/processcube_app_sdk/client/components/BPMNViewer.css';
-```
-
-> **Hinweis:** Die `DynamicUi`-Komponente importiert ihr CSS automatisch. Ein separater CSS-Import ist dafür nicht nötig.
 
 ### Umgebungsvariablen
 
@@ -726,16 +717,18 @@ Alle Client-Komponenten werden aus `@5minds/processcube_app_sdk/client` importie
 
 ### Übersicht
 
-| Komponente                   | Beschreibung                                            | CSS erforderlich |
-| ---------------------------- | ------------------------------------------------------- | ---------------- |
-| **BPMNViewer**               | BPMN-Diagramm-Rendering mit Overlays und Markern        | Ja               |
-| **ProcessInstanceInspector** | Interaktive Prozessinstanz-Ansicht mit Token-Inspektion | Ja               |
-| **DynamicUi**                | Dynamischer Formular-Builder aus UserTask-Schemas       | Ja               |
-| **ProcessModelInspector**    | Prozessmodell mit Heatmap-Visualisierung                | Ja               |
-| **DocumentationViewer**      | Markdown-Dokumentation mit Syntax-Highlighting          | Ja               |
-| **SplitterLayout**           | Größenveränderbares Panel-Layout                        | Ja               |
-| **DropdownMenu**             | Dropdown-Menü (Headless UI)                             | Ja               |
-| **RemoteUserTask**           | iFrame-basierte Remote User Task (Common)               | Nein             |
+| Komponente                   | Beschreibung                                            |
+| ---------------------------- | ------------------------------------------------------- |
+| **BPMNViewer**               | BPMN-Diagramm-Rendering mit Overlays und Markern        |
+| **ProcessInstanceInspector** | Interaktive Prozessinstanz-Ansicht mit Token-Inspektion |
+| **DynamicUi**                | Dynamischer Formular-Builder aus UserTask-Schemas       |
+| **ProcessModelInspector**    | Prozessmodell mit Heatmap-Visualisierung                |
+| **DocumentationViewer**      | Markdown-Dokumentation mit Syntax-Highlighting          |
+| **SplitterLayout**           | Größenveränderbares Panel-Layout                        |
+| **DropdownMenu**             | Dropdown-Menü (Headless UI)                             |
+| **RemoteUserTask**           | iFrame-basierte Remote User Task (Common)               |
+
+> **CSS:** Alle Komponenten laden ihr Stylesheet automatisch. Ein manueller CSS-Import ist nicht nötig.
 
 ### BPMNViewer
 
@@ -745,7 +738,6 @@ Rendert BPMN-Diagramme und bietet eine Ref-API für Overlays, Marker und Heatmap
 'use client';
 
 import { BPMNViewerNextJS, BPMNViewerFunctions } from '@5minds/processcube_app_sdk/client';
-import '@5minds/processcube_app_sdk/client/components/BPMNViewer.css';
 import { useRef } from 'react';
 
 export default function DiagramPage({ xml }: { xml: string }) {
@@ -793,8 +785,6 @@ Interaktive Ansicht einer Prozessinstanz mit BPMN-Diagramm, Token-Inspektion, Re
 'use client';
 
 import { ProcessInstanceInspectorNextJS } from '@5minds/processcube_app_sdk/client';
-import '@5minds/processcube_app_sdk/client/components/ProcessInstanceInspector/ProcessInstanceInspector.css';
-import '@5minds/processcube_app_sdk/client/components/BPMNViewer.css';
 
 export default function InspectorPage({ processInstanceId }: { processInstanceId: string }) {
   return (
@@ -832,8 +822,6 @@ export default function InspectorPage({ processInstanceId }: { processInstanceId
 ### DynamicUi
 
 Rendert dynamische Formulare basierend auf UserTask-FormField-Definitionen. Unterstützt 25+ Feldtypen und Custom Fields.
-
-Die Komponente importiert ihr CSS automatisch — ein separater CSS-Import ist nicht nötig.
 
 ```typescript
 'use client';
@@ -901,7 +889,6 @@ Rendert Markdown-Dokumentation.
 
 ```typescript
 import { DocumentationViewer } from '@5minds/processcube_app_sdk/client';
-import '@5minds/processcube_app_sdk/client/components/DocumentationViewer.css';
 
 <DocumentationViewer documentation="# Titel\n\nBeschreibung..." />
 ```
@@ -916,7 +903,6 @@ Größenveränderbares Zwei-Panel-Layout.
 
 ```typescript
 import { SplitterLayout } from '@5minds/processcube_app_sdk/client';
-import '@5minds/processcube_app_sdk/client/components/SplitterLayout.css';
 
 <SplitterLayout vertical={false} primaryIndex={0} secondaryMinSize={200}>
   <div>Linkes Panel</div>
@@ -943,7 +929,6 @@ Dropdown-Menü basierend auf Headless UI.
 
 ```typescript
 import { DropdownMenu, DropdownMenuItem } from '@5minds/processcube_app_sdk/client';
-import '@5minds/processcube_app_sdk/client/components/DropdownMenu.css';
 
 <DropdownMenu>
   <DropdownMenuItem title="Bearbeiten" onClick={() => {}} />

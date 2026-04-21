@@ -1,6 +1,7 @@
 import * as esbuild from 'esbuild';
 import fs from 'fs';
 import { createRequire } from 'module';
+import path from 'path';
 
 const require = createRequire(import.meta.url);
 
@@ -144,6 +145,37 @@ const fixEsmImports = {
   },
 };
 
+/**
+ * Preserves CSS imports in the JS output as external imports.
+ *
+ * By default esbuild extracts CSS into a separate file and removes the import
+ * from the JS bundle.  This plugin marks CSS imports as external so they stay
+ * in the output as `import "./components/Foo/Foo.css"`.  The consuming bundler
+ * (webpack / turbopack in Next.js) will then resolve and include them.
+ *
+ * @param {string} sourceBase  Source root directory of the entry (e.g. "src/client")
+ */
+function getKeepCssImports(sourceBase) {
+  const resolvedSourceBase = path.resolve(sourceBase);
+
+  return {
+    name: 'keepCssImports',
+    setup(build) {
+      build.onResolve({ filter: /\.css$/ }, (args) => {
+        const importerDir = path.dirname(args.importer);
+        const cssSourcePath = path.resolve(importerDir, args.path);
+        const relativeToBase = path.relative(resolvedSourceBase, cssSourcePath);
+
+        return {
+          path: './' + relativeToBase,
+          external: true,
+          sideEffects: true,
+        };
+      });
+    },
+  };
+}
+
 function getMarkCommonAsExternal(pathToCommon) {
   return {
     name: 'markCommonAsExternal',
@@ -200,7 +232,7 @@ const esmoduleBuildPromises = [
     ...ESMODULE_CONFIG,
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
-    plugins: [getMarkCommonAsExternal(commonOutputFile), fixEsmImports],
+    plugins: [getKeepCssImports('src/client'), getMarkCommonAsExternal(commonOutputFile), fixEsmImports],
     external: externalPackages,
     splitting: true,
   }),
@@ -246,7 +278,7 @@ const commonBuildPromises = [
     ...COMMONJS_CONFIG,
     entryPoints: ['src/client/index.ts'],
     outdir: 'build/client',
-    plugins: [getMarkCommonAsExternal(commonOutputFile)],
+    plugins: [getKeepCssImports('src/client'), getMarkCommonAsExternal(commonOutputFile)],
   }),
 ];
 
