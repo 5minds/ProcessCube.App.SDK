@@ -2,6 +2,33 @@
 
 ---
 
+## ✅ Stable v8.6.3 (22.06.2026)
+
+_Commits seit v8.6.2 — Security-Audit und Dependency-Updates._
+
+### Sicherheit / Dependencies
+
+- `npm audit fix` angewendet — von 16 auf 6 Schwachstellen reduziert, alle `high`/`critical` eliminiert. Nur `package-lock.json` geändert (alle Bumps innerhalb der bestehenden Semver-Ranges, keine `package.json`-Änderung):
+  - `lodash` 4.17.23 → 4.18.1
+  - `dompurify` 3.3.3 → 3.4.11
+  - `ws` 8.x → 8.21.0
+  - `immutable` 5.1.4 → 5.1.6
+  - `minimatch` 9.0.5 → 9.0.9
+  - `picomatch` 2.3.1 → 2.3.2
+  - `shell-quote` 1.8.3 → 1.8.4
+  - `brace-expansion` 2.0.2 → 2.1.1
+- Verbleibend (bewusst offen, nicht Consumer-relevant bzw. nur via Breaking lösbar): `dompurify` in `monaco-editor`, `postcss` in `next`, `uuid` in `next-auth`.
+
+### Neue Dateien
+
+- `todos/security-audit-rsc/todo.md` — Plan für RSC-RCE (CVE-2025-55182) und peerDependency-Verschärfung (`9411d1b`)
+
+### Geänderte Dateien
+
+- `package-lock.json` — Dependency-Security-Updates
+
+---
+
 ## ✅ Stable v8.3.0 (03.04.2026)
 
 _Enthält alle Änderungen seit v8.2.3 — Dokumentation, Engine Client/SDK Update, Dependency-Updates._

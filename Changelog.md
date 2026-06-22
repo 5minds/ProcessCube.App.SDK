@@ -2,6 +2,21 @@
 
 ---
 
+## [8.6.3] - 2026-06-22
+
+_Patch — Security-Updates für Abhängigkeiten. Alle `high`- und `critical`-Schwachstellen behoben._
+
+### Sicherheit
+
+- **Abhängigkeiten aktualisiert (`npm audit fix`)** — Behebt 10 Schwachstellen (u. a. 7×`high`, 2×`critical`) ohne Breaking Changes. Betroffen sind nur transitive bzw. interne Abhängigkeiten; die öffentliche SDK-API bleibt unverändert.
+  - `lodash` (Code Injection, Prototype Pollution)
+  - `dompurify` via `isomorphic-dompurify` (XSS)
+  - `ws` via Engine-Client (Memory-Disclosure / DoS)
+  - sowie `immutable`, `minimatch`, `picomatch`, `shell-quote`, `brace-expansion` (Build-/Dev-Abhängigkeiten)
+- **Verbleibende Hinweise** — Drei `moderate`-Findings bleiben bewusst offen, da sie nur über Breaking Changes oder fremde Bundles lösbar und nicht Consumer-relevant sind: `dompurify` (in `monaco-editor` gebündelt), `postcss` (in `next`, peerDependency) und `uuid` (in `next-auth`, peerDependency).
+
+---
+
 ## [8.6.2] - 2026-04-21
 
 _Patch — Fehlende Changelog-Einträge für v8.5.0–v8.6.1 nachgetragen, Dokumentation aktualisiert (CSS Auto-Import)._
