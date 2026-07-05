@@ -383,6 +383,92 @@ export default async function (payload: any) {
 }
 ```
 
+### Fehlerbehebung bei der Authentifizierung (Troubleshooting)
+
+Bei der User-Identity (NextAuth) kann es vorkommen, dass ein Benutzer zwar eingeloggt ist, der Access Token beim Zugriff auf die Engine oder die Authority aber nicht mehr funktioniert. Typische Log-Meldungen der Anwendung sind dann:
+
+```
+No access token found for authenticated user { "userId": "..." }
+Failed to get access token via API, falling back to cookies { "userId": "...", "error": "Account not found" }
+```
+
+Ursache ist fast immer, dass der **Refresh des Access Tokens fehlgeschlagen** ist: Die NextAuth-Session existiert noch (der Benutzer gilt als eingeloggt), der hinterlegte Access Token ist aber abgelaufen und konnte nicht erneuert werden. `authConfigJwtCallback` setzt in diesem Fall `token.error = 'RefreshAccessTokenError'`, behält aber den bestehenden (abgelaufenen) Token bei. Über `authConfigSessionCallback` landet der Fehler als `session.error` in der Session — die Anwendung „glaubt" weiterhin an eine gültige Anmeldung.
+
+#### Fehlerzustand erkennen
+
+Client (React):
+
+```typescript
+import { useSession } from 'next-auth/react';
+
+const { data: session } = useSession();
+if (session?.error === 'RefreshAccessTokenError') {
+  // Session ist kaputt — Benutzer neu anmelden lassen
+}
+```
+
+Server: `getIdentity()` wirft in diesem Fall einen Fehler (`RefreshAccessTokenError` bzw. `AccessToken or Sub could not be determined!`). Fange ihn ab und leite den Benutzer zum erneuten Login.
+
+#### Manuell von der Authority abmelden und neu anmelden
+
+Um einen frischen Access Token zu erhalten, muss die kaputte Session verworfen und der Benutzer neu angemeldet werden. Dabei sind zwei Ebenen zu unterscheiden:
+
+1. **Lokale NextAuth-Session beenden** — entfernt das Session-Cookie der Anwendung:
+
+   ```typescript
+   import { signOut } from 'next-auth/react';
+
+   // In einer Client-Komponente
+   await signOut({ callbackUrl: '/' });
+   ```
+
+   Serverseitig kann alternativ das Session-Cookie in einem Route Handler bzw. einer Server Action gelöscht oder der NextAuth-Signout-Endpunkt `POST /api/auth/signout` aufgerufen werden.
+
+2. **SSO-Session der Authority beenden** — `signOut()` löscht nur das lokale Cookie. Die Anmelde-Session bei der Authority (Single Sign-On) bleibt bestehen, sodass ein erneuter Login die alte Sitzung stillschweigend wiederherstellen kann. Um sich vollständig abzumelden, wird der OIDC-Endpunkt **`end_session_endpoint`** der Authority aufgerufen (RP-Initiated Logout). Die genaue URL steht im Discovery-Dokument `${PROCESSCUBE_AUTHORITY_URL}/.well-known/openid-configuration`:
+
+   ```typescript
+   // Nach dem lokalen signOut zur Authority umleiten, um die SSO-Session zu beenden
+   const discovery = await (await fetch(`${authorityUrl}/.well-known/openid-configuration`)).json();
+   const url = new URL(discovery.end_session_endpoint);
+   url.searchParams.set('post_logout_redirect_uri', appUrl);
+   if (idToken) url.searchParams.set('id_token_hint', idToken); // empfohlen
+   window.location.href = url.toString();
+   ```
+
+   Nach dem Logout an der Authority führt ein erneuter Login zu einer frischen Anmeldung mit neuem Access und Refresh Token.
+
+Ein bewährtes Muster ist, den Fehlerzustand automatisch abzufangen und den Benutzer neu anzumelden:
+
+```typescript
+'use client';
+import { useEffect } from 'react';
+import { signOut, useSession } from 'next-auth/react';
+
+export function AuthErrorBoundary() {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') {
+      signOut({ callbackUrl: '/' }); // erzwingt einen neuen Login
+    }
+  }, [session?.error]);
+
+  return null;
+}
+```
+
+#### Bekannte Fehlerquellen im Umgang mit der Authority
+
+| Symptom / Log                                                 | Ursache                                                                                                                                                                                       | Behebung                                                                                                                                                                                              |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `No refresh token present` (Warnung)                          | Die Authority liefert keinen Refresh Token — meist fehlt der Scope `offline_access` in der NextAuth-Provider-Konfiguration, oder der Client ist nicht für den Refresh-Grant freigeschaltet.    | Scope `offline_access` anfordern und den Client in der Authority für `refresh_token` konfigurieren. Siehe [Authentication with NextAuth](https://processcube.io/docs/app-sdk/samples/authority/authentication-with-nextauth). |
+| `RefreshAccessTokenError` / `Account not found` beim Refresh  | Der Refresh Token ist abgelaufen oder wurde serverseitig invalidiert (z. B. Benutzer/Client in der Authority gelöscht oder Session widerrufen). Der Refresh-Grant schlägt fehl, die alte Session bleibt aber bestehen. | Benutzer neu anmelden (siehe oben). Prüfen, ob Benutzer/Client in der Authority noch existieren.                                                                                                       |
+| Token wird nie erneuert                                       | Eine der Umgebungsvariablen `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID`, `NEXTAUTH_SECRET` fehlt (der Callback loggt eine entsprechende Warnung).                                        | Alle drei Variablen in der Server-Umgebung setzen.                                                                                                                                                    |
+| `falling back to cookies` / wiederholter Refresh in RSCs      | `getIdentity()` kann das erneuerte Cookie in einer React Server Component nicht schreiben (Cookies sind nur in Route Handlern oder Server Actions setzbar). Der Token wird dann nur aus der Response gelesen und nicht persistiert. | Token-Refresh in einem Route Handler / einer Server Action bzw. über die Middleware anstoßen, sodass das Cookie gesetzt werden kann.                                                                   |
+| Sporadische Abläufe direkt nach dem Login                     | Uhrzeit-Differenz (Clock Skew) zwischen Anwendung und Authority führt zu verfrühtem Token-Ablauf.                                                                                              | Systemuhren synchronisieren (NTP).                                                                                                                                                                    |
+
+> **Direkter Support:** Lässt sich das Problem damit nicht eingrenzen, wende dich an das 5Minds/ProcessCube-Team für einen gemeinsamen Blick über den Code. Halte dafür die Log-Ausgaben (inkl. `userId`), die Authority-URL und die verwendete SDK-Version bereit.
+
 ## Konfiguration
 
 ### withApplicationSdk Plugin
