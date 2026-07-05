@@ -383,6 +383,94 @@ export default async function (payload: any) {
 }
 ```
 
+### Manuelles Abmelden und Session zurücksetzen
+
+Bei der Authentifizierung existieren **zwei getrennte Sessions**:
+
+| Ebene                     | Wo gespeichert                            | Zweck                                                     |
+| ------------------------- | ----------------------------------------- | -------------------------------------------------------- |
+| **NextAuth-Session**      | Verschlüsseltes Cookie im Browser         | Hält Access Token, ID Token und Refresh Token (JWT)      |
+| **Authority-Session**     | Bei der ProcessCube Authority             | Ausstellende Sitzung, gegen die Tokens erneuert werden   |
+
+Ein häufiges Fehlerbild ist, dass ein Benutzer **eingeloggt erscheint** (die NextAuth-Session besteht noch), der Access Token aber nicht mehr genutzt werden kann — z. B. weil der zugehörige Authority-Account gelöscht/neu angelegt wurde oder die Authority-Session abgelaufen ist. In diesem Fall schlägt die Token-Erneuerung fehl (`session.error === 'RefreshAccessTokenError'`, siehe [Troubleshooting](#bekannte-fehlerquellen-bei-der-authority-troubleshooting)) und die Lösung ist ein **vollständiges Abmelden mit anschließender Neuanmeldung**, um einen frischen Token zu erhalten.
+
+#### 1. NextAuth-Session löschen (Standardfall)
+
+`signOut()` aus NextAuth entfernt das Session-Cookie im Browser. Danach fordert die App bei der nächsten geschützten Aktion eine Neuanmeldung an, bei der ein frischer Access Token ausgestellt wird:
+
+```tsx
+'use client';
+
+import { signOut } from 'next-auth/react';
+
+export function LogoutButton() {
+  // callbackUrl bestimmt, wohin nach dem Abmelden umgeleitet wird
+  return <button onClick={() => signOut({ callbackUrl: '/' })}>Abmelden</button>;
+}
+```
+
+> **Hinweis:** `signOut()` löscht nur die **lokale** NextAuth-Session. Die Sitzung bei der Authority bleibt bestehen, sodass eine erneute Anmeldung u. U. ohne erneute Passworteingabe erfolgt (Single Sign-On).
+
+#### 2. Zusätzlich bei der Authority abmelden (Federated Logout)
+
+Um auch die Sitzung bei der Authority zu beenden, wird nach dem lokalen Abmelden auf den `end_session_endpoint` der Authority umgeleitet. Die konkrete URL steht im OIDC-Discovery-Dokument der Authority (`${PROCESSCUBE_AUTHORITY_URL}/.well-known/openid-configuration`):
+
+```tsx
+'use client';
+
+import { signOut } from 'next-auth/react';
+
+async function logoutEverywhere(idToken: string) {
+  // 1. Lokale NextAuth-Session löschen (kein Redirect, wir leiten selbst um)
+  await signOut({ redirect: false });
+
+  // 2. end_session_endpoint aus dem Discovery-Dokument holen
+  const discovery = await fetch(`${process.env.NEXT_PUBLIC_PROCESSCUBE_AUTHORITY_URL}/.well-known/openid-configuration`).then((r) => r.json());
+
+  // 3. Zur Authority umleiten, um auch dort abzumelden
+  const url = new URL(discovery.end_session_endpoint);
+  url.searchParams.set('id_token_hint', idToken);
+  url.searchParams.set('post_logout_redirect_uri', window.location.origin);
+  window.location.href = url.toString();
+}
+```
+
+Der `id_token_hint` ist das ID Token aus der Session (z. B. über einen `session`-Callback verfügbar gemacht). `post_logout_redirect_uri` muss bei der Authority als erlaubte Redirect-URI konfiguriert sein.
+
+### Bekannte Fehlerquellen bei der Authority (Troubleshooting)
+
+| Log-/Fehlermeldung                                                        | Wahrscheinliche Ursache                                                                                                                  | Lösung                                                                                                                                              |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `No access token found for authenticated user`<br>`Account not found`     | Die NextAuth-Session besteht noch, der zugehörige Authority-Account existiert aber nicht mehr (gelöscht/neu angelegt) oder die Authority-Session ist abgelaufen. Die Token-Erneuerung schlägt fehl. | Vollständig **abmelden und neu anmelden** (siehe [Manuelles Abmelden](#manuelles-abmelden-und-session-zurücksetzen)). Dabei wird ein frischer Token ausgestellt. |
+| `session.error === 'RefreshAccessTokenError'`                             | Die automatische Token-Erneuerung im `authConfigJwtCallback` ist fehlgeschlagen (abgelaufene/ungültige Session, fehlender Refresh Token). | Fehler in der App auswerten und den Benutzer zur Neuanmeldung auffordern (siehe Snippet unten).                                                    |
+| `No refresh token present. Your authority might be configured incorrectly.` | Die Authority stellt keinen Refresh Token aus — meist fehlt der `offline_access`-Scope oder `prompt=consent` in der NextAuth-Provider-Konfiguration. | Provider so konfigurieren, dass ein Refresh Token angefordert wird. Siehe [Authentication mit NextAuth](https://processcube.io/docs/app-sdk/samples/authority/authentication-with-nextauth). |
+| Warnung: `PROCESSCUBE_AUTHORITY_URL, NEXTAUTH_CLIENT_ID and NEXTAUTH_SECRET must be set` | Für die automatische Token-Erneuerung notwendige Umgebungsvariablen fehlen.                                                              | `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID` und `NEXTAUTH_SECRET` setzen (siehe [Umgebungsvariablen](#umgebungsvariablen)).                    |
+| `AccessToken or Sub could not be determined!` aus `getIdentity()`         | Es existiert keine gültige Benutzer-Session (nicht eingeloggt oder Session ungültig).                                                    | Sicherstellen, dass der Aufruf im Kontext eines eingeloggten Benutzers erfolgt; ggf. Neuanmeldung.                                                 |
+
+#### Erneuerungsfehler in der App erkennen
+
+Da `authConfigSessionCallback` einen aufgetretenen Erneuerungsfehler nach `session.error` durchreicht, kann die App gezielt auf abgelaufene Sessions reagieren und den Benutzer zur Neuanmeldung führen:
+
+```tsx
+'use client';
+
+import { useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+
+export function SessionGuard() {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') {
+      // Token konnte nicht erneuert werden → Neuanmeldung erzwingen
+      signIn();
+    }
+  }, [session]);
+
+  return null;
+}
+```
+
 ## Konfiguration
 
 ### withApplicationSdk Plugin
