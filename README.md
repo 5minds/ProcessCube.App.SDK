@@ -383,6 +383,70 @@ export default async function (payload: any) {
 }
 ```
 
+### Troubleshooting: Authority & Access Token
+
+Sporadische Auth-Probleme äußern sich meist so: Der Benutzer kann sich **einloggen**, bekommt aber beim **Nutzen des Access Tokens** einen Fehler. Typische Log-Zeilen der Consumer-App:
+
+```
+No access token found for authenticated user { "userId": "…" }
+Failed to get access token via API, falling back to cookies { "userId": "…", "error": "Account not found" }
+```
+
+#### Ursache
+
+Der Access Token wird bei Ablauf automatisch über den Refresh-Flow erneuert (`authConfigJwtCallback`). Schlägt diese Erneuerung fehl, bleibt die **NextAuth-Session-Cookie gültig** — der Benutzer gilt weiterhin als eingeloggt, besitzt aber keinen brauchbaren Access Token mehr. Das SDK setzt in diesem Fall `token.error = 'RefreshAccessTokenError'`, das über `authConfigSessionCallback` als **`session.error`** verfügbar ist.
+
+#### Bekannte Fehlerquellen
+
+| Symptom / Log | Ursache | Abhilfe |
+| --- | --- | --- |
+| `No refresh token present` (Warnung) | Der Authority-Client ist nicht für Refresh Tokens (`offline_access`) konfiguriert. Ohne Refresh Token kann der Access Token nicht erneuert werden. | Am Authority-Client Refresh Tokens / `offline_access` aktivieren. |
+| `RefreshAccessTokenError` | Der Refresh Token ist abgelaufen oder wurde rotiert (Refresh Tokens werden bei jeder Erneuerung rotiert) und ist nicht mehr gültig. | Neu anmelden (siehe unten). |
+| `Account not found` beim Refresh | Das Benutzerkonto an der Authority wurde gelöscht bzw. neu angelegt, während die NextAuth-Session bestehen blieb — der alte Refresh Token zeigt auf ein nicht mehr existierendes Konto. | Session verwerfen und neu anmelden (siehe unten). |
+| Token wird nie erneuert | `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID` oder `NEXTAUTH_SECRET` fehlen. | Alle drei Umgebungsvariablen setzen. |
+| Token gilt sofort als abgelaufen | Uhrzeit-Abweichung (Clock-Skew) zwischen App-Host und Authority. | Systemzeiten per NTP synchronisieren. |
+
+#### Kaputten Zustand erkennen
+
+Prüfe in der App, ob die Session einen Refresh-Fehler trägt, und leite dann eine Neuanmeldung ein:
+
+```typescript
+import { getServerSession } from 'next-auth';
+
+const session = await getServerSession(authOptions);
+if (session?.error === 'RefreshAccessTokenError') {
+  // Access Token konnte nicht erneuert werden → Neuanmeldung erforderlich
+}
+```
+
+#### Manuell von der Authority abmelden
+
+**1. Lokale Abmeldung (NextAuth-Session verwerfen)**
+
+`signOut()` löscht die NextAuth-Session-Cookie. Bei der nächsten Anmeldung wird ein neuer Access- und Refresh Token ausgestellt:
+
+```typescript
+import { signOut } from 'next-auth/react';
+
+await signOut({ callbackUrl: '/' });
+```
+
+**2. Vollständige (federated) Abmeldung an der Authority**
+
+Besteht an der Authority noch eine SSO-Session, kann die nächste Anmeldung diese stillschweigend wiederverwenden — der problematische Zustand bliebe bestehen. Um wirklich frisch zu starten, muss zusätzlich die Session an der Authority beendet werden. Das Ziel-Endpoint (`end_session_endpoint`) steht im OIDC-Discovery-Dokument:
+
+```
+${PROCESSCUBE_AUTHORITY_URL}/.well-known/openid-configuration
+```
+
+Der Browser wird nach dem `signOut()` an dieses Endpoint umgeleitet — mit dem ID Token als `id_token_hint` und einer `post_logout_redirect_uri`:
+
+```
+${end_session_endpoint}?id_token_hint=<ID_TOKEN>&post_logout_redirect_uri=<APP_URL>
+```
+
+Das SDK legt den ID Token im JWT ab (`token.idToken`); um ihn client-seitig für `id_token_hint` verfügbar zu machen, kann er im Session-Callback durchgereicht werden. Danach ist die nächste Anmeldung eine vollständige, interaktive Authentifizierung mit frischem Token-Paar.
+
 ## Konfiguration
 
 ### withApplicationSdk Plugin
