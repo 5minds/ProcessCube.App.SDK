@@ -398,13 +398,13 @@ Der Access Token wird bei Ablauf automatisch über den Refresh-Flow erneuert (`a
 
 #### Bekannte Fehlerquellen
 
-| Symptom / Log | Ursache | Abhilfe |
-| --- | --- | --- |
-| `No refresh token present` (Warnung) | Der Authority-Client ist nicht für Refresh Tokens (`offline_access`) konfiguriert. Ohne Refresh Token kann der Access Token nicht erneuert werden. | Am Authority-Client Refresh Tokens / `offline_access` aktivieren. |
-| `RefreshAccessTokenError` | Der Refresh Token ist abgelaufen oder wurde rotiert (Refresh Tokens werden bei jeder Erneuerung rotiert) und ist nicht mehr gültig. | Neu anmelden (siehe unten). |
-| `Account not found` beim Refresh | Das Benutzerkonto an der Authority wurde gelöscht bzw. neu angelegt, während die NextAuth-Session bestehen blieb — der alte Refresh Token zeigt auf ein nicht mehr existierendes Konto. | Session verwerfen und neu anmelden (siehe unten). |
-| Token wird nie erneuert | `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID` oder `NEXTAUTH_SECRET` fehlen. | Alle drei Umgebungsvariablen setzen. |
-| Token gilt sofort als abgelaufen | Uhrzeit-Abweichung (Clock-Skew) zwischen App-Host und Authority. | Systemzeiten per NTP synchronisieren. |
+| Symptom / Log                        | Ursache                                                                                                                                                                                 | Abhilfe                                                           |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `No refresh token present` (Warnung) | Der Authority-Client ist nicht für Refresh Tokens (`offline_access`) konfiguriert. Ohne Refresh Token kann der Access Token nicht erneuert werden.                                      | Am Authority-Client Refresh Tokens / `offline_access` aktivieren. |
+| `RefreshAccessTokenError`            | Der Refresh Token ist abgelaufen oder wurde rotiert (Refresh Tokens werden bei jeder Erneuerung rotiert) und ist nicht mehr gültig.                                                     | Neu anmelden (siehe unten).                                       |
+| `Account not found` beim Refresh     | Das Benutzerkonto an der Authority wurde gelöscht bzw. neu angelegt, während die NextAuth-Session bestehen blieb — der alte Refresh Token zeigt auf ein nicht mehr existierendes Konto. | Session verwerfen und neu anmelden (siehe unten).                 |
+| Token wird nie erneuert              | `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID` oder `NEXTAUTH_SECRET` fehlen.                                                                                                        | Alle drei Umgebungsvariablen setzen.                              |
+| Token gilt sofort als abgelaufen     | Uhrzeit-Abweichung (Clock-Skew) zwischen App-Host und Authority.                                                                                                                        | Systemzeiten per NTP synchronisieren.                             |
 
 #### Kaputten Zustand erkennen
 
