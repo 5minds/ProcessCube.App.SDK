@@ -412,12 +412,12 @@ hilft nur eine **saubere Neuanmeldung**, damit ein frischer Token ausgestellt wi
 
 #### Bekannte Fehlerquellen
 
-| Symptom / Log                                                   | Mögliche Ursache                                                                                     | Abhilfe                                                                                       |
-| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `No refresh token present` (Warnung im Server-Log)              | Der Authority-Client ist ohne `offline_access` bzw. ohne `prompt=consent` konfiguriert.              | Scope `offline_access` ergänzen, damit ein Refresh Token ausgestellt wird.                    |
-| `RefreshAccessTokenError`                                       | Refresh Token an der Authority abgelaufen oder widerrufen.                                            | Manuelle Neuanmeldung erzwingen (siehe unten).                                                |
-| `Account not found`                                             | Das Benutzerkonto wurde an der Authority gelöscht/neu angelegt, das alte Session-Cookie ist stale.   | Manuelle Neuanmeldung erzwingen; ggf. Konto an der Authority prüfen.                          |
-| Token wird nie erneuert                                         | `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID` oder `NEXTAUTH_SECRET` sind nicht gesetzt.          | Alle drei Umgebungsvariablen setzen (siehe [Umgebungsvariablen](#user-identity-nextauth)).    |
+| Symptom / Log                                      | Mögliche Ursache                                                                                   | Abhilfe                                                                                    |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `No refresh token present` (Warnung im Server-Log) | Der Authority-Client ist ohne `offline_access` bzw. ohne `prompt=consent` konfiguriert.            | Scope `offline_access` ergänzen, damit ein Refresh Token ausgestellt wird.                 |
+| `RefreshAccessTokenError`                          | Refresh Token an der Authority abgelaufen oder widerrufen.                                         | Manuelle Neuanmeldung erzwingen (siehe unten).                                             |
+| `Account not found`                                | Das Benutzerkonto wurde an der Authority gelöscht/neu angelegt, das alte Session-Cookie ist stale. | Manuelle Neuanmeldung erzwingen; ggf. Konto an der Authority prüfen.                       |
+| Token wird nie erneuert                            | `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID` oder `NEXTAUTH_SECRET` sind nicht gesetzt.       | Alle drei Umgebungsvariablen setzen (siehe [Umgebungsvariablen](#user-identity-nextauth)). |
 
 #### Fehlerzustand erkennen
 
