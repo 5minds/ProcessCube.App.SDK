@@ -383,6 +383,110 @@ export default async function (payload: any) {
 }
 ```
 
+### Fehlerbehebung & manuelle Abmeldung von der Authority
+
+Bei der Nutzung der User-Identity kann es vorkommen, dass ein Benutzer zwar eingeloggt
+erscheint, der Access Token aber nicht mehr verwendet werden kann. Typische Log-Meldungen
+auf Anwendungsseite sehen so aus:
+
+```text
+No access token found for authenticated user { "userId": "..." }
+Failed to get access token via API, falling back to cookies { "userId": "...", "error": "Account not found" }
+```
+
+#### Ursache
+
+Die NextAuth-Session (das verschlüsselte Session-Cookie) und der Access Token der Authority
+haben **unterschiedliche Lebenszyklen**:
+
+1. Beim Login werden `access_token`, `id_token` und `refresh_token` in das NextAuth-JWT
+   übernommen (`authConfigJwtCallback`).
+2. Läuft der Access Token ab, wird er automatisch per `refresh_token`-Grant erneuert.
+3. Schlägt diese Erneuerung fehl — z. B. weil der Refresh Token abgelaufen/widerrufen wurde
+   oder gar nicht vorhanden ist — wird lediglich `token.error = 'RefreshAccessTokenError'`
+   gesetzt. **Das NextAuth-Session-Cookie bleibt jedoch gültig.**
+
+Der Benutzer gilt damit weiterhin als angemeldet, obwohl kein nutzbarer Access Token mehr
+existiert. Jeder Zugriff auf die Engine oder Authority schlägt dann fehl. In diesem Zustand
+hilft nur eine **saubere Neuanmeldung**, damit ein frischer Token ausgestellt wird.
+
+#### Bekannte Fehlerquellen
+
+| Symptom / Log                                                   | Mögliche Ursache                                                                                     | Abhilfe                                                                                       |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `No refresh token present` (Warnung im Server-Log)              | Der Authority-Client ist ohne `offline_access` bzw. ohne `prompt=consent` konfiguriert.              | Scope `offline_access` ergänzen, damit ein Refresh Token ausgestellt wird.                    |
+| `RefreshAccessTokenError`                                       | Refresh Token an der Authority abgelaufen oder widerrufen.                                            | Manuelle Neuanmeldung erzwingen (siehe unten).                                                |
+| `Account not found`                                             | Das Benutzerkonto wurde an der Authority gelöscht/neu angelegt, das alte Session-Cookie ist stale.   | Manuelle Neuanmeldung erzwingen; ggf. Konto an der Authority prüfen.                          |
+| Token wird nie erneuert                                         | `PROCESSCUBE_AUTHORITY_URL`, `NEXTAUTH_CLIENT_ID` oder `NEXTAUTH_SECRET` sind nicht gesetzt.          | Alle drei Umgebungsvariablen setzen (siehe [Umgebungsvariablen](#user-identity-nextauth)).    |
+
+#### Fehlerzustand erkennen
+
+Der fehlgeschlagene Refresh wird über `session.error` an die Client-Session durchgereicht.
+So lässt sich clientseitig erkennen, dass eine Neuanmeldung nötig ist:
+
+```typescript
+'use client';
+
+import { useSession, signIn } from 'next-auth/react';
+import { useEffect } from 'react';
+
+export function ReauthGuard() {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') {
+      // Refresh ist fehlgeschlagen — Neuanmeldung anstoßen.
+      signIn();
+    }
+  }, [session?.error]);
+
+  return null;
+}
+```
+
+#### Manuelle Abmeldung von der Authority
+
+Um sich gezielt neu anzumelden und einen frischen Access Token zu erhalten, reicht ein
+`signOut()` von NextAuth allein häufig nicht aus: Es löscht nur das lokale Session-Cookie,
+die **Sitzung an der Authority bleibt bestehen**. Beim nächsten Login meldet die Authority
+den Benutzer dann ohne erneute Eingabe wieder an (Single Sign-On) — ggf. mit demselben
+problematischen Zustand.
+
+Für eine vollständige Abmeldung muss zusätzlich der `end_session_endpoint` der Authority
+(RP-Initiated Logout gemäß OpenID Connect) aufgerufen werden:
+
+```typescript
+'use client';
+
+import { signOut } from 'next-auth/react';
+
+/**
+ * Meldet den Benutzer sowohl bei NextAuth als auch bei der Authority ab
+ * und erzwingt beim nächsten Aufruf eine frische Anmeldung.
+ */
+export async function signOutFromAuthority() {
+  // 1. Lokale NextAuth-Session beenden (ohne automatischen Redirect).
+  await signOut({ redirect: false });
+
+  // 2. Authority-Sitzung über den OIDC end_session_endpoint beenden.
+  const authorityUrl = process.env.NEXT_PUBLIC_PROCESSCUBE_AUTHORITY_URL;
+  const params = new URLSearchParams({
+    post_logout_redirect_uri: window.location.origin,
+    // Optional: client_id, falls die Authority dies verlangt.
+  });
+
+  window.location.href = `${authorityUrl}/connect/endsession?${params.toString()}`;
+}
+```
+
+> **Hinweis:** Der genaue Pfad des `end_session_endpoint` steht im Discovery-Dokument der
+> Authority unter `<PROCESSCUBE_AUTHORITY_URL>/.well-known/openid-configuration`. Für die
+> Verwendung im Browser muss die Authority-URL als `NEXT_PUBLIC_`-Variable verfügbar sein.
+
+Alternativ — falls kein Zugriff auf den `end_session_endpoint` besteht — genügt zum
+Zurücksetzen des lokalen Zustands das Löschen der NextAuth-Cookies (`next-auth.session-token`
+bzw. `__Secure-next-auth.session-token`) im Browser und ein erneuter Login.
+
 ## Konfiguration
 
 ### withApplicationSdk Plugin
