@@ -27,6 +27,7 @@ Linux).
 **CVE-2026-75604 (RCE Windows) — relevant für die gepinnten Lockfiles.**
 Das SDK liefert Next.js nicht selbst aus (`next` ist peerDependency), aber die im
 Repo gepinnten Lockfiles lagen im verwundbaren Bereich:
+
 - Root `package-lock.json`: `next@16.2.9` → **verwundbar**
 - `test-app/package-lock.json`: `next@15.5.12` → **verwundbar**
 
@@ -38,11 +39,12 @@ Lockfile vorhanden. Kein Handlungsbedarf.
 
 - `peerDependencies.next`: `>=15` → `>=15.5.24 <16.0.0 || >=16.3.3`
   → schließt die verwundbaren Bereiche aus, behält Next-15-Support, kein harter
-    Breaking-Change auf `^16`.
+  Breaking-Change auf `^16`.
 - Root `package-lock.json`: `next 16.2.9` → **16.3.3**
 - `test-app`: `next ^15.3.0` → `^15.5.24`, Lock `15.5.12` → **15.5.24**
 
 **Verifiziert (Stand PR #431):**
+
 - Root aufgelöst: `next@16.3.3` ✓
 - `test-app` aufgelöst: `next@15.5.24` ✓
 - Keine `next`-Auflösung unterhalb der Patch-Version mehr in beiden Lockfiles.

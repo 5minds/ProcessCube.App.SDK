@@ -26,7 +26,7 @@ geschlossen. Für den Betrieb von ProcessCube-Apps ist vor allem relevant:
   ProcessCube App-SDK verwendet diese Optimierung **nicht**.
 
 **Was das App-SDK betrifft:**
-`next` ist im App-SDK eine *peerDependency* — die tatsächlich installierte Version
+`next` ist im App-SDK eine _peerDependency_ — die tatsächlich installierte Version
 bestimmt **Ihre** Anwendung, nicht das SDK. Wir haben im SDK die zulässigen
 Versionsbereiche so verschärft, dass verwundbare Next.js-Versionen ausgeschlossen
 sind (`next: ">=15.5.24 <16.0.0 || >=16.3.3"`) und die mitgelieferten
