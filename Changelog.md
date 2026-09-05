@@ -2,6 +2,32 @@
 
 ---
 
+## [8.7.0] - 2026-09-05
+
+_Minor — Sicherheitsupdate für Next.js (CVE-2026-75604) und neue Dokumentation zu Logout und Authority-Fehlern._
+
+### Sicherheit
+
+- **Next.js August-2026-Advisories** — Die verwundbaren Next.js-Versionen sind jetzt über die peerDependency ausgeschlossen: `next` verlangt `>=15.5.24 <16.0.0 || >=16.3.3` (vorher `>=15`).
+  - **CVE-2026-75604 (CVSS 9.0, Remote Code Execution)** betrifft Next.js-Apps **unter Windows**, die Pages- oder App-Router ohne Cache-Komponente einsetzen. Es gibt **keinen Workaround** — nur das Update hilft. Betroffen sind `next < 15.5.24` und `next < 16.3.3`.
+  - **AVIF-/libheif-Heap-Overflow (CVSS 9.8)** ist für das SDK **nicht anwendbar**: Es wird keine AVIF-Optimierung über `next/image` genutzt und `libheif` ist in keiner Abhängigkeit enthalten.
+  - Die im Repository gepinnten Next.js-Versionen wurden auf die gepatchten Stände gehoben (`16.3.3` bzw. `15.5.24` in der Beispiel-App).
+- **Was Betreiber tun müssen** — `next` ist eine peerDependency, die installierte Version bestimmt also die konsumierende Anwendung. Im eigenen Projekt aktualisieren:
+
+  ```bash
+  npm install next@15.5.24   # für die 15.5-Linie
+  # oder
+  npm install next@16.3.3    # für die 16.3-Linie
+  ```
+
+  Ein Update auf dieses SDK ohne passende Next.js-Version schlägt mit einem Peer-Dependency-Konflikt fehl — das ist beabsichtigt.
+
+### Dokumentation
+
+- **Logout und Authority-Fehler** — Die README beschreibt jetzt das Zwei-Ebenen-Sessionmodell (NextAuth-Session und Authority-Session), wie man sich vollständig abmeldet und neu anmeldet (`signOut` plus föderierter Logout) sowie eine Troubleshooting-Tabelle, die bekannte Authority-Fehlermeldungen (`No access token found`, `Account not found`) ihren Ursachen und Lösungen zuordnet. Ergänzt um den Hinweis, wie Anwendungen `RefreshAccessTokenError` erkennen und eine Neuanmeldung anstoßen können.
+
+---
+
 ## [8.6.3] - 2026-06-22
 
 _Patch — Security-Updates für Abhängigkeiten. Alle `high`- und `critical`-Schwachstellen behoben._

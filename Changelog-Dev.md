@@ -2,6 +2,33 @@
 
 ---
 
+## ✅ Stable v8.7.0 (05.09.2026)
+
+_Commits seit v8.6.3 — Next.js-Security-Advisories (August 2026) und Auth-Dokumentation._
+
+### Sicherheit / Dependencies
+
+- `fbb5be9` (PR #431) — Next.js auf gepatchte Versionen gepinnt (CVE-2026-75604):
+  - `package.json`: `peerDependencies.next` `>=15` → `>=15.5.24 <16.0.0 || >=16.3.3`
+  - Root `package-lock.json`: `next` 16.2.9 → 16.3.3
+  - `test-app/package.json`: `next` `^15.3.0` → `^15.5.24`, Lock 15.5.12 → 15.5.24
+  - Bewertung: CVE-2026-75604 (CVSS 9.0, RCE unter Windows, Pages-/App-Router ohne Cache-Komponente, kein Workaround) traf die gepinnten Lockfiles beider Projekte. Der AVIF-/libheif-Heap-Overflow (CVSS 9.8) ist nicht anwendbar — keine `next/image`-AVIF-Optimierung, `libheif` in keinem Lockfile.
+- `2a3446e` — Security-Vermerk und Kunden-Textbausteine unter `todos/security-nextjs-aug2026/` (`todo.md`, `kundenmail.md`, technische und nicht-technische Variante).
+
+**Auswirkung auf Consumer:** Die verschärfte Peer-Range ist eine spürbare Änderung — Installationen mit `next < 15.5.24` bzw. `16.0.0`–`16.3.2` laufen jetzt in einen Peer-Dependency-Konflikt. Deshalb Minor (8.7.0) statt Patch.
+
+### Dokumentation
+
+- `d466698` (PR #430) — README um 88 Zeilen Auth-Doku erweitert (Support-Ticket #987, Fehlerbild „No access token found" / „Account not found"): Zwei-Ebenen-Sessionmodell, vollständiger Logout via NextAuth-`signOut` plus föderiertem Authority-Logout, Troubleshooting-Tabelle Fehlermeldung → Ursache → Behebung, Erkennung von `RefreshAccessTokenError` für erneute Anmeldung.
+- `04d42e3` — `AGENTS.md` als Quelldatei angelegt, `CLAUDE.md` ist jetzt ein Symlink darauf (gemeinsame Agent-Instruktionen).
+
+### Sonstiges
+
+- `45283f0`, `51fe5b9` — Prettier-Formatierung durch CI.
+- `76a55d3`, `841628e` — Coding-Agent-Session-Marker.
+
+---
+
 ## ✅ Stable v8.6.3 (22.06.2026)
 
 _Commits seit v8.6.2 — Security-Audit und Dependency-Updates._
