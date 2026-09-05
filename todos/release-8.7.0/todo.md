@@ -14,8 +14,8 @@ und gehört nicht in einen Patch-Release.
 
 - [x] Changelog.md — Eintrag `[8.7.0]` (Anwendersicht)
 - [x] Changelog-Dev.md — Eintrag `Stable v8.7.0` (Commit-Ebene)
-- [ ] Release über den `release-process`-Skill fahren (Stable, Branch `main`)
-- [ ] Review-Abschnitt füllen
+- [x] Release über den `release-process`-Skill fahren (Stable, Branch `main`)
+- [x] Review-Abschnitt füllen
 
 ## Inhalt des Releases
 
@@ -38,4 +38,29 @@ und gehört nicht in einen Patch-Release.
 
 ## Review
 
-_Wird nach dem Release gefüllt._
+Release **v8.7.0** am 05.09.2026 gefahren (Commit `f559bec`, Tag `v8.7.0`, beides
+auf `origin/main` gepusht).
+
+Geändert im Release-Commit:
+
+- `Changelog.md` — Eintrag `[8.7.0]` aus Anwendersicht, inklusive der Upgrade-Anleitung
+  für Betreiber (`npm install next@15.5.24` bzw. `next@16.3.3`) und dem Hinweis, dass der
+  Peer-Konflikt bei alten Next.js-Versionen beabsichtigt ist.
+- `Changelog-Dev.md` — Eintrag `Stable v8.7.0` auf Commit-Ebene mit Hashes und
+  Datei-Änderungen.
+- `package.json` / `package-lock.json` — Version 8.6.3 → 8.7.0 (`npm version --no-git-tag-version`).
+
+Entscheidungen:
+
+- **Minor statt Patch**, weil die verschärfte `peerDependencies.next`-Range für Consumer
+  mit `next < 15.5.24` bzw. `16.0.0`–`16.3.2` ein Installations-Blocker ist. Ein Patch hätte
+  das verschleiert.
+- Der eigentliche Security-Fix lag seit `fbb5be9` (28.08.2026) auf `main`, war aber
+  weder getaggt noch im Changelog — die Lücke zwischen Merge und Release war der
+  Auslöser für dieses Release.
+- Die AVIF-/libheif-Lücke (CVSS 9.8) ist bewusst als „nicht anwendbar" dokumentiert
+  statt verschwiegen, damit Kunden die Bewertung nachvollziehen können.
+
+Offen: Kundenkommunikation über die Textbausteine in
+[`todos/security-nextjs-aug2026/kundenmail.md`](../security-nextjs-aug2026/kundenmail.md)
+ist noch nicht versendet.
